@@ -1,0 +1,81 @@
+﻿{
+   "CodeGenerationMode": 4,
+   "ContextClassName": "Processos_DJContext",
+   "ContextNamespace": null,
+   "FilterSchemas": false,
+   "IncludeConnectionString": false,
+   "ModelNamespace": null,
+   "OutputContextPath": null,
+   "OutputPath": "Entities",
+   "PreserveCasingWithRegex": true,
+   "ProjectRootNamespace": "Processos_Juridicos",
+   "Schemas": null,
+   "SelectedHandlebarsLanguage": 2,
+   "SelectedToBeGenerated": 0,
+   "T4TemplatePath": null,
+   "Tables": [
+      {
+         "Name": "[dbo].[Accident_types]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Files]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Harmed_or_casualties]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Infringements]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Process_types]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Processes]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Sentences]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[States]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Units]",
+         "ObjectType": 0
+      }
+   ],
+   "UiHint": null,
+   "UncountableWords": null,
+   "UseAsyncStoredProcedureCalls": true,
+   "UseBoolPropertiesWithoutDefaultSql": false,
+   "UseDatabaseNames": false,
+   "UseDatabaseNamesForRoutines": true,
+   "UseDateOnlyTimeOnly": true,
+   "UseDbContextSplitting": false,
+   "UseDecimalDataAnnotationForSprocResult": true,
+   "UseFluentApiOnly": true,
+   "UseHandleBars": false,
+   "UseHierarchyId": false,
+   "UseInflector": false,
+   "UseInternalAccessModifiersForSprocsAndFunctions": false,
+   "UseLegacyPluralizer": false,
+   "UseManyToManyEntity": false,
+   "UseNoDefaultConstructor": false,
+   "UseNoNavigations": false,
+   "UseNoObjectFilter": false,
+   "UseNodaTime": false,
+   "UseNullableReferences": false,
+   "UsePrefixNavigationNaming": false,
+   "UseSchemaFolders": false,
+   "UseSchemaNamespaces": false,
+   "UseSpatial": false,
+   "UseT4": false,
+   "UseT4Split": false
+}
