@@ -6,18 +6,18 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
-namespace Processos_Juridicos.Entities2;
+namespace Processos_Juridicos.DTOs;
 
-public partial class Sentences
+public partial class StatesDTO
 {
     [Key]
-    public int sentence_id { get; set; }
+    public int state_id { get; set; }
 
     [Required]
-    [StringLength(50)]
+    [StringLength(20)]
     [Unicode(false)]
-    public string sentence_name { get; set; }
+    public string state_name { get; set; }
 
-    [InverseProperty("sentence")]
-    public virtual ICollection<Processes> Processes { get; set; } = new List<Processes>();
+    [InverseProperty("state")]
+    public virtual ICollection<ProcessesDTO> Processes { get; set; } = new List<ProcessesDTO>();
 }

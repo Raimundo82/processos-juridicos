@@ -4,41 +4,41 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
-namespace Processos_Juridicos.Entities2;
+namespace Processos_Juridicos.DTOs;
 
-public partial class Processos_DJContext : DbContext
+public partial class Processos_DJContextDTO : DbContext
 {
-    public Processos_DJContext(DbContextOptions<Processos_DJContext> options)
+    public Processos_DJContextDTO(DbContextOptions<Processos_DJContextDTO> options)
         : base(options)
     {
     }
 
-    public virtual DbSet<Accident_types> Accident_types { get; set; }
+    public virtual DbSet<Accident_typesDTO> Accident_types { get; set; }
 
-    public virtual DbSet<Files> Files { get; set; }
+    public virtual DbSet<FilesDTO> Files { get; set; }
 
-    public virtual DbSet<Harmed_or_casualties> Harmed_or_casualties { get; set; }
+    public virtual DbSet<Harmed_or_casualtiesDTO> Harmed_or_casualties { get; set; }
 
-    public virtual DbSet<Infringements> Infringements { get; set; }
+    public virtual DbSet<InfringementsDTO> Infringements { get; set; }
 
-    public virtual DbSet<Process_types> Process_types { get; set; }
+    public virtual DbSet<Process_typesDTO> Process_types { get; set; }
 
-    public virtual DbSet<Processes> Processes { get; set; }
+    public virtual DbSet<ProcessesDTO> Processes { get; set; }
 
-    public virtual DbSet<Sentences> Sentences { get; set; }
+    public virtual DbSet<SentencesDTO> Sentences { get; set; }
 
-    public virtual DbSet<States> States { get; set; }
+    public virtual DbSet<StatesDTO> States { get; set; }
 
     public virtual DbSet<Units> Units { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Process_types>(entity =>
+        modelBuilder.Entity<Process_typesDTO>(entity =>
         {
             entity.HasKey(e => e.process_type_id).HasName("PK_Process_type");
         });
 
-        modelBuilder.Entity<Processes>(entity =>
+        modelBuilder.Entity<ProcessesDTO>(entity =>
         {
             entity.HasOne(d => d.harmed_or_casualties).WithMany(p => p.Processes).HasConstraintName("FK_Processes_Harmed_or_casualties");
 

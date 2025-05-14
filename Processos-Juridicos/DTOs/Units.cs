@@ -6,18 +6,18 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
-namespace Processos_Juridicos.Entities2;
+namespace Processos_Juridicos.DTOs;
 
-public partial class Infringements
+public partial class Units
 {
     [Key]
-    public int infringement_id { get; set; }
+    public int unit_id { get; set; }
 
     [Required]
     [StringLength(50)]
     [Unicode(false)]
-    public string infringement_name { get; set; }
+    public string unit_name { get; set; }
 
-    [InverseProperty("infringement")]
-    public virtual ICollection<Processes> Processes { get; set; } = new List<Processes>();
+    [InverseProperty("unit")]
+    public virtual ICollection<ProcessesDTO> Processes { get; set; } = new List<ProcessesDTO>();
 }

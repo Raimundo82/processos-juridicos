@@ -6,9 +6,9 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
-namespace Processos_Juridicos.Entities2;
+namespace Processos_Juridicos.DTOs;
 
-public partial class Processes
+public partial class ProcessesDTO
 {
     [Key]
     public int process_id { get; set; }
@@ -61,27 +61,27 @@ public partial class Processes
 
     [ForeignKey("harmed_or_casualties_id")]
     [InverseProperty("Processes")]
-    public virtual Harmed_or_casualties harmed_or_casualties { get; set; }
+    public virtual Harmed_or_casualtiesDTO harmed_or_casualties { get; set; }
 
     [ForeignKey("infringement_id")]
     [InverseProperty("Processes")]
-    public virtual Infringements infringement { get; set; }
+    public virtual InfringementsDTO infringement { get; set; }
 
     [ForeignKey("process_type_id")]
     [InverseProperty("Processes")]
-    public virtual Process_types process_type { get; set; }
+    public virtual Process_typesDTO process_type { get; set; }
 
     [ForeignKey("sentence_id")]
     [InverseProperty("Processes")]
-    public virtual Sentences sentence { get; set; }
+    public virtual SentencesDTO sentence { get; set; }
 
     [ForeignKey("service_accident_id")]
     [InverseProperty("Processes")]
-    public virtual Accident_types service_accident { get; set; }
+    public virtual Accident_typesDTO service_accident { get; set; }
 
     [ForeignKey("state_id")]
     [InverseProperty("Processes")]
-    public virtual States state { get; set; }
+    public virtual StatesDTO state { get; set; }
 
     [ForeignKey("unit_id")]
     [InverseProperty("Processes")]

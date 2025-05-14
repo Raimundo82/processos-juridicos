@@ -6,18 +6,18 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
-namespace Processos_Juridicos.Entities2;
+namespace Processos_Juridicos.DTOs;
 
-public partial class Accident_types
+public partial class Process_typesDTO
 {
     [Key]
-    public int accident_id { get; set; }
+    public int process_type_id { get; set; }
 
     [Required]
     [StringLength(50)]
     [Unicode(false)]
-    public string accident_type { get; set; }
+    public string process_name { get; set; }
 
-    [InverseProperty("service_accident")]
-    public virtual ICollection<Processes> Processes { get; set; } = new List<Processes>();
+    [InverseProperty("process_type")]
+    public virtual ICollection<ProcessesDTO> Processes { get; set; } = new List<ProcessesDTO>();
 }
