@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
-namespace Processos_Juridicos.Entities;
+namespace Processos_Juridicos.Entities2;
 
 public partial class Processes
 {
@@ -29,6 +29,8 @@ public partial class Processes
 
     public DateOnly? dispatch_date { get; set; }
 
+    [Required]
+    [Unicode(false)]
     public string description { get; set; }
 
     public DateOnly? deadline_date { get; set; }
@@ -57,32 +59,31 @@ public partial class Processes
 
     public int? infringement_id { get; set; }
 
-
     [ForeignKey("harmed_or_casualties_id")]
     [InverseProperty("Processes")]
-    public  Harmed_or_casualties harmed_or_casualties { get; set; }
+    public virtual Harmed_or_casualties harmed_or_casualties { get; set; }
 
     [ForeignKey("infringement_id")]
     [InverseProperty("Processes")]
-    public  Infringements infringement { get; set; }
+    public virtual Infringements infringement { get; set; }
 
     [ForeignKey("process_type_id")]
     [InverseProperty("Processes")]
-    public  Process_types process_type { get; set; }
+    public virtual Process_types process_type { get; set; }
 
     [ForeignKey("sentence_id")]
     [InverseProperty("Processes")]
-    public  Sentences sentence { get; set; }
+    public virtual Sentences sentence { get; set; }
 
     [ForeignKey("service_accident_id")]
     [InverseProperty("Processes")]
-    public  Accident_types service_accident { get; set; }
+    public virtual Accident_types service_accident { get; set; }
 
     [ForeignKey("state_id")]
     [InverseProperty("Processes")]
-    public  States state { get; set; }
+    public virtual States state { get; set; }
 
     [ForeignKey("unit_id")]
     [InverseProperty("Processes")]
-    public  Units unit { get; set; }
+    public virtual Units unit { get; set; }
 }

@@ -8,13 +8,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Processos_Juridicos.Entities;
 
-public partial class States
+public partial class Accident_types
 {
     [Key]
-    public int state_id { get; set; }
+    public int accident_id { get; set; }
 
-
-    public string state_name { get; set; }
+    public string accident_type { get; set; }
 
     public  ICollection<Processes> Processes { get; set; } = new List<Processes>();
 }

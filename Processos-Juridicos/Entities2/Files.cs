@@ -6,15 +6,20 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
-namespace Processos_Juridicos.Entities;
+namespace Processos_Juridicos.Entities2;
 
-public partial class States
+public partial class Files
 {
     [Key]
-    public int state_id { get; set; }
+    public int file_id { get; set; }
 
+    public string file_name { get; set; }
 
-    public string state_name { get; set; }
+    public string file_type { get; set; }
 
-    public  ICollection<Processes> Processes { get; set; } = new List<Processes>();
+    public byte[] file_content { get; set; }
+
+    public int process_id { get; set; }
+
+    public int row_guid { get; set; }
 }

@@ -6,15 +6,18 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
-namespace Processos_Juridicos.Entities;
+namespace Processos_Juridicos.Entities2;
 
 public partial class States
 {
     [Key]
     public int state_id { get; set; }
 
-
+    [Required]
+    [StringLength(20)]
+    [Unicode(false)]
     public string state_name { get; set; }
 
-    public  ICollection<Processes> Processes { get; set; } = new List<Processes>();
+    [InverseProperty("state")]
+    public virtual ICollection<Processes> Processes { get; set; } = new List<Processes>();
 }

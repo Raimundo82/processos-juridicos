@@ -2,20 +2,24 @@
 #nullable disable
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace Processos_Juridicos.Entities;
 
 public partial class Files
 {
-    public int FileId { get; set; }
+    [Key]
+    public int file_id { get; set; }
 
-    public string FileName { get; set; }
+    public string file_name { get; set; }
 
-    public string FileType { get; set; }
+    public string file_type { get; set; }
 
-    public byte[] FileContent { get; set; }
+    public byte[] file_content { get; set; }
 
-    public int ProcessId { get; set; }
+    public int process_id { get; set; }
 
-    public int RowGuid { get; set; }
+    public int row_guid { get; set; }
 }

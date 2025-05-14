@@ -2,14 +2,18 @@
 #nullable disable
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace Processos_Juridicos.Entities;
 
-public partial class ProcessTypes
+public partial class Process_types
 {
-    public int ProcessTypeId { get; set; }
+    [Key]
+    public int process_type_id { get; set; }
 
-    public string ProcessName { get; set; }
+    public string process_name { get; set; }
 
     public virtual ICollection<Processes> Processes { get; set; } = new List<Processes>();
 }

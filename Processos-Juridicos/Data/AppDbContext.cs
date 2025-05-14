@@ -5,25 +5,25 @@ namespace Processos_Juridicos.Data;
 
 public class AppDbContext : DbContext
 {
-    public AppDbContext(DbContextOptions<Processos_DJContext> options) : base(options)
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
     }
 
-    public virtual DbSet<AccidentTypes> AccidentTypes { get; set; }
+    public  DbSet<Accident_types> Accident_types { get; set; }
 
-    public virtual DbSet<Files> Files { get; set; }
+    public  DbSet<Files> Files { get; set; }
 
-    public virtual DbSet<HarmedOrCasualties> HarmedOrCasualties { get; set; }
+    public  DbSet<Harmed_or_casualties> Harmed_or_casualties { get; set; }
 
-    public virtual DbSet<Infringements> Infringements { get; set; }
+    public  DbSet<Infringements> Infringements { get; set; }
 
-    public virtual DbSet<ProcessTypes> ProcessTypes { get; set; }
+    public  DbSet<Process_types> Process_types { get; set; }
 
-    public virtual DbSet<Processes> Processes { get; set; }
+    public  DbSet<Processes> Processes { get; set; }
 
-    public virtual DbSet<Sentences> Sentences { get; set; }
+    public  DbSet<Sentences> Sentences { get; set; }
 
-    public virtual DbSet<States> States { get; set; }
+    public  DbSet<States> States { get; set; }
 
-    public virtual DbSet<Units> Units { get; set; }
+    public  DbSet<Units> Units { get; set; }
 }

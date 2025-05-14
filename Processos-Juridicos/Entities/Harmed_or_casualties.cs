@@ -2,14 +2,18 @@
 #nullable disable
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace Processos_Juridicos.Entities;
 
-public partial class AccidentTypes
+public partial class Harmed_or_casualties
 {
-    public int AccidentId { get; set; }
+    [Key]
+    public int casualties_id { get; set; }
 
-    public string AccidentType { get; set; }
+    public string casualties_name { get; set; }
 
     public virtual ICollection<Processes> Processes { get; set; } = new List<Processes>();
 }
