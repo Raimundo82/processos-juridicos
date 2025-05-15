@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
+using NToastNotify;
 using Processos_Juridicos.Data;
-using Microsoft.Extensions.Configuration;
+using Processos_Juridicos.Services;
+using Processos_Juridicos.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,7 +17,15 @@ string processosDj = builder.Configuration.GetConnectionString("processosDj")!;
 builder.Services.AddDbContext<AppDbContext>(opt=>opt.UseSqlServer(processosDj));
 
 //register Interfaces services
+builder.Services.AddScoped<IToastNotify, ToastNotify>();
 
+//Register NToastNotify
+builder.Services.AddMvc().AddNToastNotifyToastr(new ToastrOptions()
+{
+    ProgressBar = true,
+    PositionClass = ToastPositions.TopCenter,
+    TimeOut = 5000
+});
 
 
 var app = builder.Build();
@@ -34,7 +44,7 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
-
+app.UseNToastNotify();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
