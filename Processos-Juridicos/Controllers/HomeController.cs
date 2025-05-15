@@ -22,7 +22,7 @@ namespace Processos_Juridicos.Controllers
         [HttpGet]
         public async Task<IActionResult> Index(int id)
         {
-           
+            await _context.Units.ToListAsync();
             return View();
         }
 

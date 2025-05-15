@@ -1,13 +1,17 @@
 using Microsoft.EntityFrameworkCore;
 using Processos_Juridicos.Data;
+using Microsoft.Extensions.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+// Add User Secrets
+builder.Configuration.AddUserSecrets<Program>();
+
 // Register Context
-string processosDj = builder.Configuration.GetConnectionString("processosDj");
+string processosDj = builder.Configuration.GetConnectionString("processosDj")!;
 builder.Services.AddDbContext<AppDbContext>(opt=>opt.UseSqlServer(processosDj));
 
 //register Interfaces services
