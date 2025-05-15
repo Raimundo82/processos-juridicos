@@ -1,0 +1,56 @@
+name: Post Merge SonarQube Scan
+
+on:
+  push:
+    branches:
+      - master
+
+env:
+  RUNNER_TOOL_CACHE: /toolcache
+
+jobs:
+  post-merge-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ssh-key: ${{ secrets.SSH_KEY }}
+          ssh-known-hosts: ${{ vars.SSH_KNOWN_HOSTS }}
+
+      - name: Setup .NET 8.0.x
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Install SonarQube scanner and Coverlet
+        shell: bash
+        run: |
+          mkdir -p .sonar/scanner
+          dotnet tool update dotnet-sonarscanner --tool-path ./.sonar/scanner
+          dotnet tool update coverlet.console --tool-path ./.sonar/coverage
+
+      - name: Begin SonarQube Analysis
+        run: |
+          ./.sonar/scanner/dotnet-sonarscanner begin \
+          /key:processos-juridicos \
+          /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
+          /d:sonar.host.url="${{ vars.SONAR_HOST_URL }}" \
+          /d:sonar.cs.opencover.reportsPaths=coverage.xml \
+          /d:sonar.exclusions="**/.devcontainer/**,**/Migrations/**,**/bin/**,**/obj/**" \
+          /d:sonar.scanner.scanAll=false
+
+      - name: Build for SonarQube (no incremental)
+        run: dotnet build --no-incremental
+
+      - name: Run tests with coverage for SonarQube
+        run: |
+          dotnet coverlet ./SigdnRhStaggingApi.Tests/bin/Debug/net9.0/SigdnRhStaggingApi.Tests.dll \
+          --target dotnet \
+          --targetargs "test --no-build" \
+          -f=opencover \
+          -o="coverage.xml"
+
+      - name: End SonarQube Analysis
+        run: ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{  secrets.SONAR_TOKEN }}"
