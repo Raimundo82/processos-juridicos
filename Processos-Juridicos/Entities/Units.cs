@@ -11,7 +11,7 @@ namespace Processos_Juridicos.Entities;
 public partial class Units
 {
     [Key]
-    public int unit_id { get; set; }
+    public string unit_code { get; set; }
 
     public string unit_name { get; set; }
 

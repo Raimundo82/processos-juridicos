@@ -17,7 +17,7 @@ public partial class ProcessesDTO
 
     public int? process_type_id { get; set; }
 
-    public int? unit_id { get; set; }
+    public string? unit_code { get; set; }
 
     public int? oficial_inst_id { get; set; }
 
@@ -83,7 +83,7 @@ public partial class ProcessesDTO
     [InverseProperty("Processes")]
     public virtual StatesDTO state { get; set; }
 
-    [ForeignKey("unit_id")]
+    [ForeignKey("unit_code")]
     [InverseProperty("Processes")]
     public virtual Units unit { get; set; }
 }
