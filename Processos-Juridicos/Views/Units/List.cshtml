@@ -6,14 +6,20 @@
 
 @model IEnumerable<Units>
 
+<div class="text-center">
+    <h1 class="display-4">Unidades</h1>
+</div>
+
+<button asp-controller ="Units" asp-action="CreateEdit" class="btn btn-primary">Inserir Unidade</button>
+
 <div>
-    <table class="table">
+    <table id="tableUnits" class="table table-striped-columns table-hover">
         <thead>
             <tr>
-                <th scope="col">#</th>
-                <th scope="col">@Html.DisplayNameFor(m=>m.FirstOrDefault().unit_name)</th>
-                <th scope="col">@Html.DisplayNameFor(m=>m.FirstOrDefault().unit_code)</th>
-                <th scope="col">@Html.DisplayNameFor(m=>m.FirstOrDefault().unit_acronym)</th>
+                <th scope="col">@count</th>
+                <th scope="col">@Html.DisplayNameFor(m=>m.First().unit_name)</th>
+                <th scope="col">@Html.DisplayNameFor(m=>m.First().unit_code)</th>
+                <th scope="col">@Html.DisplayNameFor(m=>m.First().unit_acronym)</th>
             </tr>
         </thead>
         <tbody>
@@ -21,7 +27,7 @@
             @foreach (var item in Model.ToList())
             {
                 <tr>
-                    <th scope="row">1</th>
+                    <th scope="row">@count</th>
                     <td>@Html.DisplayFor(m => item.unit_code)</td>
                     <td>@Html.DisplayFor(m => item.unit_name)</td>
                     <td>@Html.DisplayFor(m => item.unit_acronym)</td>
@@ -31,3 +37,9 @@
         </tbody>
     </table>
 </div>
+
+@section Scripts {
+    <script>
+        let table = createDataTabe("#tableUnits");
+    </script>
+} 
