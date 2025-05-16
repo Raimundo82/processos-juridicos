@@ -85,5 +85,5 @@ public partial class ProcessesDTO
 
     [ForeignKey("unit_code")]
     [InverseProperty("Processes")]
-    public virtual Units unit { get; set; }
+    public virtual UnitsDTO unit { get; set; }
 }

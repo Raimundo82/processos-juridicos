@@ -29,7 +29,7 @@ public partial class Processos_DJContextDTO : DbContext
 
     public virtual DbSet<StatesDTO> States { get; set; }
 
-    public virtual DbSet<Units> Units { get; set; }
+    public virtual DbSet<UnitsDTO> Units { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Processos_Juridicos.DTOs;
 
-public partial class Units
+public partial class UnitsDTO
 {
     [Key]
     public string unit_code { get; set; }

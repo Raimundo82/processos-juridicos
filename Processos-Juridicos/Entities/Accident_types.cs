@@ -15,5 +15,5 @@ public partial class Accident_types
 
     public string accident_type { get; set; }
 
-    public  ICollection<Processes> Processes { get; set; } = new List<Processes>();
+    public ICollection<Processes> Processes { get; set; } = new List<Processes>();
 }

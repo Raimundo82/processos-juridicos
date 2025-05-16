@@ -15,5 +15,7 @@ public partial class Process_types
 
     public string process_name { get; set; }
 
+    public int deadline { get; set; }
+
     public virtual ICollection<Processes> Processes { get; set; } = new List<Processes>();
 }

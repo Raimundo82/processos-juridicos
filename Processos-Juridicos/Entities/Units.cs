@@ -15,5 +15,9 @@ public partial class Units
 
     public string unit_name { get; set; }
 
-    public  ICollection<Processes> Processes { get; set; } = new List<Processes>();
+    public string unit_acronym { get; set; }
+
+    public string sector_code { get; set; }
+
+    public virtual ICollection<Processes> Processes { get; set; } = new List<Processes>();
 }

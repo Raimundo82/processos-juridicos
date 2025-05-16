@@ -13,8 +13,7 @@ public partial class Sentences
     [Key]
     public int sentence_id { get; set; }
 
-
     public string sentence_name { get; set; }
 
-    public  ICollection<Processes> Processes { get; set; } = new List<Processes>();
+    public ICollection<Processes> Processes { get; set; } = new List<Processes>();
 }

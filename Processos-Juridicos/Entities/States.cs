@@ -13,8 +13,7 @@ public partial class States
     [Key]
     public int state_id { get; set; }
 
-
     public string state_name { get; set; }
 
-    public  ICollection<Processes> Processes { get; set; } = new List<Processes>();
+    public ICollection<Processes> Processes { get; set; } = new List<Processes>();
 }
