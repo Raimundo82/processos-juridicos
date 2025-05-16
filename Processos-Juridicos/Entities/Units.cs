@@ -2,6 +2,7 @@
 #nullable disable
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
@@ -11,12 +12,14 @@ namespace Processos_Juridicos.Entities;
 public partial class Units
 {
     [Key]
+    [DisplayName("Código da unidade")]
     public string unit_code { get; set; }
 
+    [DisplayName("Nome da unidade")]
     public string unit_name { get; set; }
-
+    [DisplayName("Abreviatura")]
     public string unit_acronym { get; set; }
-
+    
     public string sector_code { get; set; }
 
     public virtual ICollection<Processes> Processes { get; set; } = new List<Processes>();
