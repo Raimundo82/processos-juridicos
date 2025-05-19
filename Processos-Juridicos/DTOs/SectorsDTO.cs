@@ -7,4 +7,5 @@ public class SectorsDTO
     [Key]
     public string sector_code { get; set; }
     public string sector_name { get; set; }
+    public bool Enable { get; set; } = default;
 }
