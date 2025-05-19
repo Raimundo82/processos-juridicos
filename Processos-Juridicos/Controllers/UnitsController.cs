@@ -10,21 +10,22 @@ public class UnitsController : Controller
     private readonly IUnitSvc _unitSvc;
     private readonly ISectorsSvc _sectorsSvc;
 
+    public UnitsDTO uno;
+
     public UnitsController(IUnitSvc unitSvc, ISectorsSvc sectorsSvc)
     {
         _unitSvc = unitSvc;
         _sectorsSvc = sectorsSvc;
     }
 
-
-
     // Action to get all (List) Units
     [HttpGet]
-    public async Task <IActionResult> List()
+    public async Task<IActionResult> List()
     {
         var listUnitsDto = await _unitSvc.getAllUnits();
         return View(listUnitsDto);
     }
+
 
     // Action to get one Unit
     [HttpGet]
@@ -45,64 +46,58 @@ public class UnitsController : Controller
     }
 
 
+    // Action to access create/edit form checking if exists code or not
     [HttpGet]
-    public async Task<IActionResult> Create()
+    public async Task<IActionResult> CreateEdit(string? code)
     {
-       var serctors = await _sectorsSvc.getAllSectors();
-
-        var listSectors = serctors
-            .Select(x=>new SelectListItem 
-            { 
+        var sectors = await _sectorsSvc.getAllSectors();
+        var listSectors = sectors.Select(x => new SelectListItem
+        {
             Text = x.sector_name,
             Value = x.Id.ToString()
-            })
-            .ToList();
+        }).ToList();
 
         ViewBag.selectos = listSectors;
 
-        return View();
+        UnitsDTO model = string.IsNullOrEmpty(code)
+            ? new UnitsDTO { IsEdit = false } 
+            : await _unitSvc.getUnitByCode(code) ?? new UnitsDTO { IsEdit = false };
+
+        model.IsEdit = !string.IsNullOrEmpty(code);
+
+        return View(model);
     }
 
-    [HttpGet]
-    public async Task<IActionResult> CreateEdit(string code)
-    {
-        UnitsDTO unitDto = null;
-        if (!string.IsNullOrEmpty(code))
-        {
-            unitDto = await _unitSvc.getUnitByCode(code);
-            if (unitDto == null)
-            {
-                return NotFound();
-            }
-        }
-        else
-        {
-            unitDto = new UnitsDTO(); 
-        }
-        return View(unitDto);
-    }
 
     // Action to create or edit a Unit 
     [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> CreateEdit(UnitsDTO unitDto)
+    public async Task<IActionResult> CreateEdit(UnitsDTO model)
     {
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid)
         {
-            if (await UnitExists(unitDto.unit_code)) 
+            var sectors = await _sectorsSvc.getAllSectors();
+            ViewBag.selectos = sectors.Select(x => new SelectListItem
             {
-                await _unitSvc.editUnit(unitDto);
-                TempData["Success"] = "Unidade editada com sucesso!";
-            }
-            else
-            {
-                await _unitSvc.createUnit(unitDto); 
-                TempData["Success"] = "Unidade criada com sucesso!";
-            }
-            return RedirectToAction(nameof(List));
+                Text = x.sector_name,
+                Value = x.Id.ToString(),
+                Selected = x.Id == model.sector_Id
+            }).ToList();
+
+            return View(model);
         }
-        return View(unitDto);
+
+        if (model.IsEdit)
+        {
+            await _unitSvc.editUnit(model); 
+        }
+        else
+        {
+            await _unitSvc.createUnit(model);
+        }
+
+        return RedirectToAction("List");
     }
+
 
     // Action to delete
     [HttpPost, ActionName("Delete")]
@@ -127,13 +122,4 @@ public class UnitsController : Controller
 
         return RedirectToAction(nameof(List));
     }
-
-    /* Helper code */
-    // Checks whether a unit with the specified code already exists
-    private async Task<bool> UnitExists(string unitCode)
-    {
-        var unit = await _unitSvc.getUnitByCode(unitCode);
-        return unit != null;
-    }
-
 }

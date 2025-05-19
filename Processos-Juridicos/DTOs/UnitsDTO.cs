@@ -19,9 +19,13 @@ public  class UnitsDTO
     [Unicode(false)]
     public string unit_name { get; set; }
 
+    public int sector_Id { get; set; }
+
     public string unit_acronym { get; set; }
-    public string sector_Id { get; set; }
+    
     public bool Enable { get; set; } = default;
+
+    public bool IsEdit { get; set; }
 
     [ForeignKey("sector_Id")]
     public SectorsDTO Sectors { get; set; }

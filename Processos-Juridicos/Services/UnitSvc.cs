@@ -67,8 +67,9 @@ public class UnitSvc : IUnitSvc
 
     public async Task<bool> deleteUnit(string code)
     {
+        System.Diagnostics.Debug.WriteLine(code);
         var unit = await _context.Units.FirstOrDefaultAsync(x => x.unit_code == code);
-        if (unit != null)
+        if (unit == null)
         {
             return false;
         }

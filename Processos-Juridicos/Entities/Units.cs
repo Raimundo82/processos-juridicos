@@ -17,9 +17,10 @@ public class Units
 
     [DisplayName("Nome da unidade")]
     public string unit_name { get; set; }
+
     [DisplayName("Abreviatura")]
     public string unit_acronym { get; set; }
-    public string sector_Id { get; set; }
+    
     public bool Enable { get; set; } = default;
 
     [ForeignKey("sector_Id")]

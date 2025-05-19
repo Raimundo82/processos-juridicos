@@ -36,11 +36,13 @@
                     <td>@Html.DisplayFor(m => item.unit_acronym)</td>
                     <td>@Html.DisplayFor(m => item.Sectors.sector_name)</td>
                     <td>
-                        <form asp-controller="Units" asp-action="Delete" method="post">
-                            <input type="hidden" name="code" value="sector_code">
-                            <button type="submit" class="btn btn-danger">Eliminar</button>
-                        </form>
-
+                        <div class="d-flex gap-2">
+                            <form asp-controller="Units" asp-action="Delete" method="post">
+                                <input type="hidden" name="code" value="@item.unit_code">
+                                <button type="submit" class="btn btn-danger"></button>
+                            </form>
+                            <a asp-controller="Units" asp-action="CreateEdit" asp-route-code="@item.unit_code" class="btn btn-warning"></a>
+                        </div>
                     </td>
                 </tr>
                 count++;
