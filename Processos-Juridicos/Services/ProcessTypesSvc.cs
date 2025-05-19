@@ -17,7 +17,7 @@ namespace Processos_Juridicos.Services
         }
 
 
-        public Task<Process_types> createProcessType(Process_types unit)
+        public Task<Process_types> createProcessType(Process_types processType)
         {
             throw new NotImplementedException();
         }
