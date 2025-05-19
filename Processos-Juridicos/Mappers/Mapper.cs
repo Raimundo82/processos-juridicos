@@ -13,6 +13,12 @@ public static partial class Mapper
     public static partial Units MapToUnit(UnitsDTO dto);
     public static partial IEnumerable<UnitsDTO> MapToToUnitDtoEnum(IEnumerable<Units> entity);
 
+    //Sectors
+    public static partial SectorsDTO MapToSectorsDto(Sectors entity);
+    public static partial Sectors MapToSectors(SectorsDTO dto);
+    public static partial IEnumerable<SectorsDTO> MapToToSectorsDtoEnum(IEnumerable<Sectors> entity);
+
+
     // States Map 
 
     public static partial StatesDTO MapToStateDto(States entity);

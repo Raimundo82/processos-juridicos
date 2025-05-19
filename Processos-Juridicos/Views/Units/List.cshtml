@@ -18,10 +18,10 @@
         <thead>
             <tr>
                 <th scope="col">#</th>
-                <th scope="col">@Html.DisplayNameFor(m=>m.First().unit_name)</th>
-                <th scope="col">@Html.DisplayNameFor(m=>m.First().unit_code)</th>
-                <th scope="col">@Html.DisplayNameFor(m=>m.First().unit_acronym)</th>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().sector_code)</th>
+                <th scope="col">@Html.DisplayNameFor(m=>m.unit_name)</th>
+                <th scope="col">@Html.DisplayNameFor(m=>m.unit_code)</th>
+                <th scope="col">@Html.DisplayNameFor(m=>m.unit_acronym)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.Sectors.sector_name)</th>
                 <th scope="col">Ações</th>
             </tr>
         </thead>
@@ -34,7 +34,7 @@
                     <td>@Html.DisplayFor(m => item.unit_name)</td>
                     <td>@Html.DisplayFor(m => item.unit_code)</td>
                     <td>@Html.DisplayFor(m => item.unit_acronym)</td>
-                    <td>@Html.DisplayFor(m => item.sector_code)</td>
+                    <td>@Html.DisplayFor(m => item.Sectors.sector_name)</td>
                     <td>
                         <form asp-controller="Units" asp-action="Delete" method="post">
                             <input type="hidden" name="code" value="sector_code">

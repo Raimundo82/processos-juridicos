@@ -1,17 +1,22 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Processos_Juridicos.Services.Interfaces;
 using Processos_Juridicos.DTOs;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Processos_Juridicos.Controllers;
 
 public class UnitsController : Controller
 {
     private readonly IUnitSvc _unitSvc;
+    private readonly ISectorsSvc _sectorsSvc;
 
-    public UnitsController(IUnitSvc unitSvc)
+    public UnitsController(IUnitSvc unitSvc, ISectorsSvc sectorsSvc)
     {
         _unitSvc = unitSvc;
+        _sectorsSvc = sectorsSvc;
     }
+
+
 
     // Action to get all (List) Units
     [HttpGet]
@@ -39,7 +44,25 @@ public class UnitsController : Controller
         return View(unit);
     }
 
-    // Action to display the create/edit form 
+
+    [HttpGet]
+    public async Task<IActionResult> Create()
+    {
+       var serctors = await _sectorsSvc.getAllSectors();
+
+        var listSectors = serctors
+            .Select(x=>new SelectListItem 
+            { 
+            Text = x.sector_name,
+            Value = x.Id.ToString()
+            })
+            .ToList();
+
+        ViewBag.selectos = listSectors;
+
+        return View();
+    }
+
     [HttpGet]
     public async Task<IActionResult> CreateEdit(string code)
     {
