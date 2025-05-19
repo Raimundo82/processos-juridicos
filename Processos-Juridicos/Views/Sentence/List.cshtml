@@ -18,9 +18,8 @@
         <thead>
             <tr>
                 <th scope="col">@count</th>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().process_type_id)</th>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().process_name)</th>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().deadline)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().sentence_id)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().sentence_name)</th>
             </tr>
         </thead>
         <tbody>
@@ -29,9 +28,8 @@
             {
                 <tr>
                     <th scope="row">@count</th>
-                    <td>@Html.DisplayFor(m => item.process_type_id)</td>
-                    <td>@Html.DisplayFor(m => item.process_name)</td>
-                    <td>@Html.DisplayFor(m => item.deadline) dias</td>
+                    <td>@Html.DisplayFor(m => item.sentence_id)</td>
+                    <td>@Html.DisplayFor(m => item.sentence_name)</td>
 
                 </tr>
                 count++;

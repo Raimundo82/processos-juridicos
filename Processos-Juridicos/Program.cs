@@ -21,6 +21,8 @@ builder.Services.AddScoped<IToastNotify, ToastNotify>();
 builder.Services.AddScoped<IUnitSvc, UnitSvc>();
 builder.Services.AddScoped<IStateSvc, StateSvc>();
 builder.Services.AddScoped<IProcessTypesSvc, ProcessTypesSvc>();
+builder.Services.AddScoped<ISentencesSvc, SentenceSvc>();
+
 
 
 //Register NToastNotify

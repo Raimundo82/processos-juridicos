@@ -5,7 +5,7 @@ namespace Processos_Juridicos.Services.Interfaces
 {
     public interface ISentencesSvc
     {
-        Task<IEnumerable<SentencesDTO>> getAllStates();
+        Task<IEnumerable<SentencesDTO>> getAllSentences();
         Task<Sentences> getSentencesById(int id);
         Task<Sentences> createSentence(Sentences sentence);
         Task<Sentences> editState(Sentences sentence);
