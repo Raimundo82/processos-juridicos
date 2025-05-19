@@ -6,9 +6,9 @@ namespace Processos_Juridicos.Services.Interfaces
     public interface IProcessTypesSvc
     {
         Task<IEnumerable<Process_typesDTO>> getAllProcessTypes();
-        Task<Units> getProcessTypeById(int id);
-        Task<Units> createProcessType(Units unit);
-        Task<Units> editProcessType(Units unit);
+        Task<Process_types> getProcessTypeById(int id);
+        Task<Process_types> createProcessType(Process_types type);
+        Task<Process_types> editProcessType(Process_types type);
         Task<bool> deleteProcessType(int id);
 
     }

@@ -17,7 +17,7 @@ namespace Processos_Juridicos.Services
         }
 
 
-        public Task<Units> createProcessType(Units unit)
+        public Task<Process_types> createProcessType(Process_types unit)
         {
             throw new NotImplementedException();
         }
@@ -27,7 +27,7 @@ namespace Processos_Juridicos.Services
             throw new NotImplementedException();
         }
 
-        public Task<Units> editProcessType(Units unit)
+        public Task<Process_types> editProcessType(Process_types processType)
         {
             throw new NotImplementedException();
         }
@@ -38,7 +38,7 @@ namespace Processos_Juridicos.Services
             return Mapper.MapToToProcessTypeDtoEnum(types);
         }
 
-        public Task<Units> getProcessTypeById(int id)
+        public Task<Process_types> getProcessTypeById(int id)
         {
             throw new NotImplementedException();
         }
