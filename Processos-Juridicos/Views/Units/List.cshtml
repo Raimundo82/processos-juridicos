@@ -11,16 +11,18 @@
     <h1 class="display-4">Unidades</h1>
 </div>
 
-<button asp-controller ="Units" asp-action="CreateEdit" class="btn btn-primary">Inserir Unidade</button>
+<a asp-controller="Units" asp-action="CreateEdit" class="btn btn-primary">Inserir Unidade</a>
 
 <div>
     <table id="tableUnits" class="table table-striped-columns table-hover">
         <thead>
             <tr>
-                <th scope="col">@count</th>
+                <th scope="col">#</th>
                 <th scope="col">@Html.DisplayNameFor(m=>m.First().unit_name)</th>
                 <th scope="col">@Html.DisplayNameFor(m=>m.First().unit_code)</th>
                 <th scope="col">@Html.DisplayNameFor(m=>m.First().unit_acronym)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().sector_code)</th>
+                <th scope="col">Ações</th>
             </tr>
         </thead>
         <tbody>
@@ -28,11 +30,18 @@
             @foreach (var item in Model.ToList())
             {
                 <tr>
-                    <th scope="row">@count</th>
-                    <td>@Html.DisplayFor(m => item.unit_code)</td>
+                    <td>@count</td>
                     <td>@Html.DisplayFor(m => item.unit_name)</td>
+                    <td>@Html.DisplayFor(m => item.unit_code)</td>
                     <td>@Html.DisplayFor(m => item.unit_acronym)</td>
-                  
+                    <td>@Html.DisplayFor(m => item.sector_code)</td>
+                    <td>
+                        <form asp-controller="Units" asp-action="Delete" method="post">
+                            <input type="hidden" name="code" value="sector_code">
+                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                        </form>
+
+                    </td>
                 </tr>
                 count++;
             }

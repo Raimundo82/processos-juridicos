@@ -12,7 +12,7 @@ namespace Processos_Juridicos.Entities;
 public class Units
 {
     [Key]
-    [DisplayName("Código da unidade")]
+    [DisplayName("Código da Unidade")]
     public string unit_code { get; set; }
 
     [DisplayName("Nome da unidade")]
