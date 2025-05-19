@@ -19,10 +19,10 @@ public class Units
     public string unit_name { get; set; }
     [DisplayName("Abreviatura")]
     public string unit_acronym { get; set; }
-    public string sector_code { get; set; }
+    public string sector_Id { get; set; }
+    public bool Enable { get; set; } = default;
 
-
-    [ForeignKey(" sector_code")]
+    [ForeignKey("sector_Id")]
     public Sectors Sectors { get; set; }
     public  ICollection<Processes> Processes { get; set; } = new List<Processes>();
 }

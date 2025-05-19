@@ -1,0 +1,41 @@
+﻿using Processos_Juridicos.Models;
+using Processos_Juridicos.Services.Interfaces;
+using System.Net;
+using System.Text.Json;
+
+namespace Processos_Juridicos.Services;
+
+public class ApisSvc : IApisSvc
+{
+    
+    public async Task<List<ApiUnitsModel>> geAlltUnits()
+    {
+        ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls13;
+
+        var handler = new HttpClientHandler
+        {
+            UseProxy = false,
+            ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+        };
+
+        using var httpClient = new HttpClient(handler);
+        httpClient.Timeout = TimeSpan.FromMinutes(10);
+
+        var url = "https://apisip/api/v1/Unidades/GetUnidadesAsync";
+        var request = new HttpRequestMessage(HttpMethod.Get, url);
+        request.Headers.Add("Accept", "application/json");
+        request.Headers.Add("User-Agent", "Mozilla/5.0");
+
+        var response = await httpClient.SendAsync(request);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var json = await response.Content.ReadAsStringAsync();
+
+            var listUnits = JsonSerializer.Deserialize<List<ApiUnitsModel>>(json);
+            return listUnits;
+        }
+
+        return null;
+    }
+}

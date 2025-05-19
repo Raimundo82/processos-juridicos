@@ -16,9 +16,22 @@ builder.Configuration.AddUserSecrets<Program>();
 string processosDj = builder.Configuration.GetConnectionString("processosDj")!;
 builder.Services.AddDbContext<AppDbContext>(opt=>opt.UseSqlServer(processosDj));
 
+
+//httpClient
+builder.Services.AddHttpClient<ApisSvc>()
+    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+    {
+         UseProxy = false,
+        //ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator,
+        ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true
+
+
+    });
+
 //register Interfaces services
 builder.Services.AddScoped<IToastNotify, ToastNotify>();
 builder.Services.AddScoped<IUnitSvc, UnitSvc>();
+builder.Services.AddScoped<IApisSvc, ApisSvc>();
 
 //Register NToastNotify
 builder.Services.AddMvc().AddNToastNotifyToastr(new ToastrOptions()

@@ -20,10 +20,10 @@ public  class UnitsDTO
     public string unit_name { get; set; }
 
     public string unit_acronym { get; set; }
-    public string sector_code { get; set; }
+    public string sector_Id { get; set; }
+    public bool Enable { get; set; } = default;
 
-
-    [ForeignKey(" sector_code")]
+    [ForeignKey("sector_Id")]
     public SectorsDTO Sectors { get; set; }
 
     public  ICollection<ProcessesDTO> Processes { get; set; } = new List<ProcessesDTO>();
