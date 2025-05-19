@@ -7,14 +7,20 @@
 
 @model IEnumerable<UnitsDTO>
 
+<div class="text-center">
+    <h1 class="display-4">Unidades</h1>
+</div>
+
+<button asp-controller ="Units" asp-action="CreateEdit" class="btn btn-primary">Inserir Unidade</button>
+
 <div>
-    <table class="table">
+    <table id="tableUnits" class="table table-striped-columns table-hover">
         <thead>
             <tr>
-                <th scope="col">#</th>
-                <th scope="col">@Html.DisplayNameFor(m=>m.FirstOrDefault().unit_name)</th>
-                <th scope="col">@Html.DisplayNameFor(m=>m.FirstOrDefault().unit_code)</th>
-                <th scope="col">@Html.DisplayNameFor(m=>m.FirstOrDefault().unit_acronym)</th>
+                <th scope="col">@count</th>
+                <th scope="col">@Html.DisplayNameFor(m=>m.First().unit_name)</th>
+                <th scope="col">@Html.DisplayNameFor(m=>m.First().unit_code)</th>
+                <th scope="col">@Html.DisplayNameFor(m=>m.First().unit_acronym)</th>
             </tr>
         </thead>
         <tbody>
@@ -33,3 +39,9 @@
         </tbody>
     </table>
 </div>
+
+@section Scripts {
+    <script>
+        let table = createDataTabe("#tableUnits");
+    </script>
+} 
