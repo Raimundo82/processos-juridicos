@@ -1,10 +1,11 @@
-﻿@using Processos_Juridicos.Entities
+﻿@using Processos_Juridicos.DTOs
+
 @{
     ViewData["Title"] = "Lista de unidades";
     int count = 1;
 }
 
-@model IEnumerable<Units>
+@model IEnumerable<UnitsDTO>
 
 <div>
     <table class="table">
@@ -21,10 +22,11 @@
             @foreach (var item in Model.ToList())
             {
                 <tr>
-                    <th scope="row">1</th>
+                    <th scope="row">@count</th>
                     <td>@Html.DisplayFor(m => item.unit_code)</td>
                     <td>@Html.DisplayFor(m => item.unit_name)</td>
                     <td>@Html.DisplayFor(m => item.unit_acronym)</td>
+                  
                 </tr>
                 count++;
             }

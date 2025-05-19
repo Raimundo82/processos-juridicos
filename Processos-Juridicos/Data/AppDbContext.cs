@@ -26,4 +26,5 @@ public class AppDbContext : DbContext
     public  DbSet<States> States { get; set; }
 
     public  DbSet<Units> Units { get; set; }
+    public  DbSet<Sectors> Sectors { get; set; }
 }

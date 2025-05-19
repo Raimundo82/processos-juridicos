@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Processos_Juridicos.Entities;
 
-public partial class Units
+public class Units
 {
     [Key]
     [DisplayName("Código da unidade")]
@@ -19,8 +19,10 @@ public partial class Units
     public string unit_name { get; set; }
     [DisplayName("Abreviatura")]
     public string unit_acronym { get; set; }
-    
     public string sector_code { get; set; }
 
-    public virtual ICollection<Processes> Processes { get; set; } = new List<Processes>();
+
+    [ForeignKey(" sector_code")]
+    public Sectors Sectors { get; set; }
+    public  ICollection<Processes> Processes { get; set; } = new List<Processes>();
 }

@@ -14,7 +14,7 @@ public class UnitsController : Controller
     [HttpGet]
     public async Task <IActionResult> List()
     {
-        var listUnits = await _unitSvc.getAllUnits();
-        return View(listUnits);
+        var listUnitsDto = await _unitSvc.getAllUnits();
+        return View(listUnitsDto);
     }
 }
