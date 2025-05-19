@@ -18,6 +18,8 @@ public partial class Process_typesDTO
     [Unicode(false)]
     public string process_name { get; set; }
 
+    public int deadline { get;  set; }
+
     [InverseProperty("process_type")]
     public virtual ICollection<ProcessesDTO> Processes { get; set; } = new List<ProcessesDTO>();
 }

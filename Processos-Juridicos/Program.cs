@@ -31,7 +31,11 @@ builder.Services.AddHttpClient<ApisSvc>()
 //register Interfaces services
 builder.Services.AddScoped<IToastNotify, ToastNotify>();
 builder.Services.AddScoped<IUnitSvc, UnitSvc>();
-builder.Services.AddScoped<IApisSvc, ApisSvc>();
+builder.Services.AddScoped<IStateSvc, StateSvc>();
+builder.Services.AddScoped<IProcessTypesSvc, ProcessTypesSvc>();
+builder.Services.AddScoped<ISentencesSvc, SentenceSvc>();
+
+
 
 //Register NToastNotify
 builder.Services.AddMvc().AddNToastNotifyToastr(new ToastrOptions()
