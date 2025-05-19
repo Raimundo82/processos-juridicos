@@ -19,6 +19,7 @@ builder.Services.AddDbContext<AppDbContext>(opt=>opt.UseSqlServer(processosDj));
 //register Interfaces services
 builder.Services.AddScoped<IToastNotify, ToastNotify>();
 builder.Services.AddScoped<IUnitSvc, UnitSvc>();
+builder.Services.AddScoped<IStateSvc, StateSvc>();
 
 //Register NToastNotify
 builder.Services.AddMvc().AddNToastNotifyToastr(new ToastrOptions()

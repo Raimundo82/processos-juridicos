@@ -13,5 +13,9 @@ public static partial class Mapper
     public static partial Units MapToUnit(UnitsDTO dto);
     public static partial IEnumerable<UnitsDTO> MapToToUnitDtoEnum(IEnumerable<Units> entity);
 
+    // States Map 
 
+    public static partial StatesDTO MapToStateDto(Units entity);
+    public static partial States MapToState (StatesDTO dto);
+    public static partial IEnumerable<StatesDTO> MapToToStateDtoEnum(IEnumerable<States> entity);
 }
