@@ -38,7 +38,7 @@ namespace Processos_Juridicos.Services
             return Mapper.MapToToProcessTypeDtoEnum(types);
         }
 
-        public Task<Units> getProcessTypeById(int id)
+        public Task<Process_types> getProcessTypeById(int id)
         {
             throw new NotImplementedException();
         }
