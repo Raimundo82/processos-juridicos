@@ -17,7 +17,7 @@ public partial class Processes
 
     public int? process_type_id { get; set; }
 
-    public string? unit_code { get; set; }
+    public int? unit_id { get; set; }
 
     public int? oficial_inst_id { get; set; }
 
@@ -82,7 +82,7 @@ public partial class Processes
     [InverseProperty("Processes")]
     public  States state { get; set; }
 
-    [ForeignKey("unit_code")]
+    [ForeignKey("unit_id")]
     [InverseProperty("Processes")]
     public  Units unit { get; set; }
 }

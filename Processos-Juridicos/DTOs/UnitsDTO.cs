@@ -12,6 +12,9 @@ namespace Processos_Juridicos.DTOs;
 public  class UnitsDTO
 {
     [Key]
+    public int unit_id { get; set; }
+
+
     public string unit_code { get; set; }
 
     [Required]

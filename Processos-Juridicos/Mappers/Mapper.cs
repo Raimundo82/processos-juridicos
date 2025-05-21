@@ -54,4 +54,11 @@ public static partial class Mapper
     public static partial FilesDTO MapToFilesDto(Files entity);
     public static partial Files MapToFiles(FilesDTO dto);
     public static partial IEnumerable<FilesDTO> MapToToFilesEnum(IEnumerable<Files> entity);
+
+    // Processes map
+
+    public static partial ProcessesDTO MapToProcessesDto(Processes entity);
+    public static partial Processes MapToProcesses(ProcessesDTO dto);
+    public static partial IEnumerable<ProcessesDTO> MapToToProcessesEnum(IEnumerable<Processes> entity);
+
 }
