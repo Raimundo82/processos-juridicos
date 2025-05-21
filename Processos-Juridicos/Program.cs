@@ -38,6 +38,7 @@ builder.Services.AddScoped<IApisSvc, ApisSvc>();
 builder.Services.AddScoped<IHarmedOrCasualtiesSvc, HarmedOrCasualtiesSvc>();
 builder.Services.AddScoped<IInfringementsSvc, InfringementsSvc>();
 builder.Services.AddScoped<ISectorSvc, SectorSvc>();
+builder.Services.AddScoped<IFilesSvc, FilesSvc>();
 
 
 //Register NToastNotify

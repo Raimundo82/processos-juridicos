@@ -48,4 +48,10 @@ public static partial class Mapper
     public static partial Sectors MapToSectors(InfringementsDTO dto);
     public static partial IEnumerable<SectorsDTO> MapToToSectorsEnum(IEnumerable<Sectors> entity);
 
+
+    // Files map
+
+    public static partial FilesDTO MapToFilesDto(Files entity);
+    public static partial Files MapToFiles(FilesDTO dto);
+    public static partial IEnumerable<FilesDTO> MapToToFilesEnum(IEnumerable<Files> entity);
 }

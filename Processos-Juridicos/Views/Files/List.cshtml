@@ -1,0 +1,53 @@
+﻿@using Processos_Juridicos.DTOs
+
+@{
+    ViewData["Title"] = "Lista de ficheiros";
+    int count = 1;
+}
+
+@model IEnumerable<FilesDTO>
+
+<div class="text-center">
+    <h1 class="display-4">Ficheiros</h1>
+</div>
+
+<button asp-controller="Files" asp-action="CreateEdit" class="btn btn-primary">Inserir ficheiro</button>
+
+<div>
+    <table id="tableStates" class="table table-striped-columns table-hover">
+        <thead>
+            <tr>
+                <th scope="col">@count</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().file_id)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().file_name)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().file_type)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().file_content)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().process_id)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().row_guid)</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            @foreach (var item in Model.ToList())
+            {
+                <tr>
+                    <th scope="row">@count</th>
+                    <td>@Html.DisplayFor(m => item.file_id)</td>
+                    <td>@Html.DisplayFor(m => item.file_name)</td>
+                    <td>@Html.DisplayFor(m => item.file_type)</td>
+                    <td>@Html.DisplayFor(m => item.file_content)</td>
+                    <td>@Html.DisplayFor(m => item.process_id)</td>
+                    <td>@Html.DisplayFor(m => item.row_guid)</td>
+
+                </tr>
+                count++;
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script>
+        let table = createDataTabe("#tableStates");
+    </script>
+} 
