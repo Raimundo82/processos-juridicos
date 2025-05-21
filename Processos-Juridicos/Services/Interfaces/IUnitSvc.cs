@@ -6,9 +6,9 @@ namespace Processos_Juridicos.Services.Interfaces
     public interface IUnitSvc
     {
         Task<IEnumerable<UnitsDTO>> getAllUnits();
-        Task<Units> getUnitById(int id);
-        Task<Units> createUnit(Units unit);
-        Task<Units> editUnit(Units unit);
+        Task<UnitsDTO> getUnitById(int id);
+        Task<UnitsDTO> createUnit(UnitsDTO unit);
+        Task<UnitsDTO> editUnit(UnitsDTO unit);
         Task<bool> deleteUnit(int id);
     }
 }

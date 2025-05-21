@@ -31,8 +31,10 @@ builder.Services.AddHttpClient<ApisSvc>()
 //register Interfaces services
 builder.Services.AddScoped<IToastNotify, ToastNotify>();
 builder.Services.AddScoped<IUnitSvc, UnitSvc>();
+builder.Services.AddScoped<ISectorsSvc, SectorsSvc>();
 builder.Services.AddScoped<IStateSvc, StateSvc>();
 builder.Services.AddScoped<IProcessTypesSvc, ProcessTypesSvc>();
+<<<<<<< HEAD
 builder.Services.AddScoped<ISentencesSvc, SentencesSvc>();
 builder.Services.AddScoped<IApisSvc, ApisSvc>();
 builder.Services.AddScoped<IHarmedOrCasualtiesSvc, HarmedOrCasualtiesSvc>();
@@ -40,6 +42,10 @@ builder.Services.AddScoped<IInfringementsSvc, InfringementsSvc>();
 builder.Services.AddScoped<ISectorSvc, SectorSvc>();
 builder.Services.AddScoped<IFilesSvc, FilesSvc>();
 builder.Services.AddScoped<IProcessesSvc, ProcessesSvc>();
+=======
+builder.Services.AddScoped<ISentencesSvc, SentenceSvc>();
+builder.Services.AddScoped<IApisSvc, ApisSvc>();
+>>>>>>> master
 
 
 //Register NToastNotify

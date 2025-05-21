@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Processos_Juridicos.Entities;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -14,16 +15,26 @@ public  class UnitsDTO
     [Key]
     public int unit_id { get; set; }
 
+<<<<<<< HEAD
 
+=======
+    [DisplayName("Código da Unidade")]
+    [Required(ErrorMessage = "O Código da Unidade é obrigatório")]
+>>>>>>> master
     public string unit_code { get; set; }
 
-    [Required]
-    [StringLength(50)]
+    [Required(ErrorMessage = "O Nome da Unidade é obrigatório")]
+    [StringLength(50, ErrorMessage = "O campo {0} deve ter no máximo {1} caracteres")]
     [Unicode(false)]
+    [DisplayName("Nome da unidade")]
     public string unit_name { get; set; }
 
+    [DisplayName("Abreviatura")]
+    [Required(ErrorMessage = "A Sigla da Unidade é obrigatória")]
     public string unit_acronym { get; set; }
-    public string sector_Id { get; set; }
+
+    [Required(ErrorMessage = "É obrigatório selecionar um Setor")]
+    public int sector_Id { get; set; }
     public bool Enable { get; set; } = default;
 
     [ForeignKey("sector_Id")]

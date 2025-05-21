@@ -16,6 +16,7 @@ namespace Processos_Juridicos.Services
             _context = context;
         }
 
+<<<<<<< HEAD
         public Task<States> createState(States state)
         {
             throw new NotImplementedException();
@@ -31,13 +32,36 @@ namespace Processos_Juridicos.Services
             throw new NotImplementedException();
         }
 
+=======
+>>>>>>> master
         public async Task<IEnumerable<StatesDTO>> getAllStates()
         {
             var states = await _context.States.ToListAsync();
             return Mapper.MapToToStateDtoEnum(states);
         }
 
+<<<<<<< HEAD
         public Task<States> getStateById(int id)
+=======
+         public Task<States> getStateById(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<States> createState(States state)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        public Task<States> editState(States state)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        public Task<bool> deleteState(int id)
+>>>>>>> master
         {
             throw new NotImplementedException();
         }
