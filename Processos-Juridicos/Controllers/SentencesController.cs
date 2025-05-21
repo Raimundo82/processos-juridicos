@@ -1,20 +1,22 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Processos_Juridicos.Services.Interfaces;
 
+
 namespace Processos_Juridicos.Controllers
 {
     public class SentencesController : Controller
     {
-        private readonly ISentenceSvc _sentenceSvc;
+        private readonly ISentencesSvc _sentenceSvc;
 
-        public SentencesController(ISentenceSvc stateSvc)
+        public SentencesController(ISentencesSvc sentenceSvc)
         {
-            _sentenceSvc = stateSvc;
+            _sentenceSvc = sentenceSvc;
         }
+
         [HttpGet]
         public async Task<IActionResult> List()
         {
-            var listStatesDto = await _sentenceSvc.getAllStates();
+            var listStatesDto = await _sentenceSvc.getAllSentences();
             return View(listStatesDto);
         }
     }

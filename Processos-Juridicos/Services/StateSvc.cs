@@ -37,7 +37,18 @@ namespace Processos_Juridicos.Services
             return Mapper.MapToToStateDtoEnum(states);
         }
 
-        public Task<Units> getStateById(int id)
+ 
+        Task<States> IStateSvc.createState(States state)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<States> IStateSvc.editState(States state)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<States> IStateSvc.getStateById(int id)
         {
             throw new NotImplementedException();
         }
