@@ -36,5 +36,10 @@ public static partial class Mapper
     public static partial Harmed_or_casualties MapToHarmedOrCasualties(Harmed_or_casualtiesDTO dto);
     public static partial IEnumerable<Harmed_or_casualtiesDTO> MapToToHarmedOrCasualtiesEnum(IEnumerable<Harmed_or_casualties> entity);
 
+    // Infringements map
+
+    public static partial InfringementsDTO MapToInfringementsDto(Infringements entity);
+    public static partial Infringements MapToInfringements(InfringementsDTO dto);
+    public static partial IEnumerable<InfringementsDTO> MapToToInfringementsEnum(IEnumerable<Infringements> entity);
 
 }

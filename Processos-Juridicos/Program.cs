@@ -36,6 +36,7 @@ builder.Services.AddScoped<IProcessTypesSvc, ProcessTypesSvc>();
 builder.Services.AddScoped<ISentencesSvc, SentencesSvc>();
 builder.Services.AddScoped<IApisSvc, ApisSvc>();
 builder.Services.AddScoped<IHarmedOrCasualtiesSvc, HarmedOrCasualtiesSvc>();
+builder.Services.AddScoped<IInfringementsSvc, InfringementsSvc>();
 
 
 //Register NToastNotify
