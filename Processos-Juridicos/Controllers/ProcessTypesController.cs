@@ -14,8 +14,8 @@ namespace Processos_Juridicos.Controllers
         [HttpGet]
         public async Task<IActionResult> List()
         {
-            var listStatesDto = await _processTypeSvc.getAllProcessTypes();
-            return View(listStatesDto);
+            var listProcessTypes = await _processTypeSvc.getAllProcessTypes();
+            return View(listProcessTypes);
         }
     }
 }
