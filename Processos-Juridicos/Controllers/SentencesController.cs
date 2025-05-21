@@ -2,14 +2,13 @@
 using Processos_Juridicos.Services;
 using Processos_Juridicos.Services.Interfaces;
 
-
 namespace Processos_Juridicos.Controllers;
 
 public class SentencesController : Controller
 {
-    private readonly SentenceSvc _sentenceSvc;
+    private readonly ISentencesSvc _sentenceSvc;
 
-    public SentencesController(SentenceSvc sentenceSvc)
+    public SentencesController(ISentencesSvc sentenceSvc)
     {
         _sentenceSvc = sentenceSvc;
     }

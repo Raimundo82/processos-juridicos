@@ -11,6 +11,5 @@ public class SectorsDTO
 
     [DisplayName("Nome do Setor")]
     public string sector_name { get; set; }
-
-    public bool Enable { get; set; }
+    public bool Enable { get; set; } = default;
 }

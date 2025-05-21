@@ -22,7 +22,7 @@ namespace Processos_Juridicos.Services
             return Mapper.MapToToStateDtoEnum(states);
         }
 
-        public Task<States> getStateById(int id)
+         public Task<States> getStateById(int id)
         {
             throw new NotImplementedException();
         }
@@ -43,8 +43,5 @@ namespace Processos_Juridicos.Services
         {
             throw new NotImplementedException();
         }
-
-       
-
     }
 }
