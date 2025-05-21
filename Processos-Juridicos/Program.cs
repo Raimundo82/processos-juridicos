@@ -33,8 +33,9 @@ builder.Services.AddScoped<IToastNotify, ToastNotify>();
 builder.Services.AddScoped<IUnitSvc, UnitSvc>();
 builder.Services.AddScoped<IStateSvc, StateSvc>();
 builder.Services.AddScoped<IProcessTypesSvc, ProcessTypesSvc>();
-builder.Services.AddScoped<ISentencesSvc, SentenceSvc>();
+builder.Services.AddScoped<ISentencesSvc, SentencesSvc>();
 builder.Services.AddScoped<IApisSvc, ApisSvc>();
+builder.Services.AddScoped<IHarmedOrCasualtiesSvc, HarmedOrCasualtiesSvc>();
 
 
 //Register NToastNotify

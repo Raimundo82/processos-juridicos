@@ -7,12 +7,12 @@ using Processos_Juridicos.Services.Interfaces;
 
 namespace Processos_Juridicos.Services
 {
-    public class SentenceSvc : ISentencesSvc
+    public class SentencesSvc : ISentencesSvc
     {
 
         private readonly AppDbContext _context;
 
-        public SentenceSvc(AppDbContext context)
+        public SentencesSvc(AppDbContext context)
         {
             _context = context;
         }

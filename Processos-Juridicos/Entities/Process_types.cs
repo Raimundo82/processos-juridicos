@@ -2,6 +2,7 @@
 #nullable disable
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +16,7 @@ public partial class Process_types
 
     public string process_name { get; set; }
 
+    [DisplayName("Data limite")]
     public int deadline { get; set; }
 
     public virtual ICollection<Processes> Processes { get; set; } = new List<Processes>();

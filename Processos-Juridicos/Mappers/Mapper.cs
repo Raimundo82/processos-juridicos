@@ -26,8 +26,15 @@ public static partial class Mapper
     public static partial IEnumerable<Process_typesDTO> MapToToProcessTypeDtoEnum(IEnumerable<Process_types> entity);
 
     // Sentences map
-    public static partial SentencesDTO MapToSentenceDto(Sentences sentence);
+    public static partial SentencesDTO MapToSentenceDto(Sentences entity);
     public static partial Sentences MapToSentence(SentencesDTO dto);
     public static partial IEnumerable<SentencesDTO> MapToToSentenceDtoEnum(IEnumerable<Sentences> entity);
+
+    // Harmed or Casualties map
+
+    public static partial Harmed_or_casualtiesDTO MapToHarmedOrCasualtiesDto(Harmed_or_casualties entity);
+    public static partial Harmed_or_casualties MapToHarmedOrCasualties(Harmed_or_casualtiesDTO dto);
+    public static partial IEnumerable<Harmed_or_casualtiesDTO> MapToToHarmedOrCasualtiesEnum(IEnumerable<Harmed_or_casualties> entity);
+
 
 }

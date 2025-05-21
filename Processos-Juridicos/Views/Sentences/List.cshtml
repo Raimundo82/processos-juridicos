@@ -8,10 +8,10 @@
 @model IEnumerable<SentencesDTO>
 
 <div class="text-center">
-    <h1 class="display-4">Tipos de sentenças</h1>
+    <h1 class="display-4">Sentenças</h1>
 </div>
 
-<button asp-controller="Sentences" asp-action="CreateEdit" class="btn btn-primary">Inserir tipo de processo</button>
+<button asp-controller="Sentences" asp-action="CreateEdit" class="btn btn-primary">Inserir tipo de sentença</button>
 
 <div>
     <table id="tableStates" class="table table-striped-columns table-hover">
@@ -20,6 +20,7 @@
                 <th scope="col">@count</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().sentence_id)</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().sentence_name)</th>
+
             </tr>
         </thead>
         <tbody>
