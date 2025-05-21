@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Processos_Juridicos.Data;
 using Processos_Juridicos.DTOs;
 using Processos_Juridicos.Mappers;
@@ -9,12 +8,16 @@ namespace Processos_Juridicos.Services;
 public class UnitSvc : IUnitSvc
 {
     private readonly AppDbContext _context;
+    private readonly IToastNotify _toastNotify;
 
-    public UnitSvc(AppDbContext context)
+    public UnitSvc(AppDbContext context, IToastNotify toastNotify)
     {
         _context = context;
+        _toastNotify = toastNotify;
     }
 
+
+    // Retrieves all units, including their associated sectors, from the database.
     public async Task<IEnumerable<UnitsDTO>> getAllUnits()
     {
         var units = await _context.Units
@@ -22,25 +25,19 @@ public class UnitSvc : IUnitSvc
             .ToListAsync();
         return Mapper.MapToToUnitDtoEnum(units);
     }
-    public async Task<UnitsDTO> getUnitById(int? id)
+
+
+    // Retrieves a single unit by its ID.
+    public async Task<UnitsDTO> getUnitById(int id)
     {
         var unit = await _context.Units.FirstOrDefaultAsync(x => x.unit_id == id);
         return Mapper.MapToUnitDto(unit);
     }
 
+
+    // Creates an existing unit in the database.
     public async Task<UnitsDTO> createUnit(UnitsDTO unitDto)
     {
-        if (unitDto == null)
-        {
-            throw new ArgumentNullException(nameof(unitDto));
-        }
-
-        var existingUnit = await _context.Units.FirstOrDefaultAsync(x => x.unit_code == unitDto.unit_code);
-        if (existingUnit != null)
-        {
-            throw new Exception("Já existe uma unidade com este código");
-        }
-
         var unitEntity = Mapper.MapToUnit(unitDto);
 
         _context.Units.Add(unitEntity);
@@ -48,36 +45,31 @@ public class UnitSvc : IUnitSvc
         return Mapper.MapToUnitDto(unitEntity);
     }
 
-    public async Task<UnitsDTO> editUnit(UnitsDTO unit)
+
+    // Updates an existing unit in the database.
+    public async Task<UnitsDTO> editUnit(UnitsDTO unitDto)
     {
-        if (unit == null)
-        {
-            throw new ArgumentNullException(nameof(unit));
-        }
+        var unitEntity = Mapper.MapToUnit(unitDto);
+        _context.Units.Entry(unitEntity).State = EntityState.Modified;
 
-        var existingUnit = _context.Units.Find(unit.unit_id);
-        Debug.WriteLine(unit.unit_id);
-        Debug.WriteLine($"UNIDADE EXISTENTE: {existingUnit} da {unit}");
-        if (existingUnit == null)
-        {
-            throw new Exception("Unidade não encontrada");
-        }
-
-        _context.Entry(existingUnit).CurrentValues.SetValues(unit);
         await _context.SaveChangesAsync();
-        return Mapper.MapToUnitDto(existingUnit);
+        return unitDto;
     }
 
-    public async Task<bool> deleteUnit(int? id)
+
+    // Deletes a unit by its ID
+    public async Task<bool> deleteUnit(int id)
     {
         var unit = await _context.Units.FirstOrDefaultAsync(x => x.unit_id == id);
         if (unit == null)
         {
             return false;
         }
-
-        _context.Units.Remove(unit);
-        await _context.SaveChangesAsync();
-        return true;
+        else
+        {
+            _context.Units.Remove(unit);
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }

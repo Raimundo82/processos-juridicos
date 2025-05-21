@@ -16,20 +16,22 @@ public  class UnitsDTO
     public int unit_id { get; set; }
 
     [DisplayName("Código da Unidade")]
-    [Required(ErrorMessage = "O campo 'Código da Unidade' é obrigatório.")]
+    [Required(ErrorMessage = "O Código da Unidade é obrigatório")]
     public string unit_code { get; set; }
 
-    [Required(ErrorMessage = "O campo 'Nome da Unidade' é obrigatório.")]
-    [StringLength(50)]
+    [Required(ErrorMessage = "O Nome da Unidade é obrigatório")]
+    [StringLength(50, ErrorMessage = "O campo {0} deve ter no máximo {1} caracteres")]
     [Unicode(false)]
     [DisplayName("Nome da unidade")]
     public string unit_name { get; set; }
 
     [DisplayName("Abreviatura")]
+    [Required(ErrorMessage = "A Sigla da Unidade é obrigatória")]
     public string unit_acronym { get; set; }
+
+    [Required(ErrorMessage = "É obrigatório selecionar um Setor")]
     public int sector_Id { get; set; }
     public bool Enable { get; set; } = default;
-    public bool IsEdit { get; set; }
 
     [ForeignKey("sector_Id")]
     public SectorsDTO Sectors { get; set; }

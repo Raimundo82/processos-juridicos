@@ -11,7 +11,7 @@
     <h1 class="display-4">Unidades</h1>
 </div>
 
-<a asp-controller="Units" asp-action="CreateEdit" class="btn btn-primary">Inserir Unidade</a>
+<a asp-controller="Units" asp-action="Create" class="btn btn-primary">Inserir Unidade</a>
 
 <div>
     <table id="tableUnits" class="table table-striped-columns table-hover">
@@ -41,7 +41,7 @@
                                 <input type="hidden" name="id" value="@item.unit_id">
                                 <button type="submit" class="btn btn-danger"></button>
                             </form>
-                            <a asp-controller="Units" asp-action="CreateEdit" asp-route-id="@item.unit_id" class="btn btn-warning"></a>
+                            <a asp-controller="Units" asp-action="Edit" asp-route-id="@item.unit_id" class="btn btn-warning"></a>
                         </div>
                     </td>
                 </tr>

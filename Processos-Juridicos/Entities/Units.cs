@@ -16,12 +16,8 @@ public class Units
 
     public string unit_code { get; set; }
     public string unit_name { get; set; }
-
     public string unit_acronym { get; set; }
-
-    
     public int sector_Id { get; set; }
-
     public bool Enable { get; set; } = default;
 
     [ForeignKey("sector_Id")]
