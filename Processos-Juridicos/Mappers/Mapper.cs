@@ -42,4 +42,10 @@ public static partial class Mapper
     public static partial Infringements MapToInfringements(InfringementsDTO dto);
     public static partial IEnumerable<InfringementsDTO> MapToToInfringementsEnum(IEnumerable<Infringements> entity);
 
+    // Sectors map
+
+    public static partial SectorsDTO MapToSectorsDto(Infringements entity);
+    public static partial Sectors MapToSectors(InfringementsDTO dto);
+    public static partial IEnumerable<SectorsDTO> MapToToSectorsEnum(IEnumerable<Sectors> entity);
+
 }
