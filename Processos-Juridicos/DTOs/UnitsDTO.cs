@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Processos_Juridicos.Entities;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -12,19 +13,22 @@ namespace Processos_Juridicos.DTOs;
 public  class UnitsDTO
 {
     [Key]
+    public int unit_id { get; set; }
+
+    [DisplayName("Código da Unidade")]
+    [Required(ErrorMessage = "O campo 'Código da Unidade' é obrigatório.")]
     public string unit_code { get; set; }
 
-    [Required]
+    [Required(ErrorMessage = "O campo 'Nome da Unidade' é obrigatório.")]
     [StringLength(50)]
     [Unicode(false)]
+    [DisplayName("Nome da unidade")]
     public string unit_name { get; set; }
 
-    public int sector_Id { get; set; }
-
+    [DisplayName("Abreviatura")]
     public string unit_acronym { get; set; }
-    
+    public int sector_Id { get; set; }
     public bool Enable { get; set; } = default;
-
     public bool IsEdit { get; set; }
 
     [ForeignKey("sector_Id")]

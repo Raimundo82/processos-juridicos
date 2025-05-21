@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Diagnostics;
+using Microsoft.EntityFrameworkCore;
 using Processos_Juridicos.Data;
 using Processos_Juridicos.DTOs;
 using Processos_Juridicos.Mappers;
@@ -21,9 +22,9 @@ public class UnitSvc : IUnitSvc
             .ToListAsync();
         return Mapper.MapToToUnitDtoEnum(units);
     }
-    public async Task<UnitsDTO> getUnitByCode(string code)
+    public async Task<UnitsDTO> getUnitById(int? id)
     {
-        var unit = await _context.Units.FirstOrDefaultAsync(x => x.unit_code == code);
+        var unit = await _context.Units.FirstOrDefaultAsync(x => x.unit_id == id);
         return Mapper.MapToUnitDto(unit);
     }
 
@@ -54,10 +55,12 @@ public class UnitSvc : IUnitSvc
             throw new ArgumentNullException(nameof(unit));
         }
 
-        var existingUnit = await _context.Units.FirstOrDefaultAsync(x => x.unit_code == unit.unit_code);
+        var existingUnit = _context.Units.Find(unit.unit_id);
+        Debug.WriteLine(unit.unit_id);
+        Debug.WriteLine($"UNIDADE EXISTENTE: {existingUnit} da {unit}");
         if (existingUnit == null)
         {
-            throw new Exception("Unidade não encontrada.");
+            throw new Exception("Unidade não encontrada");
         }
 
         _context.Entry(existingUnit).CurrentValues.SetValues(unit);
@@ -65,10 +68,9 @@ public class UnitSvc : IUnitSvc
         return Mapper.MapToUnitDto(existingUnit);
     }
 
-    public async Task<bool> deleteUnit(string code)
+    public async Task<bool> deleteUnit(int? id)
     {
-        System.Diagnostics.Debug.WriteLine(code);
-        var unit = await _context.Units.FirstOrDefaultAsync(x => x.unit_code == code);
+        var unit = await _context.Units.FirstOrDefaultAsync(x => x.unit_id == id);
         if (unit == null)
         {
             return false;

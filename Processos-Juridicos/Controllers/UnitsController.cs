@@ -2,6 +2,7 @@
 using Processos_Juridicos.Services.Interfaces;
 using Processos_Juridicos.DTOs;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Diagnostics;
 
 namespace Processos_Juridicos.Controllers;
 
@@ -29,14 +30,14 @@ public class UnitsController : Controller
 
     // Action to get one Unit
     [HttpGet]
-    public async Task<IActionResult> ListOne(string code)
+    public async Task<IActionResult> ListOne(int id)
     {
-        if (string.IsNullOrEmpty(code))
+        if (id == null)
         {
             return NotFound();
         }
 
-        var unit = await _unitSvc.getUnitByCode(code);
+        var unit = await _unitSvc.getUnitById(id);
         if (unit == null)
         {
             return NotFound();
@@ -48,41 +49,26 @@ public class UnitsController : Controller
 
     // Action to access create/edit form checking if exists code or not
     [HttpGet]
-    public async Task<IActionResult> CreateEdit(string? code)
+    public async Task<IActionResult> CreateEdit(int? id)
     {
-        var sectors = await _sectorsSvc.getAllSectors();
-        var listSectors = sectors.Select(x => new SelectListItem
-        {
-            Text = x.sector_name,
-            Value = x.Id.ToString()
-        }).ToList();
-
-        ViewBag.selectos = listSectors;
-
-        UnitsDTO model = string.IsNullOrEmpty(code)
+        UnitsDTO model = id == null
             ? new UnitsDTO { IsEdit = false } 
-            : await _unitSvc.getUnitByCode(code) ?? new UnitsDTO { IsEdit = false };
+            : await _unitSvc.getUnitById(id) ?? new UnitsDTO { IsEdit = false };
 
-        model.IsEdit = !string.IsNullOrEmpty(code);
+        model.IsEdit = id != null;
+
+        await PopulateSectorsForViewBag();
 
         return View(model);
     }
 
-
-    // Action to create or edit a Unit 
+    // Action to create or edit a Unit after save
     [HttpPost]
     public async Task<IActionResult> CreateEdit(UnitsDTO model)
     {
         if (!ModelState.IsValid)
         {
-            var sectors = await _sectorsSvc.getAllSectors();
-            ViewBag.selectos = sectors.Select(x => new SelectListItem
-            {
-                Text = x.sector_name,
-                Value = x.Id.ToString(),
-                Selected = x.Id == model.sector_Id
-            }).ToList();
-
+            await PopulateSectorsForViewBag();
             return View(model);
         }
 
@@ -102,9 +88,10 @@ public class UnitsController : Controller
     // Action to delete
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Delete(string code)
+    public async Task<IActionResult> Delete(int? id)
     {
-        if (string.IsNullOrEmpty(code))
+        Debug.WriteLine(id);
+        if (id == null)
         {
             TempData["Error"] = "Código inválido!";
             return RedirectToAction(nameof(List));
@@ -112,7 +99,7 @@ public class UnitsController : Controller
 
         try
         {
-            await _unitSvc.deleteUnit(code);
+            await _unitSvc.deleteUnit(id);
             TempData["Success"] = "Unidade apagada com sucesso!";
         }
         catch (Exception ex)
@@ -121,5 +108,19 @@ public class UnitsController : Controller
         }
 
         return RedirectToAction(nameof(List));
+    }
+
+    /* Other */
+    // Helper method to load and prepare the list of sectors for dropdown
+    private async Task PopulateSectorsForViewBag()
+    {
+        var sectors = await _sectorsSvc.getAllSectors();
+        var listSectors = sectors.Select(x => new SelectListItem
+        {
+            Text = x.sector_name,
+            Value = x.Id.ToString()
+        }).ToList();
+
+        ViewBag.selectors = listSectors;
     }
 }

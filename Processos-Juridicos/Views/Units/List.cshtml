@@ -19,7 +19,7 @@
             <tr>
                 <th scope="col">#</th>
                 <th scope="col">@Html.DisplayNameFor(m=>m.unit_name)</th>
-                <th scope="col">@Html.DisplayNameFor(m=>m.unit_code)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.unit_code)</th>
                 <th scope="col">@Html.DisplayNameFor(m=>m.unit_acronym)</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.Sectors.sector_name)</th>
                 <th scope="col">Ações</th>
@@ -38,10 +38,10 @@
                     <td>
                         <div class="d-flex gap-2">
                             <form asp-controller="Units" asp-action="Delete" method="post">
-                                <input type="hidden" name="code" value="@item.unit_code">
+                                <input type="hidden" name="id" value="@item.unit_id">
                                 <button type="submit" class="btn btn-danger"></button>
                             </form>
-                            <a asp-controller="Units" asp-action="CreateEdit" asp-route-code="@item.unit_code" class="btn btn-warning"></a>
+                            <a asp-controller="Units" asp-action="CreateEdit" asp-route-id="@item.unit_id" class="btn btn-warning"></a>
                         </div>
                     </td>
                 </tr>

@@ -12,15 +12,16 @@ namespace Processos_Juridicos.Entities;
 public class Units
 {
     [Key]
-    [DisplayName("Código da Unidade")]
-    public string unit_code { get; set; }
+    public int unit_id { get; set; }
 
-    [DisplayName("Nome da unidade")]
+    public string unit_code { get; set; }
     public string unit_name { get; set; }
 
-    [DisplayName("Abreviatura")]
     public string unit_acronym { get; set; }
+
     
+    public int sector_Id { get; set; }
+
     public bool Enable { get; set; } = default;
 
     [ForeignKey("sector_Id")]
