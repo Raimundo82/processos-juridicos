@@ -5,16 +5,16 @@ namespace Processos_Juridicos.Controllers
 {
     public class SentencesController : Controller
     {
-        private readonly ISentenceSvc _sentenceSvc;
+        private readonly ISentencesSvc _sentenceSvc;
 
-        public SentencesController(ISentenceSvc stateSvc)
+        public SentencesController(ISentencesSvc stateSvc)
         {
             _sentenceSvc = stateSvc;
         }
         [HttpGet]
         public async Task<IActionResult> List()
         {
-            var listStatesDto = await _sentenceSvc.getAllStates();
+            var listStatesDto = await _sentenceSvc.getAllSentences();
             return View(listStatesDto);
         }
     }
