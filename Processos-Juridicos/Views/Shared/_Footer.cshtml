@@ -1,5 +1,9 @@
 ﻿<footer class="border-top footer text-muted">
     <div class="container">
-        &copy; 2025 - Processos_Juridicos - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        &copy; <span id="footer-year"></span> Marinha | Design System (Beta)
     </div>
 </footer>
+
+<script>
+    document.getElementById('footer-year').textContent = new Date().getFullYear();
+</script>
