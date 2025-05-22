@@ -13,13 +13,8 @@ public class Units
 {
     [Key]
     public int unit_id { get; set; }
-<<<<<<< HEAD
 
     [DisplayName("Código da unidade")]
-    public string unit_code { get; set; }
-=======
->>>>>>> master
-
     public string unit_code { get; set; }
     public string unit_name { get; set; }
     public string unit_acronym { get; set; }

@@ -14,13 +14,8 @@ public  class UnitsDTO
 {
     [Key]
     public int unit_id { get; set; }
-
-<<<<<<< HEAD
-
-=======
     [DisplayName("Código da Unidade")]
     [Required(ErrorMessage = "O Código da Unidade é obrigatório")]
->>>>>>> master
     public string unit_code { get; set; }
 
     [Required(ErrorMessage = "O Nome da Unidade é obrigatório")]
