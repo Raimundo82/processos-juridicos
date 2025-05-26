@@ -4,7 +4,7 @@
 // Write your JavaScript code.
 
 // datatable 
-function createDataTabe(elmentId) {
+function createDataTable(elmentId) {
     let table = $(elmentId);
     if (table.length && table.find("tbody tr").length > 0) {
         $(elmentId).DataTable({

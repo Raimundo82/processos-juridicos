@@ -31,16 +31,17 @@ builder.Services.AddHttpClient<ApisSvc>()
 //register Interfaces services
 builder.Services.AddScoped<IToastNotify, ToastNotify>();
 builder.Services.AddScoped<IUnitSvc, UnitSvc>();
-builder.Services.AddScoped<ISectorsSvc, SectorsSvc>();
-builder.Services.AddScoped<IStateSvc, StateSvc>();
-builder.Services.AddScoped<IProcessTypesSvc, ProcessTypesSvc>();
-builder.Services.AddScoped<ISentencesSvc, SentencesSvc>();
-builder.Services.AddScoped<IApisSvc, ApisSvc>();
-builder.Services.AddScoped<IHarmedOrCasualtiesSvc, HarmedOrCasualtiesSvc>();
-builder.Services.AddScoped<IInfringementsSvc, InfringementsSvc>();
 builder.Services.AddScoped<ISectorSvc, SectorSvc>();
-builder.Services.AddScoped<IFilesSvc, FilesSvc>();
-builder.Services.AddScoped<IProcessesSvc, ProcessesSvc>();
+builder.Services.AddScoped<IStateSvc, StateSvc>();
+builder.Services.AddScoped<ISentenceSvc, SentenceSvc>();
+builder.Services.AddScoped<IProcessTypeSvc, ProcessTypesSvc>();
+builder.Services.AddScoped<IApisSvc, ApisSvc>();
+builder.Services.AddScoped<IHarmedOrCasualtySvc, HarmedOrCasualtySvc>();
+builder.Services.AddScoped<IInfringementSvc, InfringementSvc>();
+builder.Services.AddScoped<ISectorSvc, SectorSvc>();
+builder.Services.AddScoped<IProcessFileSvc, ProcessFileSvc>();
+builder.Services.AddScoped<IProcessSvc, ProcessSvc>();
+builder.Services.AddScoped<IAccidentTypeSvc, AccidentTypeSvc>();
 
 
 //Register NToastNotify

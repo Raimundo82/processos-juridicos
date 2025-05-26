@@ -2,43 +2,43 @@
 using Processos_Juridicos.Data;
 using Processos_Juridicos.DTOs;
 using Processos_Juridicos.Mappers;
+using Processos_Juridicos.Models;
 using Processos_Juridicos.Services.Interfaces;
 
 namespace Processos_Juridicos.Services;
 public class UnitSvc : IUnitSvc
 {
     private readonly AppDbContext _context;
-    private readonly IToastNotify _toastNotify;
 
     public UnitSvc(AppDbContext context, IToastNotify toastNotify)
     {
         _context = context;
-        _toastNotify = toastNotify;
     }
 
 
     // Retrieves all units, including their associated sectors, from the database.
-    public async Task<IEnumerable<UnitsDTO>> getAllUnits()
+    public async Task<IEnumerable<UnitDto>> GetAllUnits()
     {
         var units = await _context.Units
-            .Include(x => x.Sectors)
+            .Include(x => x.Sector)
             .ToListAsync();
         return Mapper.MapToToUnitDtoEnum(units);
     }
 
 
     // Retrieves a single unit by its ID.
-    public async Task<UnitsDTO> getUnitById(int id)
+    public async Task<UnitDto> GetUnitById(int id)
     {
-        var unit = await _context.Units.FirstOrDefaultAsync(x => x.unit_id == id);
+        var unit = await _context.Units.FirstOrDefaultAsync(x => x.UnitId == id)
+                ?? throw new KeyNotFoundException($"A unidade com o id {id} não existe");
         return Mapper.MapToUnitDto(unit);
     }
 
 
     // Creates an existing unit in the database.
-    public async Task<UnitsDTO> createUnit(UnitsDTO unitDto)
+    public async Task<UnitDto> CreateUnit(UnitDto unit)
     {
-        var unitEntity = Mapper.MapToUnit(unitDto);
+        var unitEntity = Mapper.MapToUnit(unit);
 
         _context.Units.Add(unitEntity);
         await _context.SaveChangesAsync();
@@ -47,20 +47,20 @@ public class UnitSvc : IUnitSvc
 
 
     // Updates an existing unit in the database.
-    public async Task<UnitsDTO> editUnit(UnitsDTO unitDto)
+    public async Task<UnitDto> EditUnit(UnitDto unit)
     {
-        var unitEntity = Mapper.MapToUnit(unitDto);
+        var unitEntity = Mapper.MapToUnit(unit);
         _context.Units.Entry(unitEntity).State = EntityState.Modified;
 
         await _context.SaveChangesAsync();
-        return unitDto;
+        return unit;
     }
 
 
     // Deletes a unit by its ID
-    public async Task<bool> deleteUnit(int id)
+    public async Task<bool> DeleteUnit(int id)
     {
-        var unit = await _context.Units.FirstOrDefaultAsync(x => x.unit_id == id);
+        var unit = await _context.Units.FirstOrDefaultAsync(x => x.UnitId == id);
         if (unit == null)
         {
             return false;

@@ -1,0 +1,53 @@
+﻿@using Processos_Juridicos.DTOs
+
+@{
+    ViewData["Title"] = "Lista de ficheiros";
+    int count = 1;
+}
+
+@model IEnumerable<ProcessFileDto>
+
+<div class="text-center">
+    <h1 class="display-4">Ficheiros</h1>
+</div>
+
+<button asp-controller="File" asp-action="CreateEdit" class="btn btn-primary">Inserir ficheiro</button>
+
+<div>
+    <table id="tableStates" class="table table-striped-columns table-hover">
+        <thead>
+            <tr>
+                <th scope="col">@count</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().ProcessFileId)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().ProcessFileName)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().ProcessFileType)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().ProcessFileContent)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().ProcessId)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().RowGuid)</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            @foreach (var item in Model.ToList())
+            {
+                <tr>
+                    <th scope="row">@count</th>
+                    <td>@Html.DisplayFor(m => item.ProcessFileId)</td>
+                    <td>@Html.DisplayFor(m => item.ProcessFileName)</td>
+                    <td>@Html.DisplayFor(m => item.ProcessFileType)</td>
+                    <td>@Html.DisplayFor(m => item.ProcessFileContent)</td>
+                    <td>@Html.DisplayFor(m => item.ProcessId)</td>
+                    <td>@Html.DisplayFor(m => item.RowGuid)</td>
+
+                </tr>
+                count++;
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script>
+        let table = createDataTable("#tableStates");
+    </script>
+} 

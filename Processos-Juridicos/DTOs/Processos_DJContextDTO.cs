@@ -13,52 +13,53 @@ public partial class Processos_DJContextDTO : DbContext
     {
     }
 
-    public virtual DbSet<Accident_typesDTO> Accident_types { get; set; }
+    public virtual DbSet<AccidentTypeDto> Accident_types { get; set; }
 
-    public virtual DbSet<FilesDTO> Files { get; set; }
+    public virtual DbSet<ProcessFileDto> Files { get; set; }
 
-    public virtual DbSet<Harmed_or_casualtiesDTO> Harmed_or_casualties { get; set; }
+    public virtual DbSet<HarmedOrCasualtyDto> Harmed_or_casualties { get; set; }
 
-    public virtual DbSet<InfringementsDTO> Infringements { get; set; }
+    public virtual DbSet<InfringementDto> Infringements { get; set; }
 
-    public virtual DbSet<Process_typesDTO> Process_types { get; set; }
+    public virtual DbSet<ProcessTypeDto> Process_types { get; set; }
 
-    public virtual DbSet<ProcessesDTO> Processes { get; set; }
+    public virtual DbSet<ProcessDto> Processes { get; set; }
 
-    public virtual DbSet<SentencesDTO> Sentences { get; set; }
+    public virtual DbSet<SentenceDto> Sentences { get; set; }
 
-    public virtual DbSet<StatesDTO> States { get; set; }
+    public virtual DbSet<StateDto> States { get; set; }
 
-    public virtual DbSet<UnitsDTO> Units { get; set; }
+    public virtual DbSet<UnitDto> Units { get; set; }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<Process_typesDTO>(entity =>
-        {
-            entity.HasKey(e => e.process_type_id).HasName("PK_Process_type");
-        });
+    // TODO: REVIEW - REMOVE IF NECESSARY OR IF REDUNDANT
+    //protected override void OnModelCreating(ModelBuilder modelBuilder)
+    //{
+    //    modelBuilder.Entity<ProcessTypeDto>(entity =>
+    //    {
+    //        entity.HasKey(e => e.ProcessTypeId).HasName("PK_Process_type");
+    //    });
 
-        modelBuilder.Entity<ProcessesDTO>(entity =>
-        {
-            entity.HasOne(d => d.harmed_or_casualties).WithMany(p => p.Processes).HasConstraintName("FK_Processes_Harmed_or_casualties");
+    //    modelBuilder.Entity<ProcessDto>(entity =>
+    //    {
+    //        entity.HasOne(d => d.HarmedOrCasualties).WithMany(p => p.Processes).HasConstraintName("FK_Processes_Harmed_or_casualties");
 
-            entity.HasOne(d => d.infringement).WithMany(p => p.Processes).HasConstraintName("FK_Processes_Infringements");
+    //        entity.HasOne(d => d.Infringement).WithMany(p => p.Processes).HasConstraintName("FK_Processes_Infringements");
 
-            entity.HasOne(d => d.process_type).WithMany(p => p.Processes).HasConstraintName("FK_Processes_Process_types");
+    //        entity.HasOne(d => d.ProcessType).WithMany(p => p.Processes).HasConstraintName("FK_Processes_Process_types");
 
-            entity.HasOne(d => d.sentence).WithMany(p => p.Processes).HasConstraintName("FK_Processes_Sentences");
+    //        entity.HasOne(d => d.Sentence).WithMany(p => p.Processes).HasConstraintName("FK_Processes_Sentences");
 
-            entity.HasOne(d => d.service_accident).WithMany(p => p.Processes).HasConstraintName("FK_Processes_Accident_types");
+    //        entity.HasOne(d => d.ServiceAccident).WithMany(p => p.Processes).HasConstraintName("FK_Processes_Accident_types");
 
-            entity.HasOne(d => d.state).WithMany(p => p.Processes)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Processes_States");
+    //        entity.HasOne(d => d.State).WithMany(p => p.Processes)
+    //            .OnDelete(DeleteBehavior.ClientSetNull)
+    //            .HasConstraintName("FK_Processes_States");
 
-            entity.HasOne(d => d.unit).WithMany(p => p.Processes).HasConstraintName("FK_Processes_Units");
-        });
+    //        entity.HasOne(d => d.Unit).WithMany(p => p.Processes).HasConstraintName("FK_Processes_Units");
+    //    });
 
-        OnModelCreatingPartial(modelBuilder);
-    }
+    //    OnModelCreatingPartial(modelBuilder);
+    //}
 
-    partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+    //partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }

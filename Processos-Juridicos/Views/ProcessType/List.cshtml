@@ -1,0 +1,45 @@
+﻿@using Processos_Juridicos.DTOs
+
+@{
+    ViewData["Title"] = "Lista de tipos de processos";
+    int count = 1;
+}
+
+@model IEnumerable<ProcessTypeDto>
+
+<div class="text-center">
+    <h1 class="display-4">Tipos de processos</h1>
+</div>
+
+<button asp-controller="ProcessType" asp-action="Create" class="btn btn-primary">Inserir tipo de processo</button>
+
+<div>
+    <table id="tableStates" class="table table-striped-columns table-hover">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().ProcessTypeName)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().Deadline)</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            @foreach (var item in Model.ToList())
+            {
+                <tr>
+                    <th scope="row">@count</th>
+                    <td>@Html.DisplayFor(m => item.ProcessTypeName)</td>
+                    <td>@Html.DisplayFor(m => item.Deadline) dias</td>
+
+                </tr>
+                count++;
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script>
+        let table = createDataTable("#tableStates");
+    </script>
+} 

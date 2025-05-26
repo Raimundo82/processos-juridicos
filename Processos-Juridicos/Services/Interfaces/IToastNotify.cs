@@ -2,9 +2,9 @@
 
 public interface IToastNotify
 {
-    Task Sucesso(string msg);
-    Task Error(string msg);
-    Task Info(string msg);
-    Task Alert(string msg);
-    Task Warning(string msg);
-}
+    void Sucesso(string msg);
+    void Error(string msg);
+    void Info(string msg);
+    void Alert(string msg);
+    void Warning(string msg);
+}   

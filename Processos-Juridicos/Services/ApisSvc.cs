@@ -1,4 +1,5 @@
-﻿using Processos_Juridicos.Models;
+﻿using Processos_Juridicos.Entities;
+using Processos_Juridicos.Models;
 using Processos_Juridicos.Services.Interfaces;
 using System.Net;
 using System.Text.Json;
@@ -32,10 +33,12 @@ public class ApisSvc : IApisSvc
         {
             var json = await response.Content.ReadAsStringAsync();
 
-            var listUnits = JsonSerializer.Deserialize<List<ApiUnitsModel>>(json);
+            var listUnits = JsonSerializer.Deserialize<List<ApiUnitsModel>>(json)
+                ?? throw new KeyNotFoundException("A lista de unidades está vazia");
+
             return listUnits;
         }
 
-        return null;
+        return [];
     }
 }

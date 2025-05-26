@@ -1,0 +1,85 @@
+﻿@using Processos_Juridicos.DTOs
+
+@{
+    ViewData["Title"] = "Lista de processos";
+    int count = 1;
+}
+
+@model IEnumerable<ProcessDto>
+
+<div class="text-center">
+    <h1 class="display-4">Processos</h1>
+</div>
+
+<button asp-controller="Process" asp-action="CreateEdit" class="btn btn-primary">Inserir Processo</button>
+
+<div class="table-responsive-md" style="max-width: calc(100vw-200px);margin: 0 auto; overflow-x: auto;">
+    <table id="tableStates" class="table table-striped-columns table-hover">
+        <thead>
+            <tr>
+                <th scope="col">@count</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().ProcessId)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().Nuipm)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().ProcessTypeId)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().OficialInstId)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().InvestigatedId)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().InvestigatedGenderId)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().OcurrenceDate)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().DispatchDate)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().Description)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().DeadlineDate)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().FinalDispatchDate)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().SentenceId)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().StateId)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().CreatedAt)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().CreatedById)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().ModifiedAt)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().ModifiedById)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().ServiceAccidentId)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().HarmedOrCasualtiesId)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().ThirdPartyCompensation)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().Reimbursement)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().InfringementId)</th>
+        </thead>
+        <tbody>
+
+            @foreach (var item in Model.ToList())
+            {
+                <tr>
+                    <th scope="row">@count</th>
+                    <td>@Html.DisplayFor(m => item.ProcessId)</td>
+                    <td>@Html.DisplayFor(m => item.Nuipm)</td>
+                    <td>@Html.DisplayFor(m => item.ProcessTypeId)</td>
+                    <td>@Html.DisplayFor(m => item.UnitId)</td>
+                    <td>@Html.DisplayFor(m => item.OficialInstId)</td>
+                    <td>@Html.DisplayFor(m => item.InvestigatedId)</td>
+                    <td>@Html.DisplayFor(m => item.InvestigatedGenderId)</td>
+                    <td>@Html.DisplayFor(m => item.OcurrenceDate)</td>
+                    <td>@Html.DisplayFor(m => item.DispatchDate)</td>
+                    <td>@Html.DisplayFor(m => item.Description)</td>
+                    <td>@Html.DisplayFor(m => item.DeadlineDate)</td>
+                    <td>@Html.DisplayFor(m => item.FinalDispatchDate)</td>
+                    <td>@Html.DisplayFor(m => item.SentenceId)</td>
+                    <td>@Html.DisplayFor(m => item.StateId)</td>
+                    <td>@Html.DisplayFor(m => item.CreatedAt)</td>
+                    <td>@Html.DisplayFor(m => item.CreatedById)</td>
+                    <td>@Html.DisplayFor(m => item.ModifiedAt)</td>
+                    <td>@Html.DisplayFor(m => item.ModifiedById)</td>
+                    <td>@Html.DisplayFor(m => item.ServiceAccidentId)</td>
+                    <td>@Html.DisplayFor(m => item.HarmedOrCasualtiesId)</td>
+                    <td>@Html.DisplayFor(m => item.ThirdPartyCompensation)</td>
+                    <td>@Html.DisplayFor(m => item.Reimbursement)</td>
+                    <td>@Html.DisplayFor(m => item.InfringementId)</td>
+
+                </tr>
+                count++;
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script>
+        let table = createDataTable("#tableStates");
+    </script>
+} 

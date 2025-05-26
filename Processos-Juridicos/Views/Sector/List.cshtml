@@ -1,0 +1,47 @@
+﻿@using Processos_Juridicos.DTOs
+
+@{
+    ViewData["Title"] = "Lista de categorias de setores";
+    int count = 1;
+}
+
+@model IEnumerable<SectorDto>
+
+<div class="text-center">
+    <h1 class="display-4">Setores</h1>
+</div>
+
+<button asp-controller="Sector" asp-action="CreateEdit" class="btn btn-primary">Inserir Acidente em Serviço</button>
+
+<div>
+    <table id="tableStates" class="table table-striped-columns table-hover">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().SectorName)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().SectorCode)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().Enable)</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            @foreach (var item in Model.ToList())
+            {
+                <tr>
+                    <th scope="row">@count</th>
+                    <td>@Html.DisplayFor(m => item.SectorName)</td>
+                    <td>@Html.DisplayFor(m => item.SectorCode)</td>
+                    <td>@Html.DisplayFor(m => item.Enable)</td>
+
+                </tr>
+                count++;
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script>
+        let table = createDataTable("#tableStates");
+    </script>
+} 

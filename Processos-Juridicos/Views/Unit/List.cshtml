@@ -1,0 +1,60 @@
+﻿@using Processos_Juridicos.DTOs
+
+@{
+    ViewData["Title"] = "Lista de unidades";
+    int count = 1;
+}
+
+@model IEnumerable<UnitDto>
+
+<div class="text-center">
+    <h1 class="display-4">Unidades</h1>
+</div>
+
+<a asp-controller="Unit" asp-action="Create" class="btn btn-primary">Inserir Unidade</a>
+
+<div>
+    <table id="tableUnits" class="table table-striped-columns table-hover">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+
+                <th scope="col">@Html.DisplayNameFor(m=>m.UnitName)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.UnitCode)</th>
+                <th scope="col">@Html.DisplayNameFor(m=>m.UnitAcronym)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.Sector.SectorName)</th>
+                <th scope="col">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            @foreach (var item in Model.ToList())
+            {
+                <tr>
+                    <td>@count</td>
+                    <td>@Html.DisplayFor(m => item.UnitName)</td>
+                    <td>@Html.DisplayFor(m => item.UnitCode)</td>
+                    <td>@Html.DisplayFor(m => item.UnitAcronym)</td>
+                    <td>@Html.DisplayFor(m => item.Sector.SectorName)</td>
+                    <td>
+                        <div class="d-flex gap-2">
+                            <form asp-controller="Unit" asp-action="Delete" method="post">
+                                <input type="hidden" name="id" value="@item.UnitId">
+                                <button type="submit" class="btn btn-danger"></button>
+                            </form>
+                            <a asp-controller="Unit" asp-action="Edit" asp-route-id="@item.UnitId"
+                                class="btn btn-warning"><i class="bi bi-pencil"></i></a>
+                        </div>
+                    </td>
+                </tr>
+                count++;
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script>
+        let table = createDataTable("#tableUnits");
+    </script>
+}

@@ -7,7 +7,7 @@ using Processos_Juridicos.Services.Interfaces;
 
 namespace Processos_Juridicos.Services
 {
-    public class ProcessTypesSvc : IProcessTypesSvc
+    public class ProcessTypesSvc : IProcessTypeSvc
     {
         private readonly AppDbContext _context;
 
@@ -17,7 +17,7 @@ namespace Processos_Juridicos.Services
         }
 
 
-        public Task<Process_types> createProcessType(Process_types processType)
+        public Task<ProcessType> createProcessType(ProcessType type)
         {
             throw new NotImplementedException();
         }
@@ -27,18 +27,18 @@ namespace Processos_Juridicos.Services
             throw new NotImplementedException();
         }
 
-        public Task<Process_types> editProcessType(Process_types processType)
+        public Task<ProcessType> editProcessType(ProcessType type)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<Process_typesDTO>> getAllProcessTypes()
+        public async Task<IEnumerable<ProcessTypeDto>> getAllProcessTypes()
         {
             var types = await _context.Process_types.ToListAsync();
             return Mapper.MapToToProcessTypeDtoEnum(types);
         }
 
-        public Task<Process_types> getProcessTypeById(int id)
+        public Task<ProcessType> getProcessTypeById(int id)
         {
             throw new NotImplementedException();
         }

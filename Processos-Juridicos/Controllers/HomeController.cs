@@ -27,26 +27,8 @@ namespace Processos_Juridicos.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-          //  var listUnits = await _apisSvc.geAlltUnits();
-
-          //  var listUnit = new List<Units>();
-          //  foreach (var unit in listUnits)
-          //  {
-          //      var units = new Units 
-          //      { 
-          //      unit_code = unit.codUnidade,
-          //      unit_acronym = unit.sigUnidade,
-          //      unit_name = unit.descUnidades,
-          //      sector_code = null
-          //      };
-          //      listUnit.Add(units);
-          //  }
-
-          //  _context.Units.AddRange(listUnit);
-          //await  _context.SaveChangesAsync();
-
             return View();
         }
 

@@ -16,25 +16,25 @@ namespace Processos_Juridicos.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<StatesDTO>> getAllStates()
+        public async Task<IEnumerable<StateDto>> getAllStates()
         {
             var states = await _context.States.ToListAsync();
             return Mapper.MapToToStateDtoEnum(states);
         }
 
 
-         public Task<States> getStateById(int id)
+         public Task<State> getStateById(int id)
         {
             throw new NotImplementedException();
         }
 
-        public Task<States> createState(States state)
+        public Task<State> createState(State state)
         {
             throw new NotImplementedException();
         }
 
 
-        public Task<States> editState(States state)
+        public Task<State> editState(State state)
         {
             throw new NotImplementedException();
         }

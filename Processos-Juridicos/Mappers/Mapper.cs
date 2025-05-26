@@ -9,62 +9,61 @@ public static partial class Mapper
 {
 
     // Units Map
-    public static partial UnitsDTO MapToUnitDto(Units entity);
-    public static partial Units MapToUnit(UnitsDTO dto);
-    public static partial IEnumerable<UnitsDTO> MapToToUnitDtoEnum(IEnumerable<Units> entity);
+    public static partial UnitDto MapToUnitDto(Unit entity);
+    public static partial Unit MapToUnit(UnitDto dto);
+    public static partial IEnumerable<UnitDto> MapToToUnitDtoEnum(IEnumerable<Unit> entity);
 
-    //Sectors
-    public static partial SectorsDTO MapToSectorsDto(Sectors entity);
-    public static partial Sectors MapToSectors(SectorsDTO dto);
-    public static partial IEnumerable<SectorsDTO> MapToToSectorsDtoEnum(IEnumerable<Sectors> entity);
+    //Sectors Map
 
+    public static partial SectorDto MapToSectorsDto(Sector entity);
+    public static partial Sector MapToSectors(SectorDto dto);
+    public static partial IEnumerable<SectorDto> MapToToSectorsEnum(IEnumerable<Sector> entity);
 
     // States Map 
 
-    public static partial StatesDTO MapToStateDto(States entity);
-    public static partial States MapToState (StatesDTO dto);
-    public static partial IEnumerable<StatesDTO> MapToToStateDtoEnum(IEnumerable<States> entity);
+    public static partial StateDto MapToStateDto(State entity);
+    public static partial State MapToState (StateDto dto);
+    public static partial IEnumerable<StateDto> MapToToStateDtoEnum(IEnumerable<State> entity);
 
     // Process_Types map
 
-    public static partial Process_typesDTO MapToStateTypeDto(Process_types entity);
-    public static partial Process_types MapToProcessType(Process_typesDTO dto);
-    public static partial IEnumerable<Process_typesDTO> MapToToProcessTypeDtoEnum(IEnumerable<Process_types> entity);
+    public static partial ProcessTypeDto MapToStateTypeDto(ProcessType entity);
+    public static partial ProcessType MapToProcessType(ProcessTypeDto dto);
+    public static partial IEnumerable<ProcessTypeDto> MapToToProcessTypeDtoEnum(IEnumerable<ProcessType> entity);
 
     // Sentences map
-    public static partial SentencesDTO MapToSentenceDto(Sentences entity);
-    public static partial Sentences MapToSentence(SentencesDTO dto);
-    public static partial IEnumerable<SentencesDTO> MapToToSentenceDtoEnum(IEnumerable<Sentences> entity);
+    public static partial SentenceDto MapToSentenceDto(Sentence entity);
+    public static partial Sentence MapToSentence(SentenceDto dto);
+    public static partial IEnumerable<SentenceDto> MapToToSentenceDtoEnum(IEnumerable<Sentence> entity);
 
     // Harmed or Casualties map
 
-    public static partial Harmed_or_casualtiesDTO MapToHarmedOrCasualtiesDto(Harmed_or_casualties entity);
-    public static partial Harmed_or_casualties MapToHarmedOrCasualties(Harmed_or_casualtiesDTO dto);
-    public static partial IEnumerable<Harmed_or_casualtiesDTO> MapToToHarmedOrCasualtiesEnum(IEnumerable<Harmed_or_casualties> entity);
+    public static partial HarmedOrCasualtyDto MapToHarmedOrCasualtiesDto(HarmedOrCasualty entity);
+    public static partial HarmedOrCasualty MapToHarmedOrCasualties(HarmedOrCasualtyDto dto);
+    public static partial IEnumerable<HarmedOrCasualtyDto> MapToToHarmedOrCasualtiesEnum(IEnumerable<HarmedOrCasualty> entity);
 
     // Infringements map
 
-    public static partial InfringementsDTO MapToInfringementsDto(Infringements entity);
-    public static partial Infringements MapToInfringements(InfringementsDTO dto);
-    public static partial IEnumerable<InfringementsDTO> MapToToInfringementsEnum(IEnumerable<Infringements> entity);
-
-    // Sectors map
-
-    public static partial SectorsDTO MapToSectorsDto(Infringements entity);
-    public static partial Sectors MapToSectors(InfringementsDTO dto);
-    public static partial IEnumerable<SectorsDTO> MapToToSectorsEnum(IEnumerable<Sectors> entity);
-
+    public static partial InfringementDto MapToInfringementsDto(Infringement entity);
+    public static partial Infringement MapToInfringements(InfringementDto dto);
+    public static partial IEnumerable<InfringementDto> MapToToInfringementsEnum(IEnumerable<Infringement> entity);
 
     // Files map
 
-    public static partial FilesDTO MapToFilesDto(Files entity);
-    public static partial Files MapToFiles(FilesDTO dto);
-    public static partial IEnumerable<FilesDTO> MapToToFilesEnum(IEnumerable<Files> entity);
+    public static partial ProcessFileDto MapToFilesDto(Entities.ProcessFile entity);
+    public static partial Entities.ProcessFile MapToFiles(ProcessFileDto dto);
+    public static partial IEnumerable<ProcessFileDto> MapToToFilesEnum(IEnumerable<Entities.ProcessFile> entity);
 
     // Processes map
 
-    public static partial ProcessesDTO MapToProcessesDto(Processes entity);
-    public static partial Processes MapToProcesses(ProcessesDTO dto);
-    public static partial IEnumerable<ProcessesDTO> MapToToProcessesEnum(IEnumerable<Processes> entity);
+    public static partial ProcessDto MapToProcessesDto(Process entity);
+    public static partial Process MapToProcesses(ProcessDto dto);
+    public static partial IEnumerable<ProcessDto> MapToToProcessesEnum(IEnumerable<Process> entity);
 
+
+    // Accident Types map
+
+    public static partial AccidentTypeDto MapToAccidenTypeDto(AccidentType entity);
+    public static partial AccidentType MapToAccidentType(AccidentTypeDto dto);
+    public static partial IEnumerable<AccidentTypeDto> MapToAccidentTypeEnum(IEnumerable<AccidentType> entity);
 }

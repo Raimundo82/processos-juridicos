@@ -16,7 +16,18 @@ namespace Processos_Juridicos.Services
             _context = context;
         }
 
-        public Task<Sectors> createSector(Sectors sentence)
+        public async Task<IEnumerable<SectorDto>> getAllSectors()
+        {
+            var sectors = await _context.Sectors.ToListAsync();
+            return Mapper.MapToToSectorsEnum(sectors);
+        }
+
+        public Task<Sector> getSectorById(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Sector> createSector(Sector sentence)
         {
             throw new NotImplementedException();
         }
@@ -26,18 +37,7 @@ namespace Processos_Juridicos.Services
             throw new NotImplementedException();
         }
 
-        public Task<Sectors> editSector(Sectors sentence)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<IEnumerable<SectorsDTO>> getAllSectors()
-        {
-            var sectors = await _context.Sectors.ToListAsync();
-            return Mapper.MapToToSectorsEnum(sectors);
-        }
-
-        public Task<Sectors> getSectorById(int id)
+        public Task<Sector> editSector(Sector sentence)
         {
             throw new NotImplementedException();
         }

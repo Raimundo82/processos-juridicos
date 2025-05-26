@@ -9,22 +9,22 @@ public class AppDbContext : DbContext
     {
     }
 
-    public  DbSet<Accident_types> Accident_types { get; set; }
+    public  DbSet<AccidentType> Accident_types { get; set; }
 
-    public  DbSet<Files> Files { get; set; }
+    public  DbSet<ProcessFile> Process_Files { get; set; }
 
-    public  DbSet<Harmed_or_casualties> Harmed_or_casualties { get; set; }
+    public  DbSet<HarmedOrCasualty> Harmed_or_casualties { get; set; }
 
-    public  DbSet<Infringements> Infringements { get; set; }
+    public  DbSet<Infringement> Infringements { get; set; }
 
-    public  DbSet<Process_types> Process_types { get; set; }
+    public  DbSet<ProcessType> Process_types { get; set; }
 
-    public  DbSet<Processes> Processes { get; set; }
+    public  DbSet<Process> Processes { get; set; }
 
-    public  DbSet<Sentences> Sentences { get; set; }
+    public  DbSet<Sentence> Sentences { get; set; }
 
-    public  DbSet<States> States { get; set; }
+    public  DbSet<State> States { get; set; }
 
-    public  DbSet<Units> Units { get; set; }
-    public  DbSet<Sectors> Sectors { get; set; }
+    public DbSet<Sector> Sectors { get; set; }
+    public DbSet<Unit> Units { get; set; }
 }
