@@ -1,0 +1,17 @@
+name: pull request lint
+
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - reopened
+      - synchronize
+
+jobs:
+  validate:
+    name: Validate PR title
+    runs-on: ubuntu-latest
+    steps:
+      - name: pull request linter
+        uses: openGemini/pr-title-checker@main
