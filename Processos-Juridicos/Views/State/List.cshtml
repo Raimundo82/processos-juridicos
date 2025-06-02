@@ -11,7 +11,7 @@
     <h1 class="display-4">Estados</h1>
 </div>
 
-<button asp-controller="States" asp-action="CreateEdit" class="btn btn-primary">Inserir Estado</button>
+<a asp-controller="State" asp-action="Create" class="btn btn-primary">Inserir Estado</a>
 
 <div>
     <table id="tableStates" class="table table-striped-columns table-hover">
@@ -20,6 +20,7 @@
                 <th scope="col">@count</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().StateId)</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().StateName)</th>
+                <th scope="col">Ações</th>
             </tr>
         </thead>
         <tbody>
@@ -30,8 +31,22 @@
                     <th scope="row">@count</th>
                     <td>@Html.DisplayFor(m => item.StateId)</td>
                     <td>@Html.DisplayFor(m => item.StateName)</td>
-
+                    <td>
+                        <div class="d-flex gap-2">
+                            <form asp-controller="State" asp-action="Delete" method="post">
+                                <input type="hidden" name="id" value="@item.StateId">
+                                <button type="submit" class="btn btn-danger"></button>
+                            </form>
+                            <a asp-controller="State" asp-action="Edit" asp-route-id="@item.StateId"
+                               class="btn btn-warning"><i class="bi bi-pencil"></i></a>
+                        </div>
+                    </td>
                 </tr>
+
+                
+                   
+                    
+                
                 count++;
             }
         </tbody>

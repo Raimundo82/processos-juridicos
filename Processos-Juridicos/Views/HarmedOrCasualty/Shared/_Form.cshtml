@@ -1,0 +1,7 @@
+﻿@model Processos_Juridicos.DTOs.HarmedOrCasualtyDto;
+
+<div class="form-group mt-3">
+    <label asp-for="CasualtiesName" for="casualty-name" class="control-label">Nome da categoria de ferido</label>
+    <input id="casualty-name" asp-for="CasualtiesName" class="form-control" />
+    <span asp-validation-for="CasualtiesName" class="text-danger"></span>
+</div>

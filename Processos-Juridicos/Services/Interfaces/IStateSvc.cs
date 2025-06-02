@@ -5,10 +5,10 @@ namespace Processos_Juridicos.Services.Interfaces
 {
     public interface IStateSvc
     {
-        Task<IEnumerable<StateDto>> getAllStates();
-        Task<State> getStateById(int id);
-        Task<State> createState(State state);
-        Task<State> editState(State state);
-        Task<bool> deleteState(int id);
+        Task<IEnumerable<StateDto>> GetAllStates();
+        Task<StateDto> GetStateById(int id);
+        Task<StateDto> CreateState(StateDto state);
+        Task<StateDto> EditState(StateDto state);
+        Task<bool> DeleteState(int id);
     }
 }

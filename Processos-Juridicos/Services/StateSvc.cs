@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Processos_Juridicos.Data;
 using Processos_Juridicos.DTOs;
-using Processos_Juridicos.Entities;
 using Processos_Juridicos.Mappers;
 using Processos_Juridicos.Services.Interfaces;
 
@@ -16,32 +15,69 @@ namespace Processos_Juridicos.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<StateDto>> getAllStates()
+        public async Task<IEnumerable<StateDto>> GetAllStates()
         {
             var states = await _context.States.ToListAsync();
             return Mapper.MapToToStateDtoEnum(states);
         }
 
 
-         public Task<State> getStateById(int id)
+         public async Task<StateDto> GetStateById(int id)
         {
-            throw new NotImplementedException();
+            var state = await _context.States.FirstOrDefaultAsync(s => s.StateId == id)
+        ?? throw new KeyNotFoundException($"O estado com o ID {id} não foi encontrado");
+            return Mapper.MapToStateDto(state);
+
         }
 
-        public Task<State> createState(State state)
+        public async Task<StateDto> CreateState(StateDto state)
         {
-            throw new NotImplementedException();
+            var existingState = await _context.States.FirstOrDefaultAsync(s => s.StateName == state.StateName);
+            if (existingState != null)
+            {
+                throw new InvalidOperationException($"Já existe um estado com o nome '{state.StateName}'.");
+            }
+
+            var stateEntity = Mapper.MapToState(state);
+
+            _context.States.Add(stateEntity);
+            await _context.SaveChangesAsync();
+            return Mapper.MapToStateDto(stateEntity);
+
         }
 
 
-        public Task<State> editState(State state)
+        public async Task<StateDto> EditState(StateDto state)
         {
-            throw new NotImplementedException();
+            var duplicateState = await _context.States
+                .Where(s => s.StateName == state.StateName && s.StateId != state.StateId)
+                .FirstOrDefaultAsync();
+
+            if (duplicateState != null)
+            {
+                throw new InvalidOperationException($"Já existe outro estado com o nome '{state.StateName}'.");
+            }
+
+            var stateEntity = Mapper.MapToState(state);
+            _context.States.Entry(stateEntity).State = EntityState.Modified;
+
+            await _context.SaveChangesAsync();
+            return state;
+
         }
 
 
-        public Task<bool> deleteState(int id){
-            throw new NotImplementedException();
+        public async Task<bool> DeleteState(int id){
+            var state = await _context.States.FirstOrDefaultAsync(x => x.StateId == id);
+            if (state == null)
+            {
+                return false;
+            }
+
+            _context.States.Remove(state);
+            await _context.SaveChangesAsync();
+            return true;
+
         }
     }
 }
