@@ -5,10 +5,10 @@ namespace Processos_Juridicos.Services.Interfaces;
 
 public interface ISentenceSvc
 {
-    Task<IEnumerable<SentenceDto>> getAllSentences();
-    Task<Sentence> getSentencesById(int id);
-    Task<Sentence> createSentence(Sentence sentence);
-    Task<Sentence> editState(Sentence sentence);
-    Task<bool> deleteState(int id);
+    Task<IEnumerable<SentenceDto>> GetAllSentences();
+    Task<SentenceDto> GetSentenceById(int id);
+    Task<SentenceDto> CreateSentence(SentenceDto sentence);
+    Task<SentenceDto> EditSentence(SentenceDto sentence);
+    Task<bool> DeleteSentence(int id);
 
 }

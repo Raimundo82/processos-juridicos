@@ -11,7 +11,7 @@
     <h1 class="display-4">Sentenças</h1>
 </div>
 
-<button asp-controller="Sentence" asp-action="Create" class="btn btn-primary">Inserir tipo de sentença</button>
+<a asp-controller="Sentence" asp-action="Create" class="btn btn-primary">Inserir tipo de sentença</a>
 
 <div>
     <table id="tableStates" class="table table-striped-columns table-hover">
@@ -19,7 +19,7 @@
             <tr>
                 <th scope="col">#</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().SentenceName)</th>
-
+                <th scope="col">Ações</th>
             </tr>
         </thead>
         <tbody>
@@ -29,7 +29,16 @@
                 <tr>
                     <th scope="row">@count</th>
                     <td>@Html.DisplayFor(m => item.SentenceName)</td>
-
+                    <td>
+                        <div class="d-flex gap-2">
+                            <form asp-controller="Sentence" asp-action="Delete" method="post">
+                                <input type="hidden" name="id" value="@item.SentenceId">
+                                <button type="submit" class="btn btn-danger"></button>
+                            </form>
+                            <a asp-controller="Sentence" asp-action="Edit" asp-route-id="@item.SentenceId"
+                               class="btn btn-warning"><i class="bi bi-pencil"></i></a>
+                        </div>
+                    </td>
                 </tr>
                 count++;
             }
