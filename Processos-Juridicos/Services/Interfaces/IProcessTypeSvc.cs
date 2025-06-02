@@ -5,11 +5,11 @@ namespace Processos_Juridicos.Services.Interfaces
 {
     public interface IProcessTypeSvc
     {
-        Task<IEnumerable<ProcessTypeDto>> getAllProcessTypes();
-        Task<ProcessType> getProcessTypeById(int id);
-        Task<ProcessType> createProcessType(ProcessType type);
-        Task<ProcessType> editProcessType(ProcessType type);
-        Task<bool> deleteProcessType(int id);
+        Task<IEnumerable<ProcessTypeDto>> GetAllProcessTypes();
+        Task<ProcessTypeDto> GetProcessTypeById(int id);
+        Task<ProcessTypeDto> CreateProcessType(ProcessTypeDto type);
+        Task<ProcessTypeDto> EditProcessType(ProcessTypeDto type);
+        Task<bool> DeleteProcessType(int id);
 
     }
 }

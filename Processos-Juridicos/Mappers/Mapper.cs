@@ -27,7 +27,7 @@ public static partial class Mapper
 
     // Process_Types map
 
-    public static partial ProcessTypeDto MapToStateTypeDto(ProcessType entity);
+    public static partial ProcessTypeDto MapToProcessTypeDto(ProcessType entity);
     public static partial ProcessType MapToProcessType(ProcessTypeDto dto);
     public static partial IEnumerable<ProcessTypeDto> MapToToProcessTypeDtoEnum(IEnumerable<ProcessType> entity);
 

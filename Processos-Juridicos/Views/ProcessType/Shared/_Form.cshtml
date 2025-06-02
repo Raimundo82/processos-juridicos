@@ -1,0 +1,21 @@
+﻿@model Processos_Juridicos.DTOs.ProcessTypeDto;
+
+<div class="form-group mt-3">
+    <label asp-for="ProcessTypeName" for="process-type-name" class="control-label">Tipo de Processo</label>
+    <input id="process-type-name" asp-for="ProcessTypeName" class="form-control" />
+    <span asp-validation-for="ProcessTypeName" class="text-danger"></span>
+</div>
+
+<div class="form-group mt-3">
+    <label asp-for="Deadline" for="deadline" class="control-label">Prazo em dias</label>
+    <input asp-for="Deadline" id="deadline" type="number" class="form-control" onkeydown="return bloquearE(event)"/>
+    <span asp-validation-for="Deadline" class="text-danger"></span>
+</div>
+
+<script>
+    function bloquearE(event) {
+        if (event.key.toLowerCase() === 'e' || event.key === '-' || event.key === '+') {
+            return false;
+        }
+    }
+</script>
