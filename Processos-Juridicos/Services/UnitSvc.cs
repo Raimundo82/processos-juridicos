@@ -2,10 +2,10 @@
 using Processos_Juridicos.Data;
 using Processos_Juridicos.DTOs;
 using Processos_Juridicos.Mappers;
-using Processos_Juridicos.Models;
 using Processos_Juridicos.Services.Interfaces;
 
 namespace Processos_Juridicos.Services;
+
 public class UnitSvc : IUnitSvc
 {
     private readonly AppDbContext _context;
@@ -14,7 +14,6 @@ public class UnitSvc : IUnitSvc
     {
         _context = context;
     }
-
 
     // Retrieves all units, including their associated sectors, from the database.
     public async Task<IEnumerable<UnitDto>> GetAllUnits()
@@ -30,12 +29,12 @@ public class UnitSvc : IUnitSvc
     public async Task<UnitDto> GetUnitById(int id)
     {
         var unit = await _context.Units.FirstOrDefaultAsync(x => x.UnitId == id)
-                ?? throw new KeyNotFoundException($"A unidade com o id {id} não existe");
+                ?? throw new KeyNotFoundException($"A unidade com o ID {id} não foi encontrada");
         return Mapper.MapToUnitDto(unit);
     }
 
 
-    // Creates an existing unit in the database.
+    // Creates a new unit in the database.
     public async Task<UnitDto> CreateUnit(UnitDto unit)
     {
         var unitEntity = Mapper.MapToUnit(unit);
@@ -65,11 +64,9 @@ public class UnitSvc : IUnitSvc
         {
             return false;
         }
-        else
-        {
-            _context.Units.Remove(unit);
-            await _context.SaveChangesAsync();
-            return true;
-        }
+
+        _context.Units.Remove(unit);
+        await _context.SaveChangesAsync();
+        return true;
     }
 }

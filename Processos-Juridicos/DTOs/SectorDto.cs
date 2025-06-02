@@ -6,7 +6,6 @@ namespace Processos_Juridicos.DTOs;
 public class SectorDto
 {
     [Key]
-    [Required]
     public required int SectorId { get; set; }
 
     [DisplayName("Código do Setor")]

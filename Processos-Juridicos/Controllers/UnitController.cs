@@ -2,6 +2,8 @@
 using Processos_Juridicos.Services.Interfaces;
 using Processos_Juridicos.DTOs;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using Processos_Juridicos.Utilities.Notifications;
 
 namespace Processos_Juridicos.Controllers;
 
@@ -11,6 +13,8 @@ public class UnitController : Controller
     private readonly ISectorSvc _sectorSvc;
     private readonly IToastNotify _toastNotify;
 
+    private const string EntityName = "Unidade";
+
     public UnitController(IUnitSvc unitSvc, ISectorSvc sectorSvc, IToastNotify toastNotify)
     {
         _unitSvc = unitSvc;
@@ -18,34 +22,25 @@ public class UnitController : Controller
         _toastNotify = toastNotify;
     }
 
-    // Action to get all (List) Units
+    // Action to display a list of all units.
     [HttpGet]
     public async Task<IActionResult> List()
     {
-        var listUnitsDto = await _unitSvc.GetAllUnits();
+        IEnumerable<UnitDto> listUnitsDto = await _unitSvc.GetAllUnits();
         return View(listUnitsDto);
     }
 
 
-    // Action to get one Unit
+    // Action to display details of a single unit by its ID.
     [HttpGet]
     public async Task<IActionResult> ListOne(int id)
     {
-        if (id == 0)
-        {
-            return NotFound();
-        }
-
-        var unit = await _unitSvc.GetUnitById(id);
-        if (unit == null)
-        {
-            return NotFound();
-        }
-
+        UnitDto unit = await _unitSvc.GetUnitById(id);
         return View(unit);
     }
 
-    // Action to access CREATE form
+
+    // Action to display the form for creating a new unit.
     [HttpGet]
     public async Task<IActionResult> Create()
     {
@@ -53,81 +48,62 @@ public class UnitController : Controller
         return View();
     }
 
-    // Action to CREATE UNIT
+    // Action to handle the creation of a new unit.
     [HttpPost]
     public async Task<IActionResult> Create(UnitDto model)
     {
-        if (ModelState.IsValid)
-        {
-            try
-            {
-                await _unitSvc.CreateUnit(model);
-                _toastNotify.Sucesso("Sucesso ao inserir unidade");
-                return RedirectToAction("List");
-            }
-            catch (Exception ex)
-            {
-                _toastNotify.Error($"Erro ao inserir unidade: {ex}");
-            }
-        }
-        else
+        if (!ModelState.IsValid)
         {
             await PopulateSectorsForViewBag();
+            return View(model);
         }
-        return View(model);
+
+        await _unitSvc.CreateUnit(model);
+        _toastNotify.Sucesso(TextTemplates.ActionSuccessMessage("inserida", "A", EntityName, null));
+        return RedirectToAction(nameof(List));        
     }
 
 
-    // Action to access edit form 
+    // Action to display the form for editing an existing unit by its ID.
     [HttpGet]
     public async Task<IActionResult> Edit(int id)
     {
         UnitDto model = await _unitSvc.GetUnitById(id);
-
         await PopulateSectorsForViewBag();
         return View(model);
     }
 
-    // Action to EDIT UNIT
+    // Action to handle the updating of an existing unit.
     [HttpPost]
     public async Task<IActionResult> Edit(UnitDto model)
     {
-        if (ModelState.IsValid)
-        {
-            try
-            {
-                await _unitSvc.EditUnit(model);
-                _toastNotify.Sucesso("Sucesso ao editar unidade");
-                return RedirectToAction("List");
-            }
-            catch (Exception ex)
-            {
-                _toastNotify.Error($"Erro ao editar unidade: {ex}");
-
-            }
-        }
-        else
+        if (!ModelState.IsValid)
         {
             await PopulateSectorsForViewBag();
+            return View(model);
         }
-        return View(model);
+
+        await _unitSvc.EditUnit(model);
+        _toastNotify.Sucesso(TextTemplates.ActionSuccessMessage("atualizada", "A", EntityName, null));
+        return RedirectToAction(nameof(List));
     }
 
 
-    // Action to delete
+    // Action to handle the deletion of a unit by its ID.
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(int id)
     {
-        try
+        var success = await _unitSvc.DeleteUnit(id);
+        if (!success)
         {
-            await _unitSvc.DeleteUnit(id);
-            _toastNotify.Sucesso("Sucesso ao eliminar unidade");
+            _toastNotify.Error(TextTemplates.ActionFailureMessage("obter", "a", EntityName, id));
         }
-        catch (Exception ex)
+        else
         {
-            _toastNotify.Error($"Erro ao eliminar unidade: {ex}");
+            _toastNotify.Sucesso(TextTemplates.ActionSuccessMessage("eliminada", "A", EntityName, null));
         }
+
         return RedirectToAction(nameof(List));
     }
 
