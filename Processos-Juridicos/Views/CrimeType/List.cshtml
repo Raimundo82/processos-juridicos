@@ -1,0 +1,53 @@
+﻿@using Processos_Juridicos.DTOs
+
+@{
+    ViewData["Title"] = "Lista de Tipos de Crimes";
+    int count = 1;
+}
+
+@model IEnumerable<CrimeTypeDto>
+
+<div class="text-center">
+    <h1 class="display-4">Tipos de Crime</h1>
+</div>
+
+<a asp-controller="CrimeType" asp-action="Create" class="btn btn-primary">Inserir Tipo de Crime</a>
+
+<div>
+    <table id="tableCrimeType" class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.CrimeTypeName)</th>
+                <th scope="col">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            @foreach (var item in Model.ToList())
+            {
+                <tr>
+                    <td>@count</td>
+                    <td>@Html.DisplayFor(m => item.CrimeTypeName)</td>
+                    <td>
+                        <div class="d-flex gap-2">
+                            <form asp-controller="CrimeType" asp-action="Delete" method="post">
+                                <input type="hidden" name="id" value="@item.CrimeTypeId">
+                                <button type="submit" class="btn btn-danger"></button>
+                            </form>
+                            <a asp-controller="CrimeType" asp-action="Edit" asp-route-id="@item.CrimeTypeId"
+                               class="btn btn-warning"><i class="bi bi-pencil"></i></a>
+                        </div>
+                    </td>
+                </tr>
+                count++;
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script>
+        let table = createDataTable("#tableCrimeType");
+    </script>
+}

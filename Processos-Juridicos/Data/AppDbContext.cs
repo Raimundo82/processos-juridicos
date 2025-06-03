@@ -11,6 +11,8 @@ public class AppDbContext : DbContext
 
     public  DbSet<AccidentType> Accident_types { get; set; }
 
+    public DbSet<CrimeType> Crime_types { get; set; }
+
     public  DbSet<ProcessFile> Process_Files { get; set; }
 
     public  DbSet<HarmedOrCasualty> Harmed_or_casualties { get; set; }

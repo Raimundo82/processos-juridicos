@@ -43,7 +43,7 @@ builder.Services.AddScoped<ISectorSvc, SectorSvc>();
 builder.Services.AddScoped<IProcessFileSvc, ProcessFileSvc>();
 builder.Services.AddScoped<IProcessSvc, ProcessSvc>();
 builder.Services.AddScoped<IAccidentTypeSvc, AccidentTypeSvc>();
-
+builder.Services.AddScoped<ICrimeTypeSvc, CrimeTypeSvc>();
 
 //Register NToastNotify
 builder.Services.AddMvc().AddNToastNotifyToastr(new ToastrOptions()
