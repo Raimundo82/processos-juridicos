@@ -11,7 +11,7 @@
     <h1 class="display-4">Categorias de Acidentes em Serviço</h1>
 </div>
 
-<button asp-controller="HarmedOrCasualties" asp-action="CreateEdit" class="btn btn-primary">Inserir Acidente em Serviço</button>
+<a asp-controller="Infringement" asp-action="Create" class="btn btn-primary">Inserir Acidente em Serviço</a>
 
 <div>
     <table id="tableStates" class="table table-striped-columns table-hover">
@@ -19,6 +19,7 @@
             <tr>
                 <th scope="col">#</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().InfringementName)</th>
+                <th scope="col">Ações</th>
             </tr>
         </thead>
         <tbody>
@@ -28,7 +29,16 @@
                 <tr>
                     <th scope="row">@count</th>
                     <td>@Html.DisplayFor(m => item.InfringementName)</td>
-
+                    <td>
+                        <div class="d-flex gap-2">
+                            <form asp-controller="Infringement" asp-action="Delete" method="post">
+                                <input type="hidden" name="id" value="@item.InfringementId">
+                                <button type="submit" class="btn btn-danger"></button>
+                            </form>
+                            <a asp-controller="Infringement" asp-action="Edit" asp-route-id="@item.InfringementId"
+                               class="btn btn-warning"><i class="bi bi-pencil"></i></a>
+                        </div>
+                    </td>
                 </tr>
                 count++;
             }

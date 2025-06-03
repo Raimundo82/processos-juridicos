@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Processos_Juridicos.Data;
 using Processos_Juridicos.DTOs;
-using Processos_Juridicos.Entities;
 using Processos_Juridicos.Mappers;
 using Processos_Juridicos.Services.Interfaces;
 
@@ -11,33 +10,58 @@ namespace Processos_Juridicos.Services
     {
         private readonly AppDbContext _context;
 
-        public InfringementSvc(AppDbContext context) { 
+        public InfringementSvc(AppDbContext context)
+        {
             _context = context;
         }
-        public Task<Infringement> createInfringement(Infringement infringement)
+        public async Task<InfringementDto> CreateInfringement(InfringementDto infringement)
         {
-            throw new NotImplementedException();
+            var infringementEntity = Mapper.MapToInfringements(infringement);
+
+            _context.Infringements.Add(infringementEntity);
+            await _context.SaveChangesAsync();
+            return Mapper.MapToInfringementsDto(infringementEntity);
         }
 
-        public Task<bool> deleteInfringement(int id)
+        public async Task<bool> DeleteInfringement(int id)
         {
-            throw new NotImplementedException();
+            var infringement = await _context.Infringements.FindAsync(id);
+            if (infringement == null)
+            {
+                return false;
+            }
+            else
+            {
+                _context.Infringements.Remove(infringement);
+                await _context.SaveChangesAsync();
+                return true;
+            }
         }
 
-        public Task<Infringement> editInfringement(Infringement infringement)
+        public async Task<InfringementDto> EditInfringement(InfringementDto infringement)
         {
-            throw new NotImplementedException();
+            var infringementEntity = Mapper.MapToInfringements(infringement);
+            _context.Infringements.Entry(infringementEntity).State = EntityState.Modified;
+
+            await _context.SaveChangesAsync();
+            return infringement;
         }
 
-        public async Task<IEnumerable<InfringementDto>> getAllInfringements()
+        public async Task<IEnumerable<InfringementDto>> GetAllInfringements()
         {
             var infringements = await _context.Infringements.ToListAsync();
             return Mapper.MapToToInfringementsEnum(infringements);
         }
 
-        public Task<Infringement> getInfringementById(int id)
+        public async Task<InfringementDto> GetInfringementById(int id)
         {
-            throw new NotImplementedException();
+            var infringement = await _context.Infringements.FindAsync(id);
+            if (infringement == null)
+            {
+                throw new KeyNotFoundException($"O artigo violado com o id {id} não existe");
+            }
+
+            return Mapper.MapToInfringementsDto(infringement);
         }
     }
 }

@@ -1,0 +1,7 @@
+﻿@model Processos_Juridicos.DTOs.InfringementDto;
+
+<div class="form-group mt-3">
+    <label asp-for="InfringementName" for="infringement-name" class="control-label">Nome da Infração</label>
+    <input id="infringement-name" asp-for="InfringementName" class="form-control" />
+    <span asp-validation-for="InfringementName" class="text-danger"></span>
+</div>
