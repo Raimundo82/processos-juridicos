@@ -1,0 +1,27 @@
+﻿@model Processos_Juridicos.DTOs.AccidentTypeDto;
+@using Processos_Juridicos.DTOs;
+
+@{
+    ViewData["Title"] = "Editar Tipos de Acidentes";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<form asp-action="Edit">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <input type="hidden" asp-for="AccidentTypeId" />
+
+    <partial name="Shared/_Form" />
+
+    <div class="form-group mt-3">
+        <input type="submit" value="Guardar" class="btn btn-primary" />
+        <a asp-action="List">Voltar à Lista</a>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -75,9 +75,9 @@ public partial class ProcessDto
     [InverseProperty("Processes")]
     public virtual SentenceDto Sentence { get; set; }
 
-    [ForeignKey("ServiceAccidentId")]
+    [ForeignKey("AccidentTypeId")]
     [InverseProperty("Processes")]
-    public virtual AccidentTypeDto ServiceAccident { get; set; }
+    public virtual AccidentTypeDto AccidentType { get; set; }
 
     [ForeignKey("StateId")]
     [InverseProperty("Processes")]

@@ -8,17 +8,18 @@
 @model IEnumerable<AccidentTypeDto>
 
 <div class="text-center">
-    <h1 class="display-4">Categorias de Mortos/Feridos</h1>
+    <h1 class="display-4">Tipos de Acidente</h1>
 </div>
 
-<button asp-controller="AccidentType" asp-action="CreateEdit" class="btn btn-primary">Inserir categoria de Morto/Ferido</button>
+<a asp-controller="AccidentType" asp-action="Create" class="btn btn-primary">Inserir tipo de acidente</a>
 
 <div>
     <table id="tableAccidents" class="table table-striped-columns table-hover">
         <thead>
             <tr>
                 <th scope="col">#</th>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().AccidentName)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().AccidentTypeName)</th>
+                <th scope="col">Ações</th>
             </tr>
         </thead>
         <tbody>
@@ -27,8 +28,17 @@
             {
                 <tr>
                     <th scope="col">@count</th>
-                    <td>@Html.DisplayFor(m => item.AccidentName)</td>
-                    
+                    <td>@Html.DisplayFor(m => item.AccidentTypeName)</td>
+                    <td>
+                        <div class="d-flex gap-2">
+                            <form asp-controller="AccidentType" asp-action="Delete" method="post">
+                                <input type="hidden" name="id" value="@item.AccidentTypeId">
+                                <button type="submit" class="btn btn-danger"></button>
+                            </form>
+                            <a asp-controller="AccidentType" asp-action="Edit" asp-route-id="@item.AccidentTypeId"
+                               class="btn btn-warning"><i class="bi bi-pencil"></i></a>
+                        </div>
+                    </td>
                 </tr>
                 count++;
             }

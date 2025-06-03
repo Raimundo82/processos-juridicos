@@ -5,11 +5,11 @@ namespace Processos_Juridicos.Services.Interfaces
 {
     public interface IAccidentTypeSvc
     {
-        Task<IEnumerable<AccidentTypeDto>> getAllAccidents();
-        Task<AccidentType> geAccidentById(int id);
-        Task<AccidentType> createAccident(AccidentType type);
-        Task<AccidentType> editAccident(AccidentType type);
-        Task<bool> deleteAccident(int id);
+        Task<IEnumerable<AccidentTypeDto>> GetAllAccidentTypes();
+        Task<AccidentTypeDto> GetAccidentTypeById(int id);
+        Task<AccidentTypeDto> CreateAccidentType(AccidentTypeDto type);
+        Task<AccidentTypeDto> EditAccidentType(AccidentTypeDto type);
+        Task<bool> DeleteAccidentType(int id);
 
     }
 }

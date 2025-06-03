@@ -1,0 +1,7 @@
+﻿@model Processos_Juridicos.DTOs.AccidentTypeDto;
+
+<div class="form-group mt-3">
+    <label asp-for="AccidentTypeName" for="accident-name" class="control-label">Tipo de Acidente</label>
+    <input id="accident-name" asp-for="AccidentTypeName" class="form-control" />
+    <span asp-validation-for="AccidentTypeName" class="text-danger"></span>
+</div>

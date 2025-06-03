@@ -13,11 +13,11 @@ public partial class AccidentType
     [Key]
     [Required]
     [Column("accident_id")]
-    public int AccidentId { get; set; }
+    public int AccidentTypeId { get; set; }
 
     [Required]
     [Column("accident_type")]
-    public string AccidentName { get; set; }
+    public string AccidentTypeName { get; set; }
 
     public ICollection<Process> Processes { get; set; } = new List<Process>();
 }

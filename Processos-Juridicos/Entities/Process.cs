@@ -97,9 +97,9 @@ public partial class Process
     [InverseProperty("Processes")]
     public  Sentence Sentence { get; set; }
 
-    [ForeignKey("ServiceAccidentId")]
+    [ForeignKey("AccidentTypeId")]
     [InverseProperty("Processes")]
-    public  AccidentType ServiceAccident { get; set; }
+    public  AccidentType AccidentType { get; set; }
 
     [ForeignKey("StateId")]
     [InverseProperty("Processes")]
