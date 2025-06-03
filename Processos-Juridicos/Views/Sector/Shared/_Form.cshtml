@@ -1,0 +1,13 @@
+﻿@model Processos_Juridicos.DTOs.SectorDto;
+
+<div class="form-group mt-3">
+    <label asp-for="SectorName" for="sector-name" class="control-label">Nome do Setor</label>
+    <input id="sector-name" asp-for="SectorName" class="form-control" />
+    <span asp-validation-for="SectorName" class="text-danger"></span>
+</div>
+
+<div class="form-group mt-3">
+    <label asp-for="SectorCode" for="sector-code" class="control-label">Código do setor</label>
+    <input asp-for="SectorCode" id="sector-code" class="form-control" />
+    <span asp-validation-for="SectorCode" class="text-danger"></span>
+</div>

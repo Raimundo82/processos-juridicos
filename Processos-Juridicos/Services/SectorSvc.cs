@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Processos_Juridicos.Data;
 using Processos_Juridicos.DTOs;
-using Processos_Juridicos.Entities;
 using Processos_Juridicos.Mappers;
 using Processos_Juridicos.Services.Interfaces;
 
@@ -16,30 +15,57 @@ namespace Processos_Juridicos.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<SectorDto>> getAllSectors()
+        public async Task<IEnumerable<SectorDto>> GetAllSectors()
         {
             var sectors = await _context.Sectors.ToListAsync();
             return Mapper.MapToToSectorsEnum(sectors);
         }
 
-        public Task<Sector> getSectorById(int id)
+        public async Task<SectorDto> GetSectorById(int id)
         {
-            throw new NotImplementedException();
+            var sector = await _context.Sectors.FindAsync(id);
+            if (sector == null)
+            {
+                throw new KeyNotFoundException($"O sector com o ID {id} não foi encontrado");
+            }
+
+
+            return Mapper.MapToSectorsDto(sector);
+
         }
 
-        public Task<Sector> createSector(Sector sentence)
+        public async Task<SectorDto> CreateSector(SectorDto sector)
         {
-            throw new NotImplementedException();
+            var sectorEntity = Mapper.MapToSectors(sector);
+
+            _context.Sectors.Add(sectorEntity);
+            await _context.SaveChangesAsync();
+            return Mapper.MapToSectorsDto(sectorEntity);
+
         }
 
-        public Task<bool> deleteSector(int id)
+        public async Task<bool> DeleteSector(int id)
         {
-            throw new NotImplementedException();
+            var sector = await _context.Sectors.FindAsync(id);
+            if (sector == null)
+            {
+                return false;
+            }
+
+            _context.Sectors.Remove(sector);
+            await _context.SaveChangesAsync();
+            return true;
+
         }
 
-        public Task<Sector> editSector(Sector sentence)
+        public async Task<SectorDto> EditSector(SectorDto sector)
         {
-            throw new NotImplementedException();
+            var sectorEntity = Mapper.MapToSectors(sector);
+            _context.Sectors.Entry(sectorEntity).State = EntityState.Modified;
+
+            await _context.SaveChangesAsync();
+            return sector;
+
         }
     }
 }

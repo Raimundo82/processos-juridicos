@@ -111,7 +111,7 @@ public class UnitController : Controller
     // Helper method to load and prepare the list of sectors for dropdown
     private async Task PopulateSectorsForViewBag()
     {
-        var sectors = await _sectorSvc.getAllSectors();
+        var sectors = await _sectorSvc.GetAllSectors();
         var listSectors = sectors.Select(x => new SelectListItem
         {
             Text = x.SectorName,

@@ -11,7 +11,7 @@
     <h1 class="display-4">Setores</h1>
 </div>
 
-<button asp-controller="Sector" asp-action="CreateEdit" class="btn btn-primary">Inserir Acidente em Serviço</button>
+<a asp-controller="Sector" asp-action="Create" class="btn btn-primary">Inserir Setor</a>
 
 <div>
     <table id="tableStates" class="table table-striped-columns table-hover">
@@ -21,6 +21,7 @@
                 <th scope="col">@Html.DisplayNameFor(m => m.First().SectorName)</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().SectorCode)</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().Enable)</th>
+                <th scope="col">Ações</th>
             </tr>
         </thead>
         <tbody>
@@ -32,7 +33,16 @@
                     <td>@Html.DisplayFor(m => item.SectorName)</td>
                     <td>@Html.DisplayFor(m => item.SectorCode)</td>
                     <td>@Html.DisplayFor(m => item.Enable)</td>
-
+                    <td>
+                        <div class="d-flex gap-2">
+                            <form asp-controller="Sector" asp-action="Delete" method="post">
+                                <input type="hidden" name="id" value="@item.SectorId">
+                                <button type="submit" class="btn btn-danger"></button>
+                            </form>
+                            <a asp-controller="Sector" asp-action="Edit" asp-route-id="@item.SectorId"
+                               class="btn btn-warning"><i class="bi bi-pencil"></i></a>
+                        </div>
+                    </td>
                 </tr>
                 count++;
             }
