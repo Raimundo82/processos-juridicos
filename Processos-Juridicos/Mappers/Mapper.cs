@@ -72,4 +72,11 @@ public static partial class Mapper
     public static partial CrimeTypeDto MapToCrimeTypeDto(CrimeType entity);
     public static partial CrimeType MapToCrimeType(CrimeTypeDto dto);
     public static partial IEnumerable<CrimeTypeDto> MapToCrimeTypeEnum(IEnumerable<CrimeType> entity);
+
+    //Military Security map
+
+    public static partial MilitarySecurityDto MapToMilitarySecurityDto(MilitarySecurity entity);
+    public static partial MilitarySecurity MapToMilitarySecurity(MilitarySecurityDto dto);
+    public static partial IEnumerable<MilitarySecurityDto> MapToMilitarySecurityEnum(IEnumerable<MilitarySecurity> entity);
+
 }

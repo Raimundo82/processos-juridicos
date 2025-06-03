@@ -1,0 +1,54 @@
+﻿@using Processos_Juridicos.DTOs
+
+@{
+    ViewData["Title"] = "Lista de seguranças militares";
+    int count = 1;
+}
+
+@model IEnumerable<MilitarySecurityDto>
+
+<div class="text-center">
+    <h1 class="display-4">Seguranças Militares</h1>
+</div>
+
+<a asp-controller="MilitarySecurity" asp-action="Create" class="btn btn-primary">Inserir Segurança Militar</a>
+
+<div>
+    <table id="tableMilitarySecurity" class="table table-striped-columns table-hover">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+
+                <th scope="col">@Html.DisplayNameFor(m => m.MilitarySecurityName)</th>
+                <th scope="col">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            @foreach (var item in Model.ToList())
+            {
+                <tr>
+                    <td>@count</td>
+                    <td>@Html.DisplayFor(m => item.MilitarySecurityName)</td>
+                    <td>
+                        <div class="d-flex gap-2">
+                            <form asp-controller="MilitarySecurity" asp-action="Delete" method="post">
+                                <input type="hidden" name="id" value="@item.MilitarySecurityId">
+                                <button type="submit" class="btn btn-danger"></button>
+                            </form>
+                            <a asp-controller="MilitarySecurity" asp-action="Edit" asp-route-id="@item.MilitarySecurityId"
+                               class="btn btn-warning"><i class="bi bi-pencil"></i></a>
+                        </div>
+                    </td>
+                </tr>
+                count++;
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script>
+        let table = createDataTable("#tableUnits");
+    </script>
+}
