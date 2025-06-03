@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Processos_Juridicos.Data;
 using Processos_Juridicos.DTOs;
-using Processos_Juridicos.Entities;
 using Processos_Juridicos.Mappers;
 using Processos_Juridicos.Services.Interfaces;
 

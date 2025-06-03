@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Processos_Juridicos.Services.Interfaces;
-using Processos_Juridicos.DTOs;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
+using Processos_Juridicos.DTOs;
+using Processos_Juridicos.Services.Interfaces;
 using Processos_Juridicos.Utilities.Notifications;
 
 namespace Processos_Juridicos.Controllers;
@@ -60,7 +59,7 @@ public class UnitController : Controller
 
         await _unitSvc.CreateUnit(model);
         _toastNotify.Sucesso(TextTemplates.ActionSuccessMessage("inserida", "A", EntityName, null));
-        return RedirectToAction(nameof(List));        
+        return RedirectToAction(nameof(List));
     }
 
 

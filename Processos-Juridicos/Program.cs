@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using NToastNotify;
 using Processos_Juridicos.Data;
+using Processos_Juridicos.Middleware.ExceptionHandlers;
 using Processos_Juridicos.Services;
 using Processos_Juridicos.Services.Interfaces;
 
@@ -14,14 +15,14 @@ builder.Configuration.AddUserSecrets<Program>();
 
 // Register Context
 string processosDj = builder.Configuration.GetConnectionString("processosDj")!;
-builder.Services.AddDbContext<AppDbContext>(opt=>opt.UseSqlServer(processosDj));
+builder.Services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer(processosDj));
 
 
 //httpClient
 builder.Services.AddHttpClient<ApisSvc>()
     .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
     {
-         UseProxy = false,
+        UseProxy = false,
         //ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator,
         ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true
 
@@ -52,13 +53,15 @@ builder.Services.AddMvc().AddNToastNotifyToastr(new ToastrOptions()
     TimeOut = 5000
 });
 
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 var app = builder.Build();
+app.UseExceptionHandler("/Home/Error");
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
+    
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }

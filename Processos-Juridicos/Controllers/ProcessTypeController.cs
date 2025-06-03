@@ -45,7 +45,7 @@ namespace Processos_Juridicos.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-                return View();
+            return View();
         }
 
         // Action to create a process type
@@ -67,9 +67,10 @@ namespace Processos_Juridicos.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            if (ModelState.IsValid) {
+            if (ModelState.IsValid)
+            {
                 ProcessTypeDto model = await _processTypeSvc.GetProcessTypeById(id);
-                return View(model);    
+                return View(model);
             }
 
             return RedirectToAction(nameof(List));
@@ -105,7 +106,7 @@ namespace Processos_Juridicos.Controllers
 
                 _toastNotify.Sucesso(TextTemplates.ActionSuccessMessage("eliminada", "O", EntityName, null));
             }
-            
+
             return RedirectToAction(nameof(List));
         }
     }

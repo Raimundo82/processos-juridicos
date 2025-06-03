@@ -22,7 +22,7 @@ namespace Processos_Juridicos.Services
         }
 
 
-         public async Task<StateDto> GetStateById(int id)
+        public async Task<StateDto> GetStateById(int id)
         {
             var state = await _context.States.FirstOrDefaultAsync(s => s.StateId == id)
         ?? throw new KeyNotFoundException($"O estado com o ID {id} não foi encontrado");
@@ -67,7 +67,8 @@ namespace Processos_Juridicos.Services
         }
 
 
-        public async Task<bool> DeleteState(int id){
+        public async Task<bool> DeleteState(int id)
+        {
             var state = await _context.States.FirstOrDefaultAsync(x => x.StateId == id);
             if (state == null)
             {

@@ -1,0 +1,28 @@
+﻿@model ErrorViewModel
+
+@{
+    ViewData["Title"] = Model.ErrorCode;
+    int code = Model.ErrorCode;
+}
+
+
+
+<div class="container">
+    <h1>CODE: @code</h1>
+    <h2>
+        Oops! An error occurred @if (Model.ErrorCode == 0)
+        {
+            <span>(Something went wrong, but no specific error code is available).</span>
+        }
+        else
+        {
+            <span>(code: @Model.ErrorCode).</span>
+        }
+    </h2>
+    <p>We are sorry for the inconvenience.</p>
+    <div id="error-details">
+        @await Html.PartialAsync(Model.PartialViewName)
+    </div>
+    <p><a href="/">Return to Home</a></p>
+</div>
+
