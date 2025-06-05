@@ -2,7 +2,7 @@
 
 namespace Processos_Juridicos.Controllers
 {
-    public class LoginController : Controller
+    public class ÁuthControllerController : Controller
     {
         public IActionResult Login()
         {

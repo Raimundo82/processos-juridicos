@@ -1,11 +1,7 @@
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Processos_Juridicos.Data;
-using Processos_Juridicos.DTOs;
-using Processos_Juridicos.Entities;
 using Processos_Juridicos.Models;
 using Processos_Juridicos.Services.Interfaces;
 
@@ -26,6 +22,7 @@ namespace Processos_Juridicos.Controllers
             _apisSvc = apisSvc;
         }
 
+        [Authorize]
         [HttpGet]
         public IActionResult Index()
         {

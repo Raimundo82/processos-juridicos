@@ -4,6 +4,9 @@ using Processos_Juridicos.Data;
 using Processos_Juridicos.Middleware.ExceptionHandlers;
 using Processos_Juridicos.Services;
 using Processos_Juridicos.Services.Interfaces;
+using Keycloak.AuthServices.Authentication;
+using Microsoft.Extensions.Configuration;
+using Keycloak.AuthServices.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,9 +28,28 @@ builder.Services.AddHttpClient<ApisSvc>()
         UseProxy = false,
         //ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator,
         ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true
-
-
     });
+
+// Keycloak
+
+var host = builder.Host;
+var configuration = builder.Configuration;
+var services = builder.Services;
+
+builder.Services.AddKeycloakWebApiAuthentication(configuration);
+builder.Services.AddAuthorization();
+
+services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminAndUser", builder =>
+    {
+        builder
+            .RequireRealmRoles("User") 
+            .RequireResourceRoles("Admin"); 
+    });
+})
+    .AddKeycloakAuthorization(configuration);
+
 
 //register Interfaces services
 builder.Services.AddScoped<IToastNotify, ToastNotify>();
@@ -72,10 +94,13 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 app.UseNToastNotify();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.MapGet("/", () => "Hello World!").RequireAuthorization();
 
 app.Run();
