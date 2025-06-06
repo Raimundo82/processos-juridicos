@@ -5,7 +5,8 @@ using Processos_Juridicos.Middleware.ExceptionHandlers;
 using Processos_Juridicos.Services;
 using Processos_Juridicos.Services.Interfaces;
 using Keycloak.AuthServices.Authentication;
-using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Keycloak.AuthServices.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -36,20 +37,33 @@ var host = builder.Host;
 var configuration = builder.Configuration;
 var services = builder.Services;
 
-builder.Services.AddKeycloakWebApiAuthentication(configuration);
-builder.Services.AddAuthorization();
+services
+    .AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
+    .AddKeycloakWebApp(
+        builder.Configuration.GetSection(KeycloakAuthenticationOptions.Section),
+        configureOpenIdConnectOptions: options =>
+        {
+            options.SaveTokens = true;
+            options.BackchannelHttpHandler = new HttpClientHandler
+            {
+                UseProxy = false,
+                ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator,
 
-services.AddAuthorization(options =>
-{
-    options.AddPolicy("AdminAndUser", builder =>
-    {
-        builder
-            .RequireRealmRoles("User") 
-            .RequireResourceRoles("Admin"); 
-    });
-})
-    .AddKeycloakAuthorization(configuration);
+            };
+            options.ResponseType = OpenIdConnectResponseType.Code;
+            options.Events = new OpenIdConnectEvents
+            {
+                OnSignedOutCallbackRedirect = context =>
+                {
+                    context.Response.Redirect("/");
+                    context.HandleResponse();
+                    return Task.CompletedTask;
+                }
+            };
+        });
 
+
+services.AddKeycloakAuthorization(configuration);
 
 //register Interfaces services
 builder.Services.AddScoped<IToastNotify, ToastNotify>();
@@ -84,7 +98,7 @@ app.UseExceptionHandler("/Home/Error");
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
-    
+
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
