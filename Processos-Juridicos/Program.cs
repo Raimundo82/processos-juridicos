@@ -37,6 +37,8 @@ var host = builder.Host;
 var configuration = builder.Configuration;
 var services = builder.Services;
 
+
+
 services
     .AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
     .AddKeycloakWebApp(
@@ -61,6 +63,7 @@ services
                 }
             };
         });
+    
 
 
 services.AddKeycloakAuthorization(configuration);
@@ -111,10 +114,9 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseNToastNotify();
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-
-app.MapGet("/", () => "Hello World!").RequireAuthorization();
 
 app.Run();
