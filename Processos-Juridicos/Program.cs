@@ -12,6 +12,15 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+/*Enable login requirement functionality on all controllers - do not delete */
+//builder.Services.AddControllersWithViews(options =>
+//{
+//    var policy = new AuthorizationPolicyBuilder()
+//                     .RequireAuthenticatedUser()
+//                     .Build();
+//    options.Filters.Add(new AuthorizeFilter(policy));
+//});
+
 // Add User Secrets
 builder.Configuration.AddUserSecrets<Program>();
 
@@ -30,8 +39,6 @@ builder.Services.AddHttpClient<ApisSvc>()
     });
 
 // Keycloak
-
-var host = builder.Host;
 var configuration = builder.Configuration;
 var services = builder.Services;
 
