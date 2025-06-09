@@ -5,9 +5,7 @@ using Processos_Juridicos.Middleware.ExceptionHandlers;
 using Processos_Juridicos.Services;
 using Processos_Juridicos.Services.Interfaces;
 using Keycloak.AuthServices.Authentication;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using Keycloak.AuthServices.Authorization;
+using Processos_Juridicos.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,36 +35,7 @@ var host = builder.Host;
 var configuration = builder.Configuration;
 var services = builder.Services;
 
-
-
-services
-    .AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-    .AddKeycloakWebApp(
-        builder.Configuration.GetSection(KeycloakAuthenticationOptions.Section),
-        configureOpenIdConnectOptions: options =>
-        {
-            options.SaveTokens = true;
-            options.BackchannelHttpHandler = new HttpClientHandler
-            {
-                UseProxy = false,
-                ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator,
-
-            };
-            options.ResponseType = OpenIdConnectResponseType.Code;
-            options.Events = new OpenIdConnectEvents
-            {
-                OnSignedOutCallbackRedirect = context =>
-                {
-                    context.Response.Redirect("/");
-                    context.HandleResponse();
-                    return Task.CompletedTask;
-                }
-            };
-        });
-    
-
-
-services.AddKeycloakAuthorization(configuration);
+services.AddKeycloakAuthentication(configuration);
 
 //register Interfaces services
 builder.Services.AddScoped<IToastNotify, ToastNotify>();
@@ -110,6 +79,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseKeycloak();
 
 app.UseAuthentication();
 app.UseAuthorization();
