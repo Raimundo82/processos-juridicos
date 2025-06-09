@@ -1,19 +1,24 @@
-﻿
-        <div class="container">
-            <div class="d-flex justify-content-between align-items-center">
-                <!-- Left: Logo -->
-                <div>
-                    <img src="/images/logo.png" alt="Logo" style="max-height: 50px;">
-                </div>
-                <!-- Right: Title and Buttons -->
-                <div class="d-flex align-items-center">
-                    <h1 class="h4 mb-0 me-3">Processos Jurídicos</h1>
+﻿<div class="container">
+    <div class="d-flex justify-content-between align-items-center">
+        <!-- Left: Logo -->
+        <div>
+            <img src="/images/logo.png" alt="Logo" style="max-height: 50px;">
+        </div>
+
+        <!-- Right: Title, Buttons and User Information -->
+        <div class="d-flex align-items-center">
+            <h1 class="h4 mb-0 me-3">Processos Jurídicos</h1>
+                    
+            <div class="d-flex gap-2 align-items-center">
+                <span>@(User.Claims.FirstOrDefault(c => c.Type == "name")?.Value ?? "Utilizador")</span>
+                <!-- imagem para aqui -->
+            </div>
+
             <button type="button" class="btn btn-secondary me-2" id="nightModeToggle">
                 <i class="bi bi-moon"></i>
             </button>
-                    <a href="/Account/Login" class="btn btn-primary">Login</a>
-                </div>
-            </div>
-        </div>
 
-    
+            <a asp-controller="Account" asp-action="SignOut" class="btn btn-danger">Logout</a>
+        </div>
+    </div>
+</div>
