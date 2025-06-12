@@ -13,9 +13,6 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
-builder.Services.AddControllersWithViews();
-
 // Add services to the container - Enable login requirement functionality on all controllers
 builder.Services.AddControllersWithViews(options =>
 {
