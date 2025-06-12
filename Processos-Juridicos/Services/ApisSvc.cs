@@ -34,7 +34,7 @@ public class ApisSvc : IApisSvc
 
             var listUnits = JsonSerializer.Deserialize<List<ApiUnitsModel>>(json);
 
-            if (listUnits == null || !listUnits.Any())
+            if (listUnits == null || listUnits.Count == 0)
             {
                 throw new KeyNotFoundException();
             }

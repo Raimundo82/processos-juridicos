@@ -33,7 +33,10 @@ namespace Processos_Juridicos.Middleware
                         options.BackchannelHttpHandler = new HttpClientHandler
                         {
                             UseProxy = false,
-                            ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator,
+                            ServerCertificateCustomValidationCallback = (message, cert, chain, errors) =>
+                            {
+                                return errors == System.Net.Security.SslPolicyErrors.None;
+                            }
                         };
                         options.ResponseType = OpenIdConnectResponseType.Code;
                         options.Events = new OpenIdConnectEvents

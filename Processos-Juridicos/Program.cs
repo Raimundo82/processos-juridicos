@@ -8,20 +8,22 @@ using Keycloak.AuthServices.Authentication;
 using Processos_Juridicos.Middleware;
 using Processos_Juridicos.Utilities.TextManager;
 using Processos_Juridicos.Utilities.TextManager.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+
 builder.Services.AddControllersWithViews();
 
-/*Enable login requirement functionality on all controllers - do not delete */
-//builder.Services.AddControllersWithViews(options =>
-//{
-//    var policy = new AuthorizationPolicyBuilder()
-//                     .RequireAuthenticatedUser()
-//                     .Build();
-//    options.Filters.Add(new AuthorizeFilter(policy));
-//});
+// Add services to the container - Enable login requirement functionality on all controllers
+builder.Services.AddControllersWithViews(options =>
+{
+    var policy = new AuthorizationPolicyBuilder()
+                     .RequireAuthenticatedUser()
+                     .Build();
+    options.Filters.Add(new AuthorizeFilter(policy));
+});
 
 // Add User Secrets
 builder.Configuration.AddUserSecrets<Program>();
