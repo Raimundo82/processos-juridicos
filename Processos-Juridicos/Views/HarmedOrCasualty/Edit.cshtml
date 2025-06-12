@@ -2,7 +2,7 @@
 @using Processos_Juridicos.DTOs;
 
 @{
-    ViewData["Title"] = "Editar categoria de Ferido";
+    ViewData["Title"] = "Editar Categoria de Ferido";
 }
 
 <h1>@ViewData["Title"]</h1>
@@ -10,7 +10,7 @@
 <form asp-action="Edit">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-    <input type="hidden" asp-for="CasualtiesId" />
+    <input type="hidden" asp-for="CasualtyId" />
 
     <partial name="Shared/_Form" />
 

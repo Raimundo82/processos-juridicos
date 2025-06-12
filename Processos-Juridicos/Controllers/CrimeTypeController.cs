@@ -1,33 +1,24 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Processos_Juridicos.DTOs;
 using Processos_Juridicos.Services.Interfaces;
-using Processos_Juridicos.Utilities.Notifications;
+using Processos_Juridicos.Utilities.TextManager;
 
 namespace Processos_Juridicos.Controllers
 {
-    public class CrimeTypeController : Controller
+    public class CrimeTypeController(ICrimeTypeSvc crimeTypeSvc, IToastNotify toastNotify) : Controller
     {
-        private readonly ICrimeTypeSvc _crimeTypeSvc;
-        private readonly IToastNotify _toastNotify;
-
         private const string EntityName = "Tipo de Crime";
 
-        public CrimeTypeController(ICrimeTypeSvc crimeTypeSvc, IToastNotify toastNotify)
-        {
-            _crimeTypeSvc = crimeTypeSvc;
-            _toastNotify = toastNotify;
-        }
+        private readonly ICrimeTypeSvc _crimeTypeSvc = crimeTypeSvc;
+        private readonly IToastNotify _toastNotify = toastNotify;
 
-        // Action to display a list of all crime types.
         [HttpGet]
         public async Task<IActionResult> List()
         {
-            IEnumerable<CrimeTypeDto> listTypesDto = await _crimeTypeSvc.GetAllCrimeTypes();
-            return View(listTypesDto);
+            IEnumerable<CrimeTypeDto> types = await _crimeTypeSvc.GetAllCrimeTypes();
+            return View(types);
         }
 
-
-        // Action to list one crime type by its id
         [HttpGet]
         public async Task<IActionResult> ListOne(int id)
         {
@@ -40,30 +31,25 @@ namespace Processos_Juridicos.Controllers
             return RedirectToAction(nameof(List));
         }
 
-
-        // Action to display the form for creating a new crime type
         [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
 
-        // Action to create a process type
         [HttpPost]
         public async Task<IActionResult> Create(CrimeTypeDto model)
         {
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid)
             {
-                return View(model);
+                await _crimeTypeSvc.CreateCrimeType(model);
+                _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("CreateSuccessMessage"), "O", EntityName, "o"));
+                return RedirectToAction(nameof(List));
             }
 
-            await _crimeTypeSvc.CreateCrimeType(model);
-            _toastNotify.Sucesso(TextTemplates.ActionSuccessMessage("inserido", "O", EntityName, null));
-            return RedirectToAction(nameof(List));
+            return View(model);
         }
 
-
-        // Action to display the form for editing an existing unit by its ID.
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
@@ -76,7 +62,6 @@ namespace Processos_Juridicos.Controllers
             return RedirectToAction(nameof(List));
         }
 
-        // Action to handle the updating of an existing unit.
         [HttpPost]
         public async Task<IActionResult> Edit(CrimeTypeDto model)
         {
@@ -86,12 +71,10 @@ namespace Processos_Juridicos.Controllers
             }
 
             await _crimeTypeSvc.EditCrimeType(model);
-            _toastNotify.Sucesso(TextTemplates.ActionSuccessMessage("atualizado", "O", EntityName, null));
+            _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("EditSuccessMessage"), "O", EntityName, "o"));
             return RedirectToAction(nameof(List));
         }
 
-
-        // Action to delete
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
@@ -101,10 +84,12 @@ namespace Processos_Juridicos.Controllers
                 var success = await _crimeTypeSvc.DeleteCrimeType(id);
                 if (!success)
                 {
-                    _toastNotify.Error(TextTemplates.ActionFailureMessage("obter", "o", EntityName, id));
+                    _toastNotify.Error(string.Format(GlobalTextManager.GetString("DeleteFailureMessage"), "o", EntityName));
                 }
-
-                _toastNotify.Sucesso(TextTemplates.ActionSuccessMessage("eliminado", "O", EntityName, null));
+                else
+                {
+                    _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("DeleteSuccessMessage"), "O", EntityName, "o"));
+                }
             }
 
             return RedirectToAction(nameof(List));

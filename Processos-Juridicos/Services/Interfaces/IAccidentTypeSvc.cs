@@ -1,5 +1,4 @@
 ﻿using Processos_Juridicos.DTOs;
-using Processos_Juridicos.Entities;
 
 namespace Processos_Juridicos.Services.Interfaces
 {

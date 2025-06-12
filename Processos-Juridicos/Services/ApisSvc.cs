@@ -1,15 +1,14 @@
-﻿using Processos_Juridicos.Entities;
+﻿using System.Net;
+using System.Text.Json;
+using Microsoft.IdentityModel.Tokens;
 using Processos_Juridicos.Models;
 using Processos_Juridicos.Services.Interfaces;
-using System.Net;
-using System.Text.Json;
 
 namespace Processos_Juridicos.Services;
 
 public class ApisSvc : IApisSvc
 {
-    
-    public async Task<List<ApiUnitsModel>> geAlltUnits()
+    public async Task<List<ApiUnitsModel>> GeAlltUnits()
     {
         ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls13;
 
@@ -33,10 +32,17 @@ public class ApisSvc : IApisSvc
         {
             var json = await response.Content.ReadAsStringAsync();
 
-            var listUnits = JsonSerializer.Deserialize<List<ApiUnitsModel>>(json)
-                ?? throw new KeyNotFoundException("A lista de unidades está vazia");
+            var listUnits = JsonSerializer.Deserialize<List<ApiUnitsModel>>(json);
 
-            return listUnits;
+            if (listUnits.IsNullOrEmpty())
+            {
+                throw new KeyNotFoundException();
+            }
+
+            if (listUnits != null)
+            {
+                return listUnits;
+            }
         }
 
         return [];

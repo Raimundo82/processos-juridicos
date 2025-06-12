@@ -1,24 +1,17 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Processos_Juridicos.DTOs;
 using Processos_Juridicos.Services.Interfaces;
-using Processos_Juridicos.Utilities.Notifications;
+using Processos_Juridicos.Utilities.TextManager;
 
 namespace Processos_Juridicos.Controllers
 {
-    public class MilitarySecurityController : Controller
+    public class MilitarySecurityController(IMilitarySecuritySvc militarySecuritySvc, IToastNotify toastNotify) : Controller
     {
-
-        private readonly IMilitarySecuritySvc _militarySecuritySvc;
-        private readonly IToastNotify _toastNotify;
         private readonly string EntityName = "Segurança Militar";
 
-        public MilitarySecurityController(IMilitarySecuritySvc militarySecuritySvc, IToastNotify toastNotify)
-        {
-            _militarySecuritySvc = militarySecuritySvc;
-            _toastNotify = toastNotify;
-        }
+        private readonly IMilitarySecuritySvc _militarySecuritySvc = militarySecuritySvc;
+        private readonly IToastNotify _toastNotify = toastNotify;
 
-        // Action to get all (List) Military securities
         [HttpGet]
         public async Task<IActionResult> List()
         {
@@ -26,60 +19,41 @@ namespace Processos_Juridicos.Controllers
             return View(listMilitarySecuritysDto);
         }
 
-
-        // Action to get one Military security
         [HttpGet]
         public async Task<IActionResult> ListOne(int id)
         {
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
-                if (id == 0)
-                {
-                    return NotFound();
-                }
-
-                var militarySecurity = await _militarySecuritySvc.GetMilitarySecurityById(id);
-                if (militarySecurity == null)
-                {
-                    return NotFound();
-                }
-
-                return View(militarySecurity);
+                MilitarySecurityDto security = await _militarySecuritySvc.GetMilitarySecurityById(id);
+                return View(security);
             }
+
             return RedirectToAction(nameof(List));
-
-
         }
 
-        // Action to access CREATE form
         [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
 
-        // Action to CREATE Military security
         [HttpPost]
         public async Task<IActionResult> Create(MilitarySecurityDto model)
         {
             if (ModelState.IsValid)
             {
-
                 await _militarySecuritySvc.CreateMilitarySecurity(model);
-                _toastNotify.Sucesso(TextTemplates.ActionSuccessMessage("inserida", "A", EntityName, null));
-
+                _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("CreateSuccessMessage"), "A", EntityName, "a"));
                 return RedirectToAction("List");
-
             }
+
             return View(model);
         }
 
-
-        // Action to access edit form 
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 MilitarySecurityDto model = await _militarySecuritySvc.GetMilitarySecurityById(id);
                 return View(model);
@@ -88,36 +62,37 @@ namespace Processos_Juridicos.Controllers
 
         }
 
-        // Action to EDIT Military Security
         [HttpPost]
         public async Task<IActionResult> Edit(MilitarySecurityDto model)
         {
-            
             if (ModelState.IsValid)
             {
                 await _militarySecuritySvc.EditMilitarySecurity(model);
-                _toastNotify.Sucesso(TextTemplates.ActionSuccessMessage("atualizada", "A", EntityName, null));
+                _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("EditSuccessMessage"), "A", EntityName, "a"));
                 return RedirectToAction("List");
             }
 
             return View(model);
         }
 
-
-        // Action to delete
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
-                await _militarySecuritySvc.DeleteMilitarySecurity(id);
-                _toastNotify.Sucesso(TextTemplates.ActionSuccessMessage("eliminada", "A", EntityName, null));
-
-                return RedirectToAction(nameof(List));
+                var success = await _militarySecuritySvc.DeleteMilitarySecurity(id);
+                if (!success)
+                {
+                    _toastNotify.Error(string.Format(GlobalTextManager.GetString("DeleteFailureMessage"), "a", EntityName));
+                }
+                else
+                {
+                    _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("DeleteSuccessMessage"), "A", EntityName, "a"));
+                }
             }
-            return RedirectToAction(nameof(List));
 
+            return RedirectToAction(nameof(List));
         }
     }
 }

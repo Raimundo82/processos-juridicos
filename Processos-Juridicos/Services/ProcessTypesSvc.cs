@@ -6,32 +6,27 @@ using Processos_Juridicos.Services.Interfaces;
 
 namespace Processos_Juridicos.Services
 {
-    public class ProcessTypesSvc : IProcessTypeSvc
+    public class ProcessTypesSvc(AppDbContext context) : IProcessTypeSvc
     {
-        private readonly AppDbContext _context;
+        private readonly AppDbContext _context = context;
 
-        public ProcessTypesSvc(AppDbContext context)
-        {
-            _context = context;
-        }
-
-
-        // Retrieves all process types
         public async Task<IEnumerable<ProcessTypeDto>> GetAllProcessTypes()
         {
             var types = await _context.Process_types.ToListAsync();
             return Mapper.MapToToProcessTypeDtoEnum(types);
         }
 
-        // Retrieves a single process type by its ID.
         public async Task<ProcessTypeDto> GetProcessTypeById(int id)
         {
-            var type = await _context.Process_types.FirstOrDefaultAsync(x => x.ProcessTypeId == id)
-                ?? throw new KeyNotFoundException($"A unidade com o id {id} não existe");
-            return Mapper.MapToProcessTypeDto(type);
+            var type = await _context.Process_types.FindAsync(id);
+            if (type != null)
+            {
+                return Mapper.MapToProcessTypeDto(type);
+            }
+
+            throw new KeyNotFoundException();
         }
 
-        // Creates a new process type in the database.
         public async Task<ProcessTypeDto> CreateProcessType(ProcessTypeDto type)
         {
             var typeEntity = Mapper.MapToProcessType(type);
@@ -41,17 +36,15 @@ namespace Processos_Juridicos.Services
             return Mapper.MapToProcessTypeDto(typeEntity);
         }
 
-        // Updates an existing process type in the database.
         public async Task<ProcessTypeDto> EditProcessType(ProcessTypeDto type)
         {
             var typeEntity = Mapper.MapToProcessType(type);
             _context.Process_types.Entry(typeEntity).State = EntityState.Modified;
 
             await _context.SaveChangesAsync();
-            return type;
+            return Mapper.MapToProcessTypeDto(typeEntity);
         }
 
-        // Deletes a proces type by its ID
         public async Task<bool> DeleteProcessType(int id)
         {
             var process = await _context.Process_types.FindAsync(id);
@@ -61,6 +54,5 @@ namespace Processos_Juridicos.Services
             await _context.SaveChangesAsync();
             return true;
         }
-
     }
 }

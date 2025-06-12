@@ -4,6 +4,8 @@ using Processos_Juridicos.Data;
 using Processos_Juridicos.Middleware.ExceptionHandlers;
 using Processos_Juridicos.Services;
 using Processos_Juridicos.Services.Interfaces;
+using Processos_Juridicos.Utilities.TextManager;
+using Processos_Juridicos.Utilities.TextManager.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,7 +19,6 @@ builder.Configuration.AddUserSecrets<Program>();
 string processosDj = builder.Configuration.GetConnectionString("processosDj")!;
 builder.Services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer(processosDj));
 
-
 //httpClient
 builder.Services.AddHttpClient<ApisSvc>()
     .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
@@ -25,9 +26,14 @@ builder.Services.AddHttpClient<ApisSvc>()
         UseProxy = false,
         //ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator,
         ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true
-
-
     });
+
+builder.Services.AddSingleton<IJsonTextManager>(sp =>
+{
+    var env = sp.GetRequiredService<IWebHostEnvironment>();
+    string filePath = Path.Combine(env.ContentRootPath, "ResourceFiles", "systemtext.json");
+    return new JsonTextManager(filePath);
+});
 
 //register Interfaces services
 builder.Services.AddScoped<IToastNotify, ToastNotify>();
@@ -59,19 +65,16 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 var app = builder.Build();
 app.UseExceptionHandler("/Home/Error");
 
-// Configure the HTTP request pipeline.
+GlobalTextManager.SetManager(app.Services.GetRequiredService<IJsonTextManager>());
+
 if (!app.Environment.IsDevelopment())
 {
-    
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
 app.UseAuthorization();
 app.UseNToastNotify();
 app.MapControllerRoute(
