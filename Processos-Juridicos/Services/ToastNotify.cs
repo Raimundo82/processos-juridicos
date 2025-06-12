@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using NToastNotify;
+﻿using NToastNotify;
 using Processos_Juridicos.Services.Interfaces;
 
 namespace Processos_Juridicos.Services;
@@ -10,10 +9,9 @@ public class ToastNotify(IToastNotification toastNotification) : IToastNotify
 
     public void Alert(string msg)
     {
-        _toastNotification.AddAlertToastMessage(msg, new ToastrOptions 
-        { 
+        _toastNotification.AddAlertToastMessage(msg, new ToastrOptions
+        {
             Title = "Alerta"
-           
         });
     }
 
@@ -22,7 +20,6 @@ public class ToastNotify(IToastNotification toastNotification) : IToastNotify
         _toastNotification.AddErrorToastMessage(msg, new ToastrOptions
         {
             Title = "Erro"
-
         });
     }
 
@@ -31,7 +28,6 @@ public class ToastNotify(IToastNotification toastNotification) : IToastNotify
         _toastNotification.AddInfoToastMessage(msg, new ToastrOptions
         {
             Title = "Informação"
-
         });
     }
 
@@ -40,9 +36,7 @@ public class ToastNotify(IToastNotification toastNotification) : IToastNotify
         _toastNotification.AddSuccessToastMessage(msg, new ToastrOptions
         {
             Title = "Sucesso"
-
         });
-       
     }
 
     public void Warning(string msg)
@@ -50,7 +44,6 @@ public class ToastNotify(IToastNotification toastNotification) : IToastNotify
         _toastNotification.AddWarningToastMessage(msg, new ToastrOptions
         {
             Title = "Aviso"
-
         });
     }
 }

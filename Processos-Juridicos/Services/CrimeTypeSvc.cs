@@ -6,35 +6,27 @@ using Processos_Juridicos.Services.Interfaces;
 
 namespace Processos_Juridicos.Services
 {
-    public class CrimeTypeSvc : ICrimeTypeSvc
+    public class CrimeTypeSvc(AppDbContext context) : ICrimeTypeSvc
     {
-        private readonly AppDbContext _context;
+        private readonly AppDbContext _context = context;
 
-        public CrimeTypeSvc(AppDbContext context)
-        {
-            _context = context;
-        }
-
-        // Retrieves all crimes types
         public async Task<IEnumerable<CrimeTypeDto>> GetAllCrimeTypes()
         {
             var crimes = await _context.Crime_types.ToListAsync();
             return Mapper.MapToCrimeTypeEnum(crimes);
         }
 
-        // Retrieves a single crime type by its ID.
         public async Task<CrimeTypeDto> GetCrimeTypeById(int id)
         {
             var type = await _context.Crime_types.FindAsync(id);
-            if (type == null)
+            if (type != null)
             {
-                throw new KeyNotFoundException($"O tipo de crime com o id {id} não existe");
+                return Mapper.MapToCrimeTypeDto(type);
             }
-           
-            return Mapper.MapToCrimeTypeDto(type);
+
+            throw new KeyNotFoundException();
         }
 
-        // Creates a new crime type in the database.
         public async Task<CrimeTypeDto> CreateCrimeType(CrimeTypeDto type)
         {
             var typeEntity = Mapper.MapToCrimeType(type);
@@ -44,17 +36,15 @@ namespace Processos_Juridicos.Services
             return Mapper.MapToCrimeTypeDto(typeEntity);
         }
 
-        // Updates an existing crime type in the database.
         public async Task<CrimeTypeDto> EditCrimeType(CrimeTypeDto type)
         {
             var typeEntity = Mapper.MapToCrimeType(type);
             _context.Crime_types.Entry(typeEntity).State = EntityState.Modified;
 
             await _context.SaveChangesAsync();
-            return type;
+            return Mapper.MapToCrimeTypeDto(typeEntity);
         }
 
-        // Deletes a crime type by its ID
         public async Task<bool> DeleteCrimeType(int id)
         {
             var type = await _context.Crime_types.FindAsync(id);
@@ -62,7 +52,7 @@ namespace Processos_Juridicos.Services
             {
                 return false;
             }
-            
+
             _context.Crime_types.Remove(type);
             await _context.SaveChangesAsync();
             return true;

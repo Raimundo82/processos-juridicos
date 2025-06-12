@@ -7,4 +7,4 @@ public interface IToastNotify
     void Info(string msg);
     void Alert(string msg);
     void Warning(string msg);
-}   
+}

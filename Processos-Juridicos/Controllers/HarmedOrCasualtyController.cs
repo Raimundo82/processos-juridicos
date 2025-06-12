@@ -1,36 +1,25 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Processos_Juridicos.DTOs;
 using Processos_Juridicos.Services.Interfaces;
-using Processos_Juridicos.Utilities.Notifications;
+using Processos_Juridicos.Utilities.TextManager;
 
 
 namespace Processos_Juridicos.Controllers
 {
-    public class HarmedOrCasualtyController : Controller
+    public class HarmedOrCasualtyController(IHarmedOrCasualtySvc casualtiesSvc, IToastNotify toastNotification) : Controller
     {
-
-        private readonly IHarmedOrCasualtySvc _harmedOrCasualtiesSvc;
-        private readonly IToastNotify _toastNotify;
-
         private const string EntityName = "Categoria de ferido";
 
-
-
-        public HarmedOrCasualtyController(IHarmedOrCasualtySvc casualtiesSvc, IToastNotify toastNotification)
-        {
-            _harmedOrCasualtiesSvc = casualtiesSvc;
-            _toastNotify = toastNotification;
-        }
+        private readonly IHarmedOrCasualtySvc _harmedOrCasualtiesSvc = casualtiesSvc;
+        private readonly IToastNotify _toastNotify = toastNotification;
 
         [HttpGet]
         public async Task<IActionResult> List()
         {
-            var harmedOrCasualtiesDto = await _harmedOrCasualtiesSvc.GetAllCasualties();
+            IEnumerable<HarmedOrCasualtyDto> harmedOrCasualtiesDto = await _harmedOrCasualtiesSvc.GetAllCasualties();
             return View(harmedOrCasualtiesDto);
         }
 
-
-        // Action to display details of a single type of casualty by its ID.
         [HttpGet]
         public async Task<IActionResult> ListOne(int id)
         {
@@ -43,15 +32,12 @@ namespace Processos_Juridicos.Controllers
             return RedirectToAction(nameof(List));
         }
 
-
-        // Action to display the form for creating a new type of casualty.
         [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
 
-        // Action to handle the creation of a new type of casualty.
         [HttpPost]
         public async Task<IActionResult> Create(HarmedOrCasualtyDto model)
         {
@@ -59,15 +45,13 @@ namespace Processos_Juridicos.Controllers
             {
 
                 await _harmedOrCasualtiesSvc.CreateCasualty(model);
-                _toastNotify.Sucesso(TextTemplates.ActionSuccessMessage("inserida", "A", EntityName, null));
+                _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("CreateSuccessMessage"), "A", EntityName, "a"));
                 return RedirectToAction(nameof(List));
             }
 
             return View(model);
         }
 
-
-        // Action to display the form for editing an existing type of casualty by its ID.
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
@@ -80,22 +64,19 @@ namespace Processos_Juridicos.Controllers
             return RedirectToAction(nameof(List));
         }
 
-        // Action to handle the updating of an existing type of casualty.
         [HttpPost]
         public async Task<IActionResult> Edit(HarmedOrCasualtyDto model)
         {
             if (ModelState.IsValid)
             {
                 await _harmedOrCasualtiesSvc.EditCasualty(model);
-                _toastNotify.Sucesso(TextTemplates.ActionSuccessMessage("atualizada", "A", EntityName, null));
+                _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("EditSuccessMessage"), "A", EntityName, "a"));
                 return RedirectToAction(nameof(List));
             }
 
             return View(model);
         }
 
-
-        // Action to handle the deletion of a casualty category by its ID.
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
@@ -104,20 +85,20 @@ namespace Processos_Juridicos.Controllers
 
             if (ModelState.IsValid)
             {
-
                 var success = await _harmedOrCasualtiesSvc.DeleteCasualty(id);
                 if (!success)
                 {
-                    _toastNotify.Error(TextTemplates.ActionFailureMessage("obter", "a", EntityName, id));
+                    _toastNotify.Error(string.Format(GlobalTextManager.GetString("DeleteFailureMessage"), "a", EntityName));
                     return result;
                 }
-                _toastNotify.Sucesso(TextTemplates.ActionSuccessMessage("eliminada", "A", EntityName, null));
+                else
+                {
+                    _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("DeleteSuccessMessage"), "A", EntityName, "a"));
+                }
             }
-
 
             return result;
         }
-
     }
 }
 

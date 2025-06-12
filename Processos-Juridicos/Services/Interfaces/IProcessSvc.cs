@@ -6,10 +6,10 @@ namespace Processos_Juridicos.Services.Interfaces
     public interface IProcessSvc
     {
 
-        Task<IEnumerable<ProcessDto>> getAllProcesses();
-        Task<Process> getProcessById(int id);
-        Task<Process> createProcess(Process process);
-        Task<Process> editProcess(Process process);
-        Task<bool> deleteProcess(int id);
+        Task<IEnumerable<ProcessDto>> GetAllProcesses();
+        Task<ProcessDto> GetProcessById(int id);
+        Task<ProcessDto> CreateProcess(ProcessDto process);
+        Task<ProcessDto> EditProcess(ProcessDto process);
+        Task<bool> DeleteProcess(int id);
     }
 }
