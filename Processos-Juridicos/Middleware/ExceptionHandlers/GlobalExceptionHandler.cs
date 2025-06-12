@@ -2,18 +2,11 @@
 using Microsoft.EntityFrameworkCore;
 
 namespace Processos_Juridicos.Middleware.ExceptionHandlers;
-public class GlobalExceptionHandler : IExceptionHandler
+public class GlobalExceptionHandler() : IExceptionHandler
 {
-    private readonly ILogger<GlobalExceptionHandler> _logger;
-
-    public GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger)
-    {
-        _logger = logger;
-    }
 
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
-        _logger.LogError(exception, "Erro capturado pelo GlobalExceptionHandler.");
 
         int statusCode = exception switch
         {

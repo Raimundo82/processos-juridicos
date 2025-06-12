@@ -1,7 +1,7 @@
 ﻿@using Processos_Juridicos.DTOs
 
 @{
-    ViewData["Title"] = "Lista de categorias de Mortos/Feridos";
+    ViewData["Title"] = "Lista de Categorias de Mortos/Feridos";
     int count = 1;
 }
 
@@ -18,8 +18,8 @@
         <thead>
             <tr>
                 <th scope="col">@count</th>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().CasualtiesId)</th>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().CasualtiesName)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().CasualtyId)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().CasualtyName)</th>
                 <th scope="col">Ações</th>
             </tr>
         </thead>
@@ -29,15 +29,15 @@
             {
                 <tr>
                     <th scope="row">@count</th>
-                    <td>@Html.DisplayFor(m => item.CasualtiesId)</td>
-                    <td>@Html.DisplayFor(m => item.CasualtiesName)</td>
+                    <td>@Html.DisplayFor(m => item.CasualtyId)</td>
+                    <td>@Html.DisplayFor(m => item.CasualtyName)</td>
                     <td>
                         <div class="d-flex gap-2">
                             <form asp-controller="HarmedOrCasualty" asp-action="Delete" method="post">
-                                <input type="hidden" name="id" value="@item.CasualtiesId">
+                                <input type="hidden" name="id" value="@item.CasualtyId">
                                 <button type="submit" class="btn btn-danger"></button>
                             </form>
-                            <a asp-controller="HarmedOrCasualty" asp-action="Edit" asp-route-id="@item.CasualtiesId"
+                            <a asp-controller="HarmedOrCasualty" asp-action="Edit" asp-route-id="@item.CasualtyId"
                                class="btn btn-warning"><i class="bi bi-pencil"></i></a>
                         </div>
                     </td>

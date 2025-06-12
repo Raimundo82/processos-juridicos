@@ -6,14 +6,10 @@ using Processos_Juridicos.Services.Interfaces;
 
 namespace Processos_Juridicos.Services
 {
-    public class InfringementSvc : IInfringementSvc
+    public class InfringementSvc(AppDbContext context) : IInfringementSvc
     {
-        private readonly AppDbContext _context;
+        private readonly AppDbContext _context = context;
 
-        public InfringementSvc(AppDbContext context)
-        {
-            _context = context;
-        }
         public async Task<InfringementDto> CreateInfringement(InfringementDto infringement)
         {
             var infringementEntity = Mapper.MapToInfringements(infringement);
@@ -25,17 +21,12 @@ namespace Processos_Juridicos.Services
 
         public async Task<bool> DeleteInfringement(int id)
         {
-            var infringement = await _context.Infringements.FindAsync(id);
-            if (infringement == null)
-            {
-                return false;
-            }
-            else
-            {
-                _context.Infringements.Remove(infringement);
-                await _context.SaveChangesAsync();
-                return true;
-            }
+            var infringement = await _context.Accident_types.FindAsync(id);
+            if (infringement == null) return false;
+
+            _context.Accident_types.Remove(infringement);
+            await _context.SaveChangesAsync();
+            return true;
         }
 
         public async Task<InfringementDto> EditInfringement(InfringementDto infringement)
@@ -44,7 +35,7 @@ namespace Processos_Juridicos.Services
             _context.Infringements.Entry(infringementEntity).State = EntityState.Modified;
 
             await _context.SaveChangesAsync();
-            return infringement;
+            return Mapper.MapToInfringementsDto(infringementEntity);
         }
 
         public async Task<IEnumerable<InfringementDto>> GetAllInfringements()
@@ -56,12 +47,12 @@ namespace Processos_Juridicos.Services
         public async Task<InfringementDto> GetInfringementById(int id)
         {
             var infringement = await _context.Infringements.FindAsync(id);
-            if (infringement == null)
+            if (infringement != null)
             {
-                throw new KeyNotFoundException($"O artigo violado com o id {id} não existe");
+                return Mapper.MapToInfringementsDto(infringement);
             }
 
-            return Mapper.MapToInfringementsDto(infringement);
+            throw new KeyNotFoundException();
         }
     }
 }

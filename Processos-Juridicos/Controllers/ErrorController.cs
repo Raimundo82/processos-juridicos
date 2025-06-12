@@ -19,7 +19,6 @@ public class ErrorController : Controller
                 _ => "ErrorPartials/_Uncategorized"      // Default partial for other error codes
             };
 
-            // Pass the error info to the view.
             var viewModel = new ErrorViewModel
             {
                 ErrorCode = code,

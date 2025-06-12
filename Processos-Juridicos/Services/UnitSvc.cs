@@ -6,16 +6,10 @@ using Processos_Juridicos.Services.Interfaces;
 
 namespace Processos_Juridicos.Services;
 
-public class UnitSvc : IUnitSvc
+public class UnitSvc(AppDbContext context) : IUnitSvc
 {
-    private readonly AppDbContext _context;
+    private readonly AppDbContext _context = context;
 
-    public UnitSvc(AppDbContext context, IToastNotify toastNotify)
-    {
-        _context = context;
-    }
-
-    // Retrieves all units, including their associated sectors, from the database.
     public async Task<IEnumerable<UnitDto>> GetAllUnits()
     {
         var units = await _context.Units
@@ -24,17 +18,16 @@ public class UnitSvc : IUnitSvc
         return Mapper.MapToToUnitDtoEnum(units);
     }
 
-
-    // Retrieves a single unit by its ID.
     public async Task<UnitDto> GetUnitById(int id)
     {
-        var unit = await _context.Units.FirstOrDefaultAsync(x => x.UnitId == id)
-                ?? throw new KeyNotFoundException($"A unidade com o ID {id} não foi encontrada");
-        return Mapper.MapToUnitDto(unit);
+        var unit = await _context.Units.FindAsync(id);
+        if (unit != null)
+        {
+            return Mapper.MapToUnitDto(unit);
+        }
+        throw new KeyNotFoundException();
     }
 
-
-    // Creates a new unit in the database.
     public async Task<UnitDto> CreateUnit(UnitDto unit)
     {
         var unitEntity = Mapper.MapToUnit(unit);
@@ -44,26 +37,19 @@ public class UnitSvc : IUnitSvc
         return Mapper.MapToUnitDto(unitEntity);
     }
 
-
-    // Updates an existing unit in the database.
     public async Task<UnitDto> EditUnit(UnitDto unit)
     {
         var unitEntity = Mapper.MapToUnit(unit);
         _context.Units.Entry(unitEntity).State = EntityState.Modified;
 
         await _context.SaveChangesAsync();
-        return unit;
+        return Mapper.MapToUnitDto(unitEntity);
     }
 
-
-    // Deletes a unit by its ID
     public async Task<bool> DeleteUnit(int id)
     {
-        var unit = await _context.Units.FirstOrDefaultAsync(x => x.UnitId == id);
-        if (unit == null)
-        {
-            return false;
-        }
+        var unit = await _context.Units.FindAsync(id);
+        if (unit == null) return false;
 
         _context.Units.Remove(unit);
         await _context.SaveChangesAsync();
