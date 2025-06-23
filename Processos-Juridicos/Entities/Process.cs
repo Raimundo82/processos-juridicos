@@ -86,15 +86,13 @@ public partial class Process
     public int? CrimeTypeId { get; set; }
 
     [Column("compensation_paid_by_unit")]
-    [Required]
     public bool CompensationPaid { get; set; }
 
     [Column("comunicated_pjm")]
-    [Required]
     public bool ComunicatedToPjm { get; set; }
 
     [Column("pjm_comunication_date")]
-    public DateOnly? ComunicationDate { get; set; }
+    public DateOnly ComunicationDate { get; set; }
 
     [Column("military_security_id")]
     public int? MilitarySecurityId { get; set; }

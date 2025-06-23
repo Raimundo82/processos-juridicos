@@ -1,9 +1,7 @@
 ﻿#nullable disable
-using System;
-using System.Collections.Generic;
+using Processos_Juridicos.Entities;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 namespace Processos_Juridicos.DTOs;
 
@@ -21,4 +19,7 @@ public partial class ProcessFileDto
     public int ProcessId { get; set; }
 
     public int RowGuid { get; set; }
+
+    [ForeignKey("ProcessId")]
+    public virtual Process Process { get; set; }
 }

@@ -69,7 +69,7 @@ GlobalTextManager.SetManager(app.Services.GetRequiredService<IJsonTextManager>()
 
 if (!app.Environment.IsDevelopment())
 {
-    //app.UseDeveloperExceptionPage();
+    app.UseDeveloperExceptionPage();
     app.UseHsts();
 
     AppDomain.CurrentDomain.UnhandledException += (sender, eventArgs) =>

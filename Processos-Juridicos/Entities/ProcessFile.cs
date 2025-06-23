@@ -24,4 +24,7 @@ public partial class ProcessFile
 
     [Column("row_guid")]
     public int RowGuid { get; set; }
+
+    [ForeignKey("ProcessId")]
+    public virtual Process Process { get; set; }
 }

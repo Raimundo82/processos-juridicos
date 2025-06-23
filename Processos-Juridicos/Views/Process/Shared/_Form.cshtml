@@ -101,8 +101,40 @@
     <span asp-validation-for="StateId" class="text-danger"></span>
 </div>
 
-@* <div>
-    <label for="attachments">Upload Attachments:</label>
-    <input type="file" id="attachments" name="attachments" multiple />
+<div class="form-group mt-3">
+    <label for="ProcessFiles" class="control-label">Upload Files</label>
+    <input type="file" asp-for="ProcessFiles" class="form-control" multiple />
+    <span asp-validation-for="ProcessFiles" class="text-danger"></span>
 </div>
- *@
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>File Name</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.UploadedFiles)
+        {
+            <tr>
+                <td>@item.ProcessFileName</td>
+                <td>
+                    <div class="d-flex gap-2">
+                        <!-- Delete button: its name/value indicate this file should be deleted -->
+                        <button type="submit" name="deleteFileId" value="@item.ProcessFileId" class="btn btn-danger">
+                            <i class="bi bi-trash"></i>
+                        </button>
+
+                        <!-- Download file link -->
+                        <a asp-controller="ProcessFile" asp-action="DownloadFile" asp-route-id="@item.ProcessFileId"
+                           class="btn btn-secondary">
+                            <i class="bi bi-download"></i>
+                        </a>
+</div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+

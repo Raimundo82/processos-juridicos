@@ -28,7 +28,7 @@
     <span asp-validation-for="InvestigatedId" class="text-danger"></span>
 </div>
 
-<div class="form-group mt-3">
+<div for="articles-infringed" class="form-group mt-3">
     <label for="articles-infringed">Artigos Infringidos:</label>
     <select id="articles-infringed" asp-for="InfringementId" asp-items="ViewBag.infringements" class="form-control">
 
@@ -63,8 +63,8 @@
 </div>
 
 <div class="form-group mt-3">
-    <label for="responsible-entity">Unidade responsável pela indeminização</label>
-    <select id="responsible-entity" asp-for="CompensatingUnitId" asp-items="ViewBag.units" class="form-control">
+    <label for="responsible-unit">Unidade responsável pela indeminização</label>
+    <select id="responsible-unit" asp-for="CompensatingUnitId" asp-items="ViewBag.units" class="form-control">
         <option value="">Selecione uma opção</option>
     </select>
     <span asp-validation-for="CompensatingUnitId" class="text-danger"></span>

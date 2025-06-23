@@ -1,14 +1,15 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using Processos_Juridicos.DTOs;
+using Processos_Juridicos.Entities;
+using Processos_Juridicos.Mappers;
 using Processos_Juridicos.Services.Interfaces;
 using Processos_Juridicos.Utilities.TextManager;
-using System.Diagnostics;
+using System.Drawing.Text;
 
 namespace Processos_Juridicos.Controllers
 {
-    public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmedOrCasualtySvc casualtiesSvc, IInfringementSvc infringementSvc, IProcessTypeSvc processTypeSvc, ISentenceSvc sentenceSvc, IStateSvc stateSvc, IAccidentTypeSvc accidentTypeSvc, IMilitarySecuritySvc militarySecuritySvc, ICrimeTypeSvc crimeTypeSvc, IToastNotify toastNotify) : Controller
+    public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmedOrCasualtySvc casualtiesSvc, IInfringementSvc infringementSvc, IProcessTypeSvc processTypeSvc, ISentenceSvc sentenceSvc, IStateSvc stateSvc, IAccidentTypeSvc accidentTypeSvc, IMilitarySecuritySvc militarySecuritySvc, ICrimeTypeSvc crimeTypeSvc, IProcessFileSvc processFileSvc, IToastNotify toastNotify) : Controller
     {
         private const string EntityName = "Processo";
 
@@ -23,6 +24,8 @@ namespace Processos_Juridicos.Controllers
         private readonly IHarmedOrCasualtySvc _casualtySvc = casualtiesSvc;
         private readonly IProcessSvc _processSvc = processSvc;
         private readonly IToastNotify _toastNotify = toastNotify;
+        private readonly IProcessFileSvc _processFileSvc = processFileSvc;
+
 
         [HttpGet]
         public async Task<IActionResult> List()
@@ -53,10 +56,35 @@ namespace Processos_Juridicos.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(ProcessDto model)
         {
+
             if (ModelState.IsValid)
             {
+                //TODO: replace this with currently logged in user
                 model.CreatedById = 1;
                 await _processSvc.CreateProcess(model);
+
+                if (model.ProcessFiles != null && model.ProcessFiles.Length > 0)
+                {
+                    foreach (var file in model.ProcessFiles)
+                    {
+                        if (file != null && file.Length > 0)
+                        {
+                            using MemoryStream ms = new();
+                            await file.CopyToAsync(ms);
+
+                            ProcessFile fileRecord = new()
+                            {
+                                ProcessFileName = file.FileName,
+                                ProcessFileType = file.ContentType,
+                                ProcessFileContent = ms.ToArray(),
+                                ProcessId = model.ProcessId
+                            };
+
+                            await _processFileSvc.CreateProcessFile(Mapper.MapToFilesDto(fileRecord));
+                        }
+                    }
+                }
+
                 _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("CreateSuccessMessage"), "O", EntityName, "o"));
                 return RedirectToAction(nameof(List));
             }
@@ -71,6 +99,10 @@ namespace Processos_Juridicos.Controllers
             if (ModelState.IsValid)
             {
                 ProcessDto model = await _processSvc.GetProcessById(id);
+                var uploadedFiles = await _processFileSvc.GetAllProcessFilesByProcessId(id);
+                model.UploadedFiles = uploadedFiles;
+
+
                 await PopulateViewbags();
                 return View(model);
             }
@@ -79,7 +111,7 @@ namespace Processos_Juridicos.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(ProcessDto model)
+        public async Task<IActionResult> Edit(ProcessDto model, string? deleteFileId)
         {
             if (!ModelState.IsValid)
             {
@@ -87,7 +119,39 @@ namespace Processos_Juridicos.Controllers
                 return View(model);
             }
 
-            await _processSvc.EditProcess(model);
+            if (!string.IsNullOrEmpty(deleteFileId))
+            {
+                await TryDeleteFile(deleteFileId, model);
+            }
+
+            if (ModelState.IsValid)
+            {
+
+                await _processSvc.EditProcess(model);
+
+                if (model.ProcessFiles != null && model.ProcessFiles.Length > 0)
+                {
+
+                    foreach (var file in model.ProcessFiles)
+                    {
+                        if (file != null && file.Length > 0)
+                        {
+                            using MemoryStream ms = new();
+                            await file.CopyToAsync(ms);
+                            ProcessFile fileRecord = new()
+                            {
+                                ProcessFileName = file.FileName,
+                                ProcessFileType = file.ContentType,
+                                ProcessFileContent = ms.ToArray(),
+                                ProcessId = model.ProcessId,
+                                RowGuid = 1
+                            };
+
+                            await _processFileSvc.CreateProcessFile(Mapper.MapToFilesDto(fileRecord));
+                        }
+                    }
+                }
+            }
             _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("EditSuccessMessage"), "O", EntityName, "o"));
             return RedirectToAction(nameof(List));
         }
@@ -110,6 +174,15 @@ namespace Processos_Juridicos.Controllers
             }
 
             return RedirectToAction(nameof(List));
+        }
+
+        private async Task<RedirectToActionResult> TryDeleteFile(string deleteFileId, ProcessDto model)
+        {
+            if (int.TryParse(deleteFileId, out int fileId))
+            {
+                await _processFileSvc.DeleteProcessFile(fileId);
+            }
+            return RedirectToAction("Edit", new { id = model.ProcessId });
         }
 
         private async Task PopulateViewbags()

@@ -56,6 +56,7 @@ public static partial class Mapper
 
     // Processes map
 
+
     public static partial ProcessDto MapToProcessesDto(Process entity);
     public static partial Process MapToProcesses(ProcessDto dto);
     public static partial IEnumerable<ProcessDto> MapToToProcessesEnum(IEnumerable<Process> entity);

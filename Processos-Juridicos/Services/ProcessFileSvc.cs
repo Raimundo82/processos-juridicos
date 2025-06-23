@@ -10,19 +10,36 @@ namespace Processos_Juridicos.Services
     {
         private readonly AppDbContext _context = context;
 
-        public Task<ProcessFileDto> CreateProcessFile(ProcessFileDto file)
+        public async Task<ProcessFileDto> CreateProcessFile(ProcessFileDto file)
         {
-            throw new NotImplementedException();
+            var processFileEntity = Mapper.MapToFiles(file);
+
+            _context.Process_Files.Add(processFileEntity);
+            await _context.SaveChangesAsync();
+            return Mapper.MapToFilesDto(processFileEntity);
         }
 
-        public Task<bool> DeleteProcessFile(int id)
+        public async Task<bool> DeleteProcessFile(int id)
         {
-            throw new NotImplementedException();
+            var processFile = await _context.Process_Files.FindAsync(id);
+            if (processFile == null)
+            {
+                return false;
+            }
+            else
+            {
+                _context.Process_Files.Remove(processFile);
+                await _context.SaveChangesAsync();
+                return true;
+            }
         }
 
-        public Task<ProcessFileDto> EditProcessFile(ProcessFileDto file)
+        public async Task<ProcessFileDto> EditProcessFile(ProcessFileDto file)
         {
-            throw new NotImplementedException();
+            var processFileEntity = Mapper.MapToFiles(file);
+            _context.Process_Files.Entry(processFileEntity).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return Mapper.MapToFilesDto(processFileEntity);
         }
 
         public async Task<IEnumerable<ProcessFileDto>> GetAllProcessFiles()
@@ -31,9 +48,22 @@ namespace Processos_Juridicos.Services
             return Mapper.MapToToFilesEnum(files);
         }
 
-        public Task<ProcessFileDto> GetProcessFileById(int id)
+        public async Task<ProcessFileDto> GetProcessFileById(int id)
         {
-            throw new NotImplementedException();
+            var processFile = await _context.Process_Files.FindAsync(id);
+            if (processFile != null)
+            {
+                return Mapper.MapToFilesDto(processFile);
+            }
+
+            throw new KeyNotFoundException();
+        }
+
+        public async Task<List<ProcessFileDto>> GetAllProcessFilesByProcessId(int id)
+        {
+            var uploadedFiles = _context.Process_Files.Where(x => x.ProcessId == id).Select(x => Mapper.MapToFilesDto(x));
+
+            return await uploadedFiles.ToListAsync();
         }
     }
 }

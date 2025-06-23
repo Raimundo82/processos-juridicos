@@ -1,7 +1,8 @@
 ﻿#nullable disable
+using Microsoft.EntityFrameworkCore;
+using Riok.Mapperly.Abstractions;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 namespace Processos_Juridicos.DTOs;
 
@@ -71,6 +72,7 @@ public partial class ProcessDto
     public DateOnly? ComunicationDate { get; set; }
 
     [ForeignKey("UnitId")]
+    [Required]
     public virtual UnitDto Unit { get; set; }
 
     [ForeignKey("HarmedOrCasualtiesId")]
@@ -99,4 +101,10 @@ public partial class ProcessDto
 
     [ForeignKey("CompensatingUnit")]
     public virtual UnitDto CompensatingUnit { get; set; }
+
+    [MapperIgnore]
+    public IFormFile[] ProcessFiles { get; set; }
+
+    [MapperIgnore]
+    public List<ProcessFileDto> UploadedFiles { get; set; } = [];
 }
