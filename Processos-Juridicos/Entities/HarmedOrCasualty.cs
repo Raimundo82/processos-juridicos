@@ -12,6 +12,4 @@ public partial class HarmedOrCasualty
 
     [Column("casualties_name")]
     public string CasualtyName { get; set; }
-
-    public virtual ICollection<Process> Processes { get; set; } = [];
 }

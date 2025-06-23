@@ -14,6 +14,4 @@ public partial class CrimeType
     [Required]
     [Column("crime_type_name")]
     public string CrimeTypeName { get; set; }
-
-    public ICollection<Process> Processes { get; set; } = [];
 }

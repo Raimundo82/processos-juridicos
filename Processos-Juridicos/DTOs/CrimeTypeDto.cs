@@ -19,7 +19,4 @@ public partial class CrimeTypeDto
     [DisplayName("Tipo de Crime")]
     [UniqueCrimeTypeName]
     public string CrimeTypeName { get; set; }
-
-    [InverseProperty("CrimeType")]
-    public virtual ICollection<ProcessDto> Processes { get; set; } = [];
 }

@@ -13,5 +13,4 @@ public partial class Sentence
     [Column("sentence_name")]
     public string SentenceName { get; set; }
 
-    public ICollection<Process> Processes { get; set; } = [];
 }

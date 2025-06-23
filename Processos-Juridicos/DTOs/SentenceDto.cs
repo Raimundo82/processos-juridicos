@@ -17,7 +17,4 @@ public partial class SentenceDto
     [StringLength(50)]
     [Unicode(false)]
     public string SentenceName { get; set; }
-
-    [InverseProperty("sentence")]
-    public virtual ICollection<ProcessDto> Processes { get; set; } = [];
 }

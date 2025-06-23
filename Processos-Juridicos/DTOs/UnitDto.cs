@@ -36,6 +36,4 @@ public class UnitDto
 
     [ForeignKey("SectorId")]
     public SectorDto Sector { get; set; }
-
-    public ICollection<ProcessDto> Processes { get; set; } = [];
 }

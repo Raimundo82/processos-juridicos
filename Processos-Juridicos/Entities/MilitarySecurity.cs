@@ -11,8 +11,5 @@ namespace Processos_Juridicos.Entities
 
         [Column("military_security_name")]
         public required string MilitarySecurityName { get; set; }
-
-        public ICollection<Process> Processes { get; set; } = [];
-
     }
 }

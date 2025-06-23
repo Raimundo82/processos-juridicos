@@ -14,6 +14,4 @@ public partial class AccidentType
     [Required]
     [Column("accident_type")]
     public string AccidentTypeName { get; set; }
-
-    public ICollection<Process> Processes { get; set; } = [];
 }

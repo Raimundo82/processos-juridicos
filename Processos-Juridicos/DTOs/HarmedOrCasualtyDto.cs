@@ -15,7 +15,4 @@ public partial class HarmedOrCasualtyDto
     [StringLength(50)]
     [Unicode(false)]
     public required string CasualtyName { get; set; }
-
-    [InverseProperty("harmed_or_casualties")]
-    public virtual ICollection<ProcessDto> Processes { get; set; } = [];
 }

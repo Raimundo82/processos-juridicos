@@ -27,5 +27,5 @@ public class Unit
 
     [ForeignKey("SectorId")]
     public Sector Sector { get; set; }
-    public ICollection<Process> Processes { get; set; } = [];
+
 }

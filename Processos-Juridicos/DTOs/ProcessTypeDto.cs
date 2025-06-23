@@ -23,7 +23,4 @@ public partial class ProcessTypeDto
     [Required(ErrorMessage = "O Prazo do Processo é obrigatório")]
     [DisplayName("Prazo do Processo (dias)")]
     public required int Deadline { get; set; }
-
-    [InverseProperty("process_type")]
-    public virtual ICollection<ProcessDto> Processes { get; set; } = [];
 }

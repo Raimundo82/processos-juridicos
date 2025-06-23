@@ -16,7 +16,4 @@ public partial class InfringementDto
     [Unicode(false)]
     [DisplayName("Acidente em Serviço")]
     public string InfringementName { get; set; }
-
-    [InverseProperty("infringement")]
-    public virtual ICollection<ProcessDto> Processes { get; set; } = [];
 }

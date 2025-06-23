@@ -17,4 +17,6 @@ public class SectorDto
     public required string SectorName { get; set; }
 
     public bool Enable { get; set; } = default;
+
+
 }

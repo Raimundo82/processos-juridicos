@@ -15,6 +15,5 @@ public partial class StateDto
     [Unicode(false)]
     public string StateName { get; set; }
 
-    [InverseProperty("state")]
-    public virtual ICollection<ProcessDto> Processes { get; set; } = [];
+
 }

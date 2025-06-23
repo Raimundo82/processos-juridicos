@@ -18,6 +18,4 @@ public partial class ProcessType
     [Required]
     [Column("deadline")]
     public required int Deadline { get; set; }
-
-    public virtual ICollection<Process> Processes { get; set; } = [];
 }

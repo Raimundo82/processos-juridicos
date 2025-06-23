@@ -13,5 +13,4 @@ public partial class State
     [Column("state_name")]
     public string StateName { get; set; }
 
-    public ICollection<Process> Processes { get; set; } = [];
 }

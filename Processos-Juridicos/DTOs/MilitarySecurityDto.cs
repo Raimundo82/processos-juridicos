@@ -18,8 +18,5 @@ namespace Processos_Juridicos.DTOs
         [UniqueMilitarySecurity]
         public required string MilitarySecurityName { get; set; }
 
-
-        [InverseProperty("military_security")]
-        public virtual ICollection<ProcessDto> Processes { get; set; } = [];
     }
 }

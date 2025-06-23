@@ -69,7 +69,22 @@ GlobalTextManager.SetManager(app.Services.GetRequiredService<IJsonTextManager>()
 
 if (!app.Environment.IsDevelopment())
 {
+    //app.UseDeveloperExceptionPage();
     app.UseHsts();
+
+    AppDomain.CurrentDomain.UnhandledException += (sender, eventArgs) =>
+    {
+        var ex = (Exception)eventArgs.ExceptionObject;
+        // Log or write the exception details to a persistent log
+        Console.WriteLine("Unhandled exception: " + ex.ToString());
+    };
+
+    TaskScheduler.UnobservedTaskException += (sender, eventArgs) =>
+    {
+        // Log exception details
+        Console.WriteLine("Unobserved task exception: " + eventArgs.Exception.ToString());
+        eventArgs.SetObserved(); // prevents the process from terminating
+    };
 }
 
 app.UseHttpsRedirection();

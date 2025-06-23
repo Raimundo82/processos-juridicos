@@ -19,7 +19,4 @@ public partial class AccidentTypeDto
     [DisplayName("Tipo de Acidente")]
     [UniqueAccidentTypeName]
     public string AccidentTypeName { get; set; }
-
-    [InverseProperty("AccidentType")]
-    public virtual ICollection<ProcessDto> Processes { get; set; } = [];
 }
