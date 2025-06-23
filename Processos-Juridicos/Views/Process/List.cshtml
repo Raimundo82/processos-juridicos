@@ -11,7 +11,7 @@
     <h1 class="display-4">Processos</h1>
 </div>
 
-<button asp-controller="Process" asp-action="CreateEdit" class="btn btn-primary">Inserir Processo</button>
+<a asp-controller="Process" asp-action="Create" class="btn btn-primary">Inserir Processo</a>
 
 <div class="table-responsive-md" style="max-width: calc(100vw-200px);margin: 0 auto; overflow-x: auto;">
     <table id="tableStates" class="table table-striped-columns table-hover">
@@ -21,9 +21,11 @@
                 <th scope="col">@Html.DisplayNameFor(m => m.First().ProcessId)</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().Nuipm)</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().ProcessTypeId)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().UnitId)</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().OficialInstId)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().OficialInstTelephone)</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().InvestigatedId)</th>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().InvestigatedGenderId)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().InvestigatedGender)</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().OcurrenceDate)</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().DispatchDate)</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().Description)</th>
@@ -40,6 +42,13 @@
                 <th scope="col">@Html.DisplayNameFor(m => m.First().ThirdPartyCompensation)</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().Reimbursement)</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().InfringementId)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().CrimeType)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().MilitarySecurity)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().CompensationPaid)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().CompensatingUnit)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().ComunicatedToPjm)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().ComunicationDate)</th>
+                <th scope="col">Ações</th>
         </thead>
         <tbody>
 
@@ -48,12 +57,13 @@
                 <tr>
                     <th scope="row">@count</th>
                     <td>@Html.DisplayFor(m => item.ProcessId)</td>
-                    <td>@Html.DisplayFor(m => item.Nuipm)</td>
+                    <td><a asp-controller="Process" asp-action="Details" asp-route-id="@item.ProcessId">@Html.DisplayFor(m => item.Nuipm)</a></td>
                     <td>@Html.DisplayFor(m => item.ProcessTypeId)</td>
                     <td>@Html.DisplayFor(m => item.UnitId)</td>
                     <td>@Html.DisplayFor(m => item.OficialInstId)</td>
+                    <td>@Html.DisplayFor(m => item.OficialInstTelephone)</td>
                     <td>@Html.DisplayFor(m => item.InvestigatedId)</td>
-                    <td>@Html.DisplayFor(m => item.InvestigatedGenderId)</td>
+                    <td>@Html.DisplayFor(m => item.InvestigatedGender)</td>
                     <td>@Html.DisplayFor(m => item.OcurrenceDate)</td>
                     <td>@Html.DisplayFor(m => item.DispatchDate)</td>
                     <td>@Html.DisplayFor(m => item.Description)</td>
@@ -70,7 +80,22 @@
                     <td>@Html.DisplayFor(m => item.ThirdPartyCompensation)</td>
                     <td>@Html.DisplayFor(m => item.Reimbursement)</td>
                     <td>@Html.DisplayFor(m => item.InfringementId)</td>
-
+                    <td>@Html.DisplayFor(m => item.CrimeType)</td>
+                    <td>@Html.DisplayFor(m => item.MilitarySecurity)</td>
+                    <td>@Html.DisplayFor(m => item.CompensationPaid)</td>
+                    <td>@Html.DisplayFor(m => item.CompensatingUnit)</td>
+                    <td>@Html.DisplayFor(m => item.ComunicatedToPjm)</td>
+                    <td>@Html.DisplayFor(m => item.ComunicationDate)</td>
+                    <td>
+                        <div class="d-flex gap-2">
+                            <form asp-controller="Process" asp-action="Delete" method="post">
+                                <input type="hidden" name="id" value="@item.ProcessId">
+                                <button type="submit" class="btn btn-danger"></button>
+                            </form>
+                            <a asp-controller="Process" asp-action="Edit" asp-route-id="@item.ProcessId"
+                               class="btn btn-warning"><i class="bi bi-pencil"></i></a>
+                        </div>
+                    </td>
                 </tr>
                 count++;
             }

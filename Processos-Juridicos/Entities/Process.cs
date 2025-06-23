@@ -11,7 +11,7 @@ public partial class Process
     public int ProcessId { get; set; }
 
     [Column("nuipm")]
-    public int? Nuipm { get; set; }
+    public string Nuipm { get; set; }
 
     [Column("process_type_id")]
     public int? ProcessTypeId { get; set; }
@@ -19,14 +19,20 @@ public partial class Process
     [Column("unit_id")]
     public int? UnitId { get; set; }
 
+    [Column("oficial_inst_telephone")]
+    public string OficialInstTelephone { get; set; }
+
     [Column("oficial_inst_id")]
     public int? OficialInstId { get; set; }
+
+    [Column("compensating_unit_id")]
+    public int? CompensatingUnitId { get; set; }
 
     [Column("investigated_id")]
     public int? InvestigatedId { get; set; }
 
-    [Column("investigated_gender_id")]
-    public int? InvestigatedGenderId { get; set; }
+    [Column("investigated_gender")]
+    public string InvestigatedGender { get; set; }
 
     [Column("occurrence_date")]
     public DateOnly? OcurrenceDate { get; set; }
@@ -76,34 +82,52 @@ public partial class Process
     [Column("infringement_id")]
     public int? InfringementId { get; set; }
 
+    [Column("crime_type_id")]
+    public int? CrimeTypeId { get; set; }
 
-    [ForeignKey("HarmedOrCasualtiesId")]
-    [InverseProperty("Processes")]
-    public HarmedOrCasualty HarmedOrCasualties { get; set; }
+    [Column("compensation_paid_by_unit")]
+    [Required]
+    public bool CompensationPaid { get; set; }
 
-    [ForeignKey("InfringementId")]
-    [InverseProperty("Processes")]
-    public Infringement Infringement { get; set; }
+    [Column("comunicated_pjm")]
+    [Required]
+    public bool ComunicatedToPjm { get; set; }
 
-    [ForeignKey("ProcessTypeId")]
-    [InverseProperty("Processes")]
-    public ProcessType ProcessType { get; set; }
+    [Column("pjm_comunication_date")]
+    public DateOnly? ComunicationDate { get; set; }
 
-    [ForeignKey("SentenceId")]
-    [InverseProperty("Processes")]
-    public Sentence Sentence { get; set; }
-
-    [ForeignKey("AccidentTypeId")]
-    [InverseProperty("Processes")]
-    public AccidentType AccidentType { get; set; }
-
-    [ForeignKey("StateId")]
-    [InverseProperty("Processes")]
-    [Column("state")]
-    public State State { get; set; }
+    [Column("military_security_id")]
+    public int? MilitarySecurityId { get; set; }
 
     [ForeignKey("UnitId")]
-    [InverseProperty("Processes")]
-    [Column("unit_id")]
-    public Unit Unit { get; set; }
+    public virtual Unit Unit { get; set; }
+
+    [ForeignKey("CompensatingUnitId")]
+    public virtual Unit CompensatingUnit { get; set; }
+
+    [ForeignKey("HarmedOrCasualtiesId")]
+    public virtual HarmedOrCasualty HarmedOrCasualties { get; set; }
+
+    [ForeignKey("InfringementId")]
+    public virtual Infringement Infringement { get; set; }
+
+    [ForeignKey("ProcessTypeId")]
+    public virtual ProcessType ProcessType { get; set; }
+
+    [ForeignKey("SentenceId")]
+    public virtual Sentence Sentence { get; set; }
+
+    [ForeignKey("StateId")]
+    public virtual State State { get; set; }
+
+    [ForeignKey("ServiceAccidentId")]
+    public virtual AccidentType AccidentType { get; set; }
+
+    [ForeignKey("MilitarySecurityId")]
+    public virtual MilitarySecurity MilitarySecurity { get; set; }
+
+    [ForeignKey("CrimeTypeId")]
+    public virtual CrimeType CrimeType { get; set; }
+
+
 }

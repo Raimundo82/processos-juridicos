@@ -10,17 +10,21 @@ public partial class ProcessDto
     [Key]
     public int ProcessId { get; set; }
 
-    public int? Nuipm { get; set; }
+    public string Nuipm { get; set; }
 
     public int? ProcessTypeId { get; set; }
 
     public int? UnitId { get; set; }
+    
+    public int? CompensatingUnitId { get; set; }
 
     public int? OficialInstId { get; set; }
 
+    public string OficialInstTelephone { get; set; }
+
     public int? InvestigatedId { get; set; }
 
-    public int? InvestigatedGenderId { get; set; }
+    public string InvestigatedGender { get; set; }
 
     public DateOnly? OcurrenceDate { get; set; }
 
@@ -55,32 +59,44 @@ public partial class ProcessDto
     public double? Reimbursement { get; set; }
 
     public int? InfringementId { get; set; }
+    [Required]
+    public bool? CompensationPaid { get; set; }
+    [Required]
+    public bool? ComunicatedToPjm { get; set; }
 
-    [ForeignKey("HarmedOrCasuatiesId")]
-    [InverseProperty("Processes")]
+    public int? CrimeTypeId { get; set; }
+
+    public int? MilitarySecurityId { get; set; }
+
+    public DateOnly? ComunicationDate { get; set; }
+
+    [ForeignKey("UnitId")]
+    public virtual UnitDto Unit { get; set; }
+
+    [ForeignKey("HarmedOrCasualtiesId")]
     public virtual HarmedOrCasualtyDto HarmedOrCasualties { get; set; }
 
     [ForeignKey("InfringementId")]
-    [InverseProperty("Processes")]
     public virtual InfringementDto Infringement { get; set; }
 
     [ForeignKey("ProcessTypeId")]
-    [InverseProperty("Processes")]
     public virtual ProcessTypeDto ProcessType { get; set; }
 
     [ForeignKey("SentenceId")]
-    [InverseProperty("Processes")]
     public virtual SentenceDto Sentence { get; set; }
 
-    [ForeignKey("AccidentTypeId")]
-    [InverseProperty("Processes")]
+    [ForeignKey("StateId")]
+    public virtual StateDto State { get; set; }
+    
+    [ForeignKey("ServiceAccidentId")]
     public virtual AccidentTypeDto AccidentType { get; set; }
 
-    [ForeignKey("StateId")]
-    [InverseProperty("Processes")]
-    public virtual StateDto State { get; set; }
+    [ForeignKey("MilitarySecurityId")]
+    public virtual MilitarySecurityDto MilitarySecurity { get; set; }
 
-    [ForeignKey("UnitId")]
-    [InverseProperty("Processes")]
-    public virtual UnitDto Unit { get; set; }
+    [ForeignKey("CrimeTypeId")]
+    public virtual CrimeTypeDto CrimeType { get; set; }
+
+    [ForeignKey("CompensatingUnit")]
+    public virtual UnitDto CompensatingUnit { get; set; }
 }

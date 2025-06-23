@@ -10,19 +10,49 @@ namespace Processos_Juridicos.Services
     {
         private readonly AppDbContext _context = context;
 
-        public Task<ProcessDto> CreateProcess(ProcessDto process)
+        public async Task<ProcessDto> CreateProcess(ProcessDto process)
         {
-            throw new NotImplementedException();
+            var processEntity = Mapper.MapToProcesses(process);
+
+            _context.Processes.Add(processEntity);
+            await _context.SaveChangesAsync();
+            return Mapper.MapToProcessesDto(processEntity);
         }
 
-        public Task<bool> DeleteProcess(int id)
+        public async Task<bool> DeleteProcess(int id)
         {
-            throw new NotImplementedException();
+            var process = await _context.Processes.FindAsync(id);
+            if (process == null)
+            {
+                return false;
+            }
+
+            _context.Processes.Remove(process);
+            await _context.SaveChangesAsync();
+            return true;
         }
 
-        public Task<ProcessDto> EditProcess(ProcessDto process)
+        public async Task<ProcessDto> EditProcess(ProcessDto process)
         {
-            throw new NotImplementedException();
+
+            var existingEntity = await _context.Processes.FindAsync(process.ProcessId);
+            if (existingEntity != null)
+            {
+                // Detach the entity so it is no longer tracked
+                _context.Entry(existingEntity).State = EntityState.Detached;
+            }
+
+            if (process.CreatedById == null && existingEntity != null)
+            {
+                process.CreatedById = existingEntity.CreatedById;
+            }
+
+            var processEntity = Mapper.MapToProcesses(process);
+            _context.Processes.Attach(processEntity);
+            _context.Entry(processEntity).State = EntityState.Modified;
+
+            await _context.SaveChangesAsync();
+            return Mapper.MapToProcessesDto(processEntity);
         }
 
         public async Task<IEnumerable<ProcessDto>> GetAllProcesses()
@@ -31,9 +61,28 @@ namespace Processos_Juridicos.Services
             return Mapper.MapToToProcessesEnum(processes);
         }
 
-        public Task<ProcessDto> GetProcessById(int id)
+        public async Task<ProcessDto> GetProcessById(int id)
         {
-            throw new NotImplementedException();
+            var process = await _context.Processes
+                .Include(x => x.Unit)
+                .Include(x => x.CompensatingUnit)
+                .Include(x => x.HarmedOrCasualties)
+                .Include(x => x.Infringement)
+                .Include(x => x.ProcessType)
+                .Include(x => x.Sentence)
+                .Include(x => x.State)
+                .Include(x => x.AccidentType)
+                .Include(x => x.MilitarySecurity)
+                .Include(x => x.CrimeType)
+                .AsSplitQuery()
+                .FirstOrDefaultAsync(x => x.ProcessId == id);
+
+            if (process != null)
+            {
+                    return Mapper.MapToProcessesDto(process);   
+            }
+
+            throw new KeyNotFoundException();
         }
     }
 }

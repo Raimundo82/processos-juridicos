@@ -58,8 +58,8 @@ namespace Processos_Juridicos.Controllers
                 MilitarySecurityDto model = await _militarySecuritySvc.GetMilitarySecurityById(id);
                 return View(model);
             }
-            return RedirectToAction(nameof(List));
 
+            return RedirectToAction(nameof(List));
         }
 
         [HttpPost]

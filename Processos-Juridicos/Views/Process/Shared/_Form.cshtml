@@ -1,0 +1,108 @@
+﻿@model Processos_Juridicos.DTOs.ProcessDto;
+
+<div class="form-group mt-3">
+    <label asp-for="Nuipm" for="process-nuipm" class="control-label">@Html.DisplayNameFor(m => m.Nuipm)</label>
+    <input id="process-nuipm" asp-for="Nuipm" class="form-control" />
+    <span asp-validation-for="Nuipm" class="text-danger"></span>
+</div>
+
+<div class="form-group mt-3">
+    <label for="process-type-id" class="control-label">Tipo de Processo</label>
+    <select id="process-type-id" asp-for="ProcessTypeId" asp-items="ViewBag.processTypes" class="form-control">
+        <option value="">Selecione um Tipo de Processo</option>
+    </select>
+    <span asp-validation-for="ProcessTypeId" class="text-danger"></span>
+</div>
+
+<div class="form-group mt-3">
+    <label for="unit-id" class="control-label">Unidade</label>
+    <select id="unit-id" asp-for="UnitId" asp-items="ViewBag.units" class="form-control">
+        <option value="">Selecione uma Unidade</option>
+    </select>
+    <span asp-validation-for="UnitId" class="text-danger"></span>
+</div>
+
+<div class="form-group mt-3">
+    <label asp-for="OficialInstId" for="instructor-name" class="control-label">Oficial instrutor</label>
+    <input id="instructor-name" asp-for="OficialInstId" class="form-control" />
+    <span asp-validation-for="OficialInstId" class="text-danger"></span>
+
+    <label asp-for="Nuipm" for="instructor-telephone" class="control-label">Telefone do oficial instrutor</label>
+    <input id="instructor-telephone" asp-for="OficialInstTelephone" class="form-control" />
+    <span asp-validation-for="OficialInstTelephone" class="text-danger"></span>
+</div>
+
+<div class="form-group mt-3">
+    <label asp-for="InvestigatedId" for="investigated-name" class="control-label">Averiguado</label>
+    <input id="investigated-name" asp-for="InvestigatedId" class="form-control" />
+    <span asp-validation-for="InvestigatedId" class="text-danger"></span>
+
+    <label for="investigated-gender" class="control-label">Sexo</label>
+    <select id="investigated-gender" asp-for="InvestigatedGender" asp-items="ViewBag.genders" class="form-control">
+        
+    </select>
+    <span asp-validation-for="InvestigatedGender" class="text-danger"></span>
+
+    <div>
+        <label for ="uncertainInvestigated">Averiguado Incerto</label>
+        <input type="checkbox" id="uncertainInvestigated" />
+    </div>
+</div>
+
+<div class="form-group mt-3">
+    <label for="created-at" asp-for="CreatedAt">Data de criação</label>
+    <input asp-for="CreatedAt" id="created-at" type="date" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+    <span asp-validation-for="CreatedAt" class="text-danger"></span>
+</div>
+
+<div class="form-group mt-3">
+    <label for="ocurrence-date" asp-for="OcurrenceDate">Data da Ocorrência</label>
+    <input id="ocurrence-date" asp-for="OcurrenceDate" type="date" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+    <span asp-validation-for="OcurrenceDate" class="text-danger"></span>
+</div>
+
+<div class="form-group mt-3">
+    <label for="nomination-date" asp-for="DispatchDate">Data de Despacho de Nomeação do Instrutor</label>
+    <input id="nomination-date" asp-for="DispatchDate" type="date" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+    <span asp-validation-for="DispatchDate" class="text-danger"></span>
+</div>
+
+<div class="form-group mt-3">
+    <label asp-for="Description" for="description" class="control-label">Descrição da Ocorrência</label>
+    <textarea id="description" asp-for="Description" class="form-control"> </textarea>
+    <span asp-validation-for="Description" class="text-danger"></span>
+</div>
+
+<div class="form-group mt-3">
+    <label for="deadline-date" asp-for="DeadlineDate">Prazo Previsto para encerramento por parte do Of. Instrutor (Inicial / Prorrogação)</label>
+    <input id="deadline-date" asp-for="DeadlineDate" type="date" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+    <span asp-validation-for="DeadlineDate" class="text-danger"></span>
+</div>
+
+<div class="form-group mt-3">
+    <label for="final-deadline-date" asp-for="FinalDispatchDate">Data de Despacho Final do Com./Dir./Chefe</label>
+    <input id="final-deadline-date" asp-for="FinalDispatchDate" type="date" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+    <span asp-validation-for="FinalDispatchDate" class="text-danger"></span>
+</div>
+
+<div class="form-group mt-3">
+    <label for="sentence-id" class="control-label">Pena Aplicada </label>
+    <select id="sentence-id" asp-for="SentenceId" asp-items="ViewBag.sentences" class="form-control">
+        <option value="">Selecione uma Pena</option>
+    </select>
+    <span asp-validation-for="SentenceId" class="text-danger"></span>
+</div>
+
+<div class="form-group mt-3">
+    <label for="state-id" class="control-label">Estado</label>
+    <select id="state-id" asp-for="StateId" asp-items="ViewBag.states" class="form-control">
+        <option value="">Selecione um Estado</option>
+    </select>
+    <span asp-validation-for="StateId" class="text-danger"></span>
+</div>
+
+@* <div>
+    <label for="attachments">Upload Attachments:</label>
+    <input type="file" id="attachments" name="attachments" multiple />
+</div>
+ *@

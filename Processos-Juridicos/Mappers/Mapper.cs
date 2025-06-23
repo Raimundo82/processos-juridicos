@@ -22,7 +22,7 @@ public static partial class Mapper
     // States Map 
 
     public static partial StateDto MapToStateDto(State entity);
-    public static partial State MapToState (StateDto dto);
+    public static partial State MapToState(StateDto dto);
     public static partial IEnumerable<StateDto> MapToToStateDtoEnum(IEnumerable<State> entity);
 
     // Process_Types map
@@ -50,9 +50,9 @@ public static partial class Mapper
 
     // Files map
 
-    public static partial ProcessFileDto MapToFilesDto(Entities.ProcessFile entity);
-    public static partial Entities.ProcessFile MapToFiles(ProcessFileDto dto);
-    public static partial IEnumerable<ProcessFileDto> MapToToFilesEnum(IEnumerable<Entities.ProcessFile> entity);
+    public static partial ProcessFileDto MapToFilesDto(ProcessFile entity);
+    public static partial ProcessFile MapToFiles(ProcessFileDto dto);
+    public static partial IEnumerable<ProcessFileDto> MapToToFilesEnum(IEnumerable<ProcessFile> entity);
 
     // Processes map
 
