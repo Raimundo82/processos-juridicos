@@ -1,98 +1,98 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
+
 using Processos_Juridicos.DTOs;
 using Processos_Juridicos.Services.Interfaces;
 using Processos_Juridicos.Utilities.TextManager;
 
-namespace Processos_Juridicos.Controllers
+namespace Processos_Juridicos.Controllers;
+
+public class MilitarySecurityController(IMilitarySecuritySvc militarySecuritySvc, IToastNotify toastNotify) : Controller
 {
-    public class MilitarySecurityController(IMilitarySecuritySvc militarySecuritySvc, IToastNotify toastNotify) : Controller
+    private readonly string EntityName = "Segurança Militar";
+
+    private readonly IMilitarySecuritySvc _militarySecuritySvc = militarySecuritySvc;
+    private readonly IToastNotify _toastNotify = toastNotify;
+
+    [HttpGet]
+    public async Task<IActionResult> List()
     {
-        private readonly string EntityName = "Segurança Militar";
+        IEnumerable<MilitarySecurityDto> listMilitarySecuritysDto = await _militarySecuritySvc.GetAllMilitarySecurities();
+        return View(listMilitarySecuritysDto);
+    }
 
-        private readonly IMilitarySecuritySvc _militarySecuritySvc = militarySecuritySvc;
-        private readonly IToastNotify _toastNotify = toastNotify;
-
-        [HttpGet]
-        public async Task<IActionResult> List()
+    [HttpGet]
+    public async Task<IActionResult> ListOne(int id)
+    {
+        if (ModelState.IsValid)
         {
-            var listMilitarySecuritysDto = await _militarySecuritySvc.GetAllMilitarySecurities();
-            return View(listMilitarySecuritysDto);
+            MilitarySecurityDto security = await _militarySecuritySvc.GetMilitarySecurityById(id);
+            return View(security);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> ListOne(int id)
-        {
-            if (ModelState.IsValid)
-            {
-                MilitarySecurityDto security = await _militarySecuritySvc.GetMilitarySecurityById(id);
-                return View(security);
-            }
+        return RedirectToAction(nameof(List));
+    }
 
-            return RedirectToAction(nameof(List));
+    [HttpGet]
+    public IActionResult Create()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Create(MilitarySecurityDto model)
+    {
+        if (ModelState.IsValid)
+        {
+            _ = await _militarySecuritySvc.CreateMilitarySecurity(model);
+            _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("CreateSuccessMessage"), "A", EntityName, "a"));
+            return RedirectToAction("List");
         }
 
-        [HttpGet]
-        public IActionResult Create()
-        {
-            return View();
-        }
+        return View(model);
+    }
 
-        [HttpPost]
-        public async Task<IActionResult> Create(MilitarySecurityDto model)
+    [HttpGet]
+    public async Task<IActionResult> Edit(int id)
+    {
+        if (ModelState.IsValid)
         {
-            if (ModelState.IsValid)
-            {
-                await _militarySecuritySvc.CreateMilitarySecurity(model);
-                _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("CreateSuccessMessage"), "A", EntityName, "a"));
-                return RedirectToAction("List");
-            }
-
+            MilitarySecurityDto model = await _militarySecuritySvc.GetMilitarySecurityById(id);
             return View(model);
         }
+        return RedirectToAction(nameof(List));
 
-        [HttpGet]
-        public async Task<IActionResult> Edit(int id)
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Edit(MilitarySecurityDto model)
+    {
+        if (ModelState.IsValid)
         {
-            if (ModelState.IsValid)
-            {
-                MilitarySecurityDto model = await _militarySecuritySvc.GetMilitarySecurityById(id);
-                return View(model);
-            }
-
-            return RedirectToAction(nameof(List));
+            _ = await _militarySecuritySvc.EditMilitarySecurity(model);
+            _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("EditSuccessMessage"), "A", EntityName, "a"));
+            return RedirectToAction("List");
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Edit(MilitarySecurityDto model)
-        {
-            if (ModelState.IsValid)
-            {
-                await _militarySecuritySvc.EditMilitarySecurity(model);
-                _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("EditSuccessMessage"), "A", EntityName, "a"));
-                return RedirectToAction("List");
-            }
+        return View(model);
+    }
 
-            return View(model);
+    [HttpPost, ActionName("Delete")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Delete(int id)
+    {
+        if (ModelState.IsValid)
+        {
+            var success = await _militarySecuritySvc.DeleteMilitarySecurity(id);
+            if (!success)
+            {
+                _toastNotify.Error(string.Format(GlobalTextManager.GetString("DeleteFailureMessage"), "a", EntityName));
+            }
+            else
+            {
+                _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("DeleteSuccessMessage"), "A", EntityName, "a"));
+            }
         }
 
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id)
-        {
-            if (ModelState.IsValid)
-            {
-                var success = await _militarySecuritySvc.DeleteMilitarySecurity(id);
-                if (!success)
-                {
-                    _toastNotify.Error(string.Format(GlobalTextManager.GetString("DeleteFailureMessage"), "a", EntityName));
-                }
-                else
-                {
-                    _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("DeleteSuccessMessage"), "A", EntityName, "a"));
-                }
-            }
-
-            return RedirectToAction(nameof(List));
-        }
+        return RedirectToAction(nameof(List));
     }
 }

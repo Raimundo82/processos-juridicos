@@ -1,10 +1,10 @@
-﻿namespace Processos_Juridicos.Services.Interfaces;
+namespace Processos_Juridicos.Services.Interfaces;
 
 public interface IToastNotify
 {
-    void Sucesso(string msg);
-    void Error(string msg);
-    void Info(string msg);
-    void Alert(string msg);
-    void Warning(string msg);
+    public void Sucesso(string msg);
+    public void Error(string msg);
+    public void Info(string msg);
+    public void Alert(string msg);
+    public void Warning(string msg);
 }

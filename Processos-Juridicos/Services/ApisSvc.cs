@@ -1,6 +1,8 @@
-﻿using System.Net;
+using System.Net;
 using System.Text.Json;
+
 using Microsoft.IdentityModel.Tokens;
+
 using Processos_Juridicos.Models;
 using Processos_Juridicos.Services.Interfaces;
 
@@ -26,13 +28,13 @@ public class ApisSvc : IApisSvc
         request.Headers.Add("Accept", "application/json");
         request.Headers.Add("User-Agent", "Mozilla/5.0");
 
-        var response = await httpClient.SendAsync(request);
+        HttpResponseMessage response = await httpClient.SendAsync(request);
 
         if (response.IsSuccessStatusCode)
         {
             var json = await response.Content.ReadAsStringAsync();
 
-            var listUnits = JsonSerializer.Deserialize<List<ApiUnitsModel>>(json);
+            List<ApiUnitsModel>? listUnits = JsonSerializer.Deserialize<List<ApiUnitsModel>>(json);
 
             if (listUnits.IsNullOrEmpty())
             {

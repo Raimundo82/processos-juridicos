@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+
 using Processos_Juridicos.Entities;
 
 namespace Processos_Juridicos.Data;

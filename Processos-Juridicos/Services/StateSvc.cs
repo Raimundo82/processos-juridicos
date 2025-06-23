@@ -1,58 +1,57 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+
 using Processos_Juridicos.Data;
 using Processos_Juridicos.DTOs;
+using Processos_Juridicos.Entities;
 using Processos_Juridicos.Mappers;
 using Processos_Juridicos.Services.Interfaces;
 
-namespace Processos_Juridicos.Services
+namespace Processos_Juridicos.Services;
+
+public class StateSvc(AppDbContext context) : IStateSvc
 {
-    public class StateSvc(AppDbContext context) : IStateSvc
+    private readonly AppDbContext _context = context;
+
+    public async Task<IEnumerable<StateDto>> GetAllStates()
     {
-        private readonly AppDbContext _context = context;
+        List<State> states = await _context.States.ToListAsync();
+        return Mapper.MapToToStateDtoEnum(states);
+    }
 
-        public async Task<IEnumerable<StateDto>> GetAllStates()
+    public async Task<StateDto> GetStateById(int id)
+    {
+        State? state = await _context.States.FindAsync(id);
+        return state != null ? Mapper.MapToStateDto(state) : throw new KeyNotFoundException();
+    }
+
+    public async Task<StateDto> CreateState(StateDto state)
+    {
+        State stateEntity = Mapper.MapToState(state);
+
+        _ = _context.States.Add(stateEntity);
+        _ = await _context.SaveChangesAsync();
+        return Mapper.MapToStateDto(stateEntity);
+    }
+
+    public async Task<StateDto> EditState(StateDto state)
+    {
+        State stateEntity = Mapper.MapToState(state);
+        _context.States.Entry(stateEntity).State = EntityState.Modified;
+
+        _ = await _context.SaveChangesAsync();
+        return Mapper.MapToStateDto(stateEntity);
+    }
+
+    public async Task<bool> DeleteState(int id)
+    {
+        State? state = await _context.States.FindAsync(id);
+        if (state == null)
         {
-            var states = await _context.States.ToListAsync();
-            return Mapper.MapToToStateDtoEnum(states);
+            return false;
         }
 
-        public async Task<StateDto> GetStateById(int id)
-        {
-            var state = await _context.States.FindAsync(id);
-            if (state != null)
-            {
-                return Mapper.MapToStateDto(state);
-            }
-
-            throw new KeyNotFoundException();
-        }
-
-        public async Task<StateDto> CreateState(StateDto state)
-        {
-            var stateEntity = Mapper.MapToState(state);
-
-            _context.States.Add(stateEntity);
-            await _context.SaveChangesAsync();
-            return Mapper.MapToStateDto(stateEntity);
-        }
-
-        public async Task<StateDto> EditState(StateDto state)
-        {
-            var stateEntity = Mapper.MapToState(state);
-            _context.States.Entry(stateEntity).State = EntityState.Modified;
-
-            await _context.SaveChangesAsync();
-            return Mapper.MapToStateDto(stateEntity);
-        }
-
-        public async Task<bool> DeleteState(int id)
-        {
-            var state = await _context.States.FindAsync(id);
-            if (state == null) return false;
-
-            _context.States.Remove(state);
-            await _context.SaveChangesAsync();
-            return true;
-        }
+        _ = _context.States.Remove(state);
+        _ = await _context.SaveChangesAsync();
+        return true;
     }
 }

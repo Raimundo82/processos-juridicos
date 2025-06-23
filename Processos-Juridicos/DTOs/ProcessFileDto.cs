@@ -1,7 +1,8 @@
-﻿#nullable disable
-using Processos_Juridicos.Entities;
+#nullable disable
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+
+using Processos_Juridicos.Entities;
 
 namespace Processos_Juridicos.DTOs;
 

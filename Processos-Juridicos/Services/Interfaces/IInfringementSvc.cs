@@ -1,13 +1,12 @@
-﻿using Processos_Juridicos.DTOs;
+using Processos_Juridicos.DTOs;
 
-namespace Processos_Juridicos.Services.Interfaces
+namespace Processos_Juridicos.Services.Interfaces;
+
+public interface IInfringementSvc
 {
-    public interface IInfringementSvc
-    {
-        Task<IEnumerable<InfringementDto>> GetAllInfringements();
-        Task<InfringementDto> GetInfringementById(int id);
-        Task<InfringementDto> CreateInfringement(InfringementDto infringement);
-        Task<InfringementDto> EditInfringement(InfringementDto infringement);
-        Task<bool> DeleteInfringement(int id);
-    }
+    public Task<IEnumerable<InfringementDto>> GetAllInfringements();
+    public Task<InfringementDto> GetInfringementById(int id);
+    public Task<InfringementDto> CreateInfringement(InfringementDto infringement);
+    public Task<InfringementDto> EditInfringement(InfringementDto infringement);
+    public Task<bool> DeleteInfringement(int id);
 }

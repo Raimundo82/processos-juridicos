@@ -1,0 +1,107 @@
+# .editorconfig
+# Top-most EditorConfig file.
+root = true
+
+############################################################
+# Global Settings (Applies to all files)
+############################################################
+[*]
+charset = utf-8
+end_of_line = crlf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+############################################################
+# Settings for C# and VB files
+############################################################
+[*.{cs,vb}]
+dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = true
+
+############################################################
+# C# Specific Formatting & Code Style Rules
+############################################################
+[*.cs]
+
+# New line formatting (brace positions, etc.)
+csharp_new_line_before_open_brace = all
+
+# Prefer file-scoped namespaces (C# 10+)
+csharp_style_namespace_declarations = file_scoped:suggestion
+
+# Accessibility modifiers must be explicitly declared.
+dotnet_style_require_accessibility_modifiers = always:error
+
+# Expression-bodied members increase readability when used appropriately.
+csharp_style_expression_bodied_methods = when_possible:suggestion
+csharp_style_expression_bodied_properties = when_possible:suggestion
+csharp_style_expression_bodied_accessors = when_possible:suggestion
+csharp_style_expression_bodied_constructors = when_possible:suggestion
+csharp_style_expression_bodied_operators = when_possible:suggestion
+
+# Var usage: Use 'var' for built-in types and when the type is apparent.
+csharp_style_var_for_built_in_types = true:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_var_elsewhere = false:suggestion
+
+# Enforce the use of braces for all control blocks.
+csharp_prefer_braces = true:suggestion
+
+# Additional formatting preferences.
+csharp_indent_case_contents = true
+csharp_indent_switch_labels = true
+
+############################################################
+# .NET Naming Conventions
+############################################################
+
+# Interfaces should start with "I".
+dotnet_naming_rule.interface_should_be_prefixed_with_I.severity = suggestion
+dotnet_naming_rule.interface_should_be_prefixed_with_I.symbols = interfaces
+dotnet_naming_rule.interface_should_be_prefixed_with_I.style = prefix_i
+
+dotnet_naming_symbols.interfaces.applicable_kinds = interface
+dotnet_naming_symbols.interfaces.applicable_accessibilities = public, internal
+dotnet_naming_symbols.interfaces.required_prefix = I
+
+# Classes (including DbContext and entity classes) must use PascalCase.
+dotnet_naming_rule.classes_should_be_pascal_case.severity = suggestion
+dotnet_naming_rule.classes_should_be_pascal_case.symbols = classes
+dotnet_naming_rule.classes_should_be_pascal_case.style = pascal_case
+
+dotnet_naming_symbols.classes.applicable_kinds = class
+dotnet_naming_symbols.classes.applicable_accessibilities = public, internal
+
+dotnet_naming_style.pascal_case.required_prefix = 
+dotnet_naming_style.pascal_case.capitalization = pascal_case
+
+# Methods should also be in PascalCase.
+dotnet_naming_rule.methods_should_be_pascal_case.severity = suggestion
+dotnet_naming_rule.methods_should_be_pascal_case.symbols = methods
+dotnet_naming_rule.methods_should_be_pascal_case.style = pascal_case
+
+dotnet_naming_symbols.methods.applicable_kinds = method
+dotnet_naming_symbols.methods.applicable_accessibilities = public, internal, protected, private
+
+############################################################
+# Additional .NET Code Style & Analyzer Settings
+############################################################
+
+# Apply .NET code style rules across the board.
+dotnet_analyzer_diagnostic.category-Style.severity = warning
+
+############################################################
+# Razor (.cshtml) File Formatting Rules
+############################################################
+[*.cshtml]
+# Enforce consistent indentation and whitespace in Razor files.
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+############################################################
+# End of File
+############################################################

@@ -1,6 +1,8 @@
 using System.Data;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+
 using Processos_Juridicos.Data;
 using Processos_Juridicos.DTOs;
 using Processos_Juridicos.Entities;
@@ -16,18 +18,18 @@ public class CrimeTypeSvcTests
     {
         // Arrange
         var factory = new CustomWebApplicationFactory<Program>(Guid.NewGuid().ToString());
-        using var scope = factory.Services.CreateScope();
-        var scopedServices = scope.ServiceProvider;
-        var db = scopedServices.GetRequiredService<AppDbContext>();
+        using IServiceScope scope = factory.Services.CreateScope();
+        IServiceProvider scopedServices = scope.ServiceProvider;
+        AppDbContext db = scopedServices.GetRequiredService<AppDbContext>();
 
         db.Crime_types.AddRange(
            new CrimeType { CrimeTypeName = "Corrupção" },
            new CrimeType { CrimeTypeName = "Fraude" }
        );
-        await db.SaveChangesAsync();
+        _ = await db.SaveChangesAsync();
 
         // Act
-        var svc = scopedServices.GetRequiredService<ICrimeTypeSvc>();
+        ICrimeTypeSvc svc = scopedServices.GetRequiredService<ICrimeTypeSvc>();
         var result = (await svc.GetAllCrimeTypes())
             .Select(c => c.CrimeTypeName)
             .ToList();
@@ -45,13 +47,13 @@ public class CrimeTypeSvcTests
     {
         // Arrange
         var factory = new CustomWebApplicationFactory<Program>(Guid.NewGuid().ToString());
-        using var scope = factory.Services.CreateScope();
-        var scopedServices = scope.ServiceProvider;
-        var db = scopedServices.GetRequiredService<AppDbContext>();
+        using IServiceScope scope = factory.Services.CreateScope();
+        IServiceProvider scopedServices = scope.ServiceProvider;
+        AppDbContext db = scopedServices.GetRequiredService<AppDbContext>();
 
         // Act
-        var svc = scope.ServiceProvider.GetRequiredService<ICrimeTypeSvc>();
-        var result = await svc.GetAllCrimeTypes();
+        ICrimeTypeSvc svc = scope.ServiceProvider.GetRequiredService<ICrimeTypeSvc>();
+        IEnumerable<CrimeTypeDto> result = await svc.GetAllCrimeTypes();
 
         // Assert
         Assert.Empty(result);
@@ -63,18 +65,18 @@ public class CrimeTypeSvcTests
     {
         // Arrange
         var factory = new CustomWebApplicationFactory<Program>(Guid.NewGuid().ToString());
-        using var scope = factory.Services.CreateScope();
-        var scopedServices = scope.ServiceProvider;
-        var db = scopedServices.GetRequiredService<AppDbContext>();
+        using IServiceScope scope = factory.Services.CreateScope();
+        IServiceProvider scopedServices = scope.ServiceProvider;
+        AppDbContext db = scopedServices.GetRequiredService<AppDbContext>();
 
         var crimeType = new CrimeType { CrimeTypeName = "Corrupção" };
-        db.Crime_types.Add(crimeType);
-        await db.SaveChangesAsync();
+        _ = db.Crime_types.Add(crimeType);
+        _ = await db.SaveChangesAsync();
 
-        var trackedEntity = await db.Crime_types.FindAsync(crimeType.CrimeTypeId);
+        CrimeType? trackedEntity = await db.Crime_types.FindAsync(crimeType.CrimeTypeId);
 
         // Act
-        var svc = scopedServices.GetRequiredService<ICrimeTypeSvc>();
+        ICrimeTypeSvc svc = scopedServices.GetRequiredService<ICrimeTypeSvc>();
         var result = (await svc.GetCrimeTypeById(trackedEntity!.CrimeTypeId)).CrimeTypeName;
 
 
@@ -88,14 +90,14 @@ public class CrimeTypeSvcTests
     {
         // Arrange
         var factory = new CustomWebApplicationFactory<Program>(Guid.NewGuid().ToString());
-        using var scope = factory.Services.CreateScope();
-        var scopedServices = scope.ServiceProvider;
+        using IServiceScope scope = factory.Services.CreateScope();
+        IServiceProvider scopedServices = scope.ServiceProvider;
 
         // Act
-        var svc = scopedServices.GetRequiredService<ICrimeTypeSvc>();
+        ICrimeTypeSvc svc = scopedServices.GetRequiredService<ICrimeTypeSvc>();
 
         // Assert
-        await Assert.ThrowsAsync<EntityNotFoundException>(() => svc.GetCrimeTypeById(999));
+        _ = await Assert.ThrowsAsync<EntityNotFoundException>(() => svc.GetCrimeTypeById(999));
     }
 
 
@@ -104,14 +106,14 @@ public class CrimeTypeSvcTests
     {
         // Arrange
         var factory = new CustomWebApplicationFactory<Program>(Guid.NewGuid().ToString());
-        using var scope = factory.Services.CreateScope();
-        var scopedServices = scope.ServiceProvider;
-        var db = scopedServices.GetRequiredService<AppDbContext>();
+        using IServiceScope scope = factory.Services.CreateScope();
+        IServiceProvider scopedServices = scope.ServiceProvider;
+        AppDbContext db = scopedServices.GetRequiredService<AppDbContext>();
 
 
         // Act
-        var svc = scopedServices.GetRequiredService<ICrimeTypeSvc>();
-        var result = await svc.CreateCrimeType(new DTOs.CrimeTypeDto { CrimeTypeName = "Assédio" });
+        ICrimeTypeSvc svc = scopedServices.GetRequiredService<ICrimeTypeSvc>();
+        CrimeTypeDto result = await svc.CreateCrimeType(new CrimeTypeDto { CrimeTypeName = "Assédio" });
 
         // Assert
         Assert.NotNull(result);
@@ -126,19 +128,19 @@ public class CrimeTypeSvcTests
     {
         // Arrange
         var factory = new CustomWebApplicationFactory<Program>(Guid.NewGuid().ToString());
-        using var scope = factory.Services.CreateScope();
-        var scopedServices = scope.ServiceProvider;
-        var db = scopedServices.GetRequiredService<AppDbContext>();
+        using IServiceScope scope = factory.Services.CreateScope();
+        IServiceProvider scopedServices = scope.ServiceProvider;
+        AppDbContext db = scopedServices.GetRequiredService<AppDbContext>();
         var crimeType = new CrimeType { CrimeTypeName = "Corrupção" };
         var crimeTypeDto = new CrimeTypeDto { CrimeTypeName = crimeType.CrimeTypeName };
-        db.Crime_types.Add(crimeType);
-        await db.SaveChangesAsync();
+        _ = db.Crime_types.Add(crimeType);
+        _ = await db.SaveChangesAsync();
 
         // Act
-        var svc = scopedServices.GetRequiredService<ICrimeTypeSvc>();
+        ICrimeTypeSvc svc = scopedServices.GetRequiredService<ICrimeTypeSvc>();
 
         // Assert
-        await Assert.ThrowsAsync<DuplicatedCrimeTypeException>(() => svc.CreateCrimeType(crimeTypeDto));
+        _ = await Assert.ThrowsAsync<DuplicatedCrimeTypeException>(() => svc.CreateCrimeType(crimeTypeDto));
     }
 
 
@@ -147,25 +149,28 @@ public class CrimeTypeSvcTests
     {
         // Arrange
         var factory = new CustomWebApplicationFactory<Program>(Guid.NewGuid().ToString());
-        using var scope = factory.Services.CreateScope();
-        var scopedServices = scope.ServiceProvider;
-        var db = scopedServices.GetRequiredService<AppDbContext>();
+        using IServiceScope scope = factory.Services.CreateScope();
+        IServiceProvider scopedServices = scope.ServiceProvider;
+        AppDbContext db = scopedServices.GetRequiredService<AppDbContext>();
 
         var crimeType = new CrimeType { CrimeTypeName = "Corrupção" };
-        db.Crime_types.Add(crimeType);
-        await db.SaveChangesAsync();
+        _ = db.Crime_types.Add(crimeType);
+        _ = await db.SaveChangesAsync();
 
-        var trackedEntity = await db.Crime_types.FindAsync(crimeType.CrimeTypeId);
-        if (trackedEntity != null) db.Entry(trackedEntity).State = EntityState.Detached;
+        CrimeType? trackedEntity = await db.Crime_types.FindAsync(crimeType.CrimeTypeId);
+        if (trackedEntity != null)
+        {
+            db.Entry(trackedEntity).State = EntityState.Detached;
+        }
 
         // Act
-        var svc = scopedServices.GetRequiredService<ICrimeTypeSvc>();
-        var result = await svc.EditCrimeType(new CrimeTypeDto { CrimeTypeId = trackedEntity!.CrimeTypeId, CrimeTypeName = "Corrupção Ativa" });
+        ICrimeTypeSvc svc = scopedServices.GetRequiredService<ICrimeTypeSvc>();
+        CrimeTypeDto result = await svc.EditCrimeType(new CrimeTypeDto { CrimeTypeId = trackedEntity!.CrimeTypeId, CrimeTypeName = "Corrupção Ativa" });
 
         // Assert
         Assert.NotNull(result);
         Assert.Equal("Corrupção Ativa", result.CrimeTypeName);
-        Assert.Single(await db.Crime_types.ToListAsync());
+        _ = Assert.Single(await db.Crime_types.ToListAsync());
         Assert.Equal("Corrupção Ativa", (await db.Crime_types.FindAsync(trackedEntity.CrimeTypeId))?.CrimeTypeName);
     }
 
@@ -175,15 +180,15 @@ public class CrimeTypeSvcTests
     {
         // Arrange
         var factory = new CustomWebApplicationFactory<Program>(Guid.NewGuid().ToString());
-        using var scope = factory.Services.CreateScope();
-        var scopedServices = scope.ServiceProvider;
+        using IServiceScope scope = factory.Services.CreateScope();
+        IServiceProvider scopedServices = scope.ServiceProvider;
 
         // Act
-        var svc = scopedServices.GetRequiredService<ICrimeTypeSvc>();
+        ICrimeTypeSvc svc = scopedServices.GetRequiredService<ICrimeTypeSvc>();
         var nonExistentDto = new CrimeTypeDto { CrimeTypeName = "Inexistente" };
 
         // Assert
-        await Assert.ThrowsAsync<EntityNotFoundException>(() => svc.EditCrimeType(nonExistentDto));
+        _ = await Assert.ThrowsAsync<EntityNotFoundException>(() => svc.EditCrimeType(nonExistentDto));
     }
 
 
@@ -192,18 +197,18 @@ public class CrimeTypeSvcTests
     {
         // Arrange
         var factory = new CustomWebApplicationFactory<Program>(Guid.NewGuid().ToString());
-        using var scope = factory.Services.CreateScope();
-        var scopedServices = scope.ServiceProvider;
-        var db = scopedServices.GetRequiredService<AppDbContext>();
+        using IServiceScope scope = factory.Services.CreateScope();
+        IServiceProvider scopedServices = scope.ServiceProvider;
+        AppDbContext db = scopedServices.GetRequiredService<AppDbContext>();
 
         var crimeType = new CrimeType { CrimeTypeName = "Corrupção" };
-        db.Crime_types.Add(crimeType);
-        await db.SaveChangesAsync();
+        _ = db.Crime_types.Add(crimeType);
+        _ = await db.SaveChangesAsync();
 
-        var trackedEntity = await db.Crime_types.FindAsync(crimeType.CrimeTypeId);
+        CrimeType? trackedEntity = await db.Crime_types.FindAsync(crimeType.CrimeTypeId);
 
         // Act
-        var svc = scopedServices.GetRequiredService<ICrimeTypeSvc>();
+        ICrimeTypeSvc svc = scopedServices.GetRequiredService<ICrimeTypeSvc>();
         var result = await svc.DeleteCrimeType(trackedEntity!.CrimeTypeId);
 
         // Assert
@@ -217,11 +222,11 @@ public class CrimeTypeSvcTests
     {
         // Arrange
         var factory = new CustomWebApplicationFactory<Program>(Guid.NewGuid().ToString());
-        using var scope = factory.Services.CreateScope();
-        var scopedServices = scope.ServiceProvider;
+        using IServiceScope scope = factory.Services.CreateScope();
+        IServiceProvider scopedServices = scope.ServiceProvider;
 
         // Act
-        var svc = scopedServices.GetRequiredService<ICrimeTypeSvc>();
+        ICrimeTypeSvc svc = scopedServices.GetRequiredService<ICrimeTypeSvc>();
         var result = await svc.DeleteCrimeType(999);
 
         // Assert

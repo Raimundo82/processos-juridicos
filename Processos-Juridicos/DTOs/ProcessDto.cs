@@ -1,8 +1,10 @@
-﻿#nullable disable
-using Microsoft.EntityFrameworkCore;
-using Riok.Mapperly.Abstractions;
+#nullable disable
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+
+using Microsoft.EntityFrameworkCore;
+
+using Riok.Mapperly.Abstractions;
 
 namespace Processos_Juridicos.DTOs;
 
@@ -16,7 +18,7 @@ public partial class ProcessDto
     public int? ProcessTypeId { get; set; }
 
     public int? UnitId { get; set; }
-    
+
     public int? CompensatingUnitId { get; set; }
 
     public int? OficialInstId { get; set; }
@@ -61,15 +63,15 @@ public partial class ProcessDto
 
     public int? InfringementId { get; set; }
     [Required]
-    public bool? CompensationPaid { get; set; }
+    public bool CompensationPaid { get; set; }
     [Required]
-    public bool? ComunicatedToPjm { get; set; }
+    public bool ComunicatedToPjm { get; set; }
 
     public int? CrimeTypeId { get; set; }
 
     public int? MilitarySecurityId { get; set; }
 
-    public DateOnly? ComunicationDate { get; set; }
+    public DateOnly ComunicationDate { get; set; }
 
     [ForeignKey("UnitId")]
     [Required]
@@ -89,7 +91,7 @@ public partial class ProcessDto
 
     [ForeignKey("StateId")]
     public virtual StateDto State { get; set; }
-    
+
     [ForeignKey("ServiceAccidentId")]
     public virtual AccidentTypeDto AccidentType { get; set; }
 

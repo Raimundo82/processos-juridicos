@@ -1,21 +1,22 @@
 using System.Diagnostics;
+
 using Microsoft.AspNetCore.Mvc;
+
 using Processos_Juridicos.Models;
 
-namespace Processos_Juridicos.Controllers
-{
-    public class HomeController() : Controller
-    {
-        [HttpGet]
-        public IActionResult Index()
-        {
-            return View();
-        }
+namespace Processos_Juridicos.Controllers;
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
+public class HomeController() : Controller
+{
+    [HttpGet]
+    public IActionResult Index()
+    {
+        return View();
+    }
+
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+    public IActionResult Error()
+    {
+        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
 }

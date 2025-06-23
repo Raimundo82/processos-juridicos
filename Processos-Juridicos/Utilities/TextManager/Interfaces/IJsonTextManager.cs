@@ -1,7 +1,6 @@
-﻿namespace Processos_Juridicos.Utilities.TextManager.Interfaces
+namespace Processos_Juridicos.Utilities.TextManager.Interfaces;
+
+public interface IJsonTextManager
 {
-    public interface IJsonTextManager
-    {
-        string GetString(string key);
-    }
+    public string GetString(string key);
 }

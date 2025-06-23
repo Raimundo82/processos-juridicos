@@ -1,4 +1,4 @@
-﻿using Processos_Juridicos.Utilities.TextManager.Interfaces;
+using Processos_Juridicos.Utilities.TextManager.Interfaces;
 
 namespace Processos_Juridicos.Utilities.TextManager;
 public static class GlobalTextManager

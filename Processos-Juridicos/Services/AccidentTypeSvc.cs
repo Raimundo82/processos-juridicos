@@ -1,60 +1,57 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+
 using Processos_Juridicos.Data;
 using Processos_Juridicos.DTOs;
+using Processos_Juridicos.Entities;
 using Processos_Juridicos.Mappers;
 using Processos_Juridicos.Services.Interfaces;
 
-namespace Processos_Juridicos.Services
+namespace Processos_Juridicos.Services;
+
+public class AccidentTypeSvc(AppDbContext context) : IAccidentTypeSvc
 {
-    public class AccidentTypeSvc(AppDbContext context) : IAccidentTypeSvc
+    private readonly AppDbContext _context = context;
+
+    public async Task<IEnumerable<AccidentTypeDto>> GetAllAccidentTypes()
     {
-        private readonly AppDbContext _context = context;
+        List<AccidentType> accidents = await _context.Accident_types.ToListAsync();
+        return Mapper.MapToAccidentTypeEnum(accidents);
+    }
 
-        public async Task<IEnumerable<AccidentTypeDto>> GetAllAccidentTypes()
+    public async Task<AccidentTypeDto> GetAccidentTypeById(int id)
+    {
+        AccidentType? accident = await _context.Accident_types.FindAsync(id);
+        return accident != null ? Mapper.MapToAccidenTypeDto(accident) : throw new KeyNotFoundException();
+    }
+
+    public async Task<AccidentTypeDto> CreateAccidentType(AccidentTypeDto type)
+    {
+        AccidentType typeEntity = Mapper.MapToAccidentType(type);
+
+        _ = _context.Accident_types.Add(typeEntity);
+        _ = await _context.SaveChangesAsync();
+        return Mapper.MapToAccidenTypeDto(typeEntity);
+    }
+
+    public async Task<AccidentTypeDto> EditAccidentType(AccidentTypeDto type)
+    {
+        AccidentType typeEntity = Mapper.MapToAccidentType(type);
+        _context.Accident_types.Entry(typeEntity).State = EntityState.Modified;
+
+        _ = await _context.SaveChangesAsync();
+        return Mapper.MapToAccidenTypeDto(typeEntity);
+    }
+
+    public async Task<bool> DeleteAccidentType(int id)
+    {
+        AccidentType? accident = await _context.Accident_types.FindAsync(id);
+        if (accident != null)
         {
-            var accidents = await _context.Accident_types.ToListAsync();
-            return Mapper.MapToAccidentTypeEnum(accidents);
+            _ = _context.Accident_types.Remove(accident);
+            _ = await _context.SaveChangesAsync();
+            return true;
         }
 
-        public async Task<AccidentTypeDto> GetAccidentTypeById(int id)
-        {
-            var accident = await _context.Accident_types.FindAsync(id);
-            if (accident != null)
-            {
-                return Mapper.MapToAccidenTypeDto(accident);
-            }
-            throw new KeyNotFoundException();
-        }
-
-        public async Task<AccidentTypeDto> CreateAccidentType(AccidentTypeDto type)
-        {
-            var typeEntity = Mapper.MapToAccidentType(type);
-
-            _context.Accident_types.Add(typeEntity);
-            await _context.SaveChangesAsync();
-            return Mapper.MapToAccidenTypeDto(typeEntity);
-        }
-
-        public async Task<AccidentTypeDto> EditAccidentType(AccidentTypeDto type)
-        {
-            var typeEntity = Mapper.MapToAccidentType(type);
-            _context.Accident_types.Entry(typeEntity).State = EntityState.Modified;
-
-            await _context.SaveChangesAsync();
-            return Mapper.MapToAccidenTypeDto(typeEntity);
-        }
-
-        public async Task<bool> DeleteAccidentType(int id)
-        {
-            var accident = await _context.Accident_types.FindAsync(id);
-            if (accident != null)
-            {
-                _context.Accident_types.Remove(accident);
-                await _context.SaveChangesAsync();
-                return true;
-            }
-
-            throw new KeyNotFoundException();
-        }
+        throw new KeyNotFoundException();
     }
 }

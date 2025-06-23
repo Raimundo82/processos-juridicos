@@ -1,9 +1,5 @@
-﻿namespace Processos_Juridicos.Exceptions
+namespace Processos_Juridicos.Exceptions;
+
+public class DuplicatedCrimeTypeException(string message) : Exception(message)
 {
-    public class DuplicatedCrimeTypeException : Exception
-    {
-        public DuplicatedCrimeTypeException(string message) : base(message) 
-        {
-        }
-    }
 }

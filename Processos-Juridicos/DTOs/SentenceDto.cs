@@ -1,7 +1,7 @@
-﻿#nullable disable
+#nullable disable
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+
 using Microsoft.EntityFrameworkCore;
 
 namespace Processos_Juridicos.DTOs;

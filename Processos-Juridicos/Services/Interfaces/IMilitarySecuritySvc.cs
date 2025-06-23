@@ -1,14 +1,12 @@
-﻿using Processos_Juridicos.DTOs;
+using Processos_Juridicos.DTOs;
 
-namespace Processos_Juridicos.Services.Interfaces
+namespace Processos_Juridicos.Services.Interfaces;
+
+public interface IMilitarySecuritySvc
 {
-    public interface IMilitarySecuritySvc
-    {
-        Task<IEnumerable<MilitarySecurityDto>> GetAllMilitarySecurities();
-        Task<MilitarySecurityDto> GetMilitarySecurityById(int id);
-        Task<MilitarySecurityDto> CreateMilitarySecurity(MilitarySecurityDto militarySecurity);
-        Task<MilitarySecurityDto> EditMilitarySecurity(MilitarySecurityDto militarySecurity);
-        Task<bool> DeleteMilitarySecurity(int id);
-
-    }
+    public Task<IEnumerable<MilitarySecurityDto>> GetAllMilitarySecurities();
+    public Task<MilitarySecurityDto> GetMilitarySecurityById(int id);
+    public Task<MilitarySecurityDto> CreateMilitarySecurity(MilitarySecurityDto militarySecurity);
+    public Task<MilitarySecurityDto> EditMilitarySecurity(MilitarySecurityDto militarySecurity);
+    public Task<bool> DeleteMilitarySecurity(int id);
 }

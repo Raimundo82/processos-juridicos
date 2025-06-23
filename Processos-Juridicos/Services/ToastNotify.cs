@@ -1,4 +1,5 @@
-﻿using NToastNotify;
+using NToastNotify;
+
 using Processos_Juridicos.Services.Interfaces;
 
 namespace Processos_Juridicos.Services;

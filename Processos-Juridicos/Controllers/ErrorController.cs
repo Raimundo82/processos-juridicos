@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
+
 using Processos_Juridicos.Models;
 
 namespace Processos_Juridicos.Controllers;
@@ -11,7 +12,7 @@ public class ErrorController : Controller
         if (ModelState.IsValid)
         {
             // Choose a partial view based on the error code.
-            string partialName = code switch
+            var partialName = code switch
             {
                 404 => "ErrorPartials/_NotFoundError",  // Handle 404 errors
                 500 => "ErrorPartials/_ServerError",    // Handle 500 errors 

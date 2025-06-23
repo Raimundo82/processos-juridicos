@@ -1,8 +1,9 @@
-﻿#nullable disable
+#nullable disable
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+
 using Microsoft.EntityFrameworkCore;
+
 using Processos_Juridicos.Attributes;
 
 namespace Processos_Juridicos.DTOs;
@@ -19,4 +20,5 @@ public partial class AccidentTypeDto
     [DisplayName("Tipo de Acidente")]
     [UniqueAccidentTypeName]
     public string AccidentTypeName { get; set; }
+
 }

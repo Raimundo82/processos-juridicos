@@ -1,14 +1,12 @@
-﻿using Processos_Juridicos.DTOs;
+using Processos_Juridicos.DTOs;
 
-namespace Processos_Juridicos.Services.Interfaces
+namespace Processos_Juridicos.Services.Interfaces;
+
+public interface IHarmedOrCasualtySvc
 {
-    public interface IHarmedOrCasualtySvc
-    {
-        Task<IEnumerable<HarmedOrCasualtyDto>> GetAllCasualties();
-        Task<HarmedOrCasualtyDto> GetCasualtyById(int id);
-        Task<HarmedOrCasualtyDto> CreateCasualty(HarmedOrCasualtyDto casualty);
-        Task<HarmedOrCasualtyDto> EditCasualty(HarmedOrCasualtyDto casualty);
-        Task<bool> DeleteCasualty(int id);
-
-    }
+    public Task<IEnumerable<HarmedOrCasualtyDto>> GetAllCasualties();
+    public Task<HarmedOrCasualtyDto> GetCasualtyById(int id);
+    public Task<HarmedOrCasualtyDto> CreateCasualty(HarmedOrCasualtyDto casualty);
+    public Task<HarmedOrCasualtyDto> EditCasualty(HarmedOrCasualtyDto casualty);
+    public Task<bool> DeleteCasualty(int id);
 }

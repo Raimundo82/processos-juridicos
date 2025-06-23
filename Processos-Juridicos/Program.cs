@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+
 using NToastNotify;
+
 using Processos_Juridicos.Data;
 using Processos_Juridicos.Middleware.ExceptionHandlers;
 using Processos_Juridicos.Services;
@@ -7,7 +9,7 @@ using Processos_Juridicos.Services.Interfaces;
 using Processos_Juridicos.Utilities.TextManager;
 using Processos_Juridicos.Utilities.TextManager.Interfaces;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -16,7 +18,7 @@ builder.Services.AddControllersWithViews();
 builder.Configuration.AddUserSecrets<Program>();
 
 // Register Context
-string processosDj = builder.Configuration.GetConnectionString("processosDj")!;
+var processosDj = builder.Configuration.GetConnectionString("processosDj")!;
 builder.Services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer(processosDj));
 
 //httpClient
@@ -30,8 +32,8 @@ builder.Services.AddHttpClient<ApisSvc>()
 
 builder.Services.AddSingleton<IJsonTextManager>(sp =>
 {
-    var env = sp.GetRequiredService<IWebHostEnvironment>();
-    string filePath = Path.Combine(env.ContentRootPath, "ResourceFiles", "systemtext.json");
+    IWebHostEnvironment env = sp.GetRequiredService<IWebHostEnvironment>();
+    var filePath = Path.Combine(env.ContentRootPath, "ResourceFiles", "systemtext.json");
     return new JsonTextManager(filePath);
 });
 
@@ -62,7 +64,7 @@ builder.Services.AddMvc().AddNToastNotifyToastr(new ToastrOptions()
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 app.UseExceptionHandler("/Home/Error");
 
 GlobalTextManager.SetManager(app.Services.GetRequiredService<IJsonTextManager>());

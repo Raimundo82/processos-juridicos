@@ -1,5 +1,6 @@
-﻿using Processos_Juridicos.DTOs;
+using Processos_Juridicos.DTOs;
 using Processos_Juridicos.Entities;
+
 using Riok.Mapperly.Abstractions;
 
 namespace Processos_Juridicos.Mappers;

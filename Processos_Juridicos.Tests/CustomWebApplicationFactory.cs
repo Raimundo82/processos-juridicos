@@ -1,11 +1,12 @@
+using System.Data.Common;
+
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-
-using System.Data.Common;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+
 using Processos_Juridicos.Data;
-using Microsoft.EntityFrameworkCore;
 
 namespace Processos_Juridicos.Tests;
 
@@ -15,18 +16,18 @@ public class CustomWebApplicationFactory<TProgram>(string databaseName) : WebApp
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.ConfigureServices(services =>
+        _ = builder.ConfigureServices(services =>
         {
-            services.RemoveAll<DbContextOptions<AppDbContext>>();
-            services.RemoveAll<DbConnection>();
+            _ = services.RemoveAll<DbContextOptions<AppDbContext>>();
+            _ = services.RemoveAll<DbConnection>();
 
-            services.AddDbContextFactory<AppDbContext>(options => options.UseInMemoryDatabase(_databaseName));
+            _ = services.AddDbContextFactory<AppDbContext>(options => options.UseInMemoryDatabase(_databaseName));
 
-            var sp = services.BuildServiceProvider();
-            using var scope = sp.CreateScope();
-            var dbFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<AppDbContext>>();
-            using var db = dbFactory.CreateDbContext();
-            db.Database.EnsureCreated();
+            ServiceProvider sp = services.BuildServiceProvider();
+            using IServiceScope scope = sp.CreateScope();
+            IDbContextFactory<AppDbContext> dbFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<AppDbContext>>();
+            using AppDbContext db = dbFactory.CreateDbContext();
+            _ = db.Database.EnsureCreated();
         });
     }
 }

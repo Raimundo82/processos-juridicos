@@ -1,58 +1,58 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+
 using Processos_Juridicos.Data;
 using Processos_Juridicos.DTOs;
+using Processos_Juridicos.Entities;
 using Processos_Juridicos.Mappers;
 using Processos_Juridicos.Services.Interfaces;
 
-namespace Processos_Juridicos.Services
+namespace Processos_Juridicos.Services;
+
+public class HarmedOrCasualtySvc(AppDbContext context) : IHarmedOrCasualtySvc
 {
-    public class HarmedOrCasualtySvc(AppDbContext context) : IHarmedOrCasualtySvc
+    private readonly AppDbContext _context = context;
+
+    public async Task<HarmedOrCasualtyDto> CreateCasualty(HarmedOrCasualtyDto casualty)
     {
-        private readonly AppDbContext _context = context;
+        HarmedOrCasualty casualtyEntity = Mapper.MapToHarmedOrCasualties(casualty);
 
-        public async Task<HarmedOrCasualtyDto> CreateCasualty(HarmedOrCasualtyDto casualty)
+        _ = _context.Harmed_or_casualties.Add(casualtyEntity);
+        _ = await _context.SaveChangesAsync();
+        return Mapper.MapToHarmedOrCasualtiesDto(casualtyEntity);
+
+    }
+
+    public async Task<bool> DeleteCasualty(int id)
+    {
+        HarmedOrCasualty? casualty = await _context.Harmed_or_casualties.FindAsync(id);
+        if (casualty != null)
         {
-            var casualtyEntity = Mapper.MapToHarmedOrCasualties(casualty);
-
-            _context.Harmed_or_casualties.Add(casualtyEntity);
-            await _context.SaveChangesAsync();
-            return Mapper.MapToHarmedOrCasualtiesDto(casualtyEntity);
-
-        }
-
-        public async Task<bool> DeleteCasualty(int id)
-        {
-            var casualty = await _context.Harmed_or_casualties.FindAsync(id);
-            if (casualty == null) return false;
-
-            _context.Harmed_or_casualties.Remove(casualty);
-            await _context.SaveChangesAsync();
+            _ = _context.Harmed_or_casualties.Remove(casualty);
+            _ = await _context.SaveChangesAsync();
             return true;
         }
 
-        public async Task<HarmedOrCasualtyDto> EditCasualty(HarmedOrCasualtyDto casualty)
-        {
-            var casualtyEntity = Mapper.MapToHarmedOrCasualties(casualty);
-            _context.Harmed_or_casualties.Entry(casualtyEntity).State = EntityState.Modified;
+        return false;
+    }
 
-            await _context.SaveChangesAsync();
-            return Mapper.MapToHarmedOrCasualtiesDto(casualtyEntity);
-        }
+    public async Task<HarmedOrCasualtyDto> EditCasualty(HarmedOrCasualtyDto casualty)
+    {
+        HarmedOrCasualty casualtyEntity = Mapper.MapToHarmedOrCasualties(casualty);
+        _context.Harmed_or_casualties.Entry(casualtyEntity).State = EntityState.Modified;
 
-        public async Task<IEnumerable<HarmedOrCasualtyDto>> GetAllCasualties()
-        {
-            var casualties = await _context.Harmed_or_casualties.ToListAsync();
-            return Mapper.MapToToHarmedOrCasualtiesEnum(casualties);
-        }
+        _ = await _context.SaveChangesAsync();
+        return Mapper.MapToHarmedOrCasualtiesDto(casualtyEntity);
+    }
 
-        public async Task<HarmedOrCasualtyDto> GetCasualtyById(int id)
-        {
-            var casualty = await _context.Harmed_or_casualties.FindAsync(id);
-            if (casualty != null)
-            {
-                return Mapper.MapToHarmedOrCasualtiesDto(casualty);
-            }
-            throw new KeyNotFoundException();
-        }
+    public async Task<IEnumerable<HarmedOrCasualtyDto>> GetAllCasualties()
+    {
+        List<HarmedOrCasualty> casualties = await _context.Harmed_or_casualties.ToListAsync();
+        return Mapper.MapToToHarmedOrCasualtiesEnum(casualties);
+    }
+
+    public async Task<HarmedOrCasualtyDto> GetCasualtyById(int id)
+    {
+        HarmedOrCasualty? casualty = await _context.Harmed_or_casualties.FindAsync(id);
+        return casualty != null ? Mapper.MapToHarmedOrCasualtiesDto(casualty) : throw new KeyNotFoundException();
     }
 }

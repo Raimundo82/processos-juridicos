@@ -1,16 +1,14 @@
-﻿using Processos_Juridicos.DTOs;
+using Processos_Juridicos.DTOs;
 
 
-namespace Processos_Juridicos.Services.Interfaces
+namespace Processos_Juridicos.Services.Interfaces;
+
+public interface IProcessFileSvc
 {
-    public interface IProcessFileSvc
-    {
-        Task<IEnumerable<ProcessFileDto>> GetAllProcessFiles();
-        Task<ProcessFileDto> GetProcessFileById(int id);
-        Task<ProcessFileDto> CreateProcessFile(ProcessFileDto file);
-        Task<ProcessFileDto> EditProcessFile(ProcessFileDto file);
-        Task<bool> DeleteProcessFile(int id);
-
-        Task<List<ProcessFileDto>> GetAllProcessFilesByProcessId(int id);
-    }
+    public Task<IEnumerable<ProcessFileDto>> GetAllProcessFiles();
+    public Task<ProcessFileDto> GetProcessFileById(int id);
+    public Task<ProcessFileDto> CreateProcessFile(ProcessFileDto file);
+    public Task<ProcessFileDto> EditProcessFile(ProcessFileDto file);
+    public Task<bool> DeleteProcessFile(int id);
+    public Task<List<ProcessFileDto>> GetAllProcessFilesByProcessId(int id);
 }

@@ -1,13 +1,12 @@
-﻿using Processos_Juridicos.DTOs;
+using Processos_Juridicos.DTOs;
 
 namespace Processos_Juridicos.Services.Interfaces;
 
 public interface ISentenceSvc
 {
-    Task<IEnumerable<SentenceDto>> GetAllSentences();
-    Task<SentenceDto> GetSentenceById(int id);
-    Task<SentenceDto> CreateSentence(SentenceDto sentence);
-    Task<SentenceDto> EditSentence(SentenceDto sentence);
-    Task<bool> DeleteSentence(int id);
-
+    public Task<IEnumerable<SentenceDto>> GetAllSentences();
+    public Task<SentenceDto> GetSentenceById(int id);
+    public Task<SentenceDto> CreateSentence(SentenceDto sentence);
+    public Task<SentenceDto> EditSentence(SentenceDto sentence);
+    public Task<bool> DeleteSentence(int id);
 }

@@ -1,99 +1,99 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
+
 using Processos_Juridicos.DTOs;
 using Processos_Juridicos.Services.Interfaces;
 using Processos_Juridicos.Utilities.TextManager;
 
-namespace Processos_Juridicos.Controllers
+namespace Processos_Juridicos.Controllers;
+
+public class AccidentTypeController(IAccidentTypeSvc accidentType, IToastNotify toastNotify) : Controller
 {
-    public class AccidentTypeController(IAccidentTypeSvc accidentType, IToastNotify toastNotify) : Controller
+    private const string EntityName = "Tipo de Acidente";
+
+    private readonly IAccidentTypeSvc _accidentTypeSvc = accidentType;
+    private readonly IToastNotify _toastNotify = toastNotify;
+
+    [HttpGet]
+    public async Task<IActionResult> List()
     {
-        private const string EntityName = "Tipo de Acidente";
+        IEnumerable<AccidentTypeDto> accidents = await _accidentTypeSvc.GetAllAccidentTypes();
+        return View(accidents);
+    }
 
-        private readonly IAccidentTypeSvc _accidentTypeSvc = accidentType;
-        private readonly IToastNotify _toastNotify = toastNotify;
-
-        [HttpGet]
-        public async Task<IActionResult> List()
+    [HttpGet]
+    public async Task<IActionResult> ListOne(int id)
+    {
+        if (ModelState.IsValid)
         {
-            IEnumerable<AccidentTypeDto> accidents = await _accidentTypeSvc.GetAllAccidentTypes();
-            return View(accidents);
+            AccidentTypeDto accident = await _accidentTypeSvc.GetAccidentTypeById(id);
+            return View(accident);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> ListOne(int id)
-        {
-            if (ModelState.IsValid)
-            {
-                AccidentTypeDto accident = await _accidentTypeSvc.GetAccidentTypeById(id);
-                return View(accident);
-            }
+        return RedirectToAction(nameof(List));
+    }
 
+    [HttpGet]
+    public IActionResult Create()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Create(AccidentTypeDto model)
+    {
+        if (ModelState.IsValid)
+        {
+            _ = await _accidentTypeSvc.CreateAccidentType(model);
+            _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("CreateSuccessMessage"), "O", EntityName, "o"));
             return RedirectToAction(nameof(List));
+
         }
 
-        [HttpGet]
-        public IActionResult Create()
+        return View(model);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Edit(int id)
+    {
+        if (ModelState.IsValid)
         {
-            return View();
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Create(AccidentTypeDto model)
-        {
-            if (ModelState.IsValid)
-            {
-                await _accidentTypeSvc.CreateAccidentType(model);
-                _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("CreateSuccessMessage"), "O", EntityName, "o"));
-                return RedirectToAction(nameof(List));
-
-            }
-
+            AccidentTypeDto model = await _accidentTypeSvc.GetAccidentTypeById(id);
             return View(model);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Edit(int id)
-        {
-            if (ModelState.IsValid)
-            {
-                AccidentTypeDto model = await _accidentTypeSvc.GetAccidentTypeById(id);
-                return View(model);
-            }
+        return RedirectToAction(nameof(List));
+    }
 
+    [HttpPost]
+    public async Task<IActionResult> Edit(AccidentTypeDto model)
+    {
+        if (ModelState.IsValid)
+        {
+            _ = await _accidentTypeSvc.EditAccidentType(model);
+            _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("EditSuccessMessage"), "O", EntityName, "o"));
             return RedirectToAction(nameof(List));
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Edit(AccidentTypeDto model)
-        {
-            if (ModelState.IsValid)
-            {
-                await _accidentTypeSvc.EditAccidentType(model);
-                _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("EditSuccessMessage"), "O", EntityName, "o"));
-                return RedirectToAction(nameof(List));
-            }
+        return View(model);
+    }
 
-            return View(model);
+    [HttpPost, ActionName("Delete")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Delete(int id)
+    {
+        if (ModelState.IsValid)
+        {
+            var success = await _accidentTypeSvc.DeleteAccidentType(id);
+            if (!success)
+            {
+                _toastNotify.Error(string.Format(GlobalTextManager.GetString("DeleteFailureMessage"), "o", EntityName));
+            }
+            else
+            {
+                _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("DeleteSuccessMessage"), "o", EntityName));
+            }
         }
 
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id)
-        {
-            if (ModelState.IsValid)
-            {
-                var success = await _accidentTypeSvc.DeleteAccidentType(id);
-                if (!success)
-                {
-                    _toastNotify.Error(string.Format(GlobalTextManager.GetString("DeleteFailureMessage"), "o", EntityName));
-                }
-                else
-                {
-                    _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("DeleteSuccessMessage"), "o", EntityName));
-                }
-            }
-
-            return RedirectToAction(nameof(List));
-        }
+        return RedirectToAction(nameof(List));
     }
 }

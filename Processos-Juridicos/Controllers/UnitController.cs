@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+
 using Processos_Juridicos.DTOs;
 using Processos_Juridicos.Services.Interfaces;
 using Processos_Juridicos.Utilities.TextManager;
@@ -40,7 +41,7 @@ public class UnitController(IUnitSvc unitSvc, ISectorSvc sectorSvc, IToastNotify
     {
         if (ModelState.IsValid)
         {
-            await _unitSvc.CreateUnit(model);
+            _ = await _unitSvc.CreateUnit(model);
             _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("CreateSuccessMessage"), "A", EntityName, "a"));
             return RedirectToAction(nameof(List));
         }
@@ -62,7 +63,7 @@ public class UnitController(IUnitSvc unitSvc, ISectorSvc sectorSvc, IToastNotify
     {
         if (ModelState.IsValid)
         {
-            await _unitSvc.EditUnit(model);
+            _ = await _unitSvc.EditUnit(model);
             _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("EditSuccessMessage"), "A", EntityName, "a"));
             return RedirectToAction(nameof(List));
         }
@@ -91,7 +92,7 @@ public class UnitController(IUnitSvc unitSvc, ISectorSvc sectorSvc, IToastNotify
 
     private async Task PopulateSectorsForViewBag()
     {
-        var sectors = await _sectorSvc.GetAllSectors();
+        IEnumerable<SectorDto> sectors = await _sectorSvc.GetAllSectors();
         var listSectors = sectors.Select(x => new SelectListItem
         {
             Text = x.SectorName,
