@@ -29,7 +29,8 @@ jobs:
         run: |
           mkdir -p .sonar/scanner
           dotnet tool update dotnet-sonarscanner --tool-path ./.sonar/scanner
-      #    dotnet tool update coverlet.console --tool-path ./.sonar/coverage
+          dotnet tool update coverlet.console --tool-path ./.sonar/coverage
+          
       - name: Begin SonarQube Analysis
         run: |
           ./.sonar/scanner/dotnet-sonarscanner begin \
@@ -43,13 +44,13 @@ jobs:
       - name: Build for SonarQube (no incremental)
         run: dotnet build --no-incremental
 
-      #      - name: Run tests with coverage for SonarQube
-      #        run: |
-      #          dotnet coverlet ./SigdnRhStaggingApi.Tests/bin/Debug/net9.0/SigdnRhStaggingApi.Tests.dll \
-      #          --target dotnet \
-      #          --targetargs "test --no-build" \
-      #          -f=opencover \
-      #          -o="coverage.xml"
+      - name: Run tests with coverage for SonarQube
+        run: |
+          dotnet coverlet ./Processos_Juridicos.Tests/bin/Debug/net8.0/Processos_Juridicos.Tests.dll \
+          --target dotnet \
+          --targetargs "test --no-build" \
+          -f=opencover \
+          -o="coverage.xml"
 
       - name: End SonarQube Analysis
         run: ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{  secrets.SONAR_TOKEN }}"
