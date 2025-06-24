@@ -1,3 +1,5 @@
+
+
 using Microsoft.EntityFrameworkCore;
 
 using Processos_Juridicos.Data;
@@ -28,6 +30,10 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
         {
             return false;
         }
+
+        IQueryable<ProcessFile> filesToDelete = _context.Process_Files.Where(pf => pf.ProcessId == id);
+
+        _context.Process_Files.RemoveRange(filesToDelete);
 
         _ = _context.Processes.Remove(process);
         _ = await _context.SaveChangesAsync();

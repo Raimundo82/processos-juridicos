@@ -69,6 +69,7 @@ app.UseExceptionHandler("/Home/Error");
 
 GlobalTextManager.SetManager(app.Services.GetRequiredService<IJsonTextManager>());
 
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
@@ -77,7 +78,6 @@ if (!app.Environment.IsDevelopment())
     AppDomain.CurrentDomain.UnhandledException += (sender, eventArgs) =>
     {
         var ex = (Exception)eventArgs.ExceptionObject;
-        // Log or write the exception details to a persistent log
         Console.WriteLine("Unhandled exception: " + ex.ToString());
     };
 

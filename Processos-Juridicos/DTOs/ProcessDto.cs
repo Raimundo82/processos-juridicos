@@ -74,7 +74,6 @@ public partial class ProcessDto
     public DateOnly ComunicationDate { get; set; }
 
     [ForeignKey("UnitId")]
-    [Required]
     public virtual UnitDto Unit { get; set; }
 
     [ForeignKey("HarmedOrCasualtiesId")]
@@ -109,4 +108,8 @@ public partial class ProcessDto
 
     [MapperIgnore]
     public List<ProcessFileDto> UploadedFiles { get; set; } = [];
+
+    [NotMapped]
+    [MapperIgnore]
+    public List<int> FilesToRemove { get; set; } = [];
 }

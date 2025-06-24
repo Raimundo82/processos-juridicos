@@ -28,4 +28,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Unit> Units { get; set; }
 
     public DbSet<MilitarySecurity> Military_securities { get; set; }
+
+
 }

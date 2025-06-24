@@ -1,4 +1,4 @@
-﻿@model Processos_Juridicos.DTOs.ProcessDto;
+@model Processos_Juridicos.DTOs.ProcessDto;
 @using Processos_Juridicos.DTOs;
 
 @{
@@ -22,6 +22,7 @@
     </div>
 </form>
 
+<script src="~/js/forms.js" asp-append-version="true"></script>
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");

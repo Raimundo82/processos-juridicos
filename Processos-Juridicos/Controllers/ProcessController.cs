@@ -61,7 +61,8 @@ public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmed
         {
             //TODO: replace this with currently logged in user
             model.CreatedById = 1;
-            _ = await _processSvc.CreateProcess(model);
+
+            ProcessDto insertTarget = await _processSvc.CreateProcess(model);
 
             if (model.ProcessFiles != null && model.ProcessFiles.Length > 0)
             {
@@ -77,7 +78,7 @@ public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmed
                             ProcessFileName = file.FileName,
                             ProcessFileType = file.ContentType,
                             ProcessFileContent = ms.ToArray(),
-                            ProcessId = model.ProcessId
+                            ProcessId = insertTarget.ProcessId
                         };
 
                         _ = await _processFileSvc.CreateProcessFile(Mapper.MapToFilesDto(fileRecord));
@@ -111,7 +112,8 @@ public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmed
     }
 
     [HttpPost]
-    public async Task<IActionResult> Edit(ProcessDto model, string? deleteFileId)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(ProcessDto model)
     {
         if (!ModelState.IsValid)
         {
@@ -119,41 +121,39 @@ public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmed
             return View(model);
         }
 
-        if (!string.IsNullOrEmpty(deleteFileId))
+        _ = await _processSvc.EditProcess(model);
+
+        if (model.ProcessFiles != null && model.ProcessFiles.Length > 0)
         {
-            _ = await TryDeleteFile(deleteFileId, model);
-        }
-
-        if (ModelState.IsValid)
-        {
-
-            _ = await _processSvc.EditProcess(model);
-
-            if (model.ProcessFiles != null && model.ProcessFiles.Length > 0)
+            foreach (IFormFile file in model.ProcessFiles)
             {
-
-                foreach (IFormFile? file in model.ProcessFiles)
+                if (file != null && file.Length > 0)
                 {
-                    if (file != null && file.Length > 0)
+                    using MemoryStream ms = new();
+                    await file.CopyToAsync(ms);
+                    ProcessFile fileRecord = new()
                     {
-                        using MemoryStream ms = new();
-                        await file.CopyToAsync(ms);
-                        ProcessFile fileRecord = new()
-                        {
-                            ProcessFileName = file.FileName,
-                            ProcessFileType = file.ContentType,
-                            ProcessFileContent = ms.ToArray(),
-                            ProcessId = model.ProcessId,
-                            RowGuid = 1
-                        };
-
-                        _ = await _processFileSvc.CreateProcessFile(Mapper.MapToFilesDto(fileRecord));
-                    }
+                        ProcessFileName = file.FileName,
+                        ProcessFileType = file.ContentType,
+                        ProcessFileContent = ms.ToArray(),
+                        ProcessId = model.ProcessId,
+                        RowGuid = 1
+                    };
+                    _ = await _processFileSvc.CreateProcessFile(Mapper.MapToFilesDto(fileRecord));
                 }
             }
         }
+
+        if (model.FilesToRemove != null && model.FilesToRemove.Count != 0)
+        {
+            foreach (var fileId in model.FilesToRemove)
+            {
+                _ = await _processFileSvc.DeleteProcessFile(fileId);
+            }
+        }
+
         _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("EditSuccessMessage"), "O", EntityName, "o"));
-        return RedirectToAction(nameof(List));
+        return RedirectToAction("Edit", new { id = model.ProcessId });
     }
 
     [HttpPost, ActionName("Delete")]
