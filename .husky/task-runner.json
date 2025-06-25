@@ -1,0 +1,31 @@
+{
+    "$schema": "https://alirezanet.github.io/Husky.Net/schema.json",
+    "tasks": [
+        {
+            "name": "format",
+            "group": "pre-commit",
+            "command": "dotnet",
+            "filteringRule": "staged",
+            "include": [ "**/*.cs" ],
+            "args": [ "format", "--include", "${staged}" ]
+        },
+        {
+            "name": "build",
+            "group": "pre-push",
+            "command": "dotnet",
+            "filteringRule": "staged",
+            "include": [ "./Processos-Juridicos/*" ],
+            "output": "verbose",
+            "args": [ "build" ]
+        },
+        {
+            "name": "test",
+            "group": "pre-push",
+            "command": "dotnet",
+            "filteringRule": "staged",
+            "include": [ "./Processos-Juridicos/*" ],
+            "output": "verbose",
+            "args": [ "test" ]
+        }
+    ]
+}
