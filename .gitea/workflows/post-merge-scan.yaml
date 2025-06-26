@@ -22,7 +22,7 @@ jobs:
       - name: Setup .NET 8.0.x
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: "8.0.x"
+          dotnet-version: '8.0.x'
 
       - name: Install SonarQube scanner and Coverlet
         shell: bash
@@ -30,7 +30,7 @@ jobs:
           mkdir -p .sonar/scanner
           dotnet tool update dotnet-sonarscanner --tool-path ./.sonar/scanner
           dotnet tool update coverlet.console --tool-path ./.sonar/coverage
-          
+
       - name: Begin SonarQube Analysis
         run: |
           ./.sonar/scanner/dotnet-sonarscanner begin \
