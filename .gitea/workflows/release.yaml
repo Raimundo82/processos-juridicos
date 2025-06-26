@@ -39,7 +39,7 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Publish
-        run: dotnet publish Processos-Juridicos\Processos-Juridicos.csproj
+        run: dotnet publish Processos-Juridicos/Processos-Juridicos.csproj
 
       - name: Package published files
         run: |
