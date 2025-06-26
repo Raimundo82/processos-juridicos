@@ -27,8 +27,12 @@ public class CrimeTypeSvc(AppDbContext context) : ICrimeTypeSvc
     public async Task<CrimeTypeDto> CreateCrimeType(CrimeTypeDto type)
     {
         var normalizedName = type.CrimeTypeName?.Trim();
-        var nameAlreadyExists = await _context.Crime_types
-            .AnyAsync(c => string.Compare(c.CrimeTypeName.Trim(), normalizedName) == 0);
+        var nameAlreadyExists = _context.Crime_types
+         .AsEnumerable()
+         .Any(c => string.Compare(
+             c.CrimeTypeName.Trim(),
+             normalizedName,
+             StringComparison.OrdinalIgnoreCase) == 0);
 
         if (nameAlreadyExists)
         {
