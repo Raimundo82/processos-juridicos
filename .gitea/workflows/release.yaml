@@ -39,11 +39,11 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Publish
-        run: dotnet publish
+        run: dotnet publish --output Processos-Juridicos/obj
 
       - name: Package published files
         run: |
-          cd .\Processos-Juridicos\obj\
+          cd Processos-Juridicos/obj
           tar -czf processos-juridicos.tar.gz -C ./Release .
         shell: bash
 
