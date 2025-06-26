@@ -10,7 +10,7 @@
                 "giteaUrl": "https://devops-01.marinha.pt",
                 "assets": [
                     {
-                        "path": "Processos-Juridicos/obj/processos-juridicos.tar.gz"
+                        "path": "Processos-Juridicos/bin/processos-juridicos.tar.gz"
                     }
                 ]
             }

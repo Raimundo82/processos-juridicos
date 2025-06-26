@@ -39,11 +39,11 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Publish
-        run: dotnet publish --output Processos-Juridicos/obj
+        run: dotnet publish Processos-Juridicos\Processos-Juridicos.csproj
 
       - name: Package published files
         run: |
-          cd Processos-Juridicos/obj
+          cd Processos-Juridicos/bin
           tar -czf processos-juridicos.tar.gz -C ./Release .
         shell: bash
 
@@ -51,4 +51,6 @@ jobs:
         env:
           GITEA_TOKEN: ${{ secrets.PACKAGE_UPLOAD_TOKEN }}
           GITEA_URL: https://devops-01.marinha.pt
-        run: npx semantic-release
+        run: |
+          export NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt
+          npx semantic-release
