@@ -1,0 +1,19 @@
+{
+    "branches": "master",
+    "plugins": [
+        "@semantic-release/commit-analyzer",
+        "@semantic-release/release-notes-generator",
+        "@semantic-release/changelog",
+        [
+            "@saithodev/semantic-release-gitea",
+            {
+                "giteaUrl": "https://devops-01.marinha.pt",
+                "assets": [
+                    {
+                        "path": "Processos-Juridicos/obj/processos-juridicos.tar.gz"
+                    }
+                ]
+            }
+        ]
+    ]
+}
