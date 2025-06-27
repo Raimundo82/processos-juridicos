@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -38,7 +38,7 @@ public partial class Process
     public DateOnly? OcurrenceDate { get; set; }
 
     [Column("dispatch_date")]
-    public DateOnly? DispatchDate { get; set; }
+    public DateOnly? DispatchDate { get; set; } = DateOnly.FromDateTime(DateTime.Now);
 
     [Column("description")]
     public string Description { get; set; }
@@ -56,13 +56,13 @@ public partial class Process
     public int StateId { get; set; }
 
     [Column("created_at")]
-    public DateOnly? CreatedAt { get; set; }
+    public DateOnly? CreatedAt { get; set; } = DateOnly.FromDateTime(DateTime.Now);
 
     [Column("created_by_id")]
     public int? CreatedById { get; set; }
 
     [Column("modified_at")]
-    public DateOnly? ModifiedAt { get; set; }
+    public DateOnly? ModifiedAt { get; set; } = DateOnly.FromDateTime(DateTime.Now);
 
     [Column("modified_by_id")]
     public int? ModifiedById { get; set; }

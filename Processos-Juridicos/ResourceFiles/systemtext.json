@@ -1,9 +1,14 @@
 {
-  "CreateSuccessMessage": "{0} {1} foi criad{2} com sucesso.",
-  "CreateFailureMessage": "Ocorreu um erro ao criar {0} {1}.",
-  "EditSuccessMessage": "{0} {1} foi atualizad{2} com sucesso.",
-  "EditFailureMessage": "Ocorreu um erro ao atualizar {0} {1}.",
-  "DeleteSuccessMessage": "{0} {1} foi apagad{2} com sucesso.",
-  "DeleteFailureMessage": "Ocorreu um erro ao apagar {0} {1}.",
-  "MaxStrSizeExceededMessage": "O campo {0} deve ter no máximo {1} caracteres"
+    "CreateSuccessMessage": "{0} {1} foi criad{2} com sucesso.",
+    "CreateFailureMessage": "Ocorreu um erro ao criar {0} {1}.",
+    "EditSuccessMessage": "{0} {1} foi atualizad{2} com sucesso.",
+    "EditFailureMessage": "Ocorreu um erro ao atualizar {0} {1}.",
+    "DeleteSuccessMessage": "{0} {1} foi apagad{2} com sucesso.",
+    "DeleteFailureMessage": "Ocorreu um erro ao apagar {0} {1}.",
+    "MaxStrSizeExceededMessage": "O campo {0} deve ter no máximo {1} caracteres.",
+    "MandatoryFieldMessage": "O campo {0} é obrigatório.",
+    "MaximumFieldSizeExceededMessage": "O campo {0} deve ter no máximo {1} caracteres.",
+    "MustBeAPositiveNumberMessage": "O valor do campo {0} deve ser positivo.",
+    "DateMustBeTodayOrLater": "A data inserida deve ser a data de hoje ou uma data futura",
+    "FieldMustBeUnique": "O valor inserido não deve ser igual nem semelhante a outros já existentes."
 }

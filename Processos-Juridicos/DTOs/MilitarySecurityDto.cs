@@ -13,9 +13,9 @@ public partial class MilitarySecurityDto
     [Required]
     public required int MilitarySecurityId { get; set; }
 
-    [Required(ErrorMessage = "O nome da segurança militar é obrigatória")]
-    [StringLength(50)]
+    [EntityFieldIsRequired("Nome da Segurança Militar")]
+    [Attributes.MaxLength(50, "Nome da Segurança Militar")]
     [Unicode(false)]
-    [UniqueMilitarySecurity]
+    [UniqueMilitarySecurityName]
     public required string MilitarySecurityName { get; set; }
 }

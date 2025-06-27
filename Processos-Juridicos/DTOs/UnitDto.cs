@@ -15,23 +15,23 @@ public class UnitDto
     public int UnitId { get; set; }
 
     [DisplayName("Código da Unidade")]
-    [Required(ErrorMessage = "O Código da Unidade é obrigatório")]
+    [EntityFieldIsRequired("Código da Unidade")]
     [UniqueUnitCode]
     public string UnitCode { get; set; }
 
-    [Required(ErrorMessage = "O Nome da Unidade é obrigatório")]
-    [StringLength(50, ErrorMessage = "O campo {0} deve ter no máximo {1} caracteres")]
+    [EntityFieldIsRequired("Nome da Unidade")]
+    [Attributes.MaxLength(50, "Nome da Unidade")]
     [Unicode(false)]
     [DisplayName("Nome da unidade")]
     [UniqueUnitName]
     public string UnitName { get; set; }
 
     [DisplayName("Sigla")]
-    [Required(ErrorMessage = "A Sigla da Unidade é obrigatória")]
+    [EntityFieldIsRequired("Sigla da Unidade")]
     [UniqueUnitAcronym]
     public string UnitAcronym { get; set; }
 
-    [Required(ErrorMessage = "É obrigatório selecionar um Setor")]
+    [EntityFieldIsRequired("Setor")]
     public required int SectorId { get; set; }
 
     public bool Enable { get; set; } = default;

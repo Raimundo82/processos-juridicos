@@ -3,16 +3,20 @@ using System.ComponentModel.DataAnnotations;
 
 using Microsoft.EntityFrameworkCore;
 
+using Processos_Juridicos.Attributes;
+
 namespace Processos_Juridicos.DTOs;
 
 public partial class HarmedOrCasualtyDto
 {
+
     [Key]
     [Required]
     public required int CasualtyId { get; set; }
 
-    [Required]
-    [StringLength(50)]
+    [EntityFieldIsRequired("Nome da categoria de ferido")]
+    [Attributes.MaxLength(50, "Nome da categoria de ferido")]
     [Unicode(false)]
+    [UniqueHarmedOrCasualtyName]
     public required string CasualtyName { get; set; }
 }

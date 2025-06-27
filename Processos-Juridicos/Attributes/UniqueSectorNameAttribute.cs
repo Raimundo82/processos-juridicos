@@ -7,21 +7,21 @@ using Processos_Juridicos.Utilities.TextManager;
 namespace Processos_Juridicos.Attributes;
 
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
-public class UniqueCrimeTypeNameAttribute : ValidationAttribute
+public class UniqueSectorNameAttribute : ValidationAttribute
 {
     private const string _messageKey = "FieldMustBeUnique";
 
     protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
     {
-        if (validationContext.GetService(typeof(AppDbContext)) is not AppDbContext context || validationContext.ObjectInstance is not CrimeTypeDto crimeTypeDto || value == null)
+        if (validationContext.GetService(typeof(AppDbContext)) is not AppDbContext context || validationContext.ObjectInstance is not SectorDto sectorDto || value == null)
         {
             return ValidationResult.Success;
         }
 
-        var crimeTypeName = value as string;
+        var sectorName = value as string;
 
-        var existingType = context.Crime_types
-            .Any(p => p.CrimeTypeName == crimeTypeName && p.CrimeTypeId != crimeTypeDto.CrimeTypeId);
+        var existingType = context.Sectors
+            .Any(p => p.SectorName == sectorName && p.SectorId != sectorDto.SectorId);
 
         return existingType ? new ValidationResult(GlobalTextManager.GetString(_messageKey)) : ValidationResult.Success;
     }

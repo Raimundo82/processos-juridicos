@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Processos_Juridicos.Entities;
@@ -16,5 +16,5 @@ public class Sector
     public required string SectorName { get; set; }
 
     [Column("enable")]
-    public bool Enable { get; set; } = default;
+    public bool Enable { get; set; } = true;
 }

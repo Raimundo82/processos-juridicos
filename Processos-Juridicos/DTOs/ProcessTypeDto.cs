@@ -11,17 +11,17 @@ namespace Processos_Juridicos.DTOs;
 public partial class ProcessTypeDto
 {
     [Key]
-    [Required]
     public int ProcessTypeId { get; set; }
 
-    [Required(ErrorMessage = "O Tipo de Processo é obrigatório")]
-    [StringLength(50, ErrorMessage = "O campo {0} deve ter no máximo {1} caracteres")]
+    [EntityFieldIsRequired("Tipo de Processo")]
+    [Attributes.MaxLength(50, "Tipo de Processo")]
     [Unicode(false)]
     [DisplayName("Tipo de Processo")]
     [UniqueProcessTypeName]
     public string ProcessTypeName { get; set; }
 
-    [Required(ErrorMessage = "O Prazo do Processo é obrigatório")]
+    [EntityFieldIsRequired("Prazo do Processo")]
+    [PositiveValue("Prazo em dias")]
     [DisplayName("Prazo do Processo (dias)")]
     public required int Deadline { get; set; }
 }

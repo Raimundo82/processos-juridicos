@@ -4,6 +4,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 using Microsoft.EntityFrameworkCore;
 
+using Processos_Juridicos.Attributes;
+
 using Riok.Mapperly.Abstractions;
 
 namespace Processos_Juridicos.DTOs;
@@ -13,6 +15,7 @@ public partial class ProcessDto
     [Key]
     public int ProcessId { get; set; }
 
+    [UniqueProcessNiupm]
     public string Nuipm { get; set; }
 
     public int? ProcessTypeId { get; set; }
@@ -23,6 +26,7 @@ public partial class ProcessDto
 
     public int? OficialInstId { get; set; }
 
+    [Phone(ErrorMessage = "Invalid phone number")]
     public string OficialInstTelephone { get; set; }
 
     public int? InvestigatedId { get; set; }
@@ -33,12 +37,14 @@ public partial class ProcessDto
 
     public DateOnly? DispatchDate { get; set; }
 
-    [Required]
+    [EntityFieldIsRequired("Descrição")]
     [Unicode(false)]
     public string Description { get; set; }
 
+    [FutureDate]
     public DateOnly? DeadlineDate { get; set; }
 
+    [FutureDate]
     public DateOnly? FinalDispatchDate { get; set; }
 
     public int? SentenceId { get; set; }
@@ -57,14 +63,17 @@ public partial class ProcessDto
 
     public int? HarmedOrCasualtiesId { get; set; }
 
+    [PositiveValue("Valor Indemnizado a Terceiros")]
     public double? ThirdPartyCompensation { get; set; }
 
+    [PositiveValue("Valor Indemnizado a Terceiros")]
     public double? Reimbursement { get; set; }
 
     public int? InfringementId { get; set; }
-    [Required]
+
+    [EntityFieldIsRequired("Compensação paga?")]
     public bool CompensationPaid { get; set; }
-    [Required]
+    [EntityFieldIsRequired("Comunicado à PJM")]
     public bool ComunicatedToPjm { get; set; }
 
     public int? CrimeTypeId { get; set; }

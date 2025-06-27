@@ -4,6 +4,8 @@ using System.ComponentModel.DataAnnotations;
 
 using Microsoft.EntityFrameworkCore;
 
+using Processos_Juridicos.Attributes;
+
 namespace Processos_Juridicos.DTOs;
 
 public partial class SentenceDto
@@ -13,8 +15,9 @@ public partial class SentenceDto
     public int SentenceId { get; set; }
 
     [DisplayName("Nome da Sentença")]
-    [Required(ErrorMessage = "O Nome da Sentença é obrigatório")]
-    [StringLength(50)]
+    [EntityFieldIsRequired("Nome da Sentença")]
+    [Attributes.MaxLength(50, "Nome da Sentença")]
     [Unicode(false)]
+    [UniqueSentenceName]
     public string SentenceName { get; set; }
 }

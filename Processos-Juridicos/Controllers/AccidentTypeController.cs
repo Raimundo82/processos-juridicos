@@ -86,7 +86,7 @@ public class AccidentTypeController(IAccidentTypeSvc accidentType, IToastNotify 
             var success = await _accidentTypeSvc.DeleteAccidentType(id);
             if (!success)
             {
-                _toastNotify.Error(string.Format(GlobalTextManager.GetString("DeleteFailureMessage"), "o", EntityName));
+                _toastNotify.Error(string.Format(GlobalTextManager.GetString("DeleteFailureMessage"), "O", EntityName, "o"));
             }
             else
             {

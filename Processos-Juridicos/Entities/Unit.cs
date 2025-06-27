@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -23,7 +23,7 @@ public class Unit
     public required int SectorId { get; set; }
 
     [Column("enable")]
-    public bool Enable { get; set; } = default;
+    public bool Enable { get; set; } = true;
 
     [ForeignKey("SectorId")]
     public Sector Sector { get; set; }
