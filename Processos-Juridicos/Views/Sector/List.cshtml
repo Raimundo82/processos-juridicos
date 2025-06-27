@@ -1,4 +1,4 @@
-﻿@using Processos_Juridicos.DTOs
+@using Processos_Juridicos.DTOs
 
 @{
     ViewData["Title"] = "Lista de Setores";
@@ -37,7 +37,7 @@
                         <div class="d-flex gap-2">
                             <form asp-controller="Sector" asp-action="Delete" method="post">
                                 <input type="hidden" name="id" value="@item.SectorId">
-                                <button type="submit" class="btn btn-danger"></button>
+                                <button type="submit" class="btn btn-danger js-delete-btn"></button>
                             </form>
                             <a asp-controller="Sector" asp-action="Edit" asp-route-id="@item.SectorId"
                                class="btn btn-warning"><i class="bi bi-pencil"></i></a>

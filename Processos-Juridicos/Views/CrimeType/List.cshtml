@@ -1,4 +1,4 @@
-﻿@using Processos_Juridicos.DTOs
+@using Processos_Juridicos.DTOs
 
 @{
     ViewData["Title"] = "Lista de Tipos de Crimes";
@@ -36,7 +36,7 @@
                                 <button type="submit" class="btn btn-danger"></button>
                             </form>
                             <a asp-controller="CrimeType" asp-action="Edit" asp-route-id="@item.CrimeTypeId"
-                               class="btn btn-warning"><i class="bi bi-pencil"></i></a>
+                               class="btn btn-warning"><i class="bi bi-pencil js-delete-btn"></i></a>
                         </div>
                     </td>
                 </tr>

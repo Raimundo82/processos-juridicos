@@ -39,6 +39,7 @@ bld/
 */wwwroot/lib/bootstrap/
 */wwwroot/lib/jquery
 */wwwroot/lib/jquery-*
+*/wwwroot/lib/sweetalert2
 
 # Visual Studio 2017 auto generated files
 Generated\ Files/

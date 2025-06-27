@@ -1,7 +1,27 @@
-﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
+// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
 // for details on configuring this project to bundle and minify static web assets.
 
-// Write your JavaScript code.
+document.querySelectorAll('.js-delete-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+        e.preventDefault();
+        Swal.fire({
+            title: 'Tem a certeza que pretende apagar?',
+            text: "Esta ação é irreverssível!",
+            icon: 'warning',
+            theme:"light",
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Apagar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // submit the surrounding form
+                btn.closest('form').submit();
+            }
+        });
+    });
+});
 
 // datatable
 function createDataTable(elmentId) {

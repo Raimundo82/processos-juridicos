@@ -1,4 +1,4 @@
-﻿@using Processos_Juridicos.DTOs
+@using Processos_Juridicos.DTOs
 
 @{
     ViewData["Title"] = "Lista de Unidades";
@@ -40,7 +40,7 @@
                         <div class="d-flex gap-2">
                             <form asp-controller="Unit" asp-action="Delete" method="post">
                                 <input type="hidden" name="id" value="@item.UnitId">
-                                <button type="submit" class="btn btn-danger"></button>
+                                <button type="submit" class="btn btn-danger js-delete-btn"></button>
                             </form>
                             <a asp-controller="Unit" asp-action="Edit" asp-route-id="@item.UnitId"
                                 class="btn btn-warning"><i class="bi bi-pencil"></i></a>
