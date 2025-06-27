@@ -9,7 +9,7 @@ namespace Processos_Juridicos.DTOs;
 public partial class ProcessFileDto
 {
     [Key]
-    public int ProcessFileId { get; set; }
+    public int? ProcessFileId { get; set; }
 
     public string ProcessFileName { get; set; }
 

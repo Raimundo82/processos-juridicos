@@ -18,7 +18,7 @@ public class ProcessTypesSvc(AppDbContext context) : IProcessTypeSvc
         return Mapper.MapToToProcessTypeDtoEnum(types);
     }
 
-    public async Task<ProcessTypeDto> GetProcessTypeById(int id)
+    public async Task<ProcessTypeDto> GetProcessTypeById(int? id)
     {
         ProcessType? type = await _context.Process_types.FindAsync(id);
         return type != null ? Mapper.MapToProcessTypeDto(type) : throw new KeyNotFoundException();
@@ -42,7 +42,7 @@ public class ProcessTypesSvc(AppDbContext context) : IProcessTypeSvc
         return Mapper.MapToProcessTypeDto(typeEntity);
     }
 
-    public async Task<bool> DeleteProcessType(int id)
+    public async Task<bool> DeleteProcessType(int? id)
     {
         ProcessType? process = await _context.Process_types.FindAsync(id);
         if (process == null)

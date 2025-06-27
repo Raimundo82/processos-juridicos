@@ -11,7 +11,7 @@ public class ProcessFileController(IProcessFileSvc filesSvc, IToastNotify toastN
     private readonly IToastNotify _toastNotify = toastNotify;
 
     [HttpGet]
-    public async Task<IActionResult> DownloadFile(int id)
+    public async Task<IActionResult> DownloadFile(int? id)
     {
         if (ModelState.IsValid)
         {

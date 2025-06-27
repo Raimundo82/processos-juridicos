@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -8,7 +8,7 @@ public partial class Sentence
 {
     [Key]
     [Column("sentence_id")]
-    public int SentenceId { get; set; }
+    public int? SentenceId { get; set; }
 
     [Column("sentence_name")]
     public string SentenceName { get; set; }

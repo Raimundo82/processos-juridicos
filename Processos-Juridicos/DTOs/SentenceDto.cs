@@ -11,8 +11,7 @@ namespace Processos_Juridicos.DTOs;
 public partial class SentenceDto
 {
     [Key]
-    [Required]
-    public int SentenceId { get; set; }
+    public int? SentenceId { get; set; }
 
     [DisplayName("Nome da Sentença")]
     [EntityFieldIsRequired("Nome da Sentença")]

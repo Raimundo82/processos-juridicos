@@ -10,7 +10,7 @@ namespace Processos_Juridicos.DTOs;
 public partial class StateDto
 {
     [Key]
-    public int StateId { get; set; }
+    public int? StateId { get; set; }
 
     [EntityFieldIsRequired("Nome do Estado")]
     [StringLength(20)]

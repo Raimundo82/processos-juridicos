@@ -8,7 +8,7 @@ namespace Processos_Juridicos.DTOs;
 public class SectorDto
 {
     [Key]
-    public required int SectorId { get; set; }
+    public int? SectorId { get; set; }
 
     [DisplayName("Código do Setor")]
     [EntityFieldIsRequired("Código do Setor")]

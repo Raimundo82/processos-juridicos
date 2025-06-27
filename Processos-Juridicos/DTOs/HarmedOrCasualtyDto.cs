@@ -11,8 +11,7 @@ public partial class HarmedOrCasualtyDto
 {
 
     [Key]
-    [Required]
-    public required int CasualtyId { get; set; }
+    public int? CasualtyId { get; set; }
 
     [EntityFieldIsRequired("Nome da categoria de ferido")]
     [Attributes.MaxLength(50, "Nome da categoria de ferido")]

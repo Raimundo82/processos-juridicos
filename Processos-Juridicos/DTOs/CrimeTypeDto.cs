@@ -14,8 +14,7 @@ public partial class CrimeTypeDto
     private const string _entityname = "Tipo de Crime";
 
     [Key]
-    [Required]
-    public int CrimeTypeId { get; set; }
+    public int? CrimeTypeId { get; set; }
 
     [Unicode(false)]
     [EntityFieldIsRequired("Nome do Tipo de Crime")]

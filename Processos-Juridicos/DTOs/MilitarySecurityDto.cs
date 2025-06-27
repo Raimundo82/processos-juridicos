@@ -10,8 +10,7 @@ public partial class MilitarySecurityDto
 {
 
     [Key]
-    [Required]
-    public required int MilitarySecurityId { get; set; }
+    public int? MilitarySecurityId { get; set; }
 
     [EntityFieldIsRequired("Nome da Segurança Militar")]
     [Attributes.MaxLength(50, "Nome da Segurança Militar")]

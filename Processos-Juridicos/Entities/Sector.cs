@@ -7,7 +7,7 @@ public class Sector
 {
     [Key]
     [Column("sector_id")]
-    public int SectorId { get; set; }
+    public int? SectorId { get; set; }
 
     [Column("sector_code")]
     public required string SectorCode { get; set; }

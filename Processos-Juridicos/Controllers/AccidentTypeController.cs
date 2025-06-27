@@ -21,7 +21,7 @@ public class AccidentTypeController(IAccidentTypeSvc accidentType, IToastNotify 
     }
 
     [HttpGet]
-    public async Task<IActionResult> ListOne(int id)
+    public async Task<IActionResult> ListOne(int? id)
     {
         if (ModelState.IsValid)
         {
@@ -53,7 +53,7 @@ public class AccidentTypeController(IAccidentTypeSvc accidentType, IToastNotify 
     }
 
     [HttpGet]
-    public async Task<IActionResult> Edit(int id)
+    public async Task<IActionResult> Edit(int? id)
     {
         if (ModelState.IsValid)
         {
@@ -79,7 +79,7 @@ public class AccidentTypeController(IAccidentTypeSvc accidentType, IToastNotify 
 
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> Delete(int? id)
     {
         if (ModelState.IsValid)
         {

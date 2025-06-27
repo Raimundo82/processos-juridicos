@@ -1,3 +1,4 @@
+
 using Microsoft.AspNetCore.Mvc;
 
 using Processos_Juridicos.DTOs;
@@ -21,7 +22,7 @@ public class CrimeTypeController(ICrimeTypeSvc crimeTypeSvc, IToastNotify toastN
     }
 
     [HttpGet]
-    public async Task<IActionResult> ListOne(int id)
+    public async Task<IActionResult> ListOne(int? id)
     {
         if (ModelState.IsValid)
         {
@@ -52,7 +53,7 @@ public class CrimeTypeController(ICrimeTypeSvc crimeTypeSvc, IToastNotify toastN
     }
 
     [HttpGet]
-    public async Task<IActionResult> Edit(int id)
+    public async Task<IActionResult> Edit(int? id)
     {
         if (ModelState.IsValid)
         {
@@ -78,7 +79,7 @@ public class CrimeTypeController(ICrimeTypeSvc crimeTypeSvc, IToastNotify toastN
 
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> Delete(int? id)
     {
         if (ModelState.IsValid)
         {

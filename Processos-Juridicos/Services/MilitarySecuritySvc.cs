@@ -20,7 +20,7 @@ public class MilitarySecuritySvc(AppDbContext context) : IMilitarySecuritySvc
         return Mapper.MapToMilitarySecurityDto(militarySecurityEntity);
     }
 
-    public async Task<bool> DeleteMilitarySecurity(int id)
+    public async Task<bool> DeleteMilitarySecurity(int? id)
     {
         MilitarySecurity? militarySecurity = await _context.Military_securities.FindAsync(id);
         if (militarySecurity == null)
@@ -50,7 +50,7 @@ public class MilitarySecuritySvc(AppDbContext context) : IMilitarySecuritySvc
         return Mapper.MapToMilitarySecurityEnum(militarySecurity);
     }
 
-    public async Task<MilitarySecurityDto> GetMilitarySecurityById(int id)
+    public async Task<MilitarySecurityDto> GetMilitarySecurityById(int? id)
     {
         MilitarySecurity? militarySecurity = await _context.Military_securities.FindAsync(id);
         return militarySecurity != null ? Mapper.MapToMilitarySecurityDto(militarySecurity) : throw new KeyNotFoundException();

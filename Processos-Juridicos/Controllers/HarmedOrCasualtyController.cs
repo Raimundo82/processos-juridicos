@@ -22,7 +22,7 @@ public class HarmedOrCasualtyController(IHarmedOrCasualtySvc casualtiesSvc, IToa
     }
 
     [HttpGet]
-    public async Task<IActionResult> ListOne(int id)
+    public async Task<IActionResult> ListOne(int? id)
     {
         if (ModelState.IsValid)
         {
@@ -54,7 +54,7 @@ public class HarmedOrCasualtyController(IHarmedOrCasualtySvc casualtiesSvc, IToa
     }
 
     [HttpGet]
-    public async Task<IActionResult> Edit(int id)
+    public async Task<IActionResult> Edit(int? id)
     {
         if (ModelState.IsValid)
         {
@@ -80,7 +80,7 @@ public class HarmedOrCasualtyController(IHarmedOrCasualtySvc casualtiesSvc, IToa
 
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> Delete(int? id)
     {
         IActionResult result = RedirectToAction(nameof(List));
 

@@ -18,7 +18,7 @@ public class CrimeTypeSvc(AppDbContext context) : ICrimeTypeSvc
         return Mapper.MapToCrimeTypeEnum(crimes);
     }
 
-    public async Task<CrimeTypeDto> GetCrimeTypeById(int id)
+    public async Task<CrimeTypeDto> GetCrimeTypeById(int? id)
     {
         Entities.CrimeType? type = await _context.Crime_types.FindAsync(id);
         return type != null ? Mapper.MapToCrimeTypeDto(type) : throw new EntityNotFoundException($"O CrimeType com o ID {id} não existe.");
@@ -60,7 +60,7 @@ public class CrimeTypeSvc(AppDbContext context) : ICrimeTypeSvc
         throw new EntityNotFoundException($"O CrimeType com o ID {type.CrimeTypeId} não existe.");
     }
 
-    public async Task<bool> DeleteCrimeType(int id)
+    public async Task<bool> DeleteCrimeType(int? id)
     {
         Entities.CrimeType? type = await _context.Crime_types.FindAsync(id);
         if (type == null)

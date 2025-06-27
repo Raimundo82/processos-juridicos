@@ -8,7 +8,7 @@ public class Unit
 {
     [Key]
     [Column("unit_id")]
-    public int UnitId { get; set; }
+    public int? UnitId { get; set; }
 
     [Column("unit_code")]
     public string UnitCode { get; set; }

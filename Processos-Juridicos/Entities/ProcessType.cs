@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -9,7 +9,7 @@ public partial class ProcessType
     [Key]
     [Required]
     [Column("process_type_id")]
-    public int ProcessTypeId { get; set; }
+    public int? ProcessTypeId { get; set; }
 
     [Required]
     [Column("process_name")]

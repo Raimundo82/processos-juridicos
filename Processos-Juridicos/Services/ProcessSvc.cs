@@ -23,7 +23,7 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
         return Mapper.MapToProcessesDto(processEntity);
     }
 
-    public async Task<bool> DeleteProcess(int id)
+    public async Task<bool> DeleteProcess(int? id)
     {
         Process? process = await _context.Processes.FindAsync(id);
         if (process == null)
@@ -69,7 +69,7 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
         return Mapper.MapToToProcessesEnum(processes);
     }
 
-    public async Task<ProcessDto> GetProcessById(int id)
+    public async Task<ProcessDto> GetProcessById(int? id)
     {
         Process? process = await _context.Processes
             .Include(x => x.Unit)

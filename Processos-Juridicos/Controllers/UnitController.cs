@@ -23,10 +23,14 @@ public class UnitController(IUnitSvc unitSvc, ISectorSvc sectorSvc, IToastNotify
     }
 
     [HttpGet]
-    public async Task<IActionResult> ListOne(int id)
+    public async Task<IActionResult> ListOne(int? id)
     {
-        UnitDto unit = await _unitSvc.GetUnitById(id);
-        return View(unit);
+        if (ModelState.IsValid)
+        {
+            UnitDto unit = await _unitSvc.GetUnitById(id);
+            return View(unit);
+        }
+        return RedirectToAction(nameof(List));
     }
 
     [HttpGet]
@@ -51,11 +55,16 @@ public class UnitController(IUnitSvc unitSvc, ISectorSvc sectorSvc, IToastNotify
     }
 
     [HttpGet]
-    public async Task<IActionResult> Edit(int id)
+    public async Task<IActionResult> Edit(int? id)
     {
-        UnitDto model = await _unitSvc.GetUnitById(id);
-        await PopulateSectorsForViewBag();
-        return View(model);
+        if (ModelState.IsValid)
+        {
+            UnitDto model = await _unitSvc.GetUnitById(id);
+            await PopulateSectorsForViewBag();
+            return View(model);
+        }
+
+        return RedirectToAction(nameof(List));
     }
 
     [HttpPost]
@@ -74,19 +83,21 @@ public class UnitController(IUnitSvc unitSvc, ISectorSvc sectorSvc, IToastNotify
 
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> Delete(int? id)
     {
-        var success = await _unitSvc.DeleteUnit(id);
-
-        if (!success)
+        if (ModelState.IsValid)
         {
-            _toastNotify.Error(string.Format(GlobalTextManager.GetString("DeleteFailureMessage"), "a", EntityName));
-        }
-        else
-        {
-            _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("DeleteSuccessMessage"), "A", EntityName, "a"));
-        }
+            var success = await _unitSvc.DeleteUnit(id);
 
+            if (!success)
+            {
+                _toastNotify.Error(string.Format(GlobalTextManager.GetString("DeleteFailureMessage"), "a", EntityName));
+            }
+            else
+            {
+                _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("DeleteSuccessMessage"), "A", EntityName, "a"));
+            }
+        }
         return RedirectToAction(nameof(List));
     }
 

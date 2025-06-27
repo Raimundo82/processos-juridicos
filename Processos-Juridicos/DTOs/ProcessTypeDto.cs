@@ -11,7 +11,7 @@ namespace Processos_Juridicos.DTOs;
 public partial class ProcessTypeDto
 {
     [Key]
-    public int ProcessTypeId { get; set; }
+    public int? ProcessTypeId { get; set; }
 
     [EntityFieldIsRequired("Tipo de Processo")]
     [Attributes.MaxLength(50, "Tipo de Processo")]

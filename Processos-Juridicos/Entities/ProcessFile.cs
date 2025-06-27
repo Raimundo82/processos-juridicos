@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -8,7 +8,7 @@ public partial class ProcessFile
 {
     [Key]
     [Column("process_file_id")]
-    public int ProcessFileId { get; set; }
+    public int? ProcessFileId { get; set; }
 
     [Column("process_file_name")]
     public string ProcessFileName { get; set; }

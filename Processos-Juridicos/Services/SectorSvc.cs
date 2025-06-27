@@ -18,7 +18,7 @@ public class SectorSvc(AppDbContext context) : ISectorSvc
         return Mapper.MapToToSectorsEnum(sectors);
     }
 
-    public async Task<SectorDto> GetSectorById(int id)
+    public async Task<SectorDto> GetSectorById(int? id)
     {
         Sector? sector = await _context.Sectors.FindAsync(id);
         return sector != null ? Mapper.MapToSectorsDto(sector) : throw new KeyNotFoundException();
@@ -33,7 +33,7 @@ public class SectorSvc(AppDbContext context) : ISectorSvc
         return Mapper.MapToSectorsDto(sectorEntity);
     }
 
-    public async Task<bool> DeleteSector(int id)
+    public async Task<bool> DeleteSector(int? id)
     {
         Sector? sector = await _context.Sectors.FindAsync(id);
         if (sector == null)

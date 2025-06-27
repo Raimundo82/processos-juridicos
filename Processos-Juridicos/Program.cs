@@ -26,9 +26,10 @@ builder.Services.AddHttpClient<ApisSvc>()
     .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
     {
         UseProxy = false,
-        //ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator,
-        ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true
     });
+
+
+builder.Configuration.AddUserSecrets<Program>();
 
 builder.Services.AddSingleton<IJsonTextManager>(sp =>
 {

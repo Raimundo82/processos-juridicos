@@ -40,7 +40,11 @@ public class CrimeTypeIntegrationTests
 
         // Assert
         ViewResult viewResult = Assert.IsType<ViewResult>(result);
-        IEnumerable<CrimeTypeDto> model = Assert.IsAssignableFrom<IEnumerable<CrimeTypeDto>>(viewResult.Model);
+        IEnumerable<CrimeTypeDto> model =
+    Assert.IsType<IEnumerable<CrimeTypeDto>>(
+        viewResult.Model,
+        exactMatch: false
+    );
         var names = model.Select(x => x.CrimeTypeName).ToList();
         Assert.Equal(2, names.Count);
         Assert.Contains("Corrupção", names);
@@ -67,7 +71,12 @@ public class CrimeTypeIntegrationTests
 
         // Assert
         ViewResult viewResult = Assert.IsType<ViewResult>(result);
-        IEnumerable<CrimeTypeDto> model = Assert.IsAssignableFrom<IEnumerable<CrimeTypeDto>>(viewResult.Model);
+        IEnumerable<CrimeTypeDto> model =
+    Assert.IsType<IEnumerable<CrimeTypeDto>>(
+        viewResult.Model,
+        exactMatch: false
+    );
+
         Assert.Empty(model);
     }
 
@@ -313,6 +322,7 @@ public class CrimeTypeIntegrationTests
         var toastNotifyMock = new Mock<IToastNotify>();
         var controller = new CrimeTypeController(svc, toastNotifyMock.Object);
 
+
         // Act
         IActionResult result = await controller.Delete(crimeType.CrimeTypeId);
 
@@ -353,7 +363,7 @@ public class CrimeTypeIntegrationTests
         using IServiceScope scope = factory.Services.CreateScope();
         IServiceProvider services = scope.ServiceProvider;
 
-        ICrimeTypeSvc svc = services.GetRequiredService<ICrimeTypeSvc>();
+        _ = services.GetRequiredService<ICrimeTypeSvc>();
         var svcMock = new Mock<ICrimeTypeSvc>();
         var toastNotifyMock = new Mock<IToastNotify>();
         var controller = new CrimeTypeController(svcMock.Object, toastNotifyMock.Object);

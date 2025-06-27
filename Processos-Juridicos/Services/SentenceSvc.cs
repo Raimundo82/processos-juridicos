@@ -21,7 +21,7 @@ public class SentenceSvc(AppDbContext context) : ISentenceSvc
         return Mapper.MapToSentenceDto(sentenceEntity);
     }
 
-    public async Task<bool> DeleteSentence(int id)
+    public async Task<bool> DeleteSentence(int? id)
     {
         Sentence? sentence = await _context.Sentences.FindAsync(id);
         if (sentence == null)
@@ -49,7 +49,7 @@ public class SentenceSvc(AppDbContext context) : ISentenceSvc
         return Mapper.MapToToSentenceDtoEnum(sentences);
     }
 
-    public async Task<SentenceDto> GetSentenceById(int id)
+    public async Task<SentenceDto> GetSentenceById(int? id)
     {
         Sentence? sentence = await _context.Sentences.FindAsync(id);
 

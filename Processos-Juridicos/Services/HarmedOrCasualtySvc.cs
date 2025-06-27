@@ -22,7 +22,7 @@ public class HarmedOrCasualtySvc(AppDbContext context) : IHarmedOrCasualtySvc
 
     }
 
-    public async Task<bool> DeleteCasualty(int id)
+    public async Task<bool> DeleteCasualty(int? id)
     {
         HarmedOrCasualty? casualty = await _context.Harmed_or_casualties.FindAsync(id);
         if (casualty != null)
@@ -50,7 +50,7 @@ public class HarmedOrCasualtySvc(AppDbContext context) : IHarmedOrCasualtySvc
         return Mapper.MapToToHarmedOrCasualtiesEnum(casualties);
     }
 
-    public async Task<HarmedOrCasualtyDto> GetCasualtyById(int id)
+    public async Task<HarmedOrCasualtyDto> GetCasualtyById(int? id)
     {
         HarmedOrCasualty? casualty = await _context.Harmed_or_casualties.FindAsync(id);
         return casualty != null ? Mapper.MapToHarmedOrCasualtiesDto(casualty) : throw new KeyNotFoundException();

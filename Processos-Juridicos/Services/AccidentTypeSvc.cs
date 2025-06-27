@@ -18,7 +18,7 @@ public class AccidentTypeSvc(AppDbContext context) : IAccidentTypeSvc
         return Mapper.MapToAccidentTypeEnum(accidents);
     }
 
-    public async Task<AccidentTypeDto> GetAccidentTypeById(int id)
+    public async Task<AccidentTypeDto> GetAccidentTypeById(int? id)
     {
         AccidentType? accident = await _context.Accident_types.FindAsync(id);
         return accident != null ? Mapper.MapToAccidenTypeDto(accident) : throw new KeyNotFoundException();
@@ -42,7 +42,7 @@ public class AccidentTypeSvc(AppDbContext context) : IAccidentTypeSvc
         return Mapper.MapToAccidenTypeDto(typeEntity);
     }
 
-    public async Task<bool> DeleteAccidentType(int id)
+    public async Task<bool> DeleteAccidentType(int? id)
     {
         AccidentType? accident = await _context.Accident_types.FindAsync(id);
         if (accident != null)

@@ -21,7 +21,7 @@ public class StateController(IStateSvc stateSvc, IToastNotify toastNotify) : Con
     }
 
     [HttpGet]
-    public async Task<IActionResult> ListOne(int id)
+    public async Task<IActionResult> ListOne(int? id)
     {
         if (ModelState.IsValid)
         {
@@ -52,7 +52,7 @@ public class StateController(IStateSvc stateSvc, IToastNotify toastNotify) : Con
     }
 
     [HttpGet]
-    public async Task<IActionResult> Edit(int id)
+    public async Task<IActionResult> Edit(int? id)
     {
         if (ModelState.IsValid)
         {
@@ -78,7 +78,7 @@ public class StateController(IStateSvc stateSvc, IToastNotify toastNotify) : Con
 
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> Delete(int? id)
     {
         IActionResult result = RedirectToAction(nameof(List));
 

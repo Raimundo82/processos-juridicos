@@ -13,7 +13,7 @@ namespace Processos_Juridicos.DTOs;
 public partial class ProcessDto
 {
     [Key]
-    public int ProcessId { get; set; }
+    public int? ProcessId { get; set; }
 
     [UniqueProcessNiupm]
     public string Nuipm { get; set; }
@@ -49,7 +49,7 @@ public partial class ProcessDto
 
     public int? SentenceId { get; set; }
 
-    public int StateId { get; set; }
+    public required int StateId { get; set; }
 
     public DateOnly? CreatedAt { get; set; }
 
@@ -72,15 +72,16 @@ public partial class ProcessDto
     public int? InfringementId { get; set; }
 
     [EntityFieldIsRequired("Compensação paga?")]
-    public bool CompensationPaid { get; set; }
+    public required bool CompensationPaid { get; set; }
+
     [EntityFieldIsRequired("Comunicado à PJM")]
-    public bool ComunicatedToPjm { get; set; }
+    public required bool ComunicatedToPjm { get; set; }
 
     public int? CrimeTypeId { get; set; }
 
     public int? MilitarySecurityId { get; set; }
 
-    public DateOnly ComunicationDate { get; set; }
+    public required DateOnly ComunicationDate { get; set; }
 
     [ForeignKey("UnitId")]
     public virtual UnitDto Unit { get; set; }

@@ -7,7 +7,7 @@ public partial class MilitarySecurity
 {
     [Key]
     [Column("military_security_id")]
-    public int MilitarySecurityId { get; set; }
+    public int? MilitarySecurityId { get; set; }
 
     [Column("military_security_name")]
     public required string MilitarySecurityName { get; set; }

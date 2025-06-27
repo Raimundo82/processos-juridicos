@@ -8,7 +8,7 @@ public partial class Process
 {
     [Key]
     [Column("process_id")]
-    public int ProcessId { get; set; }
+    public int? ProcessId { get; set; }
 
     [Column("nuipm")]
     public string Nuipm { get; set; }

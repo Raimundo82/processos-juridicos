@@ -21,7 +21,7 @@ public class ProcessFileSvc(AppDbContext context) : IProcessFileSvc
         return Mapper.MapToFilesDto(processFileEntity);
     }
 
-    public async Task<bool> DeleteProcessFile(int id)
+    public async Task<bool> DeleteProcessFile(int? id)
     {
         ProcessFile? processFile = await _context.Process_Files.FindAsync(id);
         if (processFile == null)
@@ -51,13 +51,13 @@ public class ProcessFileSvc(AppDbContext context) : IProcessFileSvc
         return Mapper.MapToToFilesEnum(files);
     }
 
-    public async Task<ProcessFileDto> GetProcessFileById(int id)
+    public async Task<ProcessFileDto> GetProcessFileById(int? id)
     {
         ProcessFile? processFile = await _context.Process_Files.FindAsync(id);
         return processFile != null ? Mapper.MapToFilesDto(processFile) : throw new KeyNotFoundException();
     }
 
-    public async Task<List<ProcessFileDto>> GetAllProcessFilesByProcessId(int id)
+    public async Task<List<ProcessFileDto>> GetAllProcessFilesByProcessId(int? id)
     {
         IQueryable<ProcessFileDto> uploadedFiles = _context.Process_Files.Where(x => x.ProcessId == id).Select(x => Mapper.MapToFilesDto(x));
 

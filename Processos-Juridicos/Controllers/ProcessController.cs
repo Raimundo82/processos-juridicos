@@ -35,7 +35,7 @@ public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmed
     }
 
     [HttpGet]
-    public async Task<IActionResult> Details(int id)
+    public async Task<IActionResult> Details(int? id)
     {
         if (ModelState.IsValid)
         {
@@ -68,7 +68,7 @@ public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmed
             {
                 foreach (IFormFile? file in model.ProcessFiles)
                 {
-                    if (file != null && file.Length > 0)
+                    if (file != null && file.Length > 0 && insertTarget.ProcessId != null)
                     {
                         using MemoryStream ms = new();
                         await file.CopyToAsync(ms);
@@ -78,7 +78,7 @@ public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmed
                             ProcessFileName = file.FileName,
                             ProcessFileType = file.ContentType,
                             ProcessFileContent = ms.ToArray(),
-                            ProcessId = insertTarget.ProcessId
+                            ProcessId = (int)insertTarget.ProcessId
                         };
 
                         _ = await _processFileSvc.CreateProcessFile(Mapper.MapToFilesDto(fileRecord));
@@ -95,7 +95,7 @@ public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmed
     }
 
     [HttpGet]
-    public async Task<IActionResult> Edit(int id)
+    public async Task<IActionResult> Edit(int? id)
     {
         if (ModelState.IsValid)
         {
@@ -127,7 +127,7 @@ public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmed
         {
             foreach (IFormFile file in model.ProcessFiles)
             {
-                if (file != null && file.Length > 0)
+                if (file != null && file.Length > 0 && model.ProcessId != null)
                 {
                     using MemoryStream ms = new();
                     await file.CopyToAsync(ms);
@@ -136,7 +136,7 @@ public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmed
                         ProcessFileName = file.FileName,
                         ProcessFileType = file.ContentType,
                         ProcessFileContent = ms.ToArray(),
-                        ProcessId = model.ProcessId,
+                        ProcessId = (int)model.ProcessId,
                         RowGuid = 1
                     };
                     _ = await _processFileSvc.CreateProcessFile(Mapper.MapToFilesDto(fileRecord));
@@ -158,7 +158,7 @@ public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmed
 
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> Delete(int? id)
     {
         if (ModelState.IsValid)
         {
@@ -174,15 +174,6 @@ public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmed
         }
 
         return RedirectToAction(nameof(List));
-    }
-
-    private async Task<RedirectToActionResult> TryDeleteFile(string deleteFileId, ProcessDto model)
-    {
-        if (int.TryParse(deleteFileId, out var fileId))
-        {
-            _ = await _processFileSvc.DeleteProcessFile(fileId);
-        }
-        return RedirectToAction("Edit", new { id = model.ProcessId });
     }
 
     private async Task PopulateViewbags()

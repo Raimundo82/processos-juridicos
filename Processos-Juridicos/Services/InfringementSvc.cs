@@ -21,7 +21,7 @@ public class InfringementSvc(AppDbContext context) : IInfringementSvc
         return Mapper.MapToInfringementsDto(infringementEntity);
     }
 
-    public async Task<bool> DeleteInfringement(int id)
+    public async Task<bool> DeleteInfringement(int? id)
     {
         Infringement? infringement = await _context.Infringements.FindAsync(id);
 
@@ -50,7 +50,7 @@ public class InfringementSvc(AppDbContext context) : IInfringementSvc
         return Mapper.MapToToInfringementsEnum(infringements);
     }
 
-    public async Task<InfringementDto> GetInfringementById(int id)
+    public async Task<InfringementDto> GetInfringementById(int? id)
     {
         Infringement? infringement = await _context.Infringements.FindAsync(id);
         return infringement != null ? Mapper.MapToInfringementsDto(infringement) : throw new KeyNotFoundException();

@@ -18,7 +18,7 @@ public class StateSvc(AppDbContext context) : IStateSvc
         return Mapper.MapToToStateDtoEnum(states);
     }
 
-    public async Task<StateDto> GetStateById(int id)
+    public async Task<StateDto> GetStateById(int? id)
     {
         State? state = await _context.States.FindAsync(id);
         return state != null ? Mapper.MapToStateDto(state) : throw new KeyNotFoundException();
@@ -42,7 +42,7 @@ public class StateSvc(AppDbContext context) : IStateSvc
         return Mapper.MapToStateDto(stateEntity);
     }
 
-    public async Task<bool> DeleteState(int id)
+    public async Task<bool> DeleteState(int? id)
     {
         State? state = await _context.States.FindAsync(id);
         if (state == null)

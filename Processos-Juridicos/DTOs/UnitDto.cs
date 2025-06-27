@@ -12,7 +12,7 @@ namespace Processos_Juridicos.DTOs;
 public class UnitDto
 {
     [Key]
-    public int UnitId { get; set; }
+    public int? UnitId { get; set; }
 
     [DisplayName("Código da Unidade")]
     [EntityFieldIsRequired("Código da Unidade")]

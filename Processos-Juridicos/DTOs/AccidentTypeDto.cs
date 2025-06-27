@@ -13,8 +13,7 @@ public partial class AccidentTypeDto
     private const string _entityName = "Tipo de Acidente";
 
     [Key]
-    [Required]
-    public int AccidentTypeId { get; set; }
+    public int? AccidentTypeId { get; set; }
 
     [Unicode(false)]
     [EntityFieldIsRequired("Nome do tipo de acidente")]

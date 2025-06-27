@@ -20,7 +20,7 @@ public class UnitSvc(AppDbContext context) : IUnitSvc
         return Mapper.MapToToUnitDtoEnum(units);
     }
 
-    public async Task<UnitDto> GetUnitById(int id)
+    public async Task<UnitDto> GetUnitById(int? id)
     {
         Unit? unit = await _context.Units.FindAsync(id);
         return unit != null ? Mapper.MapToUnitDto(unit) : throw new KeyNotFoundException();
@@ -44,7 +44,7 @@ public class UnitSvc(AppDbContext context) : IUnitSvc
         return Mapper.MapToUnitDto(unitEntity);
     }
 
-    public async Task<bool> DeleteUnit(int id)
+    public async Task<bool> DeleteUnit(int? id)
     {
         Unit? unit = await _context.Units.FindAsync(id);
         if (unit == null)
