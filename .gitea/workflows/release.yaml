@@ -52,5 +52,5 @@ jobs:
           GITEA_TOKEN: ${{ secrets.PACKAGE_UPLOAD_TOKEN }}
           GITEA_URL: https://devops-01.marinha.pt
         run: |
-          export NODE_EXTRA_CA_CERTS=/workspace/marinha-si/Processos-Juridicos/marinha-root-ca.pem
+          export NODE_OPTIONS="--use-system-ca"
           npx semantic-release
