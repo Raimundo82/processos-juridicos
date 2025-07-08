@@ -22,18 +22,6 @@ public class CrimeTypeController(ICrimeTypeSvc crimeTypeSvc, IToastNotify toastN
     }
 
     [HttpGet]
-    public async Task<IActionResult> ListOne(int? id)
-    {
-        if (ModelState.IsValid)
-        {
-            CrimeTypeDto type = await _crimeTypeSvc.GetCrimeTypeById(id);
-            return View(type);
-        }
-
-        return RedirectToAction(nameof(List));
-    }
-
-    [HttpGet]
     public IActionResult Create()
     {
         return View();

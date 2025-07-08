@@ -1,54 +1,45 @@
-using System.Data;
+using System.Net;
 
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using AngleSharp;
+using AngleSharp.Dom;
+
 using Microsoft.Extensions.DependencyInjection;
 
-using Moq;
-
-using Processos_Juridicos.Controllers;
 using Processos_Juridicos.Data;
-using Processos_Juridicos.DTOs;
 using Processos_Juridicos.Entities;
-using Processos_Juridicos.Exceptions;
-using Processos_Juridicos.Services.Interfaces;
 
 namespace Processos_Juridicos.Tests;
 
 public class CrimeTypeIntegrationTests
 {
     [Fact]
-    public async Task List_ReturnsViewWithCrimeTypes()
+    public async Task Get_CrimeTypeList_ReturnsCrimeTypeList()
     {
+
         // Arrange
         var factory = new CustomWebApplicationFactory<Program>(Guid.NewGuid().ToString());
-        using IServiceScope scope = factory.Services.CreateScope();
-        IServiceProvider scopedServices = scope.ServiceProvider;
-        AppDbContext db = scopedServices.GetRequiredService<AppDbContext>();
+        await using AsyncServiceScope scope = factory.Services.CreateAsyncScope();
+        AppDbContext db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
         db.Crime_types.AddRange(
-           new CrimeType { CrimeTypeName = "Corrupção" },
-           new CrimeType { CrimeTypeName = "Fraude" }
-       );
+            new CrimeType { CrimeTypeName = "Corrupção" },
+            new CrimeType { CrimeTypeName = "Fraude" }
+        );
         _ = await db.SaveChangesAsync();
 
-        ICrimeTypeSvc svc = scopedServices.GetRequiredService<ICrimeTypeSvc>();
-        var controller = new CrimeTypeController(svc, new Mock<IToastNotify>().Object);
+        using HttpClient client = factory.CreateClient();
 
-        // Act
-        IActionResult result = await controller.List();
+        //Act
+        IDocument doc = await client.GetDocumentAsync("/CrimeType/List");
 
         // Assert
-        ViewResult viewResult = Assert.IsType<ViewResult>(result);
-        IEnumerable<CrimeTypeDto> model =
-    Assert.IsType<IEnumerable<CrimeTypeDto>>(
-        viewResult.Model,
-        exactMatch: false
-    );
-        var names = model.Select(x => x.CrimeTypeName).ToList();
-        Assert.Equal(2, names.Count);
-        Assert.Contains("Corrupção", names);
-        Assert.Contains("Fraude", names);
+        var cellTexts = doc
+            .QuerySelectorAll("table tbody td")
+            .Select(td => td.TextContent.Trim())
+            .ToList();
+
+        Assert.Contains("Corrupção", cellTexts);
+        Assert.Contains("Fraude", cellTexts);
     }
 
     [Fact]
@@ -56,197 +47,120 @@ public class CrimeTypeIntegrationTests
     {
         // Arrange
         var factory = new CustomWebApplicationFactory<Program>(Guid.NewGuid().ToString());
-        using IServiceScope scope = factory.Services.CreateScope();
-        IServiceProvider scopedServices = scope.ServiceProvider;
-        AppDbContext db = scopedServices.GetRequiredService<AppDbContext>();
-
-        db.Crime_types.RemoveRange(db.Crime_types);
-        _ = await db.SaveChangesAsync();
-
-        ICrimeTypeSvc svc = scope.ServiceProvider.GetRequiredService<ICrimeTypeSvc>();
-        var controller = new CrimeTypeController(svc, new Mock<IToastNotify>().Object);
+        using HttpClient client = factory.CreateClient();
 
         // Act
-        IActionResult result = await controller.List();
+        IDocument doc = await client.GetDocumentAsync("/CrimeType/List");
 
         // Assert
-        ViewResult viewResult = Assert.IsType<ViewResult>(result);
-        IEnumerable<CrimeTypeDto> model =
-    Assert.IsType<IEnumerable<CrimeTypeDto>>(
-        viewResult.Model,
-        exactMatch: false
-    );
+        IHtmlCollection<IElement> rows = doc.QuerySelectorAll("table tbody tr");
+        Assert.Empty(rows);
 
-        Assert.Empty(model);
+        IHtmlCollection<IElement> cells = doc.QuerySelectorAll("table tbody td");
+        Assert.Empty(cells);
     }
 
     [Fact]
-    public async Task ListOne_WhenModelStateIsValid_ReturnsViewWithModel()
+    public async Task Create_Post_Valid_RedirectsAndPersists()
     {
         // Arrange
         var factory = new CustomWebApplicationFactory<Program>(Guid.NewGuid().ToString());
-        using IServiceScope scope = factory.Services.CreateScope();
-        IServiceProvider scopedServices = scope.ServiceProvider;
-        AppDbContext db = scopedServices.GetRequiredService<AppDbContext>();
+        using HttpClient client = factory.CreateClient();
 
-        var crimeType = new CrimeType { CrimeTypeName = "Corrupção" };
+        var fields = new Dictionary<string, string>
+        {
+            ["CrimeTypeName"] = "Assédio"
+        };
+        var content = new FormUrlEncodedContent(fields);
+
+        //Act
+        HttpResponseMessage postResponse = await client.PostAsync("/CrimeType/Create", content);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, postResponse.StatusCode);
+        IDocument listDoc = await client.GetDocumentAsync("/CrimeType/List");
+        IEnumerable<string> names = listDoc.QuerySelectorAll("table tbody td")
+                             .Select(td => td.TextContent.Trim());
+        Assert.Contains("Assédio", names);
+    }
+    [Fact]
+    public async Task Create_Post_InvalidModel_ReturnsEmptyList()
+    {
+        // Arrange
+        var factory = new CustomWebApplicationFactory<Program>(Guid.NewGuid().ToString());
+        using HttpClient client = factory.CreateClient();
+
+        IDocument getDoc = await client.GetDocumentAsync("/CrimeType/Create");
+        IElement form = getDoc.QuerySelector("form[action='/CrimeType/Create']")!;
+        var action = form.GetAttribute("action")!;  // "/CrimeType/Create"
+
+        var fields = new Dictionary<string, string>
+        {
+            ["CrimeTypeName"] = string.Empty
+        };
+
+        //Act
+        HttpResponseMessage postResponse = await client.PostAsync(
+            action,
+            new FormUrlEncodedContent(fields)
+        );
+
+        //Assert
+        Assert.Equal(HttpStatusCode.OK, postResponse.StatusCode);
+
+        IDocument listDoc = await client.GetDocumentAsync("/CrimeType/List");
+
+        IHtmlCollection<IElement> rows = listDoc.QuerySelectorAll("table tbody tr");
+        Assert.Empty(rows);
+
+        IHtmlCollection<IElement> cells = listDoc.QuerySelectorAll("table tbody td");
+        Assert.Empty(cells);
+
+
+        var html = await postResponse.Content.ReadAsStringAsync();
+        IDocument errDoc = await BrowsingContext
+                        .New(Configuration.Default)
+                        .OpenAsync(req => req.Content(html));
+        Assert.Contains(
+            "O campo Nome do Tipo de Crime é obrigatório.",
+            errDoc.DocumentElement.TextContent,
+            StringComparison.OrdinalIgnoreCase
+        );
+    }
+
+    [Fact]
+    public async Task Edit_Get_WhenModelExists_ShowsFormAndFields()
+    {
+        // Arrange
+        var factory = new CustomWebApplicationFactory<Program>(Guid.NewGuid().ToString());
+        await using AsyncServiceScope scope = factory.Services.CreateAsyncScope();
+        AppDbContext db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+        var crimeType = new CrimeType
+        {
+            CrimeTypeName = "Corrupção"
+        };
+
         _ = db.Crime_types.Add(crimeType);
+
         _ = await db.SaveChangesAsync();
 
-        ICrimeTypeSvc svc = scope.ServiceProvider.GetRequiredService<ICrimeTypeSvc>();
-        var controller = new CrimeTypeController(svc, new Mock<IToastNotify>().Object);
+        var id = crimeType.CrimeTypeId;
+
+        using HttpClient client = factory.CreateClient();
 
         // Act
-        IActionResult result = await controller.ListOne(crimeType.CrimeTypeId);
+        IDocument doc = await client.GetDocumentAsync($"/CrimeType/Edit/{id}");
 
         // Assert
-        ViewResult viewResult = Assert.IsType<ViewResult>(result);
-        CrimeTypeDto model = Assert.IsType<CrimeTypeDto>(viewResult.Model);
-        Assert.Equal(crimeType.CrimeTypeId, model.CrimeTypeId);
-        Assert.Equal(crimeType.CrimeTypeName, model.CrimeTypeName);
-    }
+        IElement? form = doc.QuerySelector("form[action^='/CrimeType/Edit']");
+        Assert.NotNull(form);
 
-    [Fact]
-    public async Task ListOne_WhenModelStateIsInvalid_RedirectsToList()
-    {
-        // Arrange
-        var factory = new CustomWebApplicationFactory<Program>(Guid.NewGuid().ToString());
-        using IServiceScope scope = factory.Services.CreateScope();
-        IServiceProvider scopedServices = scope.ServiceProvider;
+        IElement idInput = form.QuerySelector("input[name=CrimeTypeId]")!;
+        Assert.Equal(id.ToString(), idInput.GetAttribute("value"));
 
-        ICrimeTypeSvc svc = scopedServices.GetRequiredService<ICrimeTypeSvc>();
-        var controller = new CrimeTypeController(svc, new Mock<IToastNotify>().Object);
-
-        controller.ModelState.AddModelError("CrimeTypeName", "Campo obrigatório");
-
-        // Act
-        IActionResult result = await controller.ListOne(1);
-
-        // Assert
-        RedirectToActionResult redirectResult = Assert.IsType<RedirectToActionResult>(result);
-        Assert.Equal("List", redirectResult.ActionName);
-    }
-
-    [Fact]
-    public void Create_Get_ReturnsView()
-    {
-        // Arrange
-        var factory = new CustomWebApplicationFactory<Program>(Guid.NewGuid().ToString());
-        using IServiceScope scope = factory.Services.CreateScope();
-        IServiceProvider scopedServices = scope.ServiceProvider;
-
-        ICrimeTypeSvc svc = scopedServices.GetRequiredService<ICrimeTypeSvc>();
-        var controller = new CrimeTypeController(svc, new Mock<IToastNotify>().Object);
-
-        // Act
-        IActionResult result = controller.Create();
-
-        // Assert
-        _ = Assert.IsType<ViewResult>(result);
-    }
-
-    [Fact]
-    public async Task Create_Post_WhenModelIsValid_PersistsCrimeTypeAndRedirects()
-    {
-        // Arrange
-        var factory = new CustomWebApplicationFactory<Program>(Guid.NewGuid().ToString());
-        using IServiceScope scope = factory.Services.CreateScope();
-        IServiceProvider scopedServices = scope.ServiceProvider;
-        AppDbContext db = scopedServices.GetRequiredService<AppDbContext>();
-
-        ICrimeTypeSvc svc = scopedServices.GetRequiredService<ICrimeTypeSvc>();
-        var toastNotifyMock = new Mock<IToastNotify>();
-        var controller = new CrimeTypeController(svc, toastNotifyMock.Object);
-
-        var model = new CrimeTypeDto { CrimeTypeName = "Assédio" };
-
-        // Act
-        IActionResult result = await controller.Create(model);
-
-        // Assert
-        RedirectToActionResult redirectResult = Assert.IsType<RedirectToActionResult>(result);
-        Assert.Equal("List", redirectResult.ActionName);
-
-        CrimeType? crime = await db.Crime_types.FirstOrDefaultAsync(c => c.CrimeTypeName == "Assédio");
-        Assert.NotNull(crime);
-        Assert.Equal(model!.CrimeTypeName, crime!.CrimeTypeName);
-
-        toastNotifyMock.Verify(t => t.Sucesso(It.IsAny<string>()), Times.Once);
-    }
-
-    [Fact]
-    public async Task Create_Post_WhenCrimeTypeAlreadyExists_ThrowsDuplicatedCrimeTypeException()
-    {
-        // Arrange
-        var factory = new CustomWebApplicationFactory<Program>(Guid.NewGuid().ToString());
-        using IServiceScope scope = factory.Services.CreateScope();
-        IServiceProvider scopedServices = scope.ServiceProvider;
-        AppDbContext db = scopedServices.GetRequiredService<AppDbContext>();
-
-        var existing = new CrimeType { CrimeTypeName = "Corrupção" };
-        _ = db.Crime_types.Add(existing);
-        _ = await db.SaveChangesAsync();
-
-        ICrimeTypeSvc svc = scopedServices.GetRequiredService<ICrimeTypeSvc>();
-        var controller = new CrimeTypeController(svc, new Mock<IToastNotify>().Object);
-
-        var duplicateModel = new CrimeTypeDto { CrimeTypeName = "Corrupção" };
-
-        // Act & Assert
-        _ = await Assert.ThrowsAsync<DuplicatedCrimeTypeException>(() => controller.Create(duplicateModel));
-    }
-
-    [Fact]
-    public async Task Create_Post_WhenModelIsInvalid_ReturnsSameViewWithModel()
-    {
-        // Arrange
-        var factory = new CustomWebApplicationFactory<Program>(Guid.NewGuid().ToString());
-        using IServiceScope scope = factory.Services.CreateScope();
-        IServiceProvider scopedServices = scope.ServiceProvider;
-
-        ICrimeTypeSvc svc = scopedServices.GetRequiredService<ICrimeTypeSvc>();
-        var toastNotifyMock = new Mock<IToastNotify>();
-        var controller = new CrimeTypeController(svc, toastNotifyMock.Object);
-
-        controller.ModelState.AddModelError("CrimeTypeName", "Campo obrigatório");
-
-        var model = new CrimeTypeDto { CrimeTypeName = "" };
-
-        // Act
-        IActionResult result = await controller.Create(model);
-
-        // Assert
-        ViewResult viewResult = Assert.IsType<ViewResult>(result);
-        CrimeTypeDto returnedModel = Assert.IsType<CrimeTypeDto>(viewResult.Model);
-        Assert.Equal(model.CrimeTypeName, returnedModel.CrimeTypeName);
-
-        toastNotifyMock.Verify(t => t.Sucesso(It.IsAny<string>()), Times.Never);
-    }
-
-    [Fact]
-    public async Task Edit_Get_WhenModelExists_ReturnsViewWithModel()
-    {
-        // Arrange
-        var factory = new CustomWebApplicationFactory<Program>(Guid.NewGuid().ToString());
-        using IServiceScope scope = factory.Services.CreateScope();
-        IServiceProvider services = scope.ServiceProvider;
-        AppDbContext db = services.GetRequiredService<AppDbContext>();
-
-        var crimeType = new CrimeType { CrimeTypeName = "Crime X" };
-        _ = db.Crime_types.Add(crimeType);
-        _ = await db.SaveChangesAsync();
-
-        ICrimeTypeSvc svc = services.GetRequiredService<ICrimeTypeSvc>();
-        var controller = new CrimeTypeController(svc, new Mock<IToastNotify>().Object);
-
-        // Act
-        IActionResult result = await controller.Edit(crimeType.CrimeTypeId);
-
-        // Assert
-        ViewResult viewResult = Assert.IsType<ViewResult>(result);
-        CrimeTypeDto model = Assert.IsType<CrimeTypeDto>(viewResult.Model);
-        Assert.Equal(crimeType.CrimeTypeId, model.CrimeTypeId);
-        Assert.Equal("Crime X", model.CrimeTypeName);
+        IElement nameInput = form.QuerySelector("input[name=CrimeTypeName]")!;
+        Assert.Equal("Corrupção", nameInput.GetAttribute("value"));
     }
 
     [Fact]
@@ -254,128 +168,190 @@ public class CrimeTypeIntegrationTests
     {
         // Arrange
         var factory = new CustomWebApplicationFactory<Program>(Guid.NewGuid().ToString());
-        using IServiceScope scope = factory.Services.CreateScope();
-        IServiceProvider services = scope.ServiceProvider;
-        AppDbContext db = services.GetRequiredService<AppDbContext>();
+        await using AsyncServiceScope scope = factory.Services.CreateAsyncScope();
+        AppDbContext db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var crimeType = new CrimeType
+        {
+            CrimeTypeName = "Corrupção"
+        };
 
-        var original = new CrimeType { CrimeTypeName = "Original" };
-        _ = db.Crime_types.Add(original);
-        _ = await db.SaveChangesAsync();
-
-        ICrimeTypeSvc svc = services.GetRequiredService<ICrimeTypeSvc>();
-        var toastNotifyMock = new Mock<IToastNotify>();
-        var controller = new CrimeTypeController(svc, toastNotifyMock.Object);
-
-        var updatedModel = new CrimeTypeDto { CrimeTypeId = original.CrimeTypeId, CrimeTypeName = "Atualizado" };
-
-        // Act
-        IActionResult result = await controller.Edit(updatedModel);
-
-        // Assert
-        RedirectToActionResult redirectResult = Assert.IsType<RedirectToActionResult>(result);
-        Assert.Equal("List", redirectResult.ActionName);
-
-        CrimeType? crime = await db.Crime_types.FindAsync(original.CrimeTypeId);
-        Assert.Equal("Atualizado", crime?.CrimeTypeName);
-
-        toastNotifyMock.Verify(t => t.Sucesso(It.IsAny<string>()), Times.Once);
-    }
-
-    [Fact]
-    public async Task Edit_Post_WhenModelIsInvalid_ReturnsViewWithModel()
-    {
-        // Arrange
-        var factory = new CustomWebApplicationFactory<Program>(Guid.NewGuid().ToString());
-        using IServiceScope scope = factory.Services.CreateScope();
-        IServiceProvider services = scope.ServiceProvider;
-
-        ICrimeTypeSvc svc = services.GetRequiredService<ICrimeTypeSvc>();
-        var controller = new CrimeTypeController(svc, new Mock<IToastNotify>().Object);
-        var model = new CrimeTypeDto { CrimeTypeId = 1, CrimeTypeName = "Crime A" };
-
-        controller.ModelState.AddModelError("CrimeTypeName", "Campo obrigatório");
-
-        // Act
-        IActionResult result = await controller.Edit(model);
-
-        // Assert
-        ViewResult viewResult = Assert.IsType<ViewResult>(result);
-        CrimeTypeDto returned = Assert.IsType<CrimeTypeDto>(viewResult.Model);
-        Assert.Equal(model.CrimeTypeId, returned.CrimeTypeId);
-        Assert.Equal(model.CrimeTypeName, returned.CrimeTypeName);
-    }
-
-    [Fact]
-    public async Task Delete_WhenDeletionIsSuccessful_RedirectsAndCallsDelete()
-    {
-        // Arrange
-        var factory = new CustomWebApplicationFactory<Program>(Guid.NewGuid().ToString());
-        using IServiceScope scope = factory.Services.CreateScope();
-        IServiceProvider services = scope.ServiceProvider;
-        AppDbContext db = services.GetRequiredService<AppDbContext>();
-
-        var crimeType = new CrimeType { CrimeTypeName = "Corrupção" };
         _ = db.Crime_types.Add(crimeType);
+
         _ = await db.SaveChangesAsync();
 
-        ICrimeTypeSvc svc = services.GetRequiredService<ICrimeTypeSvc>();
-        var toastNotifyMock = new Mock<IToastNotify>();
-        var controller = new CrimeTypeController(svc, toastNotifyMock.Object);
+        var id = crimeType.CrimeTypeId.ToString()!;
 
+        using HttpClient client = factory.CreateClient();
+        IDocument editDoc = await client.GetDocumentAsync($"/CrimeType/Edit/{id}");
+        IElement form = editDoc.QuerySelector("form[action^='/CrimeType/Edit']")!;
+        var action = form.GetAttribute("action")!;
 
-        // Act
-        IActionResult result = await controller.Delete(crimeType.CrimeTypeId);
+        var fields = new Dictionary<string, string>
+        {
+            ["CrimeTypeId"] = id.ToString(),
+            ["CrimeTypeName"] = "Atualizado",
+        };
 
-        // Assert
-        RedirectToActionResult redirectResult = Assert.IsType<RedirectToActionResult>(result);
-        Assert.Equal("List", redirectResult.ActionName);
+        //Act
+        var content = new FormUrlEncodedContent(fields);
+        HttpResponseMessage postResponse = await client.PostAsync(action, content);
 
-        Assert.Empty(await db.Crime_types.ToListAsync());
-        toastNotifyMock.Verify(t => t.Sucesso(It.IsAny<string>()), Times.Once);
+        //Assert
+        Assert.Equal(HttpStatusCode.OK, postResponse.StatusCode);
+
+        IDocument listDoc = await client.GetDocumentAsync("/CrimeType/List");
+        IEnumerable<string> names = listDoc.QuerySelectorAll("table tbody td")
+                             .Select(td => td.TextContent.Trim());
+        Assert.Contains("Atualizado", names);
     }
 
     [Fact]
-    public async Task Delete_WhenDeletionFails_DisplaysErrorNotification()
+    public async Task Edit_Post_WhenModelIsInvalid_DoesNotApplyChanges()
     {
         // Arrange
         var factory = new CustomWebApplicationFactory<Program>(Guid.NewGuid().ToString());
-        using IServiceScope scope = factory.Services.CreateScope();
-        IServiceProvider services = scope.ServiceProvider;
+        await using AsyncServiceScope scope = factory.Services.CreateAsyncScope();
+        AppDbContext db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        ICrimeTypeSvc svc = services.GetRequiredService<ICrimeTypeSvc>();
-        var toastNotifyMock = new Mock<IToastNotify>();
-        var controller = new CrimeTypeController(svc, toastNotifyMock.Object);
+        var crimeType = new CrimeType
+        {
+            CrimeTypeName = "Corrupção"
+        };
 
-        // Act
-        IActionResult result = await controller.Delete(999);
+        _ = db.Crime_types.Add(crimeType);
+
+        _ = await db.SaveChangesAsync();
+
+        var id = crimeType.CrimeTypeId.ToString()!;
+
+        using HttpClient client = factory.CreateClient();
+
+        IDocument editDoc = await client.GetDocumentAsync($"/CrimeType/Edit/{id}");
+        IElement form = editDoc.QuerySelector("form[action^='/CrimeType/Edit']")!;
+        var action = form.GetAttribute("action")!;
+
+        var fields = new Dictionary<string, string>
+        {
+            ["CrimeTypeId"] = id.ToString(),
+            ["CrimeTypeName"] = string.Empty
+        };
+
+        //Act
+        var content = new FormUrlEncodedContent(fields);
+        HttpResponseMessage postResponse = await client.PostAsync(action, content);
 
         // Assert
-        RedirectToActionResult redirectResult = Assert.IsType<RedirectToActionResult>(result);
-        Assert.Equal("List", redirectResult.ActionName);
-        toastNotifyMock.Verify(t => t.Error(It.IsAny<string>()), Times.Once);
+        Assert.Equal(HttpStatusCode.OK, postResponse.StatusCode);
+
+        //Act
+        IDocument doc = await client.GetDocumentAsync("/CrimeType/List");
+
+        // Assert
+        var cellTexts = doc
+            .QuerySelectorAll("table tbody td")
+            .Select(td => td.TextContent.Trim())
+            .ToList();
+
+        Assert.Contains("Corrupção", cellTexts);
+
+        var html = await postResponse.Content.ReadAsStringAsync();
+        IDocument errDoc = await BrowsingContext
+                        .New(Configuration.Default)
+                        .OpenAsync(req => req.Content(html));
+        Assert.Contains(
+            "O campo Nome do Tipo de Crime é obrigatório.",
+            errDoc.DocumentElement.TextContent,
+            StringComparison.OrdinalIgnoreCase
+        );
     }
 
     [Fact]
-    public async Task Delete_WhenModelStateIsInvalid_RedirectsToListWithoutCallingDelete()
+    public async Task Delete_Successful_RemovesItemAndRedirects()
     {
         // Arrange
         var factory = new CustomWebApplicationFactory<Program>(Guid.NewGuid().ToString());
-        using IServiceScope scope = factory.Services.CreateScope();
-        IServiceProvider services = scope.ServiceProvider;
+        await using AsyncServiceScope scope = factory.Services.CreateAsyncScope();
+        AppDbContext db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        _ = services.GetRequiredService<ICrimeTypeSvc>();
-        var svcMock = new Mock<ICrimeTypeSvc>();
-        var toastNotifyMock = new Mock<IToastNotify>();
-        var controller = new CrimeTypeController(svcMock.Object, toastNotifyMock.Object);
+        var crimeType = new CrimeType
+        {
+            CrimeTypeName = "Corrupção"
+        };
 
-        controller.ModelState.AddModelError("DeletionError", "Erro simulado");
+        _ = db.Crime_types.Add(crimeType);
 
-        // Act
-        IActionResult result = await controller.Delete(1);
+        _ = await db.SaveChangesAsync();
+
+        var id = crimeType.CrimeTypeId.ToString()!;
+
+        using HttpClient client = factory.CreateClient();
+
+        IDocument listDoc = await client.GetDocumentAsync("/CrimeType/List");
+        IElement deleteForm = listDoc.QuerySelector("form[action='/CrimeType/Delete']")!;
+        var token = deleteForm
+            .QuerySelector("input[name=__RequestVerificationToken]")!
+            .GetAttribute("value")!;
+
+        // 2) POST the form with the correct Id & token
+        var fields = new Dictionary<string, string>
+        {
+            ["CrimeTypeId"] = id.ToString(),
+            ["__RequestVerificationToken"] = token
+        };
+
+        //Act
+        var content = new FormUrlEncodedContent(fields);
+        HttpResponseMessage postResponse = await client.PostAsync("/CrimeType/Delete/1", content);
+
+        // Assert 
+        Assert.Equal(HttpStatusCode.OK, postResponse.StatusCode);
+
+        IDocument afterDoc = await client.GetDocumentAsync("/CrimeType/List");
+        IEnumerable<string> names = afterDoc
+            .QuerySelectorAll("table tbody td")
+            .Select(td => td.TextContent.Trim());
+        Assert.DoesNotContain("Corrupção", names);
+    }
+
+    [Fact]
+    public async Task Delete_NonExistent_ItemRemainsAndRedirects()
+    {
+        // Arrange
+        var factory = new CustomWebApplicationFactory<Program>(Guid.NewGuid().ToString());
+        await using AsyncServiceScope scope = factory.Services.CreateAsyncScope();
+        AppDbContext db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        using HttpClient client = factory.CreateClient();
+
+        db.Crime_types.AddRange(
+           new CrimeType { CrimeTypeName = "Corrupção" }
+       );
+        _ = await db.SaveChangesAsync();
+
+        IDocument listDoc = await client.GetDocumentAsync("/CrimeType/List");
+        IElement deleteForm = listDoc.QuerySelector("form[action='/CrimeType/Delete']")!;
+        var action = deleteForm.GetAttribute("action")!;
+        var token = deleteForm
+            .QuerySelector("input[name=__RequestVerificationToken]")!
+            .GetAttribute("value")!;
+
+        var fields = new Dictionary<string, string>
+        {
+            ["CrimeTypeId"] = "9999",
+            ["__RequestVerificationToken"] = token
+        };
+
+        //Act
+        var content = new FormUrlEncodedContent(fields);
+        HttpResponseMessage postResponse = await client.PostAsync(action, content);
 
         // Assert
-        RedirectToActionResult redirectResult = Assert.IsType<RedirectToActionResult>(result);
-        Assert.Equal("List", redirectResult.ActionName);
-        svcMock.Verify(s => s.DeleteCrimeType(It.IsAny<int>()), Times.Never);
+        Assert.Equal(HttpStatusCode.OK, postResponse.StatusCode);
+
+        IDocument afterDoc = await client.GetDocumentAsync("/CrimeType/List");
+        IEnumerable<string> names = afterDoc
+            .QuerySelectorAll("table tbody td")
+            .Select(td => td.TextContent.Trim());
+        Assert.Contains("Corrupção", names);
     }
+
 }

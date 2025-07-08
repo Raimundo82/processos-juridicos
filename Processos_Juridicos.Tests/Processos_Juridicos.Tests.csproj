@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AngleSharp" Version="1.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.17" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.17" />
     <PackageReference Include="coverlet.collector" Version="6.0.4" />
@@ -27,7 +28,6 @@
     <Using Include="Xunit" />
   </ItemGroup>
   <Target Name="RestoreDotnetTools" BeforeTargets="Build">
-    <Exec Command="dotnet tool restore" StandardOutputImportance="Low"
-      StandardErrorImportance="High" />
+    <Exec Command="dotnet tool restore" StandardOutputImportance="Low" StandardErrorImportance="High" />
   </Target>
 </Project>
