@@ -10,27 +10,26 @@ using Processos_Juridicos.Entities;
 
 namespace Processos_Juridicos.Tests;
 
-public class CrimeTypeIntegrationTests
+public class CrimeTypeIntegrationTests(CustomWebApplicationFactory<Program> factory) : IClassFixture<CustomWebApplicationFactory<Program>>
 {
+    private readonly CustomWebApplicationFactory<Program> _factory = factory;
+    private readonly HttpClient _client = factory.CreateClient();
+
     [Fact]
     public async Task Get_CrimeTypeList_ReturnsCrimeTypeList()
     {
-
         // Arrange
-        var factory = new CustomWebApplicationFactory<Program>(Guid.NewGuid().ToString());
-        await using AsyncServiceScope scope = factory.Services.CreateAsyncScope();
-        AppDbContext db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
+        AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        db.Crime_types.AddRange(
+        dbContext.Crime_types.AddRange(
             new CrimeType { CrimeTypeName = "Corrupção" },
             new CrimeType { CrimeTypeName = "Fraude" }
         );
-        _ = await db.SaveChangesAsync();
-
-        using HttpClient client = factory.CreateClient();
+        _ = await dbContext.SaveChangesAsync();
 
         //Act
-        IDocument doc = await client.GetDocumentAsync("/CrimeType/List");
+        IDocument doc = await _client.GetDocumentAsync("/CrimeType/List");
 
         // Assert
         var cellTexts = doc
@@ -40,17 +39,15 @@ public class CrimeTypeIntegrationTests
 
         Assert.Contains("Corrupção", cellTexts);
         Assert.Contains("Fraude", cellTexts);
+
+        await DbUtilities.RemoveEntitiesAsync<CrimeType>(dbContext);
     }
 
     [Fact]
     public async Task List_EmptyDatabase_ReturnsEmptyList()
     {
-        // Arrange
-        var factory = new CustomWebApplicationFactory<Program>(Guid.NewGuid().ToString());
-        using HttpClient client = factory.CreateClient();
-
         // Act
-        IDocument doc = await client.GetDocumentAsync("/CrimeType/List");
+        IDocument doc = await _client.GetDocumentAsync("/CrimeType/List");
 
         // Assert
         IHtmlCollection<IElement> rows = doc.QuerySelectorAll("table tbody tr");
@@ -64,8 +61,8 @@ public class CrimeTypeIntegrationTests
     public async Task Create_Post_Valid_RedirectsAndPersists()
     {
         // Arrange
-        var factory = new CustomWebApplicationFactory<Program>(Guid.NewGuid().ToString());
-        using HttpClient client = factory.CreateClient();
+        await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
+        AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
         var fields = new Dictionary<string, string>
         {
@@ -74,23 +71,22 @@ public class CrimeTypeIntegrationTests
         var content = new FormUrlEncodedContent(fields);
 
         //Act
-        HttpResponseMessage postResponse = await client.PostAsync("/CrimeType/Create", content);
+        HttpResponseMessage postResponse = await _client.PostAsync("/CrimeType/Create", content);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, postResponse.StatusCode);
-        IDocument listDoc = await client.GetDocumentAsync("/CrimeType/List");
-        IEnumerable<string> names = listDoc.QuerySelectorAll("table tbody td")
-                             .Select(td => td.TextContent.Trim());
+        IDocument listDoc = await _client.GetDocumentAsync("/CrimeType/List");
+        IEnumerable<string> names = listDoc.QuerySelectorAll("table tbody td").Select(td => td.TextContent.Trim());
         Assert.Contains("Assédio", names);
+
+        await DbUtilities.RemoveEntitiesAsync<CrimeType>(dbContext);
     }
+
     [Fact]
     public async Task Create_Post_InvalidModel_ReturnsEmptyList()
     {
         // Arrange
-        var factory = new CustomWebApplicationFactory<Program>(Guid.NewGuid().ToString());
-        using HttpClient client = factory.CreateClient();
-
-        IDocument getDoc = await client.GetDocumentAsync("/CrimeType/Create");
+        IDocument getDoc = await _client.GetDocumentAsync("/CrimeType/Create");
         IElement form = getDoc.QuerySelector("form[action='/CrimeType/Create']")!;
         var action = form.GetAttribute("action")!;  // "/CrimeType/Create"
 
@@ -100,15 +96,12 @@ public class CrimeTypeIntegrationTests
         };
 
         //Act
-        HttpResponseMessage postResponse = await client.PostAsync(
-            action,
-            new FormUrlEncodedContent(fields)
-        );
+        HttpResponseMessage postResponse = await _client.PostAsync(action, new FormUrlEncodedContent(fields));
 
         //Assert
         Assert.Equal(HttpStatusCode.OK, postResponse.StatusCode);
 
-        IDocument listDoc = await client.GetDocumentAsync("/CrimeType/List");
+        IDocument listDoc = await _client.GetDocumentAsync("/CrimeType/List");
 
         IHtmlCollection<IElement> rows = listDoc.QuerySelectorAll("table tbody tr");
         Assert.Empty(rows);
@@ -132,25 +125,14 @@ public class CrimeTypeIntegrationTests
     public async Task Edit_Get_WhenModelExists_ShowsFormAndFields()
     {
         // Arrange
-        var factory = new CustomWebApplicationFactory<Program>(Guid.NewGuid().ToString());
-        await using AsyncServiceScope scope = factory.Services.CreateAsyncScope();
-        AppDbContext db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
+        AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        var crimeType = new CrimeType
-        {
-            CrimeTypeName = "Corrupção"
-        };
-
-        _ = db.Crime_types.Add(crimeType);
-
-        _ = await db.SaveChangesAsync();
-
-        var id = crimeType.CrimeTypeId;
-
-        using HttpClient client = factory.CreateClient();
+        var id = dbContext.Crime_types.Add(new CrimeType { CrimeTypeName = "Corrupção" }).Entity.CrimeTypeId;
+        _ = await dbContext.SaveChangesAsync();
 
         // Act
-        IDocument doc = await client.GetDocumentAsync($"/CrimeType/Edit/{id}");
+        IDocument doc = await _client.GetDocumentAsync($"/CrimeType/Edit/{id}");
 
         // Assert
         IElement? form = doc.QuerySelector("form[action^='/CrimeType/Edit']");
@@ -161,32 +143,26 @@ public class CrimeTypeIntegrationTests
 
         IElement nameInput = form.QuerySelector("input[name=CrimeTypeName]")!;
         Assert.Equal("Corrupção", nameInput.GetAttribute("value"));
+
+        await DbUtilities.RemoveEntitiesAsync<CrimeType>(dbContext);
     }
 
     [Fact]
     public async Task Edit_Post_WhenModelIsValid_UpdatesAndRedirects()
     {
         // Arrange
-        var factory = new CustomWebApplicationFactory<Program>(Guid.NewGuid().ToString());
-        await using AsyncServiceScope scope = factory.Services.CreateAsyncScope();
-        AppDbContext db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        var crimeType = new CrimeType
-        {
-            CrimeTypeName = "Corrupção"
-        };
+        await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
+        AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        _ = db.Crime_types.Add(crimeType);
+        var id = dbContext.Crime_types.Add(new CrimeType { CrimeTypeName = "Corrupção" }).Entity.CrimeTypeId;
+        _ = await dbContext.SaveChangesAsync();
 
-        _ = await db.SaveChangesAsync();
 
-        var id = crimeType.CrimeTypeId.ToString()!;
-
-        using HttpClient client = factory.CreateClient();
-        IDocument editDoc = await client.GetDocumentAsync($"/CrimeType/Edit/{id}");
+        IDocument editDoc = await _client.GetDocumentAsync($"/CrimeType/Edit/{id}");
         IElement form = editDoc.QuerySelector("form[action^='/CrimeType/Edit']")!;
         var action = form.GetAttribute("action")!;
 
-        var fields = new Dictionary<string, string>
+        var fields = new Dictionary<string, string?>
         {
             ["CrimeTypeId"] = id.ToString(),
             ["CrimeTypeName"] = "Atualizado",
@@ -194,43 +170,34 @@ public class CrimeTypeIntegrationTests
 
         //Act
         var content = new FormUrlEncodedContent(fields);
-        HttpResponseMessage postResponse = await client.PostAsync(action, content);
+        HttpResponseMessage postResponse = await _client.PostAsync(action, content);
 
         //Assert
         Assert.Equal(HttpStatusCode.OK, postResponse.StatusCode);
 
-        IDocument listDoc = await client.GetDocumentAsync("/CrimeType/List");
-        IEnumerable<string> names = listDoc.QuerySelectorAll("table tbody td")
-                             .Select(td => td.TextContent.Trim());
+        IDocument listDoc = await _client.GetDocumentAsync("/CrimeType/List");
+        IEnumerable<string> names = listDoc.QuerySelectorAll("table tbody td").Select(td => td.TextContent.Trim());
         Assert.Contains("Atualizado", names);
+
+        await DbUtilities.RemoveEntitiesAsync<CrimeType>(dbContext);
     }
 
     [Fact]
     public async Task Edit_Post_WhenModelIsInvalid_DoesNotApplyChanges()
     {
         // Arrange
-        var factory = new CustomWebApplicationFactory<Program>(Guid.NewGuid().ToString());
-        await using AsyncServiceScope scope = factory.Services.CreateAsyncScope();
-        AppDbContext db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
+        AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        var crimeType = new CrimeType
-        {
-            CrimeTypeName = "Corrupção"
-        };
+        var id = dbContext.Crime_types.Add(new CrimeType { CrimeTypeName = "Corrupção" }).Entity.CrimeTypeId;
 
-        _ = db.Crime_types.Add(crimeType);
+        _ = await dbContext.SaveChangesAsync();
 
-        _ = await db.SaveChangesAsync();
-
-        var id = crimeType.CrimeTypeId.ToString()!;
-
-        using HttpClient client = factory.CreateClient();
-
-        IDocument editDoc = await client.GetDocumentAsync($"/CrimeType/Edit/{id}");
+        IDocument editDoc = await _client.GetDocumentAsync($"/CrimeType/Edit/{id}");
         IElement form = editDoc.QuerySelector("form[action^='/CrimeType/Edit']")!;
         var action = form.GetAttribute("action")!;
 
-        var fields = new Dictionary<string, string>
+        var fields = new Dictionary<string, string?>
         {
             ["CrimeTypeId"] = id.ToString(),
             ["CrimeTypeName"] = string.Empty
@@ -238,13 +205,13 @@ public class CrimeTypeIntegrationTests
 
         //Act
         var content = new FormUrlEncodedContent(fields);
-        HttpResponseMessage postResponse = await client.PostAsync(action, content);
+        HttpResponseMessage postResponse = await _client.PostAsync(action, content);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, postResponse.StatusCode);
 
         //Act
-        IDocument doc = await client.GetDocumentAsync("/CrimeType/List");
+        IDocument doc = await _client.GetDocumentAsync("/CrimeType/List");
 
         // Assert
         var cellTexts = doc
@@ -263,37 +230,28 @@ public class CrimeTypeIntegrationTests
             errDoc.DocumentElement.TextContent,
             StringComparison.OrdinalIgnoreCase
         );
+
+        await DbUtilities.RemoveEntitiesAsync<CrimeType>(dbContext);
     }
 
     [Fact]
     public async Task Delete_Successful_RemovesItemAndRedirects()
     {
         // Arrange
-        var factory = new CustomWebApplicationFactory<Program>(Guid.NewGuid().ToString());
-        await using AsyncServiceScope scope = factory.Services.CreateAsyncScope();
-        AppDbContext db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
+        AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        var crimeType = new CrimeType
-        {
-            CrimeTypeName = "Corrupção"
-        };
+        var id = dbContext.Crime_types.Add(new CrimeType { CrimeTypeName = "Corrupção" }).Entity.CrimeTypeId;
+        _ = await dbContext.SaveChangesAsync();
 
-        _ = db.Crime_types.Add(crimeType);
-
-        _ = await db.SaveChangesAsync();
-
-        var id = crimeType.CrimeTypeId.ToString()!;
-
-        using HttpClient client = factory.CreateClient();
-
-        IDocument listDoc = await client.GetDocumentAsync("/CrimeType/List");
+        IDocument listDoc = await _client.GetDocumentAsync("/CrimeType/List");
         IElement deleteForm = listDoc.QuerySelector("form[action='/CrimeType/Delete']")!;
         var token = deleteForm
             .QuerySelector("input[name=__RequestVerificationToken]")!
             .GetAttribute("value")!;
 
         // 2) POST the form with the correct Id & token
-        var fields = new Dictionary<string, string>
+        var fields = new Dictionary<string, string?>
         {
             ["CrimeTypeId"] = id.ToString(),
             ["__RequestVerificationToken"] = token
@@ -301,33 +259,34 @@ public class CrimeTypeIntegrationTests
 
         //Act
         var content = new FormUrlEncodedContent(fields);
-        HttpResponseMessage postResponse = await client.PostAsync("/CrimeType/Delete/1", content);
+        HttpResponseMessage postResponse = await _client.PostAsync("/CrimeType/Delete/1", content);
 
         // Assert 
         Assert.Equal(HttpStatusCode.OK, postResponse.StatusCode);
 
-        IDocument afterDoc = await client.GetDocumentAsync("/CrimeType/List");
+        IDocument afterDoc = await _client.GetDocumentAsync("/CrimeType/List");
         IEnumerable<string> names = afterDoc
             .QuerySelectorAll("table tbody td")
             .Select(td => td.TextContent.Trim());
         Assert.DoesNotContain("Corrupção", names);
+
+        await DbUtilities.RemoveEntitiesAsync<CrimeType>(dbContext);
+
     }
 
     [Fact]
     public async Task Delete_NonExistent_ItemRemainsAndRedirects()
     {
         // Arrange
-        var factory = new CustomWebApplicationFactory<Program>(Guid.NewGuid().ToString());
-        await using AsyncServiceScope scope = factory.Services.CreateAsyncScope();
-        AppDbContext db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        using HttpClient client = factory.CreateClient();
+        await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
+        AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        db.Crime_types.AddRange(
+        dbContext.Crime_types.AddRange(
            new CrimeType { CrimeTypeName = "Corrupção" }
        );
-        _ = await db.SaveChangesAsync();
+        _ = await dbContext.SaveChangesAsync();
 
-        IDocument listDoc = await client.GetDocumentAsync("/CrimeType/List");
+        IDocument listDoc = await _client.GetDocumentAsync("/CrimeType/List");
         IElement deleteForm = listDoc.QuerySelector("form[action='/CrimeType/Delete']")!;
         var action = deleteForm.GetAttribute("action")!;
         var token = deleteForm
@@ -342,16 +301,18 @@ public class CrimeTypeIntegrationTests
 
         //Act
         var content = new FormUrlEncodedContent(fields);
-        HttpResponseMessage postResponse = await client.PostAsync(action, content);
+        HttpResponseMessage postResponse = await _client.PostAsync(action, content);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, postResponse.StatusCode);
 
-        IDocument afterDoc = await client.GetDocumentAsync("/CrimeType/List");
+        IDocument afterDoc = await _client.GetDocumentAsync("/CrimeType/List");
         IEnumerable<string> names = afterDoc
             .QuerySelectorAll("table tbody td")
             .Select(td => td.TextContent.Trim());
         Assert.Contains("Corrupção", names);
+
+        await DbUtilities.RemoveEntitiesAsync<CrimeType>(dbContext);
     }
 
 }

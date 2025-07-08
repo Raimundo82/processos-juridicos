@@ -10,10 +10,8 @@ using Processos_Juridicos.Data;
 
 namespace Processos_Juridicos.Tests;
 
-public class CustomWebApplicationFactory<TProgram>(string databaseName) : WebApplicationFactory<TProgram> where TProgram : class
+public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProgram> where TProgram : class
 {
-    private readonly string _databaseName = databaseName;
-
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         _ = builder.ConfigureServices(services =>
@@ -21,7 +19,7 @@ public class CustomWebApplicationFactory<TProgram>(string databaseName) : WebApp
             _ = services.RemoveAll<DbContextOptions<AppDbContext>>();
             _ = services.RemoveAll<DbConnection>();
 
-            _ = services.AddDbContextFactory<AppDbContext>(options => options.UseInMemoryDatabase(_databaseName));
+            _ = services.AddDbContextFactory<AppDbContext>(options => options.UseInMemoryDatabase(Guid.NewGuid().ToString()));
 
             ServiceProvider sp = services.BuildServiceProvider();
             using IServiceScope scope = sp.CreateScope();
