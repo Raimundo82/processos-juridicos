@@ -21,18 +21,6 @@ public class SentenceController(ISentenceSvc sentenceSvc, IToastNotify toastNoti
     }
 
     [HttpGet]
-    public async Task<IActionResult> ListOne(int? id)
-    {
-        if (ModelState.IsValid)
-        {
-            SentenceDto sentence = await _sentenceSvc.GetSentenceById(id);
-            return View(sentence);
-        }
-
-        return RedirectToAction(nameof(List));
-    }
-
-    [HttpGet]
     public IActionResult Create()
     {
         return View();
