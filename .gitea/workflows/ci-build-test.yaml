@@ -21,13 +21,21 @@ jobs:
           ssh-key: ${{ secrets.SSH_KEY }}
           ssh-known-hosts: ${{ vars.SSH_KNOWN_HOSTS }}
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+
+      - name: Install dependencies
+        run: npm clean-install
+      
       - name: Setup .NET 8.0.x
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
 
-      - name: Install dependencies
-        run: dotnet restore
+      - name: Build (No incremental)
+        run: dotnet build --no-incremental
 
-      - name: Build
-        run: dotnet build --no-restore
+      - name: Test with dotnet CLI
+        run: dotnet test --no-build
