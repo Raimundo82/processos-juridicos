@@ -44,6 +44,12 @@ public class AccidentTypeSvc(AppDbContext context) : IAccidentTypeSvc
 
     public async Task<bool> DeleteAccidentType(int? id)
     {
+        List<Process> deps = await _context.Processes
+        .Where(p => p.ServiceAccidentId == id)
+        .ToListAsync();
+
+        deps.ForEach(p => p.ServiceAccidentId = null);
+
         AccidentType? accident = await _context.Accident_types.FindAsync(id);
         if (accident != null)
         {

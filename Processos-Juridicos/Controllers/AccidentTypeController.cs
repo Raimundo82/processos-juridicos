@@ -21,18 +21,6 @@ public class AccidentTypeController(IAccidentTypeSvc accidentType, IToastNotify 
     }
 
     [HttpGet]
-    public async Task<IActionResult> ListOne(int? id)
-    {
-        if (ModelState.IsValid)
-        {
-            AccidentTypeDto accident = await _accidentTypeSvc.GetAccidentTypeById(id);
-            return View(accident);
-        }
-
-        return RedirectToAction(nameof(List));
-    }
-
-    [HttpGet]
     public IActionResult Create()
     {
         return View();
@@ -86,11 +74,11 @@ public class AccidentTypeController(IAccidentTypeSvc accidentType, IToastNotify 
             var success = await _accidentTypeSvc.DeleteAccidentType(id);
             if (!success)
             {
-                _toastNotify.Error(string.Format(GlobalTextManager.GetString("DeleteFailureMessage"), "O", EntityName, "o"));
+                _toastNotify.Error(string.Format(GlobalTextManager.GetString("DeleteFailureMessage"), "o", EntityName));
             }
             else
             {
-                _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("DeleteSuccessMessage"), "o", EntityName));
+                _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("DeleteSuccessMessage"), "O", EntityName, "o"));
             }
         }
 
