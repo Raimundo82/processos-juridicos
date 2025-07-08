@@ -22,18 +22,6 @@ public class HarmedOrCasualtyController(IHarmedOrCasualtySvc casualtiesSvc, IToa
     }
 
     [HttpGet]
-    public async Task<IActionResult> ListOne(int? id)
-    {
-        if (ModelState.IsValid)
-        {
-            HarmedOrCasualtyDto casualty = await _harmedOrCasualtiesSvc.GetCasualtyById(id);
-            return View(casualty);
-        }
-
-        return RedirectToAction(nameof(List));
-    }
-
-    [HttpGet]
     public IActionResult Create()
     {
         return View();
