@@ -14,18 +14,18 @@ public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProg
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        _ = builder.ConfigureServices(services =>
+        builder.ConfigureServices(services =>
         {
-            _ = services.RemoveAll<DbContextOptions<AppDbContext>>();
-            _ = services.RemoveAll<DbConnection>();
+            services.RemoveAll<DbContextOptions<AppDbContext>>();
+            services.RemoveAll<DbConnection>();
 
-            _ = services.AddDbContextFactory<AppDbContext>(options => options.UseInMemoryDatabase(Guid.NewGuid().ToString()));
+            services.AddDbContextFactory<AppDbContext>(options => options.UseInMemoryDatabase(Guid.NewGuid().ToString()));
 
             ServiceProvider sp = services.BuildServiceProvider();
             using IServiceScope scope = sp.CreateScope();
             IDbContextFactory<AppDbContext> dbFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<AppDbContext>>();
             using AppDbContext db = dbFactory.CreateDbContext();
-            _ = db.Database.EnsureCreated();
+            db.Database.EnsureCreated();
         });
     }
 }

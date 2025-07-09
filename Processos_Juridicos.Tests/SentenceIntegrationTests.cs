@@ -3,6 +3,7 @@ using System.Net;
 using AngleSharp;
 using AngleSharp.Dom;
 
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 using Processos_Juridicos.Data;
@@ -26,9 +27,7 @@ public class SentenceIntegrationTests(CustomWebApplicationFactory<Program> facto
             new Sentence { SentenceName = "Multa" },
             new Sentence { SentenceName = "Suspensão" }
         );
-        _ = await dbContext.SaveChangesAsync();
-
-
+        await dbContext.SaveChangesAsync();
 
         //Act
         IDocument doc = await _client.GetDocumentAsync("/Sentence/List");
@@ -41,6 +40,7 @@ public class SentenceIntegrationTests(CustomWebApplicationFactory<Program> facto
 
         Assert.Contains("Multa", cellTexts);
         Assert.Contains("Suspensão", cellTexts);
+        Assert.Equal(2, (await dbContext.Sentences.ToListAsync()).Count);
         await DbUtilities.RemoveEntitiesAsync<Sentence>(dbContext);
     }
 
@@ -48,6 +48,10 @@ public class SentenceIntegrationTests(CustomWebApplicationFactory<Program> facto
     public async Task List_EmptyDatabase_ReturnsEmptyList()
     {
         // Arrange
+        await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
+        AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        Assert.Empty(await dbContext.Sentences.ToListAsync());
+
         // Act
         IDocument doc = await _client.GetDocumentAsync("/Sentence/List");
 
@@ -57,6 +61,8 @@ public class SentenceIntegrationTests(CustomWebApplicationFactory<Program> facto
 
         IHtmlCollection<IElement> cells = doc.QuerySelectorAll("table tbody td");
         Assert.Empty(cells);
+
+        Assert.Empty(await dbContext.Sentences.ToListAsync());
     }
 
     [Fact]
@@ -80,6 +86,7 @@ public class SentenceIntegrationTests(CustomWebApplicationFactory<Program> facto
         IDocument listDoc = await _client.GetDocumentAsync("/Sentence/List");
         IEnumerable<string> names = listDoc.QuerySelectorAll("table tbody td").Select(td => td.TextContent.Trim());
         Assert.Contains("Multa", names);
+        Assert.Single(await dbContext.Sentences.ToListAsync());
 
         await DbUtilities.RemoveEntitiesAsync<Sentence>(dbContext);
     }
@@ -88,6 +95,8 @@ public class SentenceIntegrationTests(CustomWebApplicationFactory<Program> facto
     public async Task Create_Post_InvalidModel_ReturnsEmptyList()
     {
         // Arrange
+        await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
+        AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
         IDocument getDoc = await _client.GetDocumentAsync("/Sentence/Create");
         IElement form = getDoc.QuerySelector("form[action='/Sentence/Create']")!;
@@ -115,7 +124,6 @@ public class SentenceIntegrationTests(CustomWebApplicationFactory<Program> facto
         IHtmlCollection<IElement> cells = listDoc.QuerySelectorAll("table tbody td");
         Assert.Empty(cells);
 
-
         var html = await postResponse.Content.ReadAsStringAsync();
         IDocument errDoc = await BrowsingContext
                         .New(Configuration.Default)
@@ -125,6 +133,9 @@ public class SentenceIntegrationTests(CustomWebApplicationFactory<Program> facto
             errDoc.DocumentElement.TextContent,
             StringComparison.OrdinalIgnoreCase
         );
+
+        Assert.Empty(await dbContext.Sentences.ToListAsync());
+        await DbUtilities.RemoveEntitiesAsync<HarmedOrCasualty>(dbContext);
     }
 
     [Fact]
@@ -139,9 +150,9 @@ public class SentenceIntegrationTests(CustomWebApplicationFactory<Program> facto
             SentenceName = "Multa"
         };
 
-        _ = dbContext.Sentences.Add(Sentence);
+        dbContext.Sentences.Add(Sentence);
 
-        _ = await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync();
 
         var id = Sentence.SentenceId;
 
@@ -158,6 +169,8 @@ public class SentenceIntegrationTests(CustomWebApplicationFactory<Program> facto
         IElement nameInput = form.QuerySelector("input[name=SentenceName]")!;
         Assert.Equal("Multa", nameInput.GetAttribute("value"));
 
+        Assert.Single(await dbContext.Sentences.ToListAsync());
+
         await DbUtilities.RemoveEntitiesAsync<Sentence>(dbContext);
     }
 
@@ -165,7 +178,6 @@ public class SentenceIntegrationTests(CustomWebApplicationFactory<Program> facto
     public async Task Edit_Post_WhenModelIsValid_UpdatesAndRedirects()
     {
         // Arrange
-
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         var Sentence = new Sentence
@@ -173,12 +185,11 @@ public class SentenceIntegrationTests(CustomWebApplicationFactory<Program> facto
             SentenceName = "Multa"
         };
 
-        _ = dbContext.Sentences.Add(Sentence);
+        dbContext.Sentences.Add(Sentence);
 
-        _ = await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync();
 
         var id = Sentence.SentenceId.ToString()!;
-
 
         IDocument editDoc = await _client.GetDocumentAsync($"/Sentence/Edit/{id}");
         IElement form = editDoc.QuerySelector("form[action^='/Sentence/Edit']")!;
@@ -200,7 +211,7 @@ public class SentenceIntegrationTests(CustomWebApplicationFactory<Program> facto
         IDocument listDoc = await _client.GetDocumentAsync("/Sentence/List");
         IEnumerable<string> names = listDoc.QuerySelectorAll("table tbody td").Select(td => td.TextContent.Trim());
         Assert.Contains("Atualizado", names);
-
+        Assert.Single(await dbContext.Sentences.ToListAsync());
         await DbUtilities.RemoveEntitiesAsync<Sentence>(dbContext);
     }
 
@@ -208,7 +219,6 @@ public class SentenceIntegrationTests(CustomWebApplicationFactory<Program> facto
     public async Task Edit_Post_WhenModelIsInvalid_DoesNotApplyChanges()
     {
         // Arrange
-
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
@@ -217,9 +227,9 @@ public class SentenceIntegrationTests(CustomWebApplicationFactory<Program> facto
             SentenceName = "Multa"
         };
 
-        _ = dbContext.Sentences.Add(Sentence);
+        dbContext.Sentences.Add(Sentence);
 
-        _ = await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync();
 
         var id = Sentence.SentenceId.ToString()!;
 
@@ -250,6 +260,7 @@ public class SentenceIntegrationTests(CustomWebApplicationFactory<Program> facto
             .ToList();
 
         Assert.Contains("Multa", cellTexts);
+        Assert.Single(await dbContext.Sentences.ToListAsync());
 
         var html = await postResponse.Content.ReadAsStringAsync();
         IDocument errDoc = await BrowsingContext
@@ -260,6 +271,7 @@ public class SentenceIntegrationTests(CustomWebApplicationFactory<Program> facto
             errDoc.DocumentElement.TextContent,
             StringComparison.OrdinalIgnoreCase
         );
+
         await DbUtilities.RemoveEntitiesAsync<Sentence>(dbContext);
     }
 
@@ -267,22 +279,11 @@ public class SentenceIntegrationTests(CustomWebApplicationFactory<Program> facto
     public async Task Delete_Successful_RemovesItemAndRedirects()
     {
         // Arrange
-
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        var Sentence = new Sentence
-        {
-            SentenceName = "Multa"
-        };
-
-        _ = dbContext.Sentences.Add(Sentence);
-
-        _ = await dbContext.SaveChangesAsync();
-
-        var id = Sentence.SentenceId.ToString()!;
-
-
+        var id = dbContext.Sentences.Add(new Sentence { SentenceName = "Multa" }).Entity.SentenceId;
+        await dbContext.SaveChangesAsync();
 
         IDocument listDoc = await _client.GetDocumentAsync("/Sentence/List");
         IElement deleteForm = listDoc.QuerySelector("form[action='/Sentence/Delete']")!;
@@ -291,7 +292,7 @@ public class SentenceIntegrationTests(CustomWebApplicationFactory<Program> facto
             .GetAttribute("value")!;
 
         // 2) POST the form with the correct Id & token
-        var fields = new Dictionary<string, string>
+        var fields = new Dictionary<string, string?>
         {
             ["SentenceId"] = id.ToString(),
             ["__RequestVerificationToken"] = token
@@ -309,6 +310,7 @@ public class SentenceIntegrationTests(CustomWebApplicationFactory<Program> facto
             .QuerySelectorAll("table tbody td")
             .Select(td => td.TextContent.Trim());
         Assert.DoesNotContain("Multa", names);
+        Assert.Empty(await dbContext.Sentences.ToListAsync());
         await DbUtilities.RemoveEntitiesAsync<Sentence>(dbContext);
     }
 
@@ -319,11 +321,10 @@ public class SentenceIntegrationTests(CustomWebApplicationFactory<Program> facto
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-
         dbContext.Sentences.AddRange(
            new Sentence { SentenceName = "Multa" }
        );
-        _ = await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync();
 
         IDocument listDoc = await _client.GetDocumentAsync("/Sentence/List");
         IElement deleteForm = listDoc.QuerySelector("form[action='/Sentence/Delete']")!;
@@ -350,6 +351,7 @@ public class SentenceIntegrationTests(CustomWebApplicationFactory<Program> facto
             .QuerySelectorAll("table tbody td")
             .Select(td => td.TextContent.Trim());
         Assert.Contains("Multa", names);
+        Assert.Single(await dbContext.Sentences.ToListAsync());
         await DbUtilities.RemoveEntitiesAsync<Sentence>(dbContext);
     }
 

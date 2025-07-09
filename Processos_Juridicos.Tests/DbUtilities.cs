@@ -9,7 +9,8 @@ public static class DbUtilities
     {
         List<TEntity> entities = await dbContext.Set<TEntity>().ToListAsync();
         dbContext.RemoveRange(entities);
-        _ = await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync();
         dbContext.ChangeTracker.Clear();
+        Assert.Empty(await dbContext.Set<TEntity>().ToListAsync());
     }
 }

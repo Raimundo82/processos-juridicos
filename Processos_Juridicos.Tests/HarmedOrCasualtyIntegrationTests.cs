@@ -3,6 +3,7 @@ using System.Net;
 using AngleSharp;
 using AngleSharp.Dom;
 
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 using Processos_Juridicos.Data;
@@ -27,7 +28,7 @@ public class HarmedOrCasualtyIntegrationTests(CustomWebApplicationFactory<Progra
             new HarmedOrCasualty { CasualtyName = "Ferido" },
             new HarmedOrCasualty { CasualtyName = "Outros" }
         );
-        _ = await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync();
 
 
         //Act
@@ -41,6 +42,7 @@ public class HarmedOrCasualtyIntegrationTests(CustomWebApplicationFactory<Progra
 
         Assert.Contains("Ferido", cellTexts);
         Assert.Contains("Outros", cellTexts);
+        Assert.Equal(2, (await dbContext.Harmed_or_casualties.ToListAsync()).Count);
 
         await DbUtilities.RemoveEntitiesAsync<HarmedOrCasualty>(dbContext);
     }
@@ -49,6 +51,9 @@ public class HarmedOrCasualtyIntegrationTests(CustomWebApplicationFactory<Progra
     public async Task List_EmptyDatabase_ReturnsEmptyList()
     {
         // Arrange
+        await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
+        AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        Assert.Empty(await dbContext.Harmed_or_casualties.ToListAsync());
 
         // Act
         IDocument doc = await _client.GetDocumentAsync("/HarmedOrCasualty/List");
@@ -59,6 +64,8 @@ public class HarmedOrCasualtyIntegrationTests(CustomWebApplicationFactory<Progra
 
         IHtmlCollection<IElement> cells = doc.QuerySelectorAll("table tbody td");
         Assert.Empty(cells);
+
+        Assert.Empty(await dbContext.Harmed_or_casualties.ToListAsync());
     }
 
     [Fact]
@@ -83,8 +90,11 @@ public class HarmedOrCasualtyIntegrationTests(CustomWebApplicationFactory<Progra
         IEnumerable<string> names = listDoc.QuerySelectorAll("table tbody td")
                              .Select(td => td.TextContent.Trim());
         Assert.Contains("Ferido", names);
+        Assert.Single(await dbContext.Harmed_or_casualties.ToListAsync());
+
         await DbUtilities.RemoveEntitiesAsync<HarmedOrCasualty>(dbContext);
     }
+
     [Fact]
     public async Task Create_Post_InvalidModel_ReturnsEmptyList()
     {
@@ -128,6 +138,7 @@ public class HarmedOrCasualtyIntegrationTests(CustomWebApplicationFactory<Progra
             errDoc.DocumentElement.TextContent,
             StringComparison.OrdinalIgnoreCase
         );
+        Assert.Empty(await dbContext.Harmed_or_casualties.ToListAsync());
         await DbUtilities.RemoveEntitiesAsync<HarmedOrCasualty>(dbContext);
     }
 
@@ -143,9 +154,9 @@ public class HarmedOrCasualtyIntegrationTests(CustomWebApplicationFactory<Progra
             CasualtyName = "Ferido"
         };
 
-        _ = dbContext.Harmed_or_casualties.Add(HarmedOrCasualty);
+        dbContext.Harmed_or_casualties.Add(HarmedOrCasualty);
 
-        _ = await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync();
 
         var id = HarmedOrCasualty.CasualtyId;
 
@@ -164,6 +175,7 @@ public class HarmedOrCasualtyIntegrationTests(CustomWebApplicationFactory<Progra
         Assert.Equal("Ferido", nameInput.GetAttribute("value"));
 
         await DbUtilities.RemoveEntitiesAsync<HarmedOrCasualty>(dbContext);
+        Assert.Empty(await dbContext.Harmed_or_casualties.ToListAsync());
     }
 
     [Fact]
@@ -177,9 +189,9 @@ public class HarmedOrCasualtyIntegrationTests(CustomWebApplicationFactory<Progra
             CasualtyName = "Ferido"
         };
 
-        _ = dbContext.Harmed_or_casualties.Add(HarmedOrCasualty);
+        dbContext.Harmed_or_casualties.Add(HarmedOrCasualty);
 
-        _ = await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync();
 
         var id = HarmedOrCasualty.CasualtyId.ToString()!;
 
@@ -204,7 +216,7 @@ public class HarmedOrCasualtyIntegrationTests(CustomWebApplicationFactory<Progra
         IEnumerable<string> names = listDoc.QuerySelectorAll("table tbody td")
                              .Select(td => td.TextContent.Trim());
         Assert.Contains("Atualizado", names);
-
+        Assert.Single(await dbContext.Harmed_or_casualties.ToListAsync());
         await DbUtilities.RemoveEntitiesAsync<HarmedOrCasualty>(dbContext);
     }
 
@@ -220,9 +232,9 @@ public class HarmedOrCasualtyIntegrationTests(CustomWebApplicationFactory<Progra
             CasualtyName = "Ferido"
         };
 
-        _ = dbContext.Harmed_or_casualties.Add(HarmedOrCasualty);
+        dbContext.Harmed_or_casualties.Add(HarmedOrCasualty);
 
-        _ = await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync();
 
         var id = HarmedOrCasualty.CasualtyId.ToString()!;
 
@@ -254,6 +266,7 @@ public class HarmedOrCasualtyIntegrationTests(CustomWebApplicationFactory<Progra
             .ToList();
 
         Assert.Contains("Ferido", cellTexts);
+        Assert.Single(await dbContext.Harmed_or_casualties.ToListAsync());
 
         var html = await postResponse.Content.ReadAsStringAsync();
         IDocument errDoc = await BrowsingContext
@@ -280,9 +293,9 @@ public class HarmedOrCasualtyIntegrationTests(CustomWebApplicationFactory<Progra
             CasualtyName = "Ferido"
         };
 
-        _ = dbContext.Harmed_or_casualties.Add(HarmedOrCasualty);
+        dbContext.Harmed_or_casualties.Add(HarmedOrCasualty);
 
-        _ = await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync();
 
         var id = HarmedOrCasualty.CasualtyId.ToString()!;
 
@@ -312,7 +325,7 @@ public class HarmedOrCasualtyIntegrationTests(CustomWebApplicationFactory<Progra
             .QuerySelectorAll("table tbody td")
             .Select(td => td.TextContent.Trim());
         Assert.DoesNotContain("Ferido", names);
-
+        Assert.Empty(await dbContext.Harmed_or_casualties.ToListAsync());
         await DbUtilities.RemoveEntitiesAsync<HarmedOrCasualty>(dbContext);
     }
 
@@ -326,7 +339,7 @@ public class HarmedOrCasualtyIntegrationTests(CustomWebApplicationFactory<Progra
         dbContext.Harmed_or_casualties.AddRange(
            new HarmedOrCasualty { CasualtyName = "Ferido" }
        );
-        _ = await dbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync();
 
         IDocument listDoc = await _client.GetDocumentAsync("/HarmedOrCasualty/List");
         IElement deleteForm = listDoc.QuerySelector("form[action='/HarmedOrCasualty/Delete']")!;
@@ -353,7 +366,7 @@ public class HarmedOrCasualtyIntegrationTests(CustomWebApplicationFactory<Progra
             .QuerySelectorAll("table tbody td")
             .Select(td => td.TextContent.Trim());
         Assert.Contains("Ferido", names);
-
+        Assert.Single(await dbContext.Harmed_or_casualties.ToListAsync());
         await DbUtilities.RemoveEntitiesAsync<HarmedOrCasualty>(dbContext);
     }
 
