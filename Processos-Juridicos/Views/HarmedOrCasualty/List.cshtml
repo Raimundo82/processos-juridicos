@@ -14,7 +14,7 @@
 <a asp-controller="HarmedOrCasualty" asp-action="Create" class="btn btn-primary">Inserir categoria de Morto/Ferido</a>
 
 <div>
-    <table id="tableStates" class="table table-striped-columns table-hover">
+    <table id="tableHarmedOrCasualty" class="table table-striped-columns table-hover">
         <thead>
             <tr>
                 <th scope="col">@count</th>
@@ -27,17 +27,16 @@
 
             @foreach (var item in Model.ToList())
             {
-                <tr>
-                    <th scope="row">@count</th>
-                    <td>@Html.DisplayFor(m => item.CasualtyId)</td>
-                    <td>@Html.DisplayFor(m => item.CasualtyName)</td>
+                <tr data-id="@item.CasualtyId">
+                    <th scope="col">@count</th>
+                    <td data-property="name" =>@Html.DisplayFor(m => item.CasualtyName)</td>
                     <td>
                         <div class="d-flex gap-2">
-                            <form asp-controller="HarmedOrCasualty" asp-action="Delete" method="post">
+                            <form asp-controller="HarmedOrCasualty" asp-action="Delete" method="post" data-action="delete">
                                 <input type="hidden" name="id" value="@item.CasualtyId">
                                 <button type="submit" class="btn btn-danger js-delete-btn"></button>
                             </form>
-                            <a asp-controller="HarmedOrCasualty" asp-action="Edit" asp-route-id="@item.CasualtyId"
+                            <a asp-controller="HarmedOrCasualty" data-action="access-edit-form" asp-action="Edit" asp-route-id="@item.CasualtyId"
                                class="btn btn-warning"><i class="bi bi-pencil"></i></a>
                         </div>
                     </td>
@@ -50,6 +49,6 @@
 
 @section Scripts {
     <script>
-        let table = createDataTable("#tableStates");
+        let table = createDataTable("#tableHarmedOrCasualty");
     </script>
 } 

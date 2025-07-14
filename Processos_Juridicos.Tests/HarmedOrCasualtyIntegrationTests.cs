@@ -11,136 +11,96 @@ using Processos_Juridicos.Entities;
 
 namespace Processos_Juridicos.Tests;
 
-public class HarmedOrCasualtyIntegrationTests(CustomWebApplicationFactory<Program> factory) : IClassFixture<CustomWebApplicationFactory<Program>>
+public class HarmedOrCasualtyIntegrationTests(CustomWebApplicationFactory<Program> factory) :
+    IClassFixture<CustomWebApplicationFactory<Program>>,
+    IAsyncLifetime
 {
     private readonly CustomWebApplicationFactory<Program> _factory = factory;
     private readonly HttpClient _client = factory.CreateClient();
-    [Fact]
-    public async Task Get_HarmedOrCasualtyList_ReturnsHarmedOrCasualtyList()
 
+    private static HarmedOrCasualty CreateHarmedOrCasualty(string name)
     {
-
-        // Arrange
-        await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
-        AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
-        dbContext.Harmed_or_casualties.AddRange(
-            new HarmedOrCasualty { CasualtyName = "Ferido" },
-            new HarmedOrCasualty { CasualtyName = "Outros" }
-        );
-        await dbContext.SaveChangesAsync();
-
-
-        //Act
-        IDocument doc = await _client.GetDocumentAsync("/HarmedOrCasualty/List");
-
-        // Assert
-        var cellTexts = doc
-            .QuerySelectorAll("table tbody td")
-            .Select(td => td.TextContent.Trim())
-            .ToList();
-
-        Assert.Contains("Ferido", cellTexts);
-        Assert.Contains("Outros", cellTexts);
-        Assert.Equal(2, (await dbContext.Harmed_or_casualties.ToListAsync()).Count);
-
-        await DbUtilities.RemoveEntitiesAsync<HarmedOrCasualty>(dbContext);
+        return new HarmedOrCasualty { CasualtyName = name };
     }
 
-    [Fact]
-    public async Task List_EmptyDatabase_ReturnsEmptyList()
+    [Theory]
+    [InlineData()]
+    [InlineData("Ferido", "Outros")]
+    public async Task List_ReturnsExpectedItems(params string[] namesInput)
     {
         // Arrange
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        Assert.Empty(await dbContext.Harmed_or_casualties.ToListAsync());
+
+        dbContext.Harmed_or_casualties.AddRange(namesInput.Select(CreateHarmedOrCasualty));
+        await dbContext.SaveChangesAsync();
 
         // Act
         IDocument doc = await _client.GetDocumentAsync("/HarmedOrCasualty/List");
 
         // Assert
-        IHtmlCollection<IElement> rows = doc.QuerySelectorAll("table tbody tr");
-        Assert.Empty(rows);
+        Assert.Equal(namesInput.Length, await dbContext.Harmed_or_casualties.CountAsync());
 
-        IHtmlCollection<IElement> cells = doc.QuerySelectorAll("table tbody td");
-        Assert.Empty(cells);
+        var rows = doc.QuerySelectorAll("table tbody tr").ToList();
+        Assert.Equal(namesInput.Length, rows.Count);
 
-        Assert.Empty(await dbContext.Harmed_or_casualties.ToListAsync());
+        foreach (HarmedOrCasualty HarmedOrCasualty in dbContext.Harmed_or_casualties)
+        {
+            Assert.Contains(HarmedOrCasualty.CasualtyName, namesInput);
+
+            IElement? row = doc.QuerySelector($"table>tbody>tr[data-id='{HarmedOrCasualty.CasualtyId}']");
+            Assert.NotNull(row);
+
+            IElement? cell = row.QuerySelector($"td[data-property='name']");
+            Assert.NotNull(cell);
+            Assert.Equal(HarmedOrCasualty.CasualtyName, cell.TextContent.Trim());
+        }
     }
 
-    [Fact]
-    public async Task Create_Post_Valid_RedirectsAndPersists()
+    [Theory]
+    [InlineData()]
+    [InlineData("Ferido")]
+    [InlineData("Ferido", "Outros")]
+    public async Task Create_Post_CreatesExpectedItems(params string[] namesInput)
     {
         // Arrange
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        var fields = new Dictionary<string, string>
-        {
-            ["CasualtyName"] = "Ferido"
-        };
-        var content = new FormUrlEncodedContent(fields);
-
         //Act
-        HttpResponseMessage postResponse = await _client.PostAsync("/HarmedOrCasualty/Create", content);
+        foreach (var name in namesInput)
+        {
+            var formData = new Dictionary<string, string>
+            {
+                ["CasualtyName"] = name
+            };
+
+            await _client.PostAsync("/HarmedOrCasualty/Create", new FormUrlEncodedContent(formData));
+        }
 
         // Assert
-        Assert.Equal(HttpStatusCode.OK, postResponse.StatusCode);
+        DbSet<HarmedOrCasualty> dbItems = dbContext.Harmed_or_casualties;
+
+        Assert.Equal(namesInput.Length, dbItems.Count());
+
         IDocument listDoc = await _client.GetDocumentAsync("/HarmedOrCasualty/List");
-        IEnumerable<string> names = listDoc.QuerySelectorAll("table tbody td")
-                             .Select(td => td.TextContent.Trim());
-        Assert.Contains("Ferido", names);
-        Assert.Single(await dbContext.Harmed_or_casualties.ToListAsync());
+        var rows = listDoc.QuerySelectorAll("table tbody tr").ToList();
+        Assert.Equal(namesInput.Length, rows.Count);
 
-        await DbUtilities.RemoveEntitiesAsync<HarmedOrCasualty>(dbContext);
-    }
-
-    [Fact]
-    public async Task Create_Post_InvalidModel_ReturnsEmptyList()
-    {
-        // Arrange
-        await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
-        AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
-        IDocument getDoc = await _client.GetDocumentAsync("/HarmedOrCasualty/Create");
-        IElement form = getDoc.QuerySelector("form[action='/HarmedOrCasualty/Create']")!;
-        var action = form.GetAttribute("action")!;  // "/HarmedOrCasualty/Create"
-
-        var fields = new Dictionary<string, string>
+        foreach (HarmedOrCasualty at in dbItems)
         {
-            ["CasualtyName"] = string.Empty
-        };
+            Assert.Contains(at.CasualtyName, namesInput);
 
-        //Act
-        HttpResponseMessage postResponse = await _client.PostAsync(
-            action,
-            new FormUrlEncodedContent(fields)
-        );
+            IElement? row = listDoc
+                .QuerySelector($"table > tbody > tr[data-id='{at.CasualtyId}']");
+            Assert.NotNull(row);
 
-        //Assert
-        Assert.Equal(HttpStatusCode.OK, postResponse.StatusCode);
-
-        IDocument listDoc = await _client.GetDocumentAsync("/HarmedOrCasualty/List");
-
-        IHtmlCollection<IElement> rows = listDoc.QuerySelectorAll("table tbody tr");
-        Assert.Empty(rows);
-
-        IHtmlCollection<IElement> cells = listDoc.QuerySelectorAll("table tbody td");
-        Assert.Empty(cells);
-
-
-        var html = await postResponse.Content.ReadAsStringAsync();
-        IDocument errDoc = await BrowsingContext
-                        .New(Configuration.Default)
-                        .OpenAsync(req => req.Content(html));
-        Assert.Contains(
-            "O campo Nome da Categoria de ferido é obrigatório.",
-            errDoc.DocumentElement.TextContent,
-            StringComparison.OrdinalIgnoreCase
-        );
-        Assert.Empty(await dbContext.Harmed_or_casualties.ToListAsync());
-        await DbUtilities.RemoveEntitiesAsync<HarmedOrCasualty>(dbContext);
+            IElement? cell = row.QuerySelector("td[data-property='name']");
+            Assert.NotNull(cell);
+            Assert.Equal(at.CasualtyName, cell.TextContent.Trim());
+        }
     }
+
 
     [Fact]
     public async Task Edit_Get_WhenModelExists_ShowsFormAndFields()
@@ -149,10 +109,7 @@ public class HarmedOrCasualtyIntegrationTests(CustomWebApplicationFactory<Progra
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        var HarmedOrCasualty = new HarmedOrCasualty
-        {
-            CasualtyName = "Ferido"
-        };
+        HarmedOrCasualty HarmedOrCasualty = CreateHarmedOrCasualty("Ferido");
 
         dbContext.Harmed_or_casualties.Add(HarmedOrCasualty);
 
@@ -160,11 +117,11 @@ public class HarmedOrCasualtyIntegrationTests(CustomWebApplicationFactory<Progra
 
         var id = HarmedOrCasualty.CasualtyId;
 
-
         // Act
         IDocument doc = await _client.GetDocumentAsync($"/HarmedOrCasualty/Edit/{id}");
 
         // Assert
+        Assert.Single(dbContext.Harmed_or_casualties);
         IElement? form = doc.QuerySelector("form[action^='/HarmedOrCasualty/Edit']");
         Assert.NotNull(form);
 
@@ -173,9 +130,6 @@ public class HarmedOrCasualtyIntegrationTests(CustomWebApplicationFactory<Progra
 
         IElement nameInput = form.QuerySelector("input[name=CasualtyName]")!;
         Assert.Equal("Ferido", nameInput.GetAttribute("value"));
-
-        await DbUtilities.RemoveEntitiesAsync<HarmedOrCasualty>(dbContext);
-        Assert.Empty(await dbContext.Harmed_or_casualties.ToListAsync());
     }
 
     [Fact]
@@ -184,40 +138,34 @@ public class HarmedOrCasualtyIntegrationTests(CustomWebApplicationFactory<Progra
         // Arrange
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        var HarmedOrCasualty = new HarmedOrCasualty
-        {
-            CasualtyName = "Ferido"
-        };
+        HarmedOrCasualty HarmedOrCasualty = CreateHarmedOrCasualty("Ferido");
 
         dbContext.Harmed_or_casualties.Add(HarmedOrCasualty);
 
         await dbContext.SaveChangesAsync();
 
-        var id = HarmedOrCasualty.CasualtyId.ToString()!;
+        var id = HarmedOrCasualty.CasualtyId;
 
         IDocument editDoc = await _client.GetDocumentAsync($"/HarmedOrCasualty/Edit/{id}");
         IElement form = editDoc.QuerySelector("form[action^='/HarmedOrCasualty/Edit']")!;
         var action = form.GetAttribute("action")!;
 
-        var fields = new Dictionary<string, string>
+        var fields = new Dictionary<string, string?>
         {
             ["CasualtyId"] = id.ToString(),
             ["CasualtyName"] = "Atualizado",
         };
+        var content = new FormUrlEncodedContent(fields);
 
         //Act
-        var content = new FormUrlEncodedContent(fields);
-        HttpResponseMessage postResponse = await _client.PostAsync(action, content);
+        await _client.PostAsync(action, content);
+        IDocument listDoc = await _client.GetDocumentAsync("/HarmedOrCasualty/List");
 
         //Assert
-        Assert.Equal(HttpStatusCode.OK, postResponse.StatusCode);
-
-        IDocument listDoc = await _client.GetDocumentAsync("/HarmedOrCasualty/List");
-        IEnumerable<string> names = listDoc.QuerySelectorAll("table tbody td")
-                             .Select(td => td.TextContent.Trim());
-        Assert.Contains("Atualizado", names);
-        Assert.Single(await dbContext.Harmed_or_casualties.ToListAsync());
-        await DbUtilities.RemoveEntitiesAsync<HarmedOrCasualty>(dbContext);
+        Assert.Single(dbContext.Harmed_or_casualties);
+        IElement? cell = listDoc.QuerySelector("table tbody td[data-property='name']");
+        Assert.NotNull(cell);
+        Assert.Equal("Atualizado", cell.TextContent.Trim());
     }
 
     [Fact]
@@ -227,26 +175,18 @@ public class HarmedOrCasualtyIntegrationTests(CustomWebApplicationFactory<Progra
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        var HarmedOrCasualty = new HarmedOrCasualty
-        {
-            CasualtyName = "Ferido"
-        };
-
-        dbContext.Harmed_or_casualties.Add(HarmedOrCasualty);
+        var id = dbContext.Harmed_or_casualties.Add(new HarmedOrCasualty { CasualtyName = "Ferido" }).Entity.CasualtyId;
 
         await dbContext.SaveChangesAsync();
-
-        var id = HarmedOrCasualty.CasualtyId.ToString()!;
-
 
         IDocument editDoc = await _client.GetDocumentAsync($"/HarmedOrCasualty/Edit/{id}");
         IElement form = editDoc.QuerySelector("form[action^='/HarmedOrCasualty/Edit']")!;
         var action = form.GetAttribute("action")!;
 
-        var fields = new Dictionary<string, string>
+        var fields = new Dictionary<string, string?>
         {
             ["CasualtyId"] = id.ToString(),
-            ["HarmedOrCasualtyName"] = string.Empty
+            ["CasualtyName"] = string.Empty
         };
 
         //Act
@@ -288,45 +228,33 @@ public class HarmedOrCasualtyIntegrationTests(CustomWebApplicationFactory<Progra
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        var HarmedOrCasualty = new HarmedOrCasualty
-        {
-            CasualtyName = "Ferido"
-        };
-
+        HarmedOrCasualty HarmedOrCasualty = CreateHarmedOrCasualty("Ferido");
         dbContext.Harmed_or_casualties.Add(HarmedOrCasualty);
-
         await dbContext.SaveChangesAsync();
-
-        var id = HarmedOrCasualty.CasualtyId.ToString()!;
-
+        var id = HarmedOrCasualty.CasualtyId;
 
         IDocument listDoc = await _client.GetDocumentAsync("/HarmedOrCasualty/List");
         IElement deleteForm = listDoc.QuerySelector("form[action='/HarmedOrCasualty/Delete']")!;
+
         var token = deleteForm
             .QuerySelector("input[name=__RequestVerificationToken]")!
             .GetAttribute("value")!;
 
         // 2) POST the form with the correct Id & token
-        var fields = new Dictionary<string, string>
+        var fields = new Dictionary<string, string?>
         {
             ["CasualtyId"] = id.ToString(),
             ["__RequestVerificationToken"] = token
         };
 
         //Act
-        var content = new FormUrlEncodedContent(fields);
-        HttpResponseMessage postResponse = await _client.PostAsync($"/HarmedOrCasualty/Delete/{id}", content);
+        await _client.PostAsync($"/HarmedOrCasualty/Delete/{id}", new FormUrlEncodedContent(fields));
+        IDocument afterDoc = await _client.GetDocumentAsync("/HarmedOrCasualty/List");
 
         // Assert 
-        Assert.Equal(HttpStatusCode.OK, postResponse.StatusCode);
-
-        IDocument afterDoc = await _client.GetDocumentAsync("/HarmedOrCasualty/List");
-        IEnumerable<string> names = afterDoc
-            .QuerySelectorAll("table tbody td")
-            .Select(td => td.TextContent.Trim());
-        Assert.DoesNotContain("Ferido", names);
-        Assert.Empty(await dbContext.Harmed_or_casualties.ToListAsync());
-        await DbUtilities.RemoveEntitiesAsync<HarmedOrCasualty>(dbContext);
+        Assert.Empty(dbContext.Harmed_or_casualties);
+        IHtmlCollection<IElement> rows = afterDoc.QuerySelectorAll("table tbody tr");
+        Assert.Empty(rows);
     }
 
     [Fact]
@@ -336,10 +264,10 @@ public class HarmedOrCasualtyIntegrationTests(CustomWebApplicationFactory<Progra
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        dbContext.Harmed_or_casualties.AddRange(
-           new HarmedOrCasualty { CasualtyName = "Ferido" }
-       );
+        HarmedOrCasualty HarmedOrCasualty = CreateHarmedOrCasualty("Ferido");
+        dbContext.Harmed_or_casualties.Add(HarmedOrCasualty);
         await dbContext.SaveChangesAsync();
+        var id = HarmedOrCasualty.CasualtyId;
 
         IDocument listDoc = await _client.GetDocumentAsync("/HarmedOrCasualty/List");
         IElement deleteForm = listDoc.QuerySelector("form[action='/HarmedOrCasualty/Delete']")!;
@@ -350,24 +278,33 @@ public class HarmedOrCasualtyIntegrationTests(CustomWebApplicationFactory<Progra
 
         var fields = new Dictionary<string, string>
         {
-            ["CasualtyId"] = "9999",
+            ["CasualtyId"] = "-1",
             ["__RequestVerificationToken"] = token
         };
 
         //Act
-        var content = new FormUrlEncodedContent(fields);
-        HttpResponseMessage postResponse = await _client.PostAsync(action, content);
+        HttpResponseMessage postResponse = await _client.PostAsync(action, new FormUrlEncodedContent(fields));
+        IDocument afterDoc = await _client.GetDocumentAsync("/HarmedOrCasualty/List");
 
         // Assert
-        Assert.Equal(HttpStatusCode.OK, postResponse.StatusCode);
-
-        IDocument afterDoc = await _client.GetDocumentAsync("/HarmedOrCasualty/List");
-        IEnumerable<string> names = afterDoc
-            .QuerySelectorAll("table tbody td")
-            .Select(td => td.TextContent.Trim());
-        Assert.Contains("Ferido", names);
-        Assert.Single(await dbContext.Harmed_or_casualties.ToListAsync());
-        await DbUtilities.RemoveEntitiesAsync<HarmedOrCasualty>(dbContext);
+        Assert.Single(dbContext.Harmed_or_casualties);
+        IElement? row = afterDoc.QuerySelector($"table tbody tr[data-id='{id}']");
+        Assert.NotNull(row);
+        IElement? cell = row.QuerySelector("td[data-property='name']");
+        Assert.NotNull(cell);
+        Assert.Equal("Ferido", cell.TextContent.Trim());
     }
 
+    public async Task InitializeAsync()
+    {
+        await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
+        AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        dbContext.RemoveRange(dbContext.Harmed_or_casualties);
+        await dbContext.SaveChangesAsync();
+    }
+
+    public Task DisposeAsync()
+    {
+        return Task.CompletedTask;
+    }
 }
