@@ -283,7 +283,7 @@ public class AccidentTypeIntegrationTests(CustomWebApplicationFactory<Program> f
         };
 
         //Act
-        HttpResponseMessage postResponse = await _client.PostAsync(action, new FormUrlEncodedContent(fields));
+        await _client.PostAsync(action, new FormUrlEncodedContent(fields));
         IDocument afterDoc = await _client.GetDocumentAsync("/AccidentType/List");
 
         // Assert
