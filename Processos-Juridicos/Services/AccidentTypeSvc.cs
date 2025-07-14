@@ -3,8 +3,10 @@ using Microsoft.EntityFrameworkCore;
 using Processos_Juridicos.Data;
 using Processos_Juridicos.DTOs;
 using Processos_Juridicos.Entities;
+using Processos_Juridicos.Exceptions;
 using Processos_Juridicos.Mappers;
 using Processos_Juridicos.Services.Interfaces;
+using Processos_Juridicos.Utilities.TextManager;
 
 namespace Processos_Juridicos.Services;
 
@@ -21,7 +23,7 @@ public class AccidentTypeSvc(AppDbContext context) : IAccidentTypeSvc
     public async Task<AccidentTypeDto> GetAccidentTypeById(int? id)
     {
         AccidentType? accident = await _context.Accident_types.FindAsync(id);
-        return accident != null ? Mapper.MapToAccidenTypeDto(accident) : throw new KeyNotFoundException();
+        return accident != null ? Mapper.MapToAccidenTypeDto(accident) : throw new EntityNotFoundException(GlobalTextManager.GetString("EntityNotFound"));
     }
 
     public async Task<AccidentTypeDto> CreateAccidentType(AccidentTypeDto type)
@@ -58,6 +60,6 @@ public class AccidentTypeSvc(AppDbContext context) : IAccidentTypeSvc
             return true;
         }
 
-        throw new KeyNotFoundException();
+        throw new EntityNotFoundException(GlobalTextManager.GetString("EntityNotFound"));
     }
 }

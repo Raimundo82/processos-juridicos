@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 
+using Processos_Juridicos.Exceptions;
+
 namespace Processos_Juridicos.Middleware.ExceptionHandlers;
 public class GlobalExceptionHandler() : IExceptionHandler
 {
@@ -10,6 +12,7 @@ public class GlobalExceptionHandler() : IExceptionHandler
 
         var statusCode = exception switch
         {
+            EntityNotFoundException => StatusCodes.Status404NotFound,
             KeyNotFoundException => StatusCodes.Status404NotFound,
             UnauthorizedAccessException => StatusCodes.Status403Forbidden,
             InvalidOperationException => StatusCodes.Status400BadRequest,

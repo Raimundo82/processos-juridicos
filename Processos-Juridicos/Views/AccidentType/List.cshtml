@@ -26,17 +26,19 @@
 
             @foreach (var item in Model.ToList())
             {
-                <tr>
+                <tr data-id="@item.AccidentTypeId">
                     <th scope="col">@count</th>
-                    <td>@Html.DisplayFor(m => item.AccidentTypeName)</td>
+                    <td data-property="name"=>@Html.DisplayFor(m => item.AccidentTypeName)</td>
                     <td>
                         <div class="d-flex gap-2">
-                            <form asp-controller="AccidentType" asp-action="Delete" method="post">
+                            <form asp-controller="AccidentType" asp-action="Delete" method="post" data-action="delete">
                                 <input type="hidden" name="id" value="@item.AccidentTypeId">
                                 <button type="submit" class="btn btn-danger js-delete-btn"></button>
                             </form>
                             <a asp-controller="AccidentType" asp-action="Edit" asp-route-id="@item.AccidentTypeId"
-                               class="btn btn-warning"><i class="bi bi-pencil"></i></a>
+                                data-action="access-edit-form" class="btn btn-warning">
+                                <i class="bi bi-pencil"></i>
+                            </a>
                         </div>
                     </td>
                 </tr>
@@ -50,4 +52,4 @@
     <script>
         let table = createDataTable("#tableAccidents");
     </script>
-} 
+}

@@ -10,5 +10,6 @@
     "MaximumFieldSizeExceededMessage": "O campo {0} deve ter no máximo {1} caracteres.",
     "MustBeAPositiveNumberMessage": "O valor do campo {0} deve ser positivo.",
     "DateMustBeTodayOrLater": "A data inserida deve ser a data de hoje ou uma data futura",
-    "FieldMustBeUnique": "O valor inserido não deve ser igual nem semelhante a outros já existentes."
+    "FieldMustBeUnique": "O valor inserido não deve ser igual nem semelhante a outros já existentes.",
+    "EntityNotFound":  "A entidade com o ID fornecido não foi encontrada."
 }

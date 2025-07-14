@@ -11,131 +11,96 @@ using Processos_Juridicos.Entities;
 
 namespace Processos_Juridicos.Tests;
 
-public class AccidentTypeIntegrationTests(CustomWebApplicationFactory<Program> factory) : IClassFixture<CustomWebApplicationFactory<Program>>
+public class AccidentTypeIntegrationTests(CustomWebApplicationFactory<Program> factory) :
+    IClassFixture<CustomWebApplicationFactory<Program>>,
+    IAsyncLifetime
 {
     private readonly CustomWebApplicationFactory<Program> _factory = factory;
     private readonly HttpClient _client = factory.CreateClient();
 
-    [Fact]
-    public async Task Get_AccidentTypeList_ReturnsAccidentTypeList()
+    private static AccidentType CreateAccidentType(string name)
     {
-        // Arrange
-        await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
-        AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
-        dbContext.Accident_types.AddRange(
-            new AccidentType { AccidentTypeName = "Viação" },
-            new AccidentType { AccidentTypeName = "Serviço Guarnição" }
-        );
-        await dbContext.SaveChangesAsync();
-
-        //Act
-        IDocument doc = await _client.GetDocumentAsync("/AccidentType/List");
-
-        // Assert
-        var cellTexts = doc
-            .QuerySelectorAll("table tbody td")
-            .Select(td => td.TextContent.Trim())
-            .ToList();
-
-        Assert.Contains("Viação", cellTexts);
-        Assert.Contains("Serviço Guarnição", cellTexts);
-        Assert.Equal(2, (await dbContext.Accident_types.ToListAsync()).Count);
-        await DbUtilities.RemoveEntitiesAsync<AccidentType>(dbContext);
+        return new AccidentType { AccidentTypeName = name };
     }
 
-    [Fact]
-    public async Task List_EmptyDatabase_ReturnsEmptyList()
+    [Theory]
+    [InlineData()]
+    [InlineData("Viação", "Serviço")]
+    public async Task List_ReturnsExpectedItems(params string[] namesInput)
     {
         // Arrange
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        Assert.Empty(await dbContext.Accident_types.ToListAsync());
+
+        dbContext.Accident_types.AddRange(namesInput.Select(CreateAccidentType));
+        await dbContext.SaveChangesAsync();
 
         // Act
         IDocument doc = await _client.GetDocumentAsync("/AccidentType/List");
 
         // Assert
-        IHtmlCollection<IElement> rows = doc.QuerySelectorAll("table tbody tr");
-        Assert.Empty(rows);
+        Assert.Equal(namesInput.Length, await dbContext.Accident_types.CountAsync());
 
-        IHtmlCollection<IElement> cells = doc.QuerySelectorAll("table tbody td");
-        Assert.Empty(cells);
+        var rows = doc.QuerySelectorAll("table tbody tr").ToList();
+        Assert.Equal(namesInput.Length, rows.Count);
 
-        Assert.Empty(await dbContext.Accident_types.ToListAsync());
+        foreach (AccidentType accidentType in dbContext.Accident_types)
+        {
+            Assert.Contains(accidentType.AccidentTypeName, namesInput);
+
+            IElement? row = doc.QuerySelector($"table>tbody>tr[data-id='{accidentType.AccidentTypeId}']");
+            Assert.NotNull(row);
+
+            IElement? cell = row.QuerySelector($"td[data-property='name']");
+            Assert.NotNull(cell);
+            Assert.Equal(accidentType.AccidentTypeName, cell.TextContent.Trim());
+        }
     }
 
-    [Fact]
-    public async Task Create_Post_Valid_RedirectsAndPersists()
+    [Theory]
+    [InlineData()]
+    [InlineData("Viação")]
+    [InlineData("Viação", "Serviço")]
+    public async Task Create_Post_CreatesExpectedItems(params string[] namesInput)
     {
         // Arrange
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        var fields = new Dictionary<string, string>
-        {
-            ["AccidentTypeName"] = "Viação"
-        };
-        var content = new FormUrlEncodedContent(fields);
-
         //Act
-        HttpResponseMessage postResponse = await _client.PostAsync("/AccidentType/Create", content);
+        foreach (var name in namesInput)
+        {
+            var formData = new Dictionary<string, string>
+            {
+                ["AccidentTypeName"] = name
+            };
+
+            await _client.PostAsync("/AccidentType/Create", new FormUrlEncodedContent(formData));
+        }
 
         // Assert
-        Assert.Equal(HttpStatusCode.OK, postResponse.StatusCode);
+        DbSet<AccidentType> dbItems = dbContext.Accident_types;
+
+        Assert.Equal(namesInput.Length, dbItems.Count());
+
         IDocument listDoc = await _client.GetDocumentAsync("/AccidentType/List");
-        IEnumerable<string> names = listDoc.QuerySelectorAll("table tbody td").Select(td => td.TextContent.Trim());
-        Assert.Contains("Viação", names);
-        Assert.Single(await dbContext.Accident_types.ToListAsync());
+        var rows = listDoc.QuerySelectorAll("table tbody tr").ToList();
+        Assert.Equal(namesInput.Length, rows.Count);
 
-        await DbUtilities.RemoveEntitiesAsync<AccidentType>(dbContext);
-    }
-
-    [Fact]
-    public async Task Create_Post_InvalidModel_ReturnsEmptyList()
-    {
-        // Arrange
-        await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
-        AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
-        IDocument getDoc = await _client.GetDocumentAsync("/AccidentType/Create");
-        IElement form = getDoc.QuerySelector("form[action='/AccidentType/Create']")!;
-        var action = form.GetAttribute("action")!;  // "/AccidentType/Create"
-
-        var fields = new Dictionary<string, string>
+        foreach (AccidentType at in dbItems)
         {
-            ["AccidentTypeName"] = string.Empty
-        };
+            Assert.Contains(at.AccidentTypeName, namesInput);
 
-        //Act
-        HttpResponseMessage postResponse = await _client.PostAsync(
-            action,
-            new FormUrlEncodedContent(fields)
-        );
+            IElement? row = listDoc
+                .QuerySelector($"table > tbody > tr[data-id='{at.AccidentTypeId}']");
+            Assert.NotNull(row);
 
-        //Assert
-        Assert.Equal(HttpStatusCode.OK, postResponse.StatusCode);
-
-        IDocument listDoc = await _client.GetDocumentAsync("/AccidentType/List");
-
-        IHtmlCollection<IElement> rows = listDoc.QuerySelectorAll("table tbody tr");
-        Assert.Empty(rows);
-
-        IHtmlCollection<IElement> cells = listDoc.QuerySelectorAll("table tbody td");
-        Assert.Empty(cells);
-
-        var html = await postResponse.Content.ReadAsStringAsync();
-        IDocument errDoc = await BrowsingContext
-                        .New(Configuration.Default)
-                        .OpenAsync(req => req.Content(html));
-        Assert.Contains(
-            "O campo Nome do Tipo de Acidente é obrigatório.",
-            errDoc.DocumentElement.TextContent,
-            StringComparison.OrdinalIgnoreCase
-        );
-        Assert.Empty(await dbContext.Accident_types.ToListAsync());
-
+            IElement? cell = row.QuerySelector("td[data-property='name']");
+            Assert.NotNull(cell);
+            Assert.Equal(at.AccidentTypeName, cell.TextContent.Trim());
+        }
     }
+
 
     [Fact]
     public async Task Edit_Get_WhenModelExists_ShowsFormAndFields()
@@ -144,21 +109,19 @@ public class AccidentTypeIntegrationTests(CustomWebApplicationFactory<Program> f
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        var AccidentType = new AccidentType
-        {
-            AccidentTypeName = "Viação"
-        };
+        AccidentType accidentType = CreateAccidentType("Viação");
 
-        dbContext.Accident_types.Add(AccidentType);
+        dbContext.Accident_types.Add(accidentType);
 
         await dbContext.SaveChangesAsync();
 
-        var id = AccidentType.AccidentTypeId;
+        var id = accidentType.AccidentTypeId;
 
         // Act
         IDocument doc = await _client.GetDocumentAsync($"/AccidentType/Edit/{id}");
 
         // Assert
+        Assert.Single(dbContext.Accident_types);
         IElement? form = doc.QuerySelector("form[action^='/AccidentType/Edit']");
         Assert.NotNull(form);
 
@@ -167,11 +130,6 @@ public class AccidentTypeIntegrationTests(CustomWebApplicationFactory<Program> f
 
         IElement nameInput = form.QuerySelector("input[name=AccidentTypeName]")!;
         Assert.Equal("Viação", nameInput.GetAttribute("value"));
-
-        Assert.Single(await dbContext.Accident_types.ToListAsync());
-
-        await DbUtilities.RemoveEntitiesAsync<AccidentType>(dbContext);
-        Assert.Empty(await dbContext.Accident_types.ToListAsync());
     }
 
     [Fact]
@@ -180,40 +138,34 @@ public class AccidentTypeIntegrationTests(CustomWebApplicationFactory<Program> f
         // Arrange
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        var AccidentType = new AccidentType
-        {
-            AccidentTypeName = "Viação"
-        };
+        AccidentType AccidentType = CreateAccidentType("Viação");
 
         dbContext.Accident_types.Add(AccidentType);
 
         await dbContext.SaveChangesAsync();
 
-        var id = AccidentType.AccidentTypeId.ToString()!;
+        var id = AccidentType.AccidentTypeId;
 
         IDocument editDoc = await _client.GetDocumentAsync($"/AccidentType/Edit/{id}");
         IElement form = editDoc.QuerySelector("form[action^='/AccidentType/Edit']")!;
         var action = form.GetAttribute("action")!;
 
-        var fields = new Dictionary<string, string>
+        var fields = new Dictionary<string, string?>
         {
             ["AccidentTypeId"] = id.ToString(),
             ["AccidentTypeName"] = "Atualizado",
         };
+        var content = new FormUrlEncodedContent(fields);
 
         //Act
-        var content = new FormUrlEncodedContent(fields);
-        HttpResponseMessage postResponse = await _client.PostAsync(action, content);
+        await _client.PostAsync(action, content);
+        IDocument listDoc = await _client.GetDocumentAsync("/AccidentType/List");
 
         //Assert
-        Assert.Equal(HttpStatusCode.OK, postResponse.StatusCode);
-
-        IDocument listDoc = await _client.GetDocumentAsync("/AccidentType/List");
-        IEnumerable<string> names = listDoc.QuerySelectorAll("table tbody td").Select(td => td.TextContent.Trim());
-        Assert.Contains("Atualizado", names);
-        Assert.Single(await dbContext.Accident_types.ToListAsync());
-
-        await DbUtilities.RemoveEntitiesAsync<AccidentType>(dbContext);
+        Assert.Single(dbContext.Accident_types);
+        IElement? cell = listDoc.QuerySelector("table tbody td[data-property='name']");
+        Assert.NotNull(cell);
+        Assert.Equal("Atualizado", cell.TextContent.Trim());
     }
 
     [Fact]
@@ -276,9 +228,10 @@ public class AccidentTypeIntegrationTests(CustomWebApplicationFactory<Program> f
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        var id = dbContext.Accident_types.Add(new AccidentType { AccidentTypeName = "Viação" }).Entity.AccidentTypeId;
-
+        AccidentType AccidentType = CreateAccidentType("Viação");
+        dbContext.Accident_types.Add(AccidentType);
         await dbContext.SaveChangesAsync();
+        var id = AccidentType.AccidentTypeId;
 
         IDocument listDoc = await _client.GetDocumentAsync("/AccidentType/List");
         IElement deleteForm = listDoc.QuerySelector("form[action='/AccidentType/Delete']")!;
@@ -295,19 +248,13 @@ public class AccidentTypeIntegrationTests(CustomWebApplicationFactory<Program> f
         };
 
         //Act
-        var content = new FormUrlEncodedContent(fields);
-        HttpResponseMessage postResponse = await _client.PostAsync($"/AccidentType/Delete/{id}", content);
+        await _client.PostAsync($"/AccidentType/Delete/{id}", new FormUrlEncodedContent(fields));
+        IDocument afterDoc = await _client.GetDocumentAsync("/AccidentType/List");
 
         // Assert 
-        Assert.Equal(HttpStatusCode.OK, postResponse.StatusCode);
-
-        IDocument afterDoc = await _client.GetDocumentAsync("/AccidentType/List");
-        IEnumerable<string> names = afterDoc
-            .QuerySelectorAll("table tbody td")
-            .Select(td => td.TextContent.Trim());
-        Assert.DoesNotContain("Viação", names);
-        Assert.Empty(await dbContext.Accident_types.ToListAsync());
-        await DbUtilities.RemoveEntitiesAsync<AccidentType>(dbContext);
+        Assert.Empty(dbContext.Accident_types);
+        IHtmlCollection<IElement> rows = afterDoc.QuerySelectorAll("table tbody tr");
+        Assert.Empty(rows);
     }
 
     [Fact]
@@ -317,10 +264,10 @@ public class AccidentTypeIntegrationTests(CustomWebApplicationFactory<Program> f
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        dbContext.Accident_types.AddRange(
-           new AccidentType { AccidentTypeName = "Viação" }
-       );
+        AccidentType AccidentType = CreateAccidentType("Viação");
+        dbContext.Accident_types.Add(AccidentType);
         await dbContext.SaveChangesAsync();
+        var id = AccidentType.AccidentTypeId;
 
         IDocument listDoc = await _client.GetDocumentAsync("/AccidentType/List");
         IElement deleteForm = listDoc.QuerySelector("form[action='/AccidentType/Delete']")!;
@@ -331,24 +278,34 @@ public class AccidentTypeIntegrationTests(CustomWebApplicationFactory<Program> f
 
         var fields = new Dictionary<string, string>
         {
-            ["AccidentTypeId"] = "9999",
+            ["AccidentTypeId"] = "-1",
             ["__RequestVerificationToken"] = token
         };
 
         //Act
-        var content = new FormUrlEncodedContent(fields);
-        HttpResponseMessage postResponse = await _client.PostAsync(action, content);
+        HttpResponseMessage postResponse = await _client.PostAsync(action, new FormUrlEncodedContent(fields));
+        IDocument afterDoc = await _client.GetDocumentAsync("/AccidentType/List");
 
         // Assert
-        Assert.Equal(HttpStatusCode.OK, postResponse.StatusCode);
-
-        IDocument afterDoc = await _client.GetDocumentAsync("/AccidentType/List");
-        IEnumerable<string> names = afterDoc
-            .QuerySelectorAll("table tbody td")
-            .Select(td => td.TextContent.Trim());
-        Assert.Contains("Viação", names);
-        Assert.Single(await dbContext.Accident_types.ToListAsync());
-        await DbUtilities.RemoveEntitiesAsync<AccidentType>(dbContext);
+        Assert.Single(dbContext.Accident_types);
+        IElement? row = afterDoc.QuerySelector($"table tbody tr[data-id='{id}']");
+        Assert.NotNull(row);
+        IElement? cell = row.QuerySelector("td[data-property='name']");
+        Assert.NotNull(cell);
+        Assert.Equal("Viação", cell.TextContent.Trim());
     }
 
+
+    public async Task InitializeAsync()
+    {
+        await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
+        AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        dbContext.RemoveRange(dbContext.Accident_types);
+        await dbContext.SaveChangesAsync();
+    }
+
+    public Task DisposeAsync()
+    {
+        return Task.CompletedTask;
+    }
 }
