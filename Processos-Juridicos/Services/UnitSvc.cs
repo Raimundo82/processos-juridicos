@@ -31,8 +31,8 @@ public class UnitSvc(AppDbContext context) : IUnitSvc
     {
         Unit unitEntity = Mapper.MapToUnit(unit);
 
-        _ = _context.Units.Add(unitEntity);
-        _ = await _context.SaveChangesAsync();
+        _context.Units.Add(unitEntity);
+        await _context.SaveChangesAsync();
         return Mapper.MapToUnitDto(unitEntity);
     }
 
@@ -41,7 +41,7 @@ public class UnitSvc(AppDbContext context) : IUnitSvc
         Unit unitEntity = Mapper.MapToUnit(unit);
         _context.Units.Entry(unitEntity).State = EntityState.Modified;
 
-        _ = await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync();
         return Mapper.MapToUnitDto(unitEntity);
     }
 
@@ -53,8 +53,8 @@ public class UnitSvc(AppDbContext context) : IUnitSvc
             return false;
         }
 
-        _ = _context.Units.Remove(unit);
-        _ = await _context.SaveChangesAsync();
+        _context.Units.Remove(unit);
+        await _context.SaveChangesAsync();
         return true;
     }
 

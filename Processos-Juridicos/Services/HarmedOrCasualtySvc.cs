@@ -17,8 +17,8 @@ public class HarmedOrCasualtySvc(AppDbContext context) : IHarmedOrCasualtySvc
     {
         HarmedOrCasualty casualtyEntity = Mapper.MapToHarmedOrCasualties(casualty);
 
-        _ = _context.Harmed_or_casualties.Add(casualtyEntity);
-        _ = await _context.SaveChangesAsync();
+        _context.Harmed_or_casualties.Add(casualtyEntity);
+        await _context.SaveChangesAsync();
         return Mapper.MapToHarmedOrCasualtiesDto(casualtyEntity);
 
     }
@@ -28,8 +28,8 @@ public class HarmedOrCasualtySvc(AppDbContext context) : IHarmedOrCasualtySvc
         HarmedOrCasualty? casualty = await _context.Harmed_or_casualties.FindAsync(id);
         if (casualty != null)
         {
-            _ = _context.Harmed_or_casualties.Remove(casualty);
-            _ = await _context.SaveChangesAsync();
+            _context.Harmed_or_casualties.Remove(casualty);
+            await _context.SaveChangesAsync();
             return true;
         }
 
@@ -41,7 +41,7 @@ public class HarmedOrCasualtySvc(AppDbContext context) : IHarmedOrCasualtySvc
         HarmedOrCasualty casualtyEntity = Mapper.MapToHarmedOrCasualties(casualty);
         _context.Harmed_or_casualties.Entry(casualtyEntity).State = EntityState.Modified;
 
-        _ = await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync();
         return Mapper.MapToHarmedOrCasualtiesDto(casualtyEntity);
     }
 

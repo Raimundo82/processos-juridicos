@@ -31,7 +31,7 @@ public class SentenceController(ISentenceSvc sentenceSvc, IToastNotify toastNoti
     {
         if (ModelState.IsValid)
         {
-            _ = await _sentenceSvc.CreateSentence(model);
+            await _sentenceSvc.CreateSentence(model);
             _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("CreateSuccessMessage"), "A", EntityName, "a"));
             return RedirectToAction(nameof(List));
         }
@@ -56,7 +56,7 @@ public class SentenceController(ISentenceSvc sentenceSvc, IToastNotify toastNoti
     {
         if (ModelState.IsValid)
         {
-            _ = await _sentenceSvc.EditSentence(model);
+            await _sentenceSvc.EditSentence(model);
             _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("EditSuccessMessage"), "A", EntityName, "a"));
             return RedirectToAction(nameof(List));
         }

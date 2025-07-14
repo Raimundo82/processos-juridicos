@@ -43,7 +43,7 @@ public class MilitarySecurityController(IMilitarySecuritySvc militarySecuritySvc
     {
         if (ModelState.IsValid)
         {
-            _ = await _militarySecuritySvc.CreateMilitarySecurity(model);
+            await _militarySecuritySvc.CreateMilitarySecurity(model);
             _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("CreateSuccessMessage"), "A", EntityName, "a"));
             return RedirectToAction("List");
         }
@@ -68,7 +68,7 @@ public class MilitarySecurityController(IMilitarySecuritySvc militarySecuritySvc
     {
         if (ModelState.IsValid)
         {
-            _ = await _militarySecuritySvc.EditMilitarySecurity(model);
+            await _militarySecuritySvc.EditMilitarySecurity(model);
             _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("EditSuccessMessage"), "A", EntityName, "a"));
             return RedirectToAction("List");
         }

@@ -32,7 +32,7 @@ public class CrimeTypeController(ICrimeTypeSvc crimeTypeSvc, IToastNotify toastN
     {
         if (ModelState.IsValid)
         {
-            _ = await _crimeTypeSvc.CreateCrimeType(model);
+            await _crimeTypeSvc.CreateCrimeType(model);
             _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("CreateSuccessMessage"), "O", EntityName, "o"));
             return RedirectToAction(nameof(List));
         }
@@ -60,7 +60,7 @@ public class CrimeTypeController(ICrimeTypeSvc crimeTypeSvc, IToastNotify toastN
             return View(model);
         }
 
-        _ = await _crimeTypeSvc.EditCrimeType(model);
+        await _crimeTypeSvc.EditCrimeType(model);
         _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("EditSuccessMessage"), "O", EntityName, "o"));
         return RedirectToAction(nameof(List));
     }

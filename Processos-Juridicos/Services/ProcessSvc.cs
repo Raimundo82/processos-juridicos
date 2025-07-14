@@ -19,8 +19,8 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
     {
         Process processEntity = Mapper.MapToProcesses(process);
 
-        _ = _context.Processes.Add(processEntity);
-        _ = await _context.SaveChangesAsync();
+        _context.Processes.Add(processEntity);
+        await _context.SaveChangesAsync();
         return Mapper.MapToProcessesDto(processEntity);
     }
 
@@ -36,8 +36,8 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
 
         _context.Process_Files.RemoveRange(filesToDelete);
 
-        _ = _context.Processes.Remove(process);
-        _ = await _context.SaveChangesAsync();
+        _context.Processes.Remove(process);
+        await _context.SaveChangesAsync();
         return true;
     }
 
@@ -57,10 +57,10 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
         }
 
         Process processEntity = Mapper.MapToProcesses(process);
-        _ = _context.Processes.Attach(processEntity);
+        _context.Processes.Attach(processEntity);
         _context.Entry(processEntity).State = EntityState.Modified;
 
-        _ = await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync();
         return Mapper.MapToProcessesDto(processEntity);
     }
 

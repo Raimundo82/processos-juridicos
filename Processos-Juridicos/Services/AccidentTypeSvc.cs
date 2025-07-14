@@ -30,8 +30,8 @@ public class AccidentTypeSvc(AppDbContext context) : IAccidentTypeSvc
     {
         AccidentType typeEntity = Mapper.MapToAccidentType(type);
 
-        _ = _context.Accident_types.Add(typeEntity);
-        _ = await _context.SaveChangesAsync();
+        _context.Accident_types.Add(typeEntity);
+        await _context.SaveChangesAsync();
         return Mapper.MapToAccidenTypeDto(typeEntity);
     }
 
@@ -40,7 +40,7 @@ public class AccidentTypeSvc(AppDbContext context) : IAccidentTypeSvc
         AccidentType typeEntity = Mapper.MapToAccidentType(type);
         _context.Accident_types.Entry(typeEntity).State = EntityState.Modified;
 
-        _ = await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync();
         return Mapper.MapToAccidenTypeDto(typeEntity);
     }
 
@@ -55,8 +55,8 @@ public class AccidentTypeSvc(AppDbContext context) : IAccidentTypeSvc
         AccidentType? accident = await _context.Accident_types.FindAsync(id);
         if (accident != null)
         {
-            _ = _context.Accident_types.Remove(accident);
-            _ = await _context.SaveChangesAsync();
+            _context.Accident_types.Remove(accident);
+            await _context.SaveChangesAsync();
             return true;
         }
 

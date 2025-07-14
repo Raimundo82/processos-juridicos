@@ -33,7 +33,7 @@ public class HarmedOrCasualtyController(IHarmedOrCasualtySvc casualtiesSvc, IToa
         if (ModelState.IsValid)
         {
 
-            _ = await _harmedOrCasualtiesSvc.CreateCasualty(model);
+            await _harmedOrCasualtiesSvc.CreateCasualty(model);
             _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("CreateSuccessMessage"), "A", EntityName, "a"));
             return RedirectToAction(nameof(List));
         }
@@ -58,7 +58,7 @@ public class HarmedOrCasualtyController(IHarmedOrCasualtySvc casualtiesSvc, IToa
     {
         if (ModelState.IsValid)
         {
-            _ = await _harmedOrCasualtiesSvc.EditCasualty(model);
+            await _harmedOrCasualtiesSvc.EditCasualty(model);
             _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("EditSuccessMessage"), "A", EntityName, "a"));
             return RedirectToAction(nameof(List));
         }

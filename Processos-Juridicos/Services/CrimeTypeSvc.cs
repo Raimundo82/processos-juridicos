@@ -41,8 +41,8 @@ public class CrimeTypeSvc(AppDbContext context) : ICrimeTypeSvc
 
         Entities.CrimeType typeEntity = Mapper.MapToCrimeType(type);
 
-        _ = _context.Crime_types.Add(typeEntity);
-        _ = await _context.SaveChangesAsync();
+        _context.Crime_types.Add(typeEntity);
+        await _context.SaveChangesAsync();
         return Mapper.MapToCrimeTypeDto(typeEntity);
     }
 
@@ -53,7 +53,7 @@ public class CrimeTypeSvc(AppDbContext context) : ICrimeTypeSvc
         {
             existingCrimeType.CrimeTypeName = type.CrimeTypeName;
 
-            _ = await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
             return Mapper.MapToCrimeTypeDto(existingCrimeType);
         }
 
@@ -68,8 +68,8 @@ public class CrimeTypeSvc(AppDbContext context) : ICrimeTypeSvc
             return false;
         }
 
-        _ = _context.Crime_types.Remove(type);
-        _ = await _context.SaveChangesAsync();
+        _context.Crime_types.Remove(type);
+        await _context.SaveChangesAsync();
         return true;
     }
 }

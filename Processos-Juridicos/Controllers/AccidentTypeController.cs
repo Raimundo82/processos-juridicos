@@ -31,7 +31,7 @@ public class AccidentTypeController(IAccidentTypeSvc accidentType, IToastNotify 
     {
         if (ModelState.IsValid)
         {
-            _ = await _accidentTypeSvc.CreateAccidentType(model);
+            await _accidentTypeSvc.CreateAccidentType(model);
             _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("CreateSuccessMessage"), "O", EntityName, "o"));
             return RedirectToAction(nameof(List));
 
@@ -57,7 +57,7 @@ public class AccidentTypeController(IAccidentTypeSvc accidentType, IToastNotify 
     {
         if (ModelState.IsValid)
         {
-            _ = await _accidentTypeSvc.EditAccidentType(model);
+            await _accidentTypeSvc.EditAccidentType(model);
             _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("EditSuccessMessage"), "O", EntityName, "o"));
             return RedirectToAction(nameof(List));
         }

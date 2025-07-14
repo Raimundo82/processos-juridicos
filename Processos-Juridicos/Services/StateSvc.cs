@@ -29,8 +29,8 @@ public class StateSvc(AppDbContext context) : IStateSvc
     {
         State stateEntity = Mapper.MapToState(state);
 
-        _ = _context.States.Add(stateEntity);
-        _ = await _context.SaveChangesAsync();
+        _context.States.Add(stateEntity);
+        await _context.SaveChangesAsync();
         return Mapper.MapToStateDto(stateEntity);
     }
 
@@ -39,7 +39,7 @@ public class StateSvc(AppDbContext context) : IStateSvc
         State stateEntity = Mapper.MapToState(state);
         _context.States.Entry(stateEntity).State = EntityState.Modified;
 
-        _ = await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync();
         return Mapper.MapToStateDto(stateEntity);
     }
 
@@ -51,8 +51,8 @@ public class StateSvc(AppDbContext context) : IStateSvc
             return false;
         }
 
-        _ = _context.States.Remove(state);
-        _ = await _context.SaveChangesAsync();
+        _context.States.Remove(state);
+        await _context.SaveChangesAsync();
         return true;
     }
 }

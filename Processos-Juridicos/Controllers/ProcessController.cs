@@ -81,7 +81,7 @@ public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmed
                             ProcessId = (int)insertTarget.ProcessId
                         };
 
-                        _ = await _processFileSvc.CreateProcessFile(Mapper.MapToFilesDto(fileRecord));
+                        await _processFileSvc.CreateProcessFile(Mapper.MapToFilesDto(fileRecord));
                     }
                 }
             }
@@ -121,7 +121,7 @@ public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmed
             return View(model);
         }
 
-        _ = await _processSvc.EditProcess(model);
+        await _processSvc.EditProcess(model);
 
         if (model.ProcessFiles != null && model.ProcessFiles.Length > 0)
         {
@@ -139,7 +139,7 @@ public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmed
                         ProcessId = (int)model.ProcessId,
                         RowGuid = 1
                     };
-                    _ = await _processFileSvc.CreateProcessFile(Mapper.MapToFilesDto(fileRecord));
+                    await _processFileSvc.CreateProcessFile(Mapper.MapToFilesDto(fileRecord));
                 }
             }
         }
@@ -148,7 +148,7 @@ public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmed
         {
             foreach (var fileId in model.FilesToRemove)
             {
-                _ = await _processFileSvc.DeleteProcessFile(fileId);
+                await _processFileSvc.DeleteProcessFile(fileId);
             }
         }
 

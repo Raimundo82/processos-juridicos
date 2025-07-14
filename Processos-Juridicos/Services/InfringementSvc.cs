@@ -17,8 +17,8 @@ public class InfringementSvc(AppDbContext context) : IInfringementSvc
     {
         Infringement infringementEntity = Mapper.MapToInfringements(infringement);
 
-        _ = _context.Infringements.Add(infringementEntity);
-        _ = await _context.SaveChangesAsync();
+        _context.Infringements.Add(infringementEntity);
+        await _context.SaveChangesAsync();
         return Mapper.MapToInfringementsDto(infringementEntity);
     }
 
@@ -31,8 +31,8 @@ public class InfringementSvc(AppDbContext context) : IInfringementSvc
             return false;
         }
 
-        _ = _context.Infringements.Remove(infringement);
-        _ = await _context.SaveChangesAsync();
+        _context.Infringements.Remove(infringement);
+        await _context.SaveChangesAsync();
         return true;
     }
 
@@ -41,7 +41,7 @@ public class InfringementSvc(AppDbContext context) : IInfringementSvc
         Infringement infringementEntity = Mapper.MapToInfringements(infringement);
         _context.Infringements.Entry(infringementEntity).State = EntityState.Modified;
 
-        _ = await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync();
         return Mapper.MapToInfringementsDto(infringementEntity);
     }
 

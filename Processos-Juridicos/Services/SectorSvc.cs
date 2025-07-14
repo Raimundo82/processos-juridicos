@@ -29,8 +29,8 @@ public class SectorSvc(AppDbContext context) : ISectorSvc
     {
         Sector sectorEntity = Mapper.MapToSectors(sector);
 
-        _ = _context.Sectors.Add(sectorEntity);
-        _ = await _context.SaveChangesAsync();
+        _context.Sectors.Add(sectorEntity);
+        await _context.SaveChangesAsync();
         return Mapper.MapToSectorsDto(sectorEntity);
     }
 
@@ -42,8 +42,8 @@ public class SectorSvc(AppDbContext context) : ISectorSvc
             return false;
         }
 
-        _ = _context.Sectors.Remove(sector);
-        _ = await _context.SaveChangesAsync();
+        _context.Sectors.Remove(sector);
+        await _context.SaveChangesAsync();
         return true;
     }
 
@@ -52,7 +52,7 @@ public class SectorSvc(AppDbContext context) : ISectorSvc
         Sector sectorEntity = Mapper.MapToSectors(sector);
         _context.Sectors.Entry(sectorEntity).State = EntityState.Modified;
 
-        _ = await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync();
         return Mapper.MapToSectorsDto(sectorEntity);
     }
 }

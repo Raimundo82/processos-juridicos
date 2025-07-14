@@ -16,8 +16,8 @@ public class MilitarySecuritySvc(AppDbContext context) : IMilitarySecuritySvc
     {
         MilitarySecurity militarySecurityEntity = Mapper.MapToMilitarySecurity(militarySecurity);
 
-        _ = _context.Military_securities.Add(militarySecurityEntity);
-        _ = await _context.SaveChangesAsync();
+        _context.Military_securities.Add(militarySecurityEntity);
+        await _context.SaveChangesAsync();
         return Mapper.MapToMilitarySecurityDto(militarySecurityEntity);
     }
 
@@ -30,8 +30,8 @@ public class MilitarySecuritySvc(AppDbContext context) : IMilitarySecuritySvc
         }
         else
         {
-            _ = _context.Military_securities.Remove(militarySecurity);
-            _ = await _context.SaveChangesAsync();
+            _context.Military_securities.Remove(militarySecurity);
+            await _context.SaveChangesAsync();
             return true;
         }
     }
@@ -41,7 +41,7 @@ public class MilitarySecuritySvc(AppDbContext context) : IMilitarySecuritySvc
         MilitarySecurity militarySecurityEntity = Mapper.MapToMilitarySecurity(militarySecurity);
         _context.Military_securities.Entry(militarySecurityEntity).State = EntityState.Modified;
 
-        _ = await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync();
         return Mapper.MapToMilitarySecurityDto(militarySecurityEntity);
     }
 

@@ -42,7 +42,7 @@ public class SectorController(ISectorSvc sectorSvc, IToastNotify toastNotify) : 
     {
         if (ModelState.IsValid)
         {
-            _ = await _sectorSvc.CreateSector(model);
+            await _sectorSvc.CreateSector(model);
             _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("CreateSuccessMessage"), "O", EntityName, "o"));
             return RedirectToAction(nameof(List));
         }
@@ -67,7 +67,7 @@ public class SectorController(ISectorSvc sectorSvc, IToastNotify toastNotify) : 
     {
         if (ModelState.IsValid)
         {
-            _ = await _sectorSvc.EditSector(model);
+            await _sectorSvc.EditSector(model);
             _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("EditSuccessMessage"), "O", EntityName, "o"));
             return RedirectToAction(nameof(List));
 

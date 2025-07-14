@@ -30,7 +30,7 @@ public class ProcessFileController(IProcessFileSvc filesSvc, IToastNotify toastN
         if (ModelState.IsValid)
         {
             // Call your file service to delete the file.
-            _ = await _filesSvc.DeleteProcessFile(fileId);
+            await _filesSvc.DeleteProcessFile(fileId);
 
             // Optionally add a toast notification here.
             _toastNotify.Sucesso("File successfully deleted.");

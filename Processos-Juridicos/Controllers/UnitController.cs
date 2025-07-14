@@ -45,7 +45,7 @@ public class UnitController(IUnitSvc unitSvc, ISectorSvc sectorSvc, IToastNotify
     {
         if (ModelState.IsValid)
         {
-            _ = await _unitSvc.CreateUnit(model);
+            await _unitSvc.CreateUnit(model);
             _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("CreateSuccessMessage"), "A", EntityName, "a"));
             return RedirectToAction(nameof(List));
         }
@@ -72,7 +72,7 @@ public class UnitController(IUnitSvc unitSvc, ISectorSvc sectorSvc, IToastNotify
     {
         if (ModelState.IsValid)
         {
-            _ = await _unitSvc.EditUnit(model);
+            await _unitSvc.EditUnit(model);
             _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("EditSuccessMessage"), "A", EntityName, "a"));
             return RedirectToAction(nameof(List));
         }

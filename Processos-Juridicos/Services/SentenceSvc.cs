@@ -17,8 +17,8 @@ public class SentenceSvc(AppDbContext context) : ISentenceSvc
     {
         Sentence sentenceEntity = Mapper.MapToSentence(sentence);
 
-        _ = _context.Sentences.Add(sentenceEntity);
-        _ = await _context.SaveChangesAsync();
+        _context.Sentences.Add(sentenceEntity);
+        await _context.SaveChangesAsync();
         return Mapper.MapToSentenceDto(sentenceEntity);
     }
 
@@ -30,8 +30,8 @@ public class SentenceSvc(AppDbContext context) : ISentenceSvc
             return false;
         }
 
-        _ = _context.Sentences.Remove(sentence);
-        _ = await _context.SaveChangesAsync();
+        _context.Sentences.Remove(sentence);
+        await _context.SaveChangesAsync();
         return true;
     }
 
@@ -40,7 +40,7 @@ public class SentenceSvc(AppDbContext context) : ISentenceSvc
         Sentence sentenceEntity = Mapper.MapToSentence(sentence);
         _context.Sentences.Entry(sentenceEntity).State = EntityState.Modified;
 
-        _ = await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync();
         return Mapper.MapToSentenceDto(sentenceEntity);
     }
 

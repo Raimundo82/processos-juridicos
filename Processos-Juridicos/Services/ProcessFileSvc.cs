@@ -17,8 +17,8 @@ public class ProcessFileSvc(AppDbContext context) : IProcessFileSvc
     {
         ProcessFile processFileEntity = Mapper.MapToFiles(file);
 
-        _ = _context.Process_Files.Add(processFileEntity);
-        _ = await _context.SaveChangesAsync();
+        _context.Process_Files.Add(processFileEntity);
+        await _context.SaveChangesAsync();
         return Mapper.MapToFilesDto(processFileEntity);
     }
 
@@ -32,8 +32,8 @@ public class ProcessFileSvc(AppDbContext context) : IProcessFileSvc
         else
         {
 
-            _ = _context.Process_Files.Remove(processFile);
-            _ = await _context.SaveChangesAsync();
+            _context.Process_Files.Remove(processFile);
+            await _context.SaveChangesAsync();
             return true;
         }
     }
@@ -42,7 +42,7 @@ public class ProcessFileSvc(AppDbContext context) : IProcessFileSvc
     {
         ProcessFile processFileEntity = Mapper.MapToFiles(file);
         _context.Process_Files.Entry(processFileEntity).State = EntityState.Modified;
-        _ = await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync();
         return Mapper.MapToFilesDto(processFileEntity);
     }
 

@@ -35,7 +35,7 @@ public class ApisSvc : IApisSvc
         request.Headers.Add("User-Agent", "Mozilla/5.0");
 
         HttpResponseMessage response = await httpClient.SendAsync(request);
-        _ = response.EnsureSuccessStatusCode();
+        response.EnsureSuccessStatusCode();
 
         var json = await response.Content.ReadAsStringAsync();
         List<ApiUnitsModel> listUnits = JsonSerializer.Deserialize<List<ApiUnitsModel>>(json)

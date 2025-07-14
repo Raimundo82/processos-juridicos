@@ -43,7 +43,7 @@ public class InfringementController(IInfringementSvc infringementSvc, IToastNoti
     {
         if (ModelState.IsValid)
         {
-            _ = await _infringementSvc.CreateInfringement(model);
+            await _infringementSvc.CreateInfringement(model);
             _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("CreateSuccessMessage"), "O", EntityName, "o"));
             return RedirectToAction("List");
         }
@@ -68,7 +68,7 @@ public class InfringementController(IInfringementSvc infringementSvc, IToastNoti
     {
         if (ModelState.IsValid)
         {
-            _ = await _infringementSvc.EditInfringement(model);
+            await _infringementSvc.EditInfringement(model);
             _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("EditSuccessMessage"), "O", EntityName, "o"));
             return RedirectToAction("List");
         }

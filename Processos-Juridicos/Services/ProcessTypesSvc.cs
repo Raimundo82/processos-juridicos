@@ -29,8 +29,8 @@ public class ProcessTypesSvc(AppDbContext context) : IProcessTypeSvc
     {
         ProcessType typeEntity = Mapper.MapToProcessType(type);
 
-        _ = _context.Process_types.Add(typeEntity);
-        _ = await _context.SaveChangesAsync();
+        _context.Process_types.Add(typeEntity);
+        await _context.SaveChangesAsync();
         return Mapper.MapToProcessTypeDto(typeEntity);
     }
 
@@ -39,7 +39,7 @@ public class ProcessTypesSvc(AppDbContext context) : IProcessTypeSvc
         ProcessType typeEntity = Mapper.MapToProcessType(type);
         _context.Process_types.Entry(typeEntity).State = EntityState.Modified;
 
-        _ = await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync();
         return Mapper.MapToProcessTypeDto(typeEntity);
     }
 
@@ -51,8 +51,8 @@ public class ProcessTypesSvc(AppDbContext context) : IProcessTypeSvc
             return false;
         }
 
-        _ = _context.Process_types.Remove(process);
-        _ = await _context.SaveChangesAsync();
+        _context.Process_types.Remove(process);
+        await _context.SaveChangesAsync();
         return true;
     }
 }

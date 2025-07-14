@@ -43,7 +43,7 @@ public class ProcessTypeController(IProcessTypeSvc processTypeSvc, IToastNotify 
     {
         if (ModelState.IsValid)
         {
-            _ = await _processTypeSvc.CreateProcessType(model);
+            await _processTypeSvc.CreateProcessType(model);
             _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("CreateSuccessMessage"), "O", EntityName, "o"));
             return RedirectToAction(nameof(List));
         }
@@ -68,7 +68,7 @@ public class ProcessTypeController(IProcessTypeSvc processTypeSvc, IToastNotify 
     {
         if (ModelState.IsValid)
         {
-            _ = await _processTypeSvc.EditProcessType(model);
+            await _processTypeSvc.EditProcessType(model);
             _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("EditSuccessMessage"), "O", EntityName, "o"));
             return RedirectToAction(nameof(List));
         }

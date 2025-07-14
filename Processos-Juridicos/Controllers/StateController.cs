@@ -43,7 +43,7 @@ public class StateController(IStateSvc stateSvc, IToastNotify toastNotify) : Con
     {
         if (ModelState.IsValid)
         {
-            _ = await _stateSvc.CreateState(model);
+            await _stateSvc.CreateState(model);
             _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("CreateSuccessMessage"), "O", EntityName, "o"));
             return RedirectToAction(nameof(List));
         }
@@ -68,7 +68,7 @@ public class StateController(IStateSvc stateSvc, IToastNotify toastNotify) : Con
     {
         if (ModelState.IsValid)
         {
-            _ = await _stateSvc.EditState(model);
+            await _stateSvc.EditState(model);
             _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("EditSuccessMessage"), "O", EntityName, "o"));
             return RedirectToAction(nameof(List));
         }
