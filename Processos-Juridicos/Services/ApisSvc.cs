@@ -1,6 +1,7 @@
 using System.Net;
 using System.Text.Json;
 
+using Processos_Juridicos.Exceptions;
 using Processos_Juridicos.Models;
 using Processos_Juridicos.Services.Interfaces;
 
@@ -38,7 +39,7 @@ public class ApisSvc : IApisSvc
 
         var json = await response.Content.ReadAsStringAsync();
         List<ApiUnitsModel> listUnits = JsonSerializer.Deserialize<List<ApiUnitsModel>>(json)
-                        ?? throw new KeyNotFoundException("No units returned");
+                        ?? throw new EntityNotFoundException("No units returned");
 
         return listUnits;
     }

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Processos_Juridicos.Data;
 using Processos_Juridicos.DTOs;
 using Processos_Juridicos.Entities;
+using Processos_Juridicos.Exceptions;
 using Processos_Juridicos.Mappers;
 using Processos_Juridicos.Services.Interfaces;
 
@@ -53,6 +54,6 @@ public class HarmedOrCasualtySvc(AppDbContext context) : IHarmedOrCasualtySvc
     public async Task<HarmedOrCasualtyDto> GetCasualtyById(int? id)
     {
         HarmedOrCasualty? casualty = await _context.Harmed_or_casualties.FindAsync(id);
-        return casualty != null ? Mapper.MapToHarmedOrCasualtiesDto(casualty) : throw new KeyNotFoundException();
+        return casualty != null ? Mapper.MapToHarmedOrCasualtiesDto(casualty) : throw new EntityNotFoundException("Casualty was not found");
     }
 }

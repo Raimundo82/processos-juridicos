@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Processos_Juridicos.Data;
 using Processos_Juridicos.DTOs;
 using Processos_Juridicos.Entities;
+using Processos_Juridicos.Exceptions;
 using Processos_Juridicos.Mappers;
 using Processos_Juridicos.Services.Interfaces;
 
@@ -21,7 +22,7 @@ public class ProcessTypesSvc(AppDbContext context) : IProcessTypeSvc
     public async Task<ProcessTypeDto> GetProcessTypeById(int? id)
     {
         ProcessType? type = await _context.Process_types.FindAsync(id);
-        return type != null ? Mapper.MapToProcessTypeDto(type) : throw new KeyNotFoundException();
+        return type != null ? Mapper.MapToProcessTypeDto(type) : throw new EntityNotFoundException("Process type not found");
     }
 
     public async Task<ProcessTypeDto> CreateProcessType(ProcessTypeDto type)

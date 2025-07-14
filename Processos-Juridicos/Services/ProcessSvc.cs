@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Processos_Juridicos.Data;
 using Processos_Juridicos.DTOs;
 using Processos_Juridicos.Entities;
+using Processos_Juridicos.Exceptions;
 using Processos_Juridicos.Mappers;
 using Processos_Juridicos.Services.Interfaces;
 
@@ -85,7 +86,7 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
             .AsSplitQuery()
             .FirstOrDefaultAsync(x => x.ProcessId == id);
 
-        return process != null ? Mapper.MapToProcessesDto(process) : throw new KeyNotFoundException();
+        return process != null ? Mapper.MapToProcessesDto(process) : throw new EntityNotFoundException("Process not found");
     }
 }
 

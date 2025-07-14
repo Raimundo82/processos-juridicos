@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Processos_Juridicos.Data;
 using Processos_Juridicos.DTOs;
 using Processos_Juridicos.Entities;
+using Processos_Juridicos.Exceptions;
 using Processos_Juridicos.Mappers;
 using Processos_Juridicos.Services.Interfaces;
 
@@ -53,6 +54,6 @@ public class InfringementSvc(AppDbContext context) : IInfringementSvc
     public async Task<InfringementDto> GetInfringementById(int? id)
     {
         Infringement? infringement = await _context.Infringements.FindAsync(id);
-        return infringement != null ? Mapper.MapToInfringementsDto(infringement) : throw new KeyNotFoundException();
+        return infringement != null ? Mapper.MapToInfringementsDto(infringement) : throw new EntityNotFoundException("Infringement not found");
     }
 }

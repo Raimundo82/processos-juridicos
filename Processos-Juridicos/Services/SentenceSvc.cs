@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Processos_Juridicos.Data;
 using Processos_Juridicos.DTOs;
 using Processos_Juridicos.Entities;
+using Processos_Juridicos.Exceptions;
 using Processos_Juridicos.Mappers;
 using Processos_Juridicos.Services.Interfaces;
 
@@ -53,6 +54,6 @@ public class SentenceSvc(AppDbContext context) : ISentenceSvc
     {
         Sentence? sentence = await _context.Sentences.FindAsync(id);
 
-        return sentence != null ? Mapper.MapToSentenceDto(sentence) : throw new KeyNotFoundException();
+        return sentence != null ? Mapper.MapToSentenceDto(sentence) : throw new EntityNotFoundException("Sentence not found");
     }
 }

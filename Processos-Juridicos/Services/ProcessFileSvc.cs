@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Processos_Juridicos.Data;
 using Processos_Juridicos.DTOs;
 using Processos_Juridicos.Entities;
+using Processos_Juridicos.Exceptions;
 using Processos_Juridicos.Mappers;
 using Processos_Juridicos.Services.Interfaces;
 
@@ -54,7 +55,7 @@ public class ProcessFileSvc(AppDbContext context) : IProcessFileSvc
     public async Task<ProcessFileDto> GetProcessFileById(int? id)
     {
         ProcessFile? processFile = await _context.Process_Files.FindAsync(id);
-        return processFile != null ? Mapper.MapToFilesDto(processFile) : throw new KeyNotFoundException();
+        return processFile != null ? Mapper.MapToFilesDto(processFile) : throw new EntityNotFoundException("Process File not found");
     }
 
     public async Task<List<ProcessFileDto>> GetAllProcessFilesByProcessId(int? id)

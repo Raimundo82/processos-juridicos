@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Processos_Juridicos.Data;
 using Processos_Juridicos.DTOs;
 using Processos_Juridicos.Entities;
+using Processos_Juridicos.Exceptions;
 using Processos_Juridicos.Mappers;
 using Processos_Juridicos.Services.Interfaces;
 
@@ -21,7 +22,7 @@ public class StateSvc(AppDbContext context) : IStateSvc
     public async Task<StateDto> GetStateById(int? id)
     {
         State? state = await _context.States.FindAsync(id);
-        return state != null ? Mapper.MapToStateDto(state) : throw new KeyNotFoundException();
+        return state != null ? Mapper.MapToStateDto(state) : throw new EntityNotFoundException("State not found");
     }
 
     public async Task<StateDto> CreateState(StateDto state)

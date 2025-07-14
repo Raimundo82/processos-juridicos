@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Processos_Juridicos.Data;
 using Processos_Juridicos.DTOs;
 using Processos_Juridicos.Entities;
+using Processos_Juridicos.Exceptions;
 using Processos_Juridicos.Mappers;
 using Processos_Juridicos.Services.Interfaces;
 
@@ -21,7 +22,7 @@ public class SectorSvc(AppDbContext context) : ISectorSvc
     public async Task<SectorDto> GetSectorById(int? id)
     {
         Sector? sector = await _context.Sectors.FindAsync(id);
-        return sector != null ? Mapper.MapToSectorsDto(sector) : throw new KeyNotFoundException();
+        return sector != null ? Mapper.MapToSectorsDto(sector) : throw new EntityNotFoundException("Sector not found");
     }
 
     public async Task<SectorDto> CreateSector(SectorDto sector)

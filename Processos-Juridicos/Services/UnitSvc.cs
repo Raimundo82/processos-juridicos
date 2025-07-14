@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Processos_Juridicos.Data;
 using Processos_Juridicos.DTOs;
 using Processos_Juridicos.Entities;
+using Processos_Juridicos.Exceptions;
 using Processos_Juridicos.Mappers;
 using Processos_Juridicos.Services.Interfaces;
 
@@ -23,7 +24,7 @@ public class UnitSvc(AppDbContext context) : IUnitSvc
     public async Task<UnitDto> GetUnitById(int? id)
     {
         Unit? unit = await _context.Units.FindAsync(id);
-        return unit != null ? Mapper.MapToUnitDto(unit) : throw new KeyNotFoundException();
+        return unit != null ? Mapper.MapToUnitDto(unit) : throw new EntityNotFoundException("Unit not found");
     }
 
     public async Task<UnitDto> CreateUnit(UnitDto unit)
