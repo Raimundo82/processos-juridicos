@@ -1,20 +1,20 @@
 @using Processos_Juridicos.DTOs
 
 @{
-    ViewData["Title"] = "Lista de Sentenças";
+    ViewData["Title"] = "Tipos de Acidentes";
     int count = 1;
 }
 
 @model IEnumerable<SentenceDto>
 
 <div class="text-center">
-    <h1 class="display-4">Sentenças</h1>
+    <h1 class="display-4">Tipos de Acidente</h1>
 </div>
 
-<a asp-controller="Sentence" asp-action="Create" class="btn btn-primary">Inserir tipo de sentença</a>
+<a asp-controller="Sentence" asp-action="Create" class="btn btn-primary">Inserir tipo de acidente</a>
 
 <div>
-    <table id="tableStates" class="table table-striped-columns table-hover">
+    <table id="tableSentences" class="table table-striped-columns table-hover">
         <thead>
             <tr>
                 <th scope="col">#</th>
@@ -26,17 +26,19 @@
 
             @foreach (var item in Model.ToList())
             {
-                <tr>
-                    <th scope="row">@count</th>
-                    <td>@Html.DisplayFor(m => item.SentenceName)</td>
+                <tr data-id="@item.SentenceId">
+                    <th scope="col">@count</th>
+                    <td data-property="name"=>@Html.DisplayFor(m => item.SentenceName)</td>
                     <td>
                         <div class="d-flex gap-2">
-                            <form asp-controller="Sentence" asp-action="Delete" method="post">
+                            <form asp-controller="Sentence" asp-action="Delete" method="post" data-action="delete">
                                 <input type="hidden" name="id" value="@item.SentenceId">
                                 <button type="submit" class="btn btn-danger js-delete-btn"></button>
                             </form>
                             <a asp-controller="Sentence" asp-action="Edit" asp-route-id="@item.SentenceId"
-                               class="btn btn-warning"><i class="bi bi-pencil"></i></a>
+                                data-action="access-edit-form" class="btn btn-warning">
+                                <i class="bi bi-pencil"></i>
+                            </a>
                         </div>
                     </td>
                 </tr>
@@ -48,6 +50,6 @@
 
 @section Scripts {
     <script>
-        let table = createDataTable("#tableStates");
+        let table = createDataTable("#tableSentences");
     </script>
-} 
+}

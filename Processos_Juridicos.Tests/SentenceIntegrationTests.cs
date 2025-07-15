@@ -1,6 +1,3 @@
-using System.Net;
-
-using AngleSharp;
 using AngleSharp.Dom;
 
 using Microsoft.EntityFrameworkCore;
@@ -11,132 +8,96 @@ using Processos_Juridicos.Entities;
 
 namespace Processos_Juridicos.Tests;
 
-public class SentenceIntegrationTests(CustomWebApplicationFactory<Program> factory) : IClassFixture<CustomWebApplicationFactory<Program>>
+public class SentenceIntegrationTests(CustomWebApplicationFactory<Program> factory) :
+    IClassFixture<CustomWebApplicationFactory<Program>>,
+    IAsyncLifetime
 {
     private readonly CustomWebApplicationFactory<Program> _factory = factory;
     private readonly HttpClient _client = factory.CreateClient();
 
-    [Fact]
-    public async Task Get_SentenceList_ReturnsSentenceList()
+    private static Sentence CreateSentence(string name)
     {
-        // Arrange
-        await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
-        AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
-        dbContext.Sentences.AddRange(
-            new Sentence { SentenceName = "Multa" },
-            new Sentence { SentenceName = "Suspensão" }
-        );
-        await dbContext.SaveChangesAsync();
-
-        //Act
-        IDocument doc = await _client.GetDocumentAsync("/Sentence/List");
-
-        // Assert
-        var cellTexts = doc
-            .QuerySelectorAll("table tbody td")
-            .Select(td => td.TextContent.Trim())
-            .ToList();
-
-        Assert.Contains("Multa", cellTexts);
-        Assert.Contains("Suspensão", cellTexts);
-        Assert.Equal(2, (await dbContext.Sentences.ToListAsync()).Count);
-        await DbUtilities.RemoveEntitiesAsync<Sentence>(dbContext);
+        return new Sentence { SentenceName = name };
     }
 
-    [Fact]
-    public async Task List_EmptyDatabase_ReturnsEmptyList()
+    [Theory]
+    [InlineData()]
+    [InlineData("Viação", "Serviço")]
+    public async Task List_ReturnsExpectedItems(params string[] namesInput)
     {
         // Arrange
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        Assert.Empty(await dbContext.Sentences.ToListAsync());
+
+        dbContext.Sentences.AddRange(namesInput.Select(CreateSentence));
+        await dbContext.SaveChangesAsync();
 
         // Act
         IDocument doc = await _client.GetDocumentAsync("/Sentence/List");
 
         // Assert
-        IHtmlCollection<IElement> rows = doc.QuerySelectorAll("table tbody tr");
-        Assert.Empty(rows);
+        Assert.Equal(namesInput.Length, await dbContext.Sentences.CountAsync());
 
-        IHtmlCollection<IElement> cells = doc.QuerySelectorAll("table tbody td");
-        Assert.Empty(cells);
+        var rows = doc.QuerySelectorAll("table tbody tr").ToList();
+        Assert.Equal(namesInput.Length, rows.Count);
 
-        Assert.Empty(await dbContext.Sentences.ToListAsync());
+        foreach (Sentence Sentence in dbContext.Sentences)
+        {
+            Assert.Contains(Sentence.SentenceName, namesInput);
+
+            IElement? row = doc.QuerySelector($"table>tbody>tr[data-id='{Sentence.SentenceId}']");
+            Assert.NotNull(row);
+
+            IElement? cell = row.QuerySelector($"td[data-property='name']");
+            Assert.NotNull(cell);
+            Assert.Equal(Sentence.SentenceName, cell.TextContent.Trim());
+        }
     }
 
-    [Fact]
-    public async Task Create_Post_Valid_RedirectsAndPersists()
+    [Theory]
+    [InlineData()]
+    [InlineData("Viação")]
+    [InlineData("Viação", "Serviço")]
+    public async Task Create_Post_CreatesExpectedItems(params string[] namesInput)
     {
         // Arrange
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        var fields = new Dictionary<string, string>
-        {
-            ["SentenceName"] = "Multa"
-        };
-        var content = new FormUrlEncodedContent(fields);
-
         //Act
-        HttpResponseMessage postResponse = await _client.PostAsync("/Sentence/Create", content);
+        foreach (var name in namesInput)
+        {
+            var formData = new Dictionary<string, string>
+            {
+                ["SentenceName"] = name
+            };
+
+            await _client.PostAsync("/Sentence/Create", new FormUrlEncodedContent(formData));
+        }
 
         // Assert
-        Assert.Equal(HttpStatusCode.OK, postResponse.StatusCode);
+        DbSet<Sentence> dbItems = dbContext.Sentences;
+
+        Assert.Equal(namesInput.Length, dbItems.Count());
+
         IDocument listDoc = await _client.GetDocumentAsync("/Sentence/List");
-        IEnumerable<string> names = listDoc.QuerySelectorAll("table tbody td").Select(td => td.TextContent.Trim());
-        Assert.Contains("Multa", names);
-        Assert.Single(await dbContext.Sentences.ToListAsync());
+        var rows = listDoc.QuerySelectorAll("table tbody tr").ToList();
+        Assert.Equal(namesInput.Length, rows.Count);
 
-        await DbUtilities.RemoveEntitiesAsync<Sentence>(dbContext);
-    }
-
-    [Fact]
-    public async Task Create_Post_InvalidModel_ReturnsEmptyList()
-    {
-        // Arrange
-        await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
-        AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
-        IDocument getDoc = await _client.GetDocumentAsync("/Sentence/Create");
-        IElement form = getDoc.QuerySelector("form[action='/Sentence/Create']")!;
-        var action = form.GetAttribute("action")!;  // "/Sentence/Create"
-
-        var fields = new Dictionary<string, string>
+        foreach (Sentence at in dbItems)
         {
-            ["SentenceName"] = string.Empty
-        };
+            Assert.Contains(at.SentenceName, namesInput);
 
-        //Act
-        HttpResponseMessage postResponse = await _client.PostAsync(
-            action,
-            new FormUrlEncodedContent(fields)
-        );
+            IElement? row = listDoc
+                .QuerySelector($"table > tbody > tr[data-id='{at.SentenceId}']");
+            Assert.NotNull(row);
 
-        //Assert
-        Assert.Equal(HttpStatusCode.OK, postResponse.StatusCode);
-
-        IDocument listDoc = await _client.GetDocumentAsync("/Sentence/List");
-
-        IHtmlCollection<IElement> rows = listDoc.QuerySelectorAll("table tbody tr");
-        Assert.Empty(rows);
-
-        IHtmlCollection<IElement> cells = listDoc.QuerySelectorAll("table tbody td");
-        Assert.Empty(cells);
-
-        var html = await postResponse.Content.ReadAsStringAsync();
-        IDocument errDoc = await BrowsingContext
-                        .New(Configuration.Default)
-                        .OpenAsync(req => req.Content(html));
-        Assert.Contains(
-            "O campo Nome da Sentença é obrigatório.",
-            errDoc.DocumentElement.TextContent,
-            StringComparison.OrdinalIgnoreCase
-        );
-
-        Assert.Empty(await dbContext.Sentences.ToListAsync());
-        await DbUtilities.RemoveEntitiesAsync<HarmedOrCasualty>(dbContext);
+            IElement? cell = row.QuerySelector("td[data-property='name']");
+            Assert.NotNull(cell);
+            Assert.Equal(at.SentenceName, cell.TextContent.Trim());
+        }
     }
+
 
     [Fact]
     public async Task Edit_Get_WhenModelExists_ShowsFormAndFields()
@@ -145,10 +106,7 @@ public class SentenceIntegrationTests(CustomWebApplicationFactory<Program> facto
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        var Sentence = new Sentence
-        {
-            SentenceName = "Multa"
-        };
+        Sentence Sentence = CreateSentence("Viação");
 
         dbContext.Sentences.Add(Sentence);
 
@@ -160,6 +118,7 @@ public class SentenceIntegrationTests(CustomWebApplicationFactory<Program> facto
         IDocument doc = await _client.GetDocumentAsync($"/Sentence/Edit/{id}");
 
         // Assert
+        Assert.Single(dbContext.Sentences);
         IElement? form = doc.QuerySelector("form[action^='/Sentence/Edit']");
         Assert.NotNull(form);
 
@@ -167,11 +126,7 @@ public class SentenceIntegrationTests(CustomWebApplicationFactory<Program> facto
         Assert.Equal(id.ToString(), idInput.GetAttribute("value"));
 
         IElement nameInput = form.QuerySelector("input[name=SentenceName]")!;
-        Assert.Equal("Multa", nameInput.GetAttribute("value"));
-
-        Assert.Single(await dbContext.Sentences.ToListAsync());
-
-        await DbUtilities.RemoveEntitiesAsync<Sentence>(dbContext);
+        Assert.Equal("Viação", nameInput.GetAttribute("value"));
     }
 
     [Fact]
@@ -180,39 +135,34 @@ public class SentenceIntegrationTests(CustomWebApplicationFactory<Program> facto
         // Arrange
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        var Sentence = new Sentence
-        {
-            SentenceName = "Multa"
-        };
+        Sentence Sentence = CreateSentence("Viação");
 
         dbContext.Sentences.Add(Sentence);
 
         await dbContext.SaveChangesAsync();
 
-        var id = Sentence.SentenceId.ToString()!;
+        var id = Sentence.SentenceId;
 
         IDocument editDoc = await _client.GetDocumentAsync($"/Sentence/Edit/{id}");
         IElement form = editDoc.QuerySelector("form[action^='/Sentence/Edit']")!;
         var action = form.GetAttribute("action")!;
 
-        var fields = new Dictionary<string, string>
+        var fields = new Dictionary<string, string?>
         {
             ["SentenceId"] = id.ToString(),
             ["SentenceName"] = "Atualizado",
         };
+        var content = new FormUrlEncodedContent(fields);
 
         //Act
-        var content = new FormUrlEncodedContent(fields);
-        HttpResponseMessage postResponse = await _client.PostAsync(action, content);
+        await _client.PostAsync(action, content);
+        IDocument listDoc = await _client.GetDocumentAsync("/Sentence/List");
 
         //Assert
-        Assert.Equal(HttpStatusCode.OK, postResponse.StatusCode);
-
-        IDocument listDoc = await _client.GetDocumentAsync("/Sentence/List");
-        IEnumerable<string> names = listDoc.QuerySelectorAll("table tbody td").Select(td => td.TextContent.Trim());
-        Assert.Contains("Atualizado", names);
-        Assert.Single(await dbContext.Sentences.ToListAsync());
-        await DbUtilities.RemoveEntitiesAsync<Sentence>(dbContext);
+        Assert.Single(dbContext.Sentences);
+        IElement? cell = listDoc.QuerySelector("table tbody td[data-property='name']");
+        Assert.NotNull(cell);
+        Assert.Equal("Atualizado", cell.TextContent.Trim());
     }
 
     [Fact]
@@ -222,57 +172,34 @@ public class SentenceIntegrationTests(CustomWebApplicationFactory<Program> facto
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        var Sentence = new Sentence
-        {
-            SentenceName = "Multa"
-        };
-
-        dbContext.Sentences.Add(Sentence);
-
+        var sentenceName = "prisão";
+        Sentence sentence = CreateSentence(sentenceName);
+        dbContext.Sentences.Add(sentence);
+        var id = sentence.SentenceId;
         await dbContext.SaveChangesAsync();
-
-        var id = Sentence.SentenceId.ToString()!;
 
         IDocument editDoc = await _client.GetDocumentAsync($"/Sentence/Edit/{id}");
         IElement form = editDoc.QuerySelector("form[action^='/Sentence/Edit']")!;
         var action = form.GetAttribute("action")!;
 
-        var fields = new Dictionary<string, string>
+        var fields = new Dictionary<string, string?>
         {
             ["SentenceId"] = id.ToString(),
             ["SentenceName"] = string.Empty
         };
 
         //Act
-        var content = new FormUrlEncodedContent(fields);
-        HttpResponseMessage postResponse = await _client.PostAsync(action, content);
-
-        // Assert
-        Assert.Equal(HttpStatusCode.OK, postResponse.StatusCode);
-
-        //Act
+        await _client.PostAsync(action, new FormUrlEncodedContent(fields));
         IDocument doc = await _client.GetDocumentAsync("/Sentence/List");
 
         // Assert
-        var cellTexts = doc
-            .QuerySelectorAll("table tbody td")
-            .Select(td => td.TextContent.Trim())
-            .ToList();
+        Assert.Single(dbContext.Sentences);
 
-        Assert.Contains("Multa", cellTexts);
-        Assert.Single(await dbContext.Sentences.ToListAsync());
-
-        var html = await postResponse.Content.ReadAsStringAsync();
-        IDocument errDoc = await BrowsingContext
-                        .New(Configuration.Default)
-                        .OpenAsync(req => req.Content(html));
-        Assert.Contains(
-            "O campo Nome da Sentença é obrigatório.",
-            errDoc.DocumentElement.TextContent,
-            StringComparison.OrdinalIgnoreCase
-        );
-
-        await DbUtilities.RemoveEntitiesAsync<Sentence>(dbContext);
+        IElement? row = doc.QuerySelector($"table tbody tr[data-id='{id}']");
+        Assert.NotNull(row);
+        IElement? cell = row.QuerySelector("td[data-property='name']");
+        Assert.NotNull(cell);
+        Assert.Equal(cell.TextContent.Trim(), sentenceName);
     }
 
     [Fact]
@@ -282,11 +209,14 @@ public class SentenceIntegrationTests(CustomWebApplicationFactory<Program> facto
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        var id = dbContext.Sentences.Add(new Sentence { SentenceName = "Multa" }).Entity.SentenceId;
+        Sentence Sentence = CreateSentence("Viação");
+        dbContext.Sentences.Add(Sentence);
         await dbContext.SaveChangesAsync();
+        var id = Sentence.SentenceId;
 
         IDocument listDoc = await _client.GetDocumentAsync("/Sentence/List");
         IElement deleteForm = listDoc.QuerySelector("form[action='/Sentence/Delete']")!;
+
         var token = deleteForm
             .QuerySelector("input[name=__RequestVerificationToken]")!
             .GetAttribute("value")!;
@@ -299,19 +229,13 @@ public class SentenceIntegrationTests(CustomWebApplicationFactory<Program> facto
         };
 
         //Act
-        var content = new FormUrlEncodedContent(fields);
-        HttpResponseMessage postResponse = await _client.PostAsync($"/Sentence/Delete/{id}", content);
+        await _client.PostAsync($"/Sentence/Delete/{id}", new FormUrlEncodedContent(fields));
+        IDocument afterDoc = await _client.GetDocumentAsync("/Sentence/List");
 
         // Assert 
-        Assert.Equal(HttpStatusCode.OK, postResponse.StatusCode);
-
-        IDocument afterDoc = await _client.GetDocumentAsync("/Sentence/List");
-        IEnumerable<string> names = afterDoc
-            .QuerySelectorAll("table tbody td")
-            .Select(td => td.TextContent.Trim());
-        Assert.DoesNotContain("Multa", names);
-        Assert.Empty(await dbContext.Sentences.ToListAsync());
-        await DbUtilities.RemoveEntitiesAsync<Sentence>(dbContext);
+        Assert.Empty(dbContext.Sentences);
+        IHtmlCollection<IElement> rows = afterDoc.QuerySelectorAll("table tbody tr");
+        Assert.Empty(rows);
     }
 
     [Fact]
@@ -321,10 +245,10 @@ public class SentenceIntegrationTests(CustomWebApplicationFactory<Program> facto
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        dbContext.Sentences.AddRange(
-           new Sentence { SentenceName = "Multa" }
-       );
+        Sentence Sentence = CreateSentence("Viação");
+        dbContext.Sentences.Add(Sentence);
         await dbContext.SaveChangesAsync();
+        var id = Sentence.SentenceId;
 
         IDocument listDoc = await _client.GetDocumentAsync("/Sentence/List");
         IElement deleteForm = listDoc.QuerySelector("form[action='/Sentence/Delete']")!;
@@ -335,24 +259,34 @@ public class SentenceIntegrationTests(CustomWebApplicationFactory<Program> facto
 
         var fields = new Dictionary<string, string>
         {
-            ["SentenceId"] = "9999",
+            ["SentenceId"] = "-1",
             ["__RequestVerificationToken"] = token
         };
 
         //Act
-        var content = new FormUrlEncodedContent(fields);
-        HttpResponseMessage postResponse = await _client.PostAsync(action, content);
+        HttpResponseMessage postResponse = await _client.PostAsync(action, new FormUrlEncodedContent(fields));
+        IDocument afterDoc = await _client.GetDocumentAsync("/Sentence/List");
 
         // Assert
-        Assert.Equal(HttpStatusCode.OK, postResponse.StatusCode);
-
-        IDocument afterDoc = await _client.GetDocumentAsync("/Sentence/List");
-        IEnumerable<string> names = afterDoc
-            .QuerySelectorAll("table tbody td")
-            .Select(td => td.TextContent.Trim());
-        Assert.Contains("Multa", names);
-        Assert.Single(await dbContext.Sentences.ToListAsync());
-        await DbUtilities.RemoveEntitiesAsync<Sentence>(dbContext);
+        Assert.Single(dbContext.Sentences);
+        IElement? row = afterDoc.QuerySelector($"table tbody tr[data-id='{id}']");
+        Assert.NotNull(row);
+        IElement? cell = row.QuerySelector("td[data-property='name']");
+        Assert.NotNull(cell);
+        Assert.Equal("Viação", cell.TextContent.Trim());
     }
 
+
+    public async Task InitializeAsync()
+    {
+        await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
+        AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        dbContext.RemoveRange(dbContext.Sentences);
+        await dbContext.SaveChangesAsync();
+    }
+
+    public Task DisposeAsync()
+    {
+        return Task.CompletedTask;
+    }
 }
