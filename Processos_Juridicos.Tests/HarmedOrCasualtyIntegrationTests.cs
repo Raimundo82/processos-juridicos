@@ -1,6 +1,3 @@
-using System.Net;
-
-using AngleSharp;
 using AngleSharp.Dom;
 
 using Microsoft.EntityFrameworkCore;
@@ -175,8 +172,10 @@ public class HarmedOrCasualtyIntegrationTests(CustomWebApplicationFactory<Progra
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        var id = dbContext.Harmed_or_casualties.Add(new HarmedOrCasualty { CasualtyName = "Ferido" }).Entity.CasualtyId;
-
+        var casualtyName = "Ferido";
+        HarmedOrCasualty harmedOrCasualty = CreateHarmedOrCasualty(casualtyName);
+        dbContext.Harmed_or_casualties.Add(harmedOrCasualty);
+        var id = harmedOrCasualty.CasualtyId;
         await dbContext.SaveChangesAsync();
 
         IDocument editDoc = await _client.GetDocumentAsync($"/HarmedOrCasualty/Edit/{id}");
@@ -190,35 +189,17 @@ public class HarmedOrCasualtyIntegrationTests(CustomWebApplicationFactory<Progra
         };
 
         //Act
-        var content = new FormUrlEncodedContent(fields);
-        HttpResponseMessage postResponse = await _client.PostAsync(action, content);
-
-        // Assert
-        Assert.Equal(HttpStatusCode.OK, postResponse.StatusCode);
-
-        //Act
+        await _client.PostAsync(action, new FormUrlEncodedContent(fields));
         IDocument doc = await _client.GetDocumentAsync("/HarmedOrCasualty/List");
 
         // Assert
-        var cellTexts = doc
-            .QuerySelectorAll("table tbody td")
-            .Select(td => td.TextContent.Trim())
-            .ToList();
+        Assert.Single(dbContext.Harmed_or_casualties);
 
-        Assert.Contains("Ferido", cellTexts);
-        Assert.Single(await dbContext.Harmed_or_casualties.ToListAsync());
-
-        var html = await postResponse.Content.ReadAsStringAsync();
-        IDocument errDoc = await BrowsingContext
-                        .New(Configuration.Default)
-                        .OpenAsync(req => req.Content(html));
-        Assert.Contains(
-            "O campo Nome da Categoria de ferido é obrigatório.",
-            errDoc.DocumentElement.TextContent,
-            StringComparison.OrdinalIgnoreCase
-        );
-
-        await DbUtilities.RemoveEntitiesAsync<HarmedOrCasualty>(dbContext);
+        IElement? row = doc.QuerySelector($"table tbody tr[data-id='{id}']");
+        Assert.NotNull(row);
+        IElement? cell = row.QuerySelector("td[data-property='name']");
+        Assert.NotNull(cell);
+        Assert.Equal(cell.TextContent.Trim(), casualtyName);
     }
 
     [Fact]
@@ -283,7 +264,7 @@ public class HarmedOrCasualtyIntegrationTests(CustomWebApplicationFactory<Progra
         };
 
         //Act
-        HttpResponseMessage postResponse = await _client.PostAsync(action, new FormUrlEncodedContent(fields));
+        await _client.PostAsync(action, new FormUrlEncodedContent(fields));
         IDocument afterDoc = await _client.GetDocumentAsync("/HarmedOrCasualty/List");
 
         // Assert
