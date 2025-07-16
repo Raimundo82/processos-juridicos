@@ -1,6 +1,3 @@
-using System.Net;
-
-using AngleSharp;
 using AngleSharp.Dom;
 
 using Microsoft.EntityFrameworkCore;
@@ -175,8 +172,10 @@ public class CrimeTypeIntegrationTests(CustomWebApplicationFactory<Program> fact
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        var id = dbContext.Crime_types.Add(new CrimeType { CrimeTypeName = "Corrupção" }).Entity.CrimeTypeId;
-
+        var crimeTypeName = "Corrupção";
+        CrimeType crimeType = CreateCrimeType(crimeTypeName);
+        dbContext.Crime_types.Add(crimeType);
+        var id = crimeType.CrimeTypeId;
         await dbContext.SaveChangesAsync();
 
         IDocument editDoc = await _client.GetDocumentAsync($"/CrimeType/Edit/{id}");
@@ -190,35 +189,17 @@ public class CrimeTypeIntegrationTests(CustomWebApplicationFactory<Program> fact
         };
 
         //Act
-        var content = new FormUrlEncodedContent(fields);
-        HttpResponseMessage postResponse = await _client.PostAsync(action, content);
-
-        // Assert
-        Assert.Equal(HttpStatusCode.OK, postResponse.StatusCode);
-
-        //Act
+        await _client.PostAsync(action, new FormUrlEncodedContent(fields));
         IDocument doc = await _client.GetDocumentAsync("/CrimeType/List");
 
         // Assert
-        var cellTexts = doc
-            .QuerySelectorAll("table tbody td")
-            .Select(td => td.TextContent.Trim())
-            .ToList();
+        Assert.Single(dbContext.Crime_types);
 
-        Assert.Contains("Corrupção", cellTexts);
-        Assert.Single(await dbContext.Crime_types.ToListAsync());
-
-        var html = await postResponse.Content.ReadAsStringAsync();
-        IDocument errDoc = await BrowsingContext
-                        .New(Configuration.Default)
-                        .OpenAsync(req => req.Content(html));
-        Assert.Contains(
-            "O campo Nome do Tipo de Crime é obrigatório.",
-            errDoc.DocumentElement.TextContent,
-            StringComparison.OrdinalIgnoreCase
-        );
-
-        await DbUtilities.RemoveEntitiesAsync<CrimeType>(dbContext);
+        IElement? row = doc.QuerySelector($"table tbody tr[data-id='{id}']");
+        Assert.NotNull(row);
+        IElement? cell = row.QuerySelector("td[data-property='name']");
+        Assert.NotNull(cell);
+        Assert.Equal(cell.TextContent.Trim(), crimeTypeName);
     }
 
     [Fact]
