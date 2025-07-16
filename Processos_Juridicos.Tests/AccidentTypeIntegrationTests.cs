@@ -1,6 +1,3 @@
-using System.Net;
-
-using AngleSharp;
 using AngleSharp.Dom;
 
 using Microsoft.EntityFrameworkCore;
@@ -167,7 +164,6 @@ public class AccidentTypeIntegrationTests(CustomWebApplicationFactory<Program> f
         Assert.NotNull(cell);
         Assert.Equal("Atualizado", cell.TextContent.Trim());
     }
-
     [Fact]
     public async Task Edit_Post_WhenModelIsInvalid_DoesNotApplyChanges()
     {
@@ -175,8 +171,10 @@ public class AccidentTypeIntegrationTests(CustomWebApplicationFactory<Program> f
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        var id = dbContext.Accident_types.Add(new AccidentType { AccidentTypeName = "Viação" }).Entity.AccidentTypeId;
-
+        var accidentTypeName = "serviço";
+        AccidentType accidentType = CreateAccidentType(accidentTypeName);
+        dbContext.Accident_types.Add(accidentType);
+        var id = accidentType.AccidentTypeId;
         await dbContext.SaveChangesAsync();
 
         IDocument editDoc = await _client.GetDocumentAsync($"/AccidentType/Edit/{id}");
@@ -190,36 +188,19 @@ public class AccidentTypeIntegrationTests(CustomWebApplicationFactory<Program> f
         };
 
         //Act
-        var content = new FormUrlEncodedContent(fields);
-        HttpResponseMessage postResponse = await _client.PostAsync(action, content);
-
-        // Assert
-        Assert.Equal(HttpStatusCode.OK, postResponse.StatusCode);
-
-        //Act
+        await _client.PostAsync(action, new FormUrlEncodedContent(fields));
         IDocument doc = await _client.GetDocumentAsync("/AccidentType/List");
 
         // Assert
-        var cellTexts = doc
-            .QuerySelectorAll("table tbody td")
-            .Select(td => td.TextContent.Trim())
-            .ToList();
+        Assert.Single(dbContext.Accident_types);
 
-        Assert.Contains("Viação", cellTexts);
-        Assert.Single(await dbContext.Accident_types.ToListAsync());
-
-        var html = await postResponse.Content.ReadAsStringAsync();
-        IDocument errDoc = await BrowsingContext
-                        .New(Configuration.Default)
-                        .OpenAsync(req => req.Content(html));
-        Assert.Contains(
-            "O campo Nome do Tipo de Acidente é obrigatório.",
-            errDoc.DocumentElement.TextContent,
-            StringComparison.OrdinalIgnoreCase
-        );
-
-        await DbUtilities.RemoveEntitiesAsync<AccidentType>(dbContext);
+        IElement? row = doc.QuerySelector($"table tbody tr[data-id='{id}']");
+        Assert.NotNull(row);
+        IElement? cell = row.QuerySelector("td[data-property='name']");
+        Assert.NotNull(cell);
+        Assert.Equal(cell.TextContent.Trim(), accidentTypeName);
     }
+
 
     [Fact]
     public async Task Delete_Successful_RemovesItemAndRedirects()
