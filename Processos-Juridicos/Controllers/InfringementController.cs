@@ -21,18 +21,6 @@ public class InfringementController(IInfringementSvc infringementSvc, IToastNoti
     }
 
     [HttpGet]
-    public async Task<IActionResult> ListOne(int? id)
-    {
-        if (ModelState.IsValid)
-        {
-            InfringementDto infringement = await _infringementSvc.GetInfringementById(id);
-            return View(infringement);
-        }
-
-        return RedirectToAction(nameof(List));
-    }
-
-    [HttpGet]
     public IActionResult Create()
     {
         return View();

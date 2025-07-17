@@ -14,7 +14,7 @@
 <a asp-controller="Infringement" asp-action="Create" class="btn btn-primary">Inserir Acidente em Serviço</a>
 
 <div>
-    <table id="tableStates" class="table table-striped-columns table-hover">
+    <table id="tableInfringements" class="table table-striped-columns table-hover">
         <thead>
             <tr>
                 <th scope="col">#</th>
@@ -26,17 +26,17 @@
 
             @foreach (var item in Model.ToList())
             {
-                <tr>
-                    <th scope="row">@count</th>
-                    <td>@Html.DisplayFor(m => item.InfringementName)</td>
+                <tr data-id="@item.InfringementId">
+                    <th scope="col">@count</th>
+                    <td data-property="name"=>@Html.DisplayFor(m => item.InfringementName)</td>
                     <td>
                         <div class="d-flex gap-2">
-                            <form asp-controller="Infringement" asp-action="Delete" method="post">
+                            <form asp-controller="Infringement" asp-action="Delete" method="post" data-action="delete">
                                 <input type="hidden" name="id" value="@item.InfringementId">
                                 <button type="submit" class="btn btn-danger js-delete-btn"></button>
                             </form>
                             <a asp-controller="Infringement" asp-action="Edit" asp-route-id="@item.InfringementId"
-                               class="btn btn-warning"><i class="bi bi-pencil"></i></a>
+                               data-action="access-edit-form" class="btn btn-warning"><i class="bi bi-pencil"></i></a>
                         </div>
                     </td>
                 </tr>
@@ -48,6 +48,6 @@
 
 @section Scripts {
     <script>
-        let table = createDataTable("#tableStates");
+        let table = createDataTable("#tableInfringements");
     </script>
 } 
