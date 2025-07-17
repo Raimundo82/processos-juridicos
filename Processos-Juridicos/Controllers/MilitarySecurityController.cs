@@ -21,18 +21,6 @@ public class MilitarySecurityController(IMilitarySecuritySvc militarySecuritySvc
     }
 
     [HttpGet]
-    public async Task<IActionResult> ListOne(int? id)
-    {
-        if (ModelState.IsValid)
-        {
-            MilitarySecurityDto security = await _militarySecuritySvc.GetMilitarySecurityById(id);
-            return View(security);
-        }
-
-        return RedirectToAction(nameof(List));
-    }
-
-    [HttpGet]
     public IActionResult Create()
     {
         return View();

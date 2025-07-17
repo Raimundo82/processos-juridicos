@@ -27,17 +27,17 @@
 
             @foreach (var item in Model.ToList())
             {
-                <tr>
-                    <td>@count</td>
-                    <td>@Html.DisplayFor(m => item.MilitarySecurityName)</td>
+                <tr data-id="@item.MilitarySecurityId">
+                    <th scope="col">@count</th>
+                    <td data-property="name"=>@Html.DisplayFor(m => item.MilitarySecurityName)</td>
                     <td>
                         <div class="d-flex gap-2">
-                            <form asp-controller="MilitarySecurity" asp-action="Delete" method="post">
+                            <form asp-controller="MilitarySecurity" asp-action="Delete" method="post" data-action="delete">
                                 <input type="hidden" name="id" value="@item.MilitarySecurityId">
                                 <button type="submit" class="btn btn-danger js-delete-btn"></button>
                             </form>
                             <a asp-controller="MilitarySecurity" asp-action="Edit" asp-route-id="@item.MilitarySecurityId"
-                               class="btn btn-warning"><i class="bi bi-pencil"></i></a>
+                               data-action="access-edit-form" class="btn btn-warning"><i class="bi bi-pencil"></i></a>
                         </div>
                     </td>
                 </tr>
