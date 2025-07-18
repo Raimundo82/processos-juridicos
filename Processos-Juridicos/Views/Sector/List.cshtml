@@ -14,7 +14,7 @@
 <a asp-controller="Sector" asp-action="Create" class="btn btn-primary">Inserir Setor</a>
 
 <div>
-    <table id="tableStates" class="table table-striped-columns table-hover">
+    <table id="tableSectors" class="table table-striped-columns table-hover">
         <thead>
             <tr>
                 <th scope="col">#</th>
@@ -28,19 +28,18 @@
 
             @foreach (var item in Model.ToList())
             {
-                <tr>
-                    <th scope="row">@count</th>
-                    <td>@Html.DisplayFor(m => item.SectorName)</td>
-                    <td>@Html.DisplayFor(m => item.SectorCode)</td>
-                    <td>@Html.DisplayFor(m => item.Enable)</td>
+                <tr data-id="@item.SectorId" @(item.Enable ? "data-enable" : "")>
+                    <th scope="col">@count</th>
+                    <td data-property="name"=>@Html.DisplayFor(m => item.SectorName)</td>
+                    <td data-property="code"=>@Html.DisplayFor(m => item.SectorCode)</td>
                     <td>
                         <div class="d-flex gap-2">
-                            <form asp-controller="Sector" asp-action="Delete" method="post">
+                            <form asp-controller="Sector" asp-action="Delete" method="post" data-action="delete">
                                 <input type="hidden" name="id" value="@item.SectorId">
                                 <button type="submit" class="btn btn-danger js-delete-btn"></button>
                             </form>
                             <a asp-controller="Sector" asp-action="Edit" asp-route-id="@item.SectorId"
-                               class="btn btn-warning"><i class="bi bi-pencil"></i></a>
+                                data-action="access-edit-form" class="btn btn-warning"><i class="bi bi-pencil"></i></a>
                         </div>
                     </td>
                 </tr>
@@ -52,6 +51,6 @@
 
 @section Scripts {
     <script>
-        let table = createDataTable("#tableStates");
+        let table = createDataTable("#tableSectors");
     </script>
-} 
+}

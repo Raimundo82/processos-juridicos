@@ -20,18 +20,6 @@ public class SectorController(ISectorSvc sectorSvc, IToastNotify toastNotify) : 
     }
 
     [HttpGet]
-    public async Task<IActionResult> ListOne(int? id)
-    {
-        if (ModelState.IsValid)
-        {
-            SectorDto sector = await _sectorSvc.GetSectorById(id);
-            return View(sector);
-        }
-
-        return RedirectToAction(nameof(List));
-    }
-
-    [HttpGet]
     public IActionResult Create()
     {
         return View();
