@@ -276,7 +276,6 @@ public class AccidentTypeIntegrationTests(CustomWebApplicationFactory<Program> f
         Assert.Equal("Viação", cell.TextContent.Trim());
     }
 
-
     public async Task InitializeAsync()
     {
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
