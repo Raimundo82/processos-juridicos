@@ -92,6 +92,7 @@ dotnet_naming_symbols.methods.applicable_accessibilities = public, internal, pro
 # Apply .NET code style rules across the board.
 dotnet_analyzer_diagnostic.category-Style.severity = warning
 dotnet_diagnostic.IDE0058.severity = none
+dotnet_diagnostic.S6966.severity = none
 
 ############################################################
 # Razor (.cshtml) File Formatting Rules
