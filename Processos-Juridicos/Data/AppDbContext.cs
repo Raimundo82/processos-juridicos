@@ -6,17 +6,17 @@ namespace Processos_Juridicos.Data;
 
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
-    public DbSet<AccidentType> Accident_types { get; set; }
+    public DbSet<AccidentType> AccidentTypes { get; set; }
 
-    public DbSet<CrimeType> Crime_types { get; set; }
+    public DbSet<CrimeType> CrimeTypes { get; set; }
 
-    public DbSet<ProcessFile> Process_Files { get; set; }
+    public DbSet<ProcessFile> ProcessFiles { get; set; }
 
-    public DbSet<HarmedOrCasualty> Harmed_or_casualties { get; set; }
+    public DbSet<HarmedOrCasualty> HarmedOrCasualties { get; set; }
 
     public DbSet<Infringement> Infringements { get; set; }
 
-    public DbSet<ProcessType> Process_types { get; set; }
+    public DbSet<ProcessType> ProcessTypes { get; set; }
 
     public DbSet<Process> Processes { get; set; }
 
@@ -27,7 +27,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Sector> Sectors { get; set; }
     public DbSet<Unit> Units { get; set; }
 
-    public DbSet<MilitarySecurity> Military_securities { get; set; }
+    public DbSet<MilitarySecurity> MilitarySecurities { get; set; }
 
 
 }

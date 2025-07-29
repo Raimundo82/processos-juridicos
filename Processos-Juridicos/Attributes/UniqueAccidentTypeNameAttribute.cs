@@ -20,7 +20,7 @@ public sealed class UniqueAccidentTypeNameAttribute : ValidationAttribute
 
         var accidentTypeName = value as string;
 
-        var existingType = context.Accident_types
+        var existingType = context.AccidentTypes
             .Any(p => p.AccidentTypeName == accidentTypeName && p.AccidentTypeId != accidentTypeDto.AccidentTypeId);
 
         return existingType

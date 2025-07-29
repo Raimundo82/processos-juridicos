@@ -17,7 +17,7 @@ public class HarmedOrCasualtySvc(AppDbContext context) : IHarmedOrCasualtySvc
     {
         HarmedOrCasualty casualtyEntity = Mapper.MapToHarmedOrCasualties(casualty);
 
-        _context.Harmed_or_casualties.Add(casualtyEntity);
+        _context.HarmedOrCasualties.Add(casualtyEntity);
         await _context.SaveChangesAsync();
         return Mapper.MapToHarmedOrCasualtiesDto(casualtyEntity);
 
@@ -25,10 +25,10 @@ public class HarmedOrCasualtySvc(AppDbContext context) : IHarmedOrCasualtySvc
 
     public async Task<bool> DeleteCasualty(int? id)
     {
-        HarmedOrCasualty? casualty = await _context.Harmed_or_casualties.FindAsync(id);
+        HarmedOrCasualty? casualty = await _context.HarmedOrCasualties.FindAsync(id);
         if (casualty != null)
         {
-            _context.Harmed_or_casualties.Remove(casualty);
+            _context.HarmedOrCasualties.Remove(casualty);
             await _context.SaveChangesAsync();
             return true;
         }
@@ -39,7 +39,7 @@ public class HarmedOrCasualtySvc(AppDbContext context) : IHarmedOrCasualtySvc
     public async Task<HarmedOrCasualtyDto> EditCasualty(HarmedOrCasualtyDto casualty)
     {
         HarmedOrCasualty casualtyEntity = Mapper.MapToHarmedOrCasualties(casualty);
-        _context.Harmed_or_casualties.Entry(casualtyEntity).State = EntityState.Modified;
+        _context.HarmedOrCasualties.Entry(casualtyEntity).State = EntityState.Modified;
 
         await _context.SaveChangesAsync();
         return Mapper.MapToHarmedOrCasualtiesDto(casualtyEntity);
@@ -47,13 +47,13 @@ public class HarmedOrCasualtySvc(AppDbContext context) : IHarmedOrCasualtySvc
 
     public async Task<IEnumerable<HarmedOrCasualtyDto>> GetAllCasualties()
     {
-        List<HarmedOrCasualty> casualties = await _context.Harmed_or_casualties.ToListAsync();
+        List<HarmedOrCasualty> casualties = await _context.HarmedOrCasualties.ToListAsync();
         return Mapper.MapToToHarmedOrCasualtiesEnum(casualties);
     }
 
     public async Task<HarmedOrCasualtyDto> GetCasualtyById(int? id)
     {
-        HarmedOrCasualty? casualty = await _context.Harmed_or_casualties.FindAsync(id);
+        HarmedOrCasualty? casualty = await _context.HarmedOrCasualties.FindAsync(id);
         return casualty != null ? Mapper.MapToHarmedOrCasualtiesDto(casualty) : throw new EntityNotFoundException("Casualty was not found");
     }
 }

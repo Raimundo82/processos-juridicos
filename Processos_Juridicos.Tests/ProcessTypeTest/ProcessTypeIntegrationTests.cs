@@ -23,14 +23,14 @@ public class ProcessTypeIntegrationTests(CustomWebApplicationFactory<Program> fa
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        dbContext.Process_types.AddRange(scenarioProcessTypes);
+        dbContext.ProcessTypes.AddRange(scenarioProcessTypes);
         await dbContext.SaveChangesAsync();
 
         // Act
         IDocument doc = await _client.GetDocumentAsync("/ProcessType/List");
 
         // Assert
-        DbSet<ProcessType> dbItems = dbContext.Process_types;
+        DbSet<ProcessType> dbItems = dbContext.ProcessTypes;
 
         Assert.All(dbItems, dbItem =>
         {
@@ -69,7 +69,7 @@ public class ProcessTypeIntegrationTests(CustomWebApplicationFactory<Program> fa
         IDocument listDoc = await _client.GetDocumentAsync("/ProcessType/List");
 
         // Assert
-        DbSet<ProcessType> dbItems = dbContext.Process_types;
+        DbSet<ProcessType> dbItems = dbContext.ProcessTypes;
         Assert.Equal(scenarioProcessTypes.Length, dbItems.Count());
 
         Assert.All(dbItems, dbItem =>
@@ -99,7 +99,7 @@ public class ProcessTypeIntegrationTests(CustomWebApplicationFactory<Program> fa
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
         ProcessType sector = ProcessTypeTestData.CreateProcessType("CPLM", 15);
-        dbContext.Process_types.Add(sector);
+        dbContext.ProcessTypes.Add(sector);
         var id = sector.ProcessTypeId;
         await dbContext.SaveChangesAsync();
 
@@ -107,7 +107,7 @@ public class ProcessTypeIntegrationTests(CustomWebApplicationFactory<Program> fa
         IDocument doc = await _client.GetDocumentAsync($"/ProcessType/Edit/{id}");
 
         // Assert
-        Assert.Single(dbContext.Process_types);
+        Assert.Single(dbContext.ProcessTypes);
         IElement? form = doc.QuerySelector("form[action^='/ProcessType/Edit']");
         Assert.NotNull(form);
 
@@ -129,7 +129,7 @@ public class ProcessTypeIntegrationTests(CustomWebApplicationFactory<Program> fa
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         ProcessType ProcessType = ProcessTypeTestData.CreateProcessType("CPLM", 15);
 
-        dbContext.Process_types.Add(ProcessType);
+        dbContext.ProcessTypes.Add(ProcessType);
         var id = ProcessType.ProcessTypeId;
         await dbContext.SaveChangesAsync();
 
@@ -150,7 +150,7 @@ public class ProcessTypeIntegrationTests(CustomWebApplicationFactory<Program> fa
         IDocument listDoc = await _client.GetDocumentAsync("/ProcessType/List");
 
         //Assert
-        Assert.Single(dbContext.Process_types);
+        Assert.Single(dbContext.ProcessTypes);
         IElement? nameCell = listDoc.QuerySelector("table tbody td[data-property='name']");
         Assert.NotNull(nameCell);
         Assert.Equal("Atualizado", nameCell.TextContent.Trim());
@@ -170,7 +170,7 @@ public class ProcessTypeIntegrationTests(CustomWebApplicationFactory<Program> fa
         var processTypeName = "Revisão";
         var processTypeDeadline = 15;
         ProcessType processType = ProcessTypeTestData.CreateProcessType(processTypeName, processTypeDeadline);
-        dbContext.Process_types.Add(processType);
+        dbContext.ProcessTypes.Add(processType);
         var id = processType.ProcessTypeId;
         await dbContext.SaveChangesAsync();
 
@@ -190,7 +190,7 @@ public class ProcessTypeIntegrationTests(CustomWebApplicationFactory<Program> fa
         IDocument listDoc = await _client.GetDocumentAsync("/ProcessType/List");
 
         // Assert
-        Assert.Single(dbContext.Process_types);
+        Assert.Single(dbContext.ProcessTypes);
 
         IElement? row = listDoc.QuerySelector($"table tbody tr[data-id='{id}']");
         Assert.NotNull(row);
@@ -214,7 +214,7 @@ public class ProcessTypeIntegrationTests(CustomWebApplicationFactory<Program> fa
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
         ProcessType ProcessType = ProcessTypeTestData.CreateProcessType("CPLM", 15);
-        dbContext.Process_types.Add(ProcessType);
+        dbContext.ProcessTypes.Add(ProcessType);
         var id = ProcessType.ProcessTypeId;
         await dbContext.SaveChangesAsync();
 
@@ -236,7 +236,7 @@ public class ProcessTypeIntegrationTests(CustomWebApplicationFactory<Program> fa
         IDocument afterDoc = await _client.GetDocumentAsync("/ProcessType/List");
 
         // Assert 
-        Assert.Empty(dbContext.Process_types);
+        Assert.Empty(dbContext.ProcessTypes);
         IElement? row = afterDoc.QuerySelector($"table tbody tr[data-id='{id}']");
         Assert.Null(row);
     }
@@ -249,7 +249,7 @@ public class ProcessTypeIntegrationTests(CustomWebApplicationFactory<Program> fa
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
         ProcessType ProcessType = ProcessTypeTestData.CreateProcessType("CPLM", 15);
-        dbContext.Process_types.Add(ProcessType);
+        dbContext.ProcessTypes.Add(ProcessType);
         var id = ProcessType.ProcessTypeId;
         await dbContext.SaveChangesAsync();
 
@@ -271,7 +271,7 @@ public class ProcessTypeIntegrationTests(CustomWebApplicationFactory<Program> fa
         IDocument afterDoc = await _client.GetDocumentAsync("/ProcessType/List");
 
         // Assert
-        Assert.Single(dbContext.Process_types);
+        Assert.Single(dbContext.ProcessTypes);
         IElement? row = afterDoc.QuerySelector($"table tbody tr[data-id='{id}']");
         Assert.NotNull(row);
 
@@ -289,7 +289,7 @@ public class ProcessTypeIntegrationTests(CustomWebApplicationFactory<Program> fa
     {
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        dbContext.RemoveRange(dbContext.Process_types);
+        dbContext.RemoveRange(dbContext.ProcessTypes);
         await dbContext.SaveChangesAsync();
     }
 

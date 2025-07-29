@@ -29,19 +29,19 @@ public class HarmedOrCasualtyIntegrationTests(CustomWebApplicationFactory<Progra
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        dbContext.Harmed_or_casualties.AddRange(namesInput.Select(CreateHarmedOrCasualty));
+        dbContext.HarmedOrCasualties.AddRange(namesInput.Select(CreateHarmedOrCasualty));
         await dbContext.SaveChangesAsync();
 
         // Act
         IDocument doc = await _client.GetDocumentAsync("/HarmedOrCasualty/List");
 
         // Assert
-        Assert.Equal(namesInput.Length, await dbContext.Harmed_or_casualties.CountAsync());
+        Assert.Equal(namesInput.Length, await dbContext.HarmedOrCasualties.CountAsync());
 
         var rows = doc.QuerySelectorAll("table tbody tr").ToList();
         Assert.Equal(namesInput.Length, rows.Count);
 
-        foreach (HarmedOrCasualty HarmedOrCasualty in dbContext.Harmed_or_casualties)
+        foreach (HarmedOrCasualty HarmedOrCasualty in dbContext.HarmedOrCasualties)
         {
             Assert.Contains(HarmedOrCasualty.CasualtyName, namesInput);
 
@@ -76,7 +76,7 @@ public class HarmedOrCasualtyIntegrationTests(CustomWebApplicationFactory<Progra
         }
 
         // Assert
-        DbSet<HarmedOrCasualty> dbItems = dbContext.Harmed_or_casualties;
+        DbSet<HarmedOrCasualty> dbItems = dbContext.HarmedOrCasualties;
 
         Assert.Equal(namesInput.Length, dbItems.Count());
 
@@ -108,7 +108,7 @@ public class HarmedOrCasualtyIntegrationTests(CustomWebApplicationFactory<Progra
 
         HarmedOrCasualty HarmedOrCasualty = CreateHarmedOrCasualty("Ferido");
 
-        dbContext.Harmed_or_casualties.Add(HarmedOrCasualty);
+        dbContext.HarmedOrCasualties.Add(HarmedOrCasualty);
 
         await dbContext.SaveChangesAsync();
 
@@ -118,7 +118,7 @@ public class HarmedOrCasualtyIntegrationTests(CustomWebApplicationFactory<Progra
         IDocument doc = await _client.GetDocumentAsync($"/HarmedOrCasualty/Edit/{id}");
 
         // Assert
-        Assert.Single(dbContext.Harmed_or_casualties);
+        Assert.Single(dbContext.HarmedOrCasualties);
         IElement? form = doc.QuerySelector("form[action^='/HarmedOrCasualty/Edit']");
         Assert.NotNull(form);
 
@@ -137,7 +137,7 @@ public class HarmedOrCasualtyIntegrationTests(CustomWebApplicationFactory<Progra
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         HarmedOrCasualty HarmedOrCasualty = CreateHarmedOrCasualty("Ferido");
 
-        dbContext.Harmed_or_casualties.Add(HarmedOrCasualty);
+        dbContext.HarmedOrCasualties.Add(HarmedOrCasualty);
 
         await dbContext.SaveChangesAsync();
 
@@ -159,7 +159,7 @@ public class HarmedOrCasualtyIntegrationTests(CustomWebApplicationFactory<Progra
         IDocument listDoc = await _client.GetDocumentAsync("/HarmedOrCasualty/List");
 
         //Assert
-        Assert.Single(dbContext.Harmed_or_casualties);
+        Assert.Single(dbContext.HarmedOrCasualties);
         IElement? cell = listDoc.QuerySelector("table tbody td[data-property='name']");
         Assert.NotNull(cell);
         Assert.Equal("Atualizado", cell.TextContent.Trim());
@@ -174,7 +174,7 @@ public class HarmedOrCasualtyIntegrationTests(CustomWebApplicationFactory<Progra
 
         var casualtyName = "Ferido";
         HarmedOrCasualty harmedOrCasualty = CreateHarmedOrCasualty(casualtyName);
-        dbContext.Harmed_or_casualties.Add(harmedOrCasualty);
+        dbContext.HarmedOrCasualties.Add(harmedOrCasualty);
         var id = harmedOrCasualty.CasualtyId;
         await dbContext.SaveChangesAsync();
 
@@ -193,7 +193,7 @@ public class HarmedOrCasualtyIntegrationTests(CustomWebApplicationFactory<Progra
         IDocument doc = await _client.GetDocumentAsync("/HarmedOrCasualty/List");
 
         // Assert
-        Assert.Single(dbContext.Harmed_or_casualties);
+        Assert.Single(dbContext.HarmedOrCasualties);
 
         IElement? row = doc.QuerySelector($"table tbody tr[data-id='{id}']");
         Assert.NotNull(row);
@@ -210,7 +210,7 @@ public class HarmedOrCasualtyIntegrationTests(CustomWebApplicationFactory<Progra
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
         HarmedOrCasualty HarmedOrCasualty = CreateHarmedOrCasualty("Ferido");
-        dbContext.Harmed_or_casualties.Add(HarmedOrCasualty);
+        dbContext.HarmedOrCasualties.Add(HarmedOrCasualty);
         await dbContext.SaveChangesAsync();
         var id = HarmedOrCasualty.CasualtyId;
 
@@ -233,7 +233,7 @@ public class HarmedOrCasualtyIntegrationTests(CustomWebApplicationFactory<Progra
         IDocument afterDoc = await _client.GetDocumentAsync("/HarmedOrCasualty/List");
 
         // Assert 
-        Assert.Empty(dbContext.Harmed_or_casualties);
+        Assert.Empty(dbContext.HarmedOrCasualties);
         IHtmlCollection<IElement> rows = afterDoc.QuerySelectorAll("table tbody tr");
         Assert.Empty(rows);
     }
@@ -246,7 +246,7 @@ public class HarmedOrCasualtyIntegrationTests(CustomWebApplicationFactory<Progra
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
         HarmedOrCasualty HarmedOrCasualty = CreateHarmedOrCasualty("Ferido");
-        dbContext.Harmed_or_casualties.Add(HarmedOrCasualty);
+        dbContext.HarmedOrCasualties.Add(HarmedOrCasualty);
         await dbContext.SaveChangesAsync();
         var id = HarmedOrCasualty.CasualtyId;
 
@@ -268,7 +268,7 @@ public class HarmedOrCasualtyIntegrationTests(CustomWebApplicationFactory<Progra
         IDocument afterDoc = await _client.GetDocumentAsync("/HarmedOrCasualty/List");
 
         // Assert
-        Assert.Single(dbContext.Harmed_or_casualties);
+        Assert.Single(dbContext.HarmedOrCasualties);
         IElement? row = afterDoc.QuerySelector($"table tbody tr[data-id='{id}']");
         Assert.NotNull(row);
         IElement? cell = row.QuerySelector("td[data-property='name']");
@@ -280,7 +280,7 @@ public class HarmedOrCasualtyIntegrationTests(CustomWebApplicationFactory<Progra
     {
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        dbContext.RemoveRange(dbContext.Harmed_or_casualties);
+        dbContext.RemoveRange(dbContext.HarmedOrCasualties);
         await dbContext.SaveChangesAsync();
     }
 

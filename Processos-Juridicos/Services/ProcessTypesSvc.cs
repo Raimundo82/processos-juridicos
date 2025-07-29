@@ -15,13 +15,13 @@ public class ProcessTypesSvc(AppDbContext context) : IProcessTypeSvc
 
     public async Task<IEnumerable<ProcessTypeDto>> GetAllProcessTypes()
     {
-        List<ProcessType> types = await _context.Process_types.ToListAsync();
+        List<ProcessType> types = await _context.ProcessTypes.ToListAsync();
         return Mapper.MapToToProcessTypeDtoEnum(types);
     }
 
     public async Task<ProcessTypeDto> GetProcessTypeById(int? id)
     {
-        ProcessType? type = await _context.Process_types.FindAsync(id);
+        ProcessType? type = await _context.ProcessTypes.FindAsync(id);
         return type != null ? Mapper.MapToProcessTypeDto(type) : throw new EntityNotFoundException("Process type not found");
     }
 
@@ -29,7 +29,7 @@ public class ProcessTypesSvc(AppDbContext context) : IProcessTypeSvc
     {
         ProcessType typeEntity = Mapper.MapToProcessType(type);
 
-        _context.Process_types.Add(typeEntity);
+        _context.ProcessTypes.Add(typeEntity);
         await _context.SaveChangesAsync();
         return Mapper.MapToProcessTypeDto(typeEntity);
     }
@@ -37,7 +37,7 @@ public class ProcessTypesSvc(AppDbContext context) : IProcessTypeSvc
     public async Task<ProcessTypeDto> EditProcessType(ProcessTypeDto type)
     {
         ProcessType typeEntity = Mapper.MapToProcessType(type);
-        _context.Process_types.Entry(typeEntity).State = EntityState.Modified;
+        _context.ProcessTypes.Entry(typeEntity).State = EntityState.Modified;
 
         await _context.SaveChangesAsync();
         return Mapper.MapToProcessTypeDto(typeEntity);
@@ -45,13 +45,13 @@ public class ProcessTypesSvc(AppDbContext context) : IProcessTypeSvc
 
     public async Task<bool> DeleteProcessType(int? id)
     {
-        ProcessType? process = await _context.Process_types.FindAsync(id);
+        ProcessType? process = await _context.ProcessTypes.FindAsync(id);
         if (process == null)
         {
             return false;
         }
 
-        _context.Process_types.Remove(process);
+        _context.ProcessTypes.Remove(process);
         await _context.SaveChangesAsync();
         return true;
     }

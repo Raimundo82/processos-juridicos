@@ -16,13 +16,13 @@ public class AccidentTypeSvc(AppDbContext context) : IAccidentTypeSvc
 
     public async Task<IEnumerable<AccidentTypeDto>> GetAllAccidentTypes()
     {
-        List<AccidentType> accidents = await _context.Accident_types.ToListAsync();
+        List<AccidentType> accidents = await _context.AccidentTypes.ToListAsync();
         return Mapper.MapToAccidentTypeEnum(accidents);
     }
 
     public async Task<AccidentTypeDto> GetAccidentTypeById(int? id)
     {
-        AccidentType? accident = await _context.Accident_types.FindAsync(id);
+        AccidentType? accident = await _context.AccidentTypes.FindAsync(id);
         return accident != null ? Mapper.MapToAccidenTypeDto(accident) : throw new EntityNotFoundException(GlobalTextManager.GetString("EntityNotFound"));
     }
 
@@ -30,7 +30,7 @@ public class AccidentTypeSvc(AppDbContext context) : IAccidentTypeSvc
     {
         AccidentType typeEntity = Mapper.MapToAccidentType(type);
 
-        _context.Accident_types.Add(typeEntity);
+        _context.AccidentTypes.Add(typeEntity);
         await _context.SaveChangesAsync();
         return Mapper.MapToAccidenTypeDto(typeEntity);
     }
@@ -38,7 +38,7 @@ public class AccidentTypeSvc(AppDbContext context) : IAccidentTypeSvc
     public async Task<AccidentTypeDto> EditAccidentType(AccidentTypeDto type)
     {
         AccidentType typeEntity = Mapper.MapToAccidentType(type);
-        _context.Accident_types.Entry(typeEntity).State = EntityState.Modified;
+        _context.AccidentTypes.Entry(typeEntity).State = EntityState.Modified;
 
         await _context.SaveChangesAsync();
         return Mapper.MapToAccidenTypeDto(typeEntity);
@@ -52,10 +52,10 @@ public class AccidentTypeSvc(AppDbContext context) : IAccidentTypeSvc
 
         deps.ForEach(p => p.ServiceAccidentId = null);
 
-        AccidentType? accident = await _context.Accident_types.FindAsync(id);
+        AccidentType? accident = await _context.AccidentTypes.FindAsync(id);
         if (accident != null)
         {
-            _context.Accident_types.Remove(accident);
+            _context.AccidentTypes.Remove(accident);
             await _context.SaveChangesAsync();
             return true;
         }

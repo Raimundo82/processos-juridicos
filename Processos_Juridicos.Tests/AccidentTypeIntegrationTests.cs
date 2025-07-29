@@ -29,19 +29,19 @@ public class AccidentTypeIntegrationTests(CustomWebApplicationFactory<Program> f
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        dbContext.Accident_types.AddRange(namesInput.Select(CreateAccidentType));
+        dbContext.AccidentTypes.AddRange(namesInput.Select(CreateAccidentType));
         await dbContext.SaveChangesAsync();
 
         // Act
         IDocument doc = await _client.GetDocumentAsync("/AccidentType/List");
 
         // Assert
-        Assert.Equal(namesInput.Length, await dbContext.Accident_types.CountAsync());
+        Assert.Equal(namesInput.Length, await dbContext.AccidentTypes.CountAsync());
 
         var rows = doc.QuerySelectorAll("table tbody tr").ToList();
         Assert.Equal(namesInput.Length, rows.Count);
 
-        foreach (AccidentType accidentType in dbContext.Accident_types)
+        foreach (AccidentType accidentType in dbContext.AccidentTypes)
         {
             Assert.Contains(accidentType.AccidentTypeName, namesInput);
 
@@ -76,7 +76,7 @@ public class AccidentTypeIntegrationTests(CustomWebApplicationFactory<Program> f
         }
 
         // Assert
-        DbSet<AccidentType> dbItems = dbContext.Accident_types;
+        DbSet<AccidentType> dbItems = dbContext.AccidentTypes;
 
         Assert.Equal(namesInput.Length, dbItems.Count());
 
@@ -108,7 +108,7 @@ public class AccidentTypeIntegrationTests(CustomWebApplicationFactory<Program> f
 
         AccidentType accidentType = CreateAccidentType("Viação");
 
-        dbContext.Accident_types.Add(accidentType);
+        dbContext.AccidentTypes.Add(accidentType);
 
         await dbContext.SaveChangesAsync();
 
@@ -118,7 +118,7 @@ public class AccidentTypeIntegrationTests(CustomWebApplicationFactory<Program> f
         IDocument doc = await _client.GetDocumentAsync($"/AccidentType/Edit/{id}");
 
         // Assert
-        Assert.Single(dbContext.Accident_types);
+        Assert.Single(dbContext.AccidentTypes);
         IElement? form = doc.QuerySelector("form[action^='/AccidentType/Edit']");
         Assert.NotNull(form);
 
@@ -137,7 +137,7 @@ public class AccidentTypeIntegrationTests(CustomWebApplicationFactory<Program> f
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         AccidentType AccidentType = CreateAccidentType("Viação");
 
-        dbContext.Accident_types.Add(AccidentType);
+        dbContext.AccidentTypes.Add(AccidentType);
 
         await dbContext.SaveChangesAsync();
 
@@ -159,7 +159,7 @@ public class AccidentTypeIntegrationTests(CustomWebApplicationFactory<Program> f
         IDocument listDoc = await _client.GetDocumentAsync("/AccidentType/List");
 
         //Assert
-        Assert.Single(dbContext.Accident_types);
+        Assert.Single(dbContext.AccidentTypes);
         IElement? cell = listDoc.QuerySelector("table tbody td[data-property='name']");
         Assert.NotNull(cell);
         Assert.Equal("Atualizado", cell.TextContent.Trim());
@@ -173,7 +173,7 @@ public class AccidentTypeIntegrationTests(CustomWebApplicationFactory<Program> f
 
         var accidentTypeName = "serviço";
         AccidentType accidentType = CreateAccidentType(accidentTypeName);
-        dbContext.Accident_types.Add(accidentType);
+        dbContext.AccidentTypes.Add(accidentType);
         var id = accidentType.AccidentTypeId;
         await dbContext.SaveChangesAsync();
 
@@ -192,7 +192,7 @@ public class AccidentTypeIntegrationTests(CustomWebApplicationFactory<Program> f
         IDocument doc = await _client.GetDocumentAsync("/AccidentType/List");
 
         // Assert
-        Assert.Single(dbContext.Accident_types);
+        Assert.Single(dbContext.AccidentTypes);
 
         IElement? row = doc.QuerySelector($"table tbody tr[data-id='{id}']");
         Assert.NotNull(row);
@@ -210,7 +210,7 @@ public class AccidentTypeIntegrationTests(CustomWebApplicationFactory<Program> f
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
         AccidentType AccidentType = CreateAccidentType("Viação");
-        dbContext.Accident_types.Add(AccidentType);
+        dbContext.AccidentTypes.Add(AccidentType);
         await dbContext.SaveChangesAsync();
         var id = AccidentType.AccidentTypeId;
 
@@ -233,7 +233,7 @@ public class AccidentTypeIntegrationTests(CustomWebApplicationFactory<Program> f
         IDocument afterDoc = await _client.GetDocumentAsync("/AccidentType/List");
 
         // Assert 
-        Assert.Empty(dbContext.Accident_types);
+        Assert.Empty(dbContext.AccidentTypes);
         IHtmlCollection<IElement> rows = afterDoc.QuerySelectorAll("table tbody tr");
         Assert.Empty(rows);
     }
@@ -246,7 +246,7 @@ public class AccidentTypeIntegrationTests(CustomWebApplicationFactory<Program> f
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
         AccidentType AccidentType = CreateAccidentType("Viação");
-        dbContext.Accident_types.Add(AccidentType);
+        dbContext.AccidentTypes.Add(AccidentType);
         await dbContext.SaveChangesAsync();
         var id = AccidentType.AccidentTypeId;
 
@@ -268,7 +268,7 @@ public class AccidentTypeIntegrationTests(CustomWebApplicationFactory<Program> f
         IDocument afterDoc = await _client.GetDocumentAsync("/AccidentType/List");
 
         // Assert
-        Assert.Single(dbContext.Accident_types);
+        Assert.Single(dbContext.AccidentTypes);
         IElement? row = afterDoc.QuerySelector($"table tbody tr[data-id='{id}']");
         Assert.NotNull(row);
         IElement? cell = row.QuerySelector("td[data-property='name']");
@@ -280,7 +280,7 @@ public class AccidentTypeIntegrationTests(CustomWebApplicationFactory<Program> f
     {
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        dbContext.RemoveRange(dbContext.Accident_types);
+        dbContext.RemoveRange(dbContext.AccidentTypes);
         await dbContext.SaveChangesAsync();
     }
 

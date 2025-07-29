@@ -289,7 +289,7 @@ public class UnitIntegrationTests(CustomWebApplicationFactory<Program> factory) 
         IDocument lisdDoc = await _client.GetDocumentAsync("/Unit/List");
 
         // Assert 
-        Assert.Empty(dbContext.Accident_types);
+        Assert.Empty(dbContext.AccidentTypes);
         IHtmlCollection<IElement> rows = lisdDoc.QuerySelectorAll("table tbody tr");
         Assert.Empty(rows);
     }

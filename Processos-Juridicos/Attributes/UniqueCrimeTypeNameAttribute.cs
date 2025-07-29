@@ -20,7 +20,7 @@ public class UniqueCrimeTypeNameAttribute : ValidationAttribute
 
         var crimeTypeName = value as string;
 
-        var existingType = context.Crime_types
+        var existingType = context.CrimeTypes
             .Any(p => p.CrimeTypeName == crimeTypeName && p.CrimeTypeId != crimeTypeDto.CrimeTypeId);
 
         return existingType ? new ValidationResult(GlobalTextManager.GetString(_messageKey)) : ValidationResult.Success;

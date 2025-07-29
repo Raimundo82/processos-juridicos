@@ -20,7 +20,7 @@ public class UniqueHarmedOrCasualtyNameAttribute : ValidationAttribute
 
         var casualtyName = value as string;
 
-        var existingType = context.Harmed_or_casualties
+        var existingType = context.HarmedOrCasualties
             .Any(p => p.CasualtyName == casualtyName && p.CasualtyId != casualtyDto.CasualtyId);
 
         return existingType ? new ValidationResult(GlobalTextManager.GetString(_messageKey)) : ValidationResult.Success;

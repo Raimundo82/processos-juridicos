@@ -29,19 +29,19 @@ public class CrimeTypeIntegrationTests(CustomWebApplicationFactory<Program> fact
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        dbContext.Crime_types.AddRange(namesInput.Select(CreateCrimeType));
+        dbContext.CrimeTypes.AddRange(namesInput.Select(CreateCrimeType));
         await dbContext.SaveChangesAsync();
 
         // Act
         IDocument doc = await _client.GetDocumentAsync("/CrimeType/List");
 
         // Assert
-        Assert.Equal(namesInput.Length, await dbContext.Crime_types.CountAsync());
+        Assert.Equal(namesInput.Length, await dbContext.CrimeTypes.CountAsync());
 
         var rows = doc.QuerySelectorAll("table tbody tr").ToList();
         Assert.Equal(namesInput.Length, rows.Count);
 
-        foreach (CrimeType CrimeType in dbContext.Crime_types)
+        foreach (CrimeType CrimeType in dbContext.CrimeTypes)
         {
             Assert.Contains(CrimeType.CrimeTypeName, namesInput);
 
@@ -76,7 +76,7 @@ public class CrimeTypeIntegrationTests(CustomWebApplicationFactory<Program> fact
         }
 
         // Assert
-        DbSet<CrimeType> dbItems = dbContext.Crime_types;
+        DbSet<CrimeType> dbItems = dbContext.CrimeTypes;
 
         Assert.Equal(namesInput.Length, dbItems.Count());
 
@@ -108,7 +108,7 @@ public class CrimeTypeIntegrationTests(CustomWebApplicationFactory<Program> fact
 
         CrimeType CrimeType = CreateCrimeType("Corrupção");
 
-        dbContext.Crime_types.Add(CrimeType);
+        dbContext.CrimeTypes.Add(CrimeType);
 
         await dbContext.SaveChangesAsync();
 
@@ -118,7 +118,7 @@ public class CrimeTypeIntegrationTests(CustomWebApplicationFactory<Program> fact
         IDocument doc = await _client.GetDocumentAsync($"/CrimeType/Edit/{id}");
 
         // Assert
-        Assert.Single(dbContext.Crime_types);
+        Assert.Single(dbContext.CrimeTypes);
         IElement? form = doc.QuerySelector("form[action^='/CrimeType/Edit']");
         Assert.NotNull(form);
 
@@ -137,7 +137,7 @@ public class CrimeTypeIntegrationTests(CustomWebApplicationFactory<Program> fact
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         CrimeType CrimeType = CreateCrimeType("Corrupção");
 
-        dbContext.Crime_types.Add(CrimeType);
+        dbContext.CrimeTypes.Add(CrimeType);
 
         await dbContext.SaveChangesAsync();
 
@@ -159,7 +159,7 @@ public class CrimeTypeIntegrationTests(CustomWebApplicationFactory<Program> fact
         IDocument listDoc = await _client.GetDocumentAsync("/CrimeType/List");
 
         //Assert
-        Assert.Single(dbContext.Crime_types);
+        Assert.Single(dbContext.CrimeTypes);
         IElement? cell = listDoc.QuerySelector("table tbody td[data-property='name']");
         Assert.NotNull(cell);
         Assert.Equal("Atualizado", cell.TextContent.Trim());
@@ -174,7 +174,7 @@ public class CrimeTypeIntegrationTests(CustomWebApplicationFactory<Program> fact
 
         var crimeTypeName = "Corrupção";
         CrimeType crimeType = CreateCrimeType(crimeTypeName);
-        dbContext.Crime_types.Add(crimeType);
+        dbContext.CrimeTypes.Add(crimeType);
         var id = crimeType.CrimeTypeId;
         await dbContext.SaveChangesAsync();
 
@@ -193,7 +193,7 @@ public class CrimeTypeIntegrationTests(CustomWebApplicationFactory<Program> fact
         IDocument doc = await _client.GetDocumentAsync("/CrimeType/List");
 
         // Assert
-        Assert.Single(dbContext.Crime_types);
+        Assert.Single(dbContext.CrimeTypes);
 
         IElement? row = doc.QuerySelector($"table tbody tr[data-id='{id}']");
         Assert.NotNull(row);
@@ -210,7 +210,7 @@ public class CrimeTypeIntegrationTests(CustomWebApplicationFactory<Program> fact
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
         CrimeType CrimeType = CreateCrimeType("Corrupção");
-        dbContext.Crime_types.Add(CrimeType);
+        dbContext.CrimeTypes.Add(CrimeType);
         await dbContext.SaveChangesAsync();
         var id = CrimeType.CrimeTypeId;
 
@@ -233,7 +233,7 @@ public class CrimeTypeIntegrationTests(CustomWebApplicationFactory<Program> fact
         IDocument afterDoc = await _client.GetDocumentAsync("/CrimeType/List");
 
         // Assert 
-        Assert.Empty(dbContext.Crime_types);
+        Assert.Empty(dbContext.CrimeTypes);
         IHtmlCollection<IElement> rows = afterDoc.QuerySelectorAll("table tbody tr");
         Assert.Empty(rows);
     }
@@ -246,7 +246,7 @@ public class CrimeTypeIntegrationTests(CustomWebApplicationFactory<Program> fact
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
         CrimeType CrimeType = CreateCrimeType("Corrupção");
-        dbContext.Crime_types.Add(CrimeType);
+        dbContext.CrimeTypes.Add(CrimeType);
         await dbContext.SaveChangesAsync();
         var id = CrimeType.CrimeTypeId;
 
@@ -268,7 +268,7 @@ public class CrimeTypeIntegrationTests(CustomWebApplicationFactory<Program> fact
         IDocument afterDoc = await _client.GetDocumentAsync("/CrimeType/List");
 
         // Assert
-        Assert.Single(dbContext.Crime_types);
+        Assert.Single(dbContext.CrimeTypes);
         IElement? row = afterDoc.QuerySelector($"table tbody tr[data-id='{id}']");
         Assert.NotNull(row);
         IElement? cell = row.QuerySelector("td[data-property='name']");
@@ -281,7 +281,7 @@ public class CrimeTypeIntegrationTests(CustomWebApplicationFactory<Program> fact
     {
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        dbContext.RemoveRange(dbContext.Crime_types);
+        dbContext.RemoveRange(dbContext.CrimeTypes);
         await dbContext.SaveChangesAsync();
     }
 

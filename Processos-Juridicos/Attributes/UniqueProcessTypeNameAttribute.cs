@@ -20,7 +20,7 @@ public sealed class UniqueProcessTypeNameAttribute : ValidationAttribute
 
         var processTypeName = value as string;
 
-        var existingType = context.Process_types
+        var existingType = context.ProcessTypes
             .Any(p => p.ProcessTypeName == processTypeName && p.ProcessTypeId != processTypeDto.ProcessTypeId);
 
         return existingType

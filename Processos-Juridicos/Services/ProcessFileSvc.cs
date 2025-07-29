@@ -17,14 +17,14 @@ public class ProcessFileSvc(AppDbContext context) : IProcessFileSvc
     {
         ProcessFile processFileEntity = Mapper.MapToFiles(file);
 
-        _context.Process_Files.Add(processFileEntity);
+        _context.ProcessFiles.Add(processFileEntity);
         await _context.SaveChangesAsync();
         return Mapper.MapToFilesDto(processFileEntity);
     }
 
     public async Task<bool> DeleteProcessFile(int? id)
     {
-        ProcessFile? processFile = await _context.Process_Files.FindAsync(id);
+        ProcessFile? processFile = await _context.ProcessFiles.FindAsync(id);
         if (processFile == null)
         {
             return false;
@@ -32,7 +32,7 @@ public class ProcessFileSvc(AppDbContext context) : IProcessFileSvc
         else
         {
 
-            _context.Process_Files.Remove(processFile);
+            _context.ProcessFiles.Remove(processFile);
             await _context.SaveChangesAsync();
             return true;
         }
@@ -41,26 +41,26 @@ public class ProcessFileSvc(AppDbContext context) : IProcessFileSvc
     public async Task<ProcessFileDto> EditProcessFile(ProcessFileDto file)
     {
         ProcessFile processFileEntity = Mapper.MapToFiles(file);
-        _context.Process_Files.Entry(processFileEntity).State = EntityState.Modified;
+        _context.ProcessFiles.Entry(processFileEntity).State = EntityState.Modified;
         await _context.SaveChangesAsync();
         return Mapper.MapToFilesDto(processFileEntity);
     }
 
     public async Task<IEnumerable<ProcessFileDto>> GetAllProcessFiles()
     {
-        List<ProcessFile> files = await _context.Process_Files.ToListAsync();
+        List<ProcessFile> files = await _context.ProcessFiles.ToListAsync();
         return Mapper.MapToToFilesEnum(files);
     }
 
     public async Task<ProcessFileDto> GetProcessFileById(int? id)
     {
-        ProcessFile? processFile = await _context.Process_Files.FindAsync(id);
+        ProcessFile? processFile = await _context.ProcessFiles.FindAsync(id);
         return processFile != null ? Mapper.MapToFilesDto(processFile) : throw new EntityNotFoundException("Process File not found");
     }
 
     public async Task<List<ProcessFileDto>> GetAllProcessFilesByProcessId(int? id)
     {
-        IQueryable<ProcessFileDto> uploadedFiles = _context.Process_Files.Where(x => x.ProcessId == id).Select(x => Mapper.MapToFilesDto(x));
+        IQueryable<ProcessFileDto> uploadedFiles = _context.ProcessFiles.Where(x => x.ProcessId == id).Select(x => Mapper.MapToFilesDto(x));
 
         return await uploadedFiles.ToListAsync();
     }

@@ -29,19 +29,19 @@ public class MilitarySecurityIntegrationTests(CustomWebApplicationFactory<Progra
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        dbContext.Military_securities.AddRange(namesInput.Select(CreateMilitarySecurity));
+        dbContext.MilitarySecurities.AddRange(namesInput.Select(CreateMilitarySecurity));
         await dbContext.SaveChangesAsync();
 
         // Act
         IDocument doc = await _client.GetDocumentAsync("/MilitarySecurity/List");
 
         // Assert
-        Assert.Equal(namesInput.Length, await dbContext.Military_securities.CountAsync());
+        Assert.Equal(namesInput.Length, await dbContext.MilitarySecurities.CountAsync());
 
         var rows = doc.QuerySelectorAll("table tbody tr").ToList();
         Assert.Equal(namesInput.Length, rows.Count);
 
-        foreach (MilitarySecurity militarySecurity in dbContext.Military_securities)
+        foreach (MilitarySecurity militarySecurity in dbContext.MilitarySecurities)
         {
             Assert.Contains(militarySecurity.MilitarySecurityName, namesInput);
 
@@ -76,7 +76,7 @@ public class MilitarySecurityIntegrationTests(CustomWebApplicationFactory<Progra
         }
 
         // Assert
-        DbSet<MilitarySecurity> dbItems = dbContext.Military_securities;
+        DbSet<MilitarySecurity> dbItems = dbContext.MilitarySecurities;
 
         Assert.Equal(namesInput.Length, dbItems.Count());
 
@@ -107,7 +107,7 @@ public class MilitarySecurityIntegrationTests(CustomWebApplicationFactory<Progra
 
         MilitarySecurity militarySecurity = CreateMilitarySecurity("Incidentes entre militares");
 
-        dbContext.Military_securities.Add(militarySecurity);
+        dbContext.MilitarySecurities.Add(militarySecurity);
 
         await dbContext.SaveChangesAsync();
 
@@ -117,7 +117,7 @@ public class MilitarySecurityIntegrationTests(CustomWebApplicationFactory<Progra
         IDocument doc = await _client.GetDocumentAsync($"/MilitarySecurity/Edit/{id}");
 
         // Assert
-        Assert.Single(dbContext.Military_securities);
+        Assert.Single(dbContext.MilitarySecurities);
         IElement? form = doc.QuerySelector("form[action^='/MilitarySecurity/Edit']");
         Assert.NotNull(form);
 
@@ -136,7 +136,7 @@ public class MilitarySecurityIntegrationTests(CustomWebApplicationFactory<Progra
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         MilitarySecurity MilitarySecurity = CreateMilitarySecurity("Incidentes entre militares");
 
-        dbContext.Military_securities.Add(MilitarySecurity);
+        dbContext.MilitarySecurities.Add(MilitarySecurity);
 
         await dbContext.SaveChangesAsync();
 
@@ -158,7 +158,7 @@ public class MilitarySecurityIntegrationTests(CustomWebApplicationFactory<Progra
         IDocument listDoc = await _client.GetDocumentAsync("/MilitarySecurity/List");
 
         //Assert
-        Assert.Single(dbContext.Military_securities);
+        Assert.Single(dbContext.MilitarySecurities);
         IElement? cell = listDoc.QuerySelector("table tbody td[data-property='name']");
         Assert.NotNull(cell);
         Assert.Equal("Atualizado", cell.TextContent.Trim());
@@ -173,7 +173,7 @@ public class MilitarySecurityIntegrationTests(CustomWebApplicationFactory<Progra
 
         var sentenceName = "prisão";
         MilitarySecurity sentence = CreateMilitarySecurity(sentenceName);
-        dbContext.Military_securities.Add(sentence);
+        dbContext.MilitarySecurities.Add(sentence);
         var id = sentence.MilitarySecurityId;
         await dbContext.SaveChangesAsync();
 
@@ -192,7 +192,7 @@ public class MilitarySecurityIntegrationTests(CustomWebApplicationFactory<Progra
         IDocument doc = await _client.GetDocumentAsync("/MilitarySecurity/List");
 
         // Assert
-        Assert.Single(dbContext.Military_securities);
+        Assert.Single(dbContext.MilitarySecurities);
 
         IElement? row = doc.QuerySelector($"table tbody tr[data-id='{id}']");
         Assert.NotNull(row);
@@ -209,7 +209,7 @@ public class MilitarySecurityIntegrationTests(CustomWebApplicationFactory<Progra
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
         MilitarySecurity MilitarySecurity = CreateMilitarySecurity("Incidentes entre militares");
-        dbContext.Military_securities.Add(MilitarySecurity);
+        dbContext.MilitarySecurities.Add(MilitarySecurity);
         await dbContext.SaveChangesAsync();
         var id = MilitarySecurity.MilitarySecurityId;
 
@@ -232,7 +232,7 @@ public class MilitarySecurityIntegrationTests(CustomWebApplicationFactory<Progra
         IDocument afterDoc = await _client.GetDocumentAsync("/MilitarySecurity/List");
 
         // Assert 
-        Assert.Empty(dbContext.Military_securities);
+        Assert.Empty(dbContext.MilitarySecurities);
         IHtmlCollection<IElement> rows = afterDoc.QuerySelectorAll("table tbody tr");
         Assert.Empty(rows);
     }
@@ -245,7 +245,7 @@ public class MilitarySecurityIntegrationTests(CustomWebApplicationFactory<Progra
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
         MilitarySecurity MilitarySecurity = CreateMilitarySecurity("Incidentes entre militares");
-        dbContext.Military_securities.Add(MilitarySecurity);
+        dbContext.MilitarySecurities.Add(MilitarySecurity);
         await dbContext.SaveChangesAsync();
         var id = MilitarySecurity.MilitarySecurityId;
 
@@ -267,7 +267,7 @@ public class MilitarySecurityIntegrationTests(CustomWebApplicationFactory<Progra
         IDocument afterDoc = await _client.GetDocumentAsync("/MilitarySecurity/List");
 
         // Assert
-        Assert.Single(dbContext.Military_securities);
+        Assert.Single(dbContext.MilitarySecurities);
         IElement? row = afterDoc.QuerySelector($"table tbody tr[data-id='{id}']");
         Assert.NotNull(row);
         IElement? cell = row.QuerySelector("td[data-property='name']");
@@ -280,7 +280,7 @@ public class MilitarySecurityIntegrationTests(CustomWebApplicationFactory<Progra
     {
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        dbContext.RemoveRange(dbContext.Military_securities);
+        dbContext.RemoveRange(dbContext.MilitarySecurities);
         await dbContext.SaveChangesAsync();
     }
 

@@ -16,21 +16,21 @@ public class MilitarySecuritySvc(AppDbContext context) : IMilitarySecuritySvc
     {
         MilitarySecurity militarySecurityEntity = Mapper.MapToMilitarySecurity(militarySecurity);
 
-        _context.Military_securities.Add(militarySecurityEntity);
+        _context.MilitarySecurities.Add(militarySecurityEntity);
         await _context.SaveChangesAsync();
         return Mapper.MapToMilitarySecurityDto(militarySecurityEntity);
     }
 
     public async Task<bool> DeleteMilitarySecurity(int? id)
     {
-        MilitarySecurity? militarySecurity = await _context.Military_securities.FindAsync(id);
+        MilitarySecurity? militarySecurity = await _context.MilitarySecurities.FindAsync(id);
         if (militarySecurity == null)
         {
             return false;
         }
         else
         {
-            _context.Military_securities.Remove(militarySecurity);
+            _context.MilitarySecurities.Remove(militarySecurity);
             await _context.SaveChangesAsync();
             return true;
         }
@@ -39,7 +39,7 @@ public class MilitarySecuritySvc(AppDbContext context) : IMilitarySecuritySvc
     public async Task<MilitarySecurityDto> EditMilitarySecurity(MilitarySecurityDto militarySecurity)
     {
         MilitarySecurity militarySecurityEntity = Mapper.MapToMilitarySecurity(militarySecurity);
-        _context.Military_securities.Entry(militarySecurityEntity).State = EntityState.Modified;
+        _context.MilitarySecurities.Entry(militarySecurityEntity).State = EntityState.Modified;
 
         await _context.SaveChangesAsync();
         return Mapper.MapToMilitarySecurityDto(militarySecurityEntity);
@@ -47,13 +47,13 @@ public class MilitarySecuritySvc(AppDbContext context) : IMilitarySecuritySvc
 
     public async Task<IEnumerable<MilitarySecurityDto>> GetAllMilitarySecurities()
     {
-        List<MilitarySecurity> militarySecurity = await _context.Military_securities.ToListAsync();
+        List<MilitarySecurity> militarySecurity = await _context.MilitarySecurities.ToListAsync();
         return Mapper.MapToMilitarySecurityEnum(militarySecurity);
     }
 
     public async Task<MilitarySecurityDto> GetMilitarySecurityById(int? id)
     {
-        MilitarySecurity? militarySecurity = await _context.Military_securities.FindAsync(id);
+        MilitarySecurity? militarySecurity = await _context.MilitarySecurities.FindAsync(id);
         return militarySecurity != null ? Mapper.MapToMilitarySecurityDto(militarySecurity) : throw new EntityNotFoundException("Military security not found");
     }
 }

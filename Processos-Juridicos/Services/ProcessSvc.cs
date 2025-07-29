@@ -32,9 +32,9 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
             return false;
         }
 
-        IQueryable<ProcessFile> filesToDelete = _context.Process_Files.Where(pf => pf.ProcessId == id);
+        IQueryable<ProcessFile> filesToDelete = _context.ProcessFiles.Where(pf => pf.ProcessId == id);
 
-        _context.Process_Files.RemoveRange(filesToDelete);
+        _context.ProcessFiles.RemoveRange(filesToDelete);
 
         _context.Processes.Remove(process);
         await _context.SaveChangesAsync();

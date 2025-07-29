@@ -14,20 +14,20 @@ public class CrimeTypeSvc(AppDbContext context) : ICrimeTypeSvc
 
     public async Task<IEnumerable<CrimeTypeDto>> GetAllCrimeTypes()
     {
-        List<Entities.CrimeType> crimes = await _context.Crime_types.ToListAsync();
+        List<Entities.CrimeType> crimes = await _context.CrimeTypes.ToListAsync();
         return Mapper.MapToCrimeTypeEnum(crimes);
     }
 
     public async Task<CrimeTypeDto> GetCrimeTypeById(int? id)
     {
-        Entities.CrimeType? type = await _context.Crime_types.FindAsync(id);
+        Entities.CrimeType? type = await _context.CrimeTypes.FindAsync(id);
         return type != null ? Mapper.MapToCrimeTypeDto(type) : throw new EntityNotFoundException($"O CrimeType com o ID {id} não existe.");
     }
 
     public async Task<CrimeTypeDto> CreateCrimeType(CrimeTypeDto type)
     {
         var normalizedName = type.CrimeTypeName?.Trim();
-        var nameAlreadyExists = _context.Crime_types
+        var nameAlreadyExists = _context.CrimeTypes
          .AsEnumerable()
          .Any(c => string.Compare(
              c.CrimeTypeName.Trim(),
@@ -41,14 +41,14 @@ public class CrimeTypeSvc(AppDbContext context) : ICrimeTypeSvc
 
         Entities.CrimeType typeEntity = Mapper.MapToCrimeType(type);
 
-        _context.Crime_types.Add(typeEntity);
+        _context.CrimeTypes.Add(typeEntity);
         await _context.SaveChangesAsync();
         return Mapper.MapToCrimeTypeDto(typeEntity);
     }
 
     public async Task<CrimeTypeDto> EditCrimeType(CrimeTypeDto type)
     {
-        Entities.CrimeType? existingCrimeType = await _context.Crime_types.FindAsync(type.CrimeTypeId);
+        Entities.CrimeType? existingCrimeType = await _context.CrimeTypes.FindAsync(type.CrimeTypeId);
         if (existingCrimeType != null)
         {
             existingCrimeType.CrimeTypeName = type.CrimeTypeName;
@@ -62,13 +62,13 @@ public class CrimeTypeSvc(AppDbContext context) : ICrimeTypeSvc
 
     public async Task<bool> DeleteCrimeType(int? id)
     {
-        Entities.CrimeType? type = await _context.Crime_types.FindAsync(id);
+        Entities.CrimeType? type = await _context.CrimeTypes.FindAsync(id);
         if (type == null)
         {
             return false;
         }
 
-        _context.Crime_types.Remove(type);
+        _context.CrimeTypes.Remove(type);
         await _context.SaveChangesAsync();
         return true;
     }

@@ -22,7 +22,7 @@ public sealed class UniqueMilitarySecurityNameAttribute : ValidationAttribute
 
         var militarySecurityName = value as string;
 
-        var existingType = context.Military_securities
+        var existingType = context.MilitarySecurities
             .Any(m => m.MilitarySecurityName == militarySecurityName && m.MilitarySecurityId != militarySecurityDto.MilitarySecurityId);
 
         return existingType
