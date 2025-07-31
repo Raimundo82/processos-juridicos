@@ -60,7 +60,7 @@ public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmed
         if (ModelState.IsValid)
         {
             //TODO: replace this with currently logged in user
-            model.CreatedById = 1;
+            model.CreatedById = "1";
 
             ProcessDto insertTarget = await _processSvc.CreateProcess(model);
 

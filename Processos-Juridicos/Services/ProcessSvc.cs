@@ -66,7 +66,16 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
 
     public async Task<IEnumerable<ProcessDto>> GetAllProcesses()
     {
-        List<Process> processes = await _context.Processes.ToListAsync();
+        List<Process> processes = await _context.Processes.Include(x => x.Unit)
+            .Include(x => x.CompensatingUnit)
+            .Include(x => x.HarmedOrCasualties)
+            .Include(x => x.Infringement)
+            .Include(x => x.ProcessType)
+            .Include(x => x.Sentence)
+            .Include(x => x.State)
+            .Include(x => x.AccidentType)
+            .Include(x => x.MilitarySecurity)
+            .Include(x => x.CrimeType).ToListAsync();
         return Mapper.MapToToProcessesEnum(processes);
     }
 

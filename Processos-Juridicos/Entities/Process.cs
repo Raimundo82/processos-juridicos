@@ -23,13 +23,13 @@ public partial class Process
     public string OficialInstTelephone { get; set; }
 
     [Column("oficial_inst_id")]
-    public int? OficialInstId { get; set; }
+    public string OficialInstId { get; set; }
 
     [Column("compensating_unit_id")]
     public int? CompensatingUnitId { get; set; }
 
     [Column("investigated_id")]
-    public int? InvestigatedId { get; set; }
+    public string InvestigatedId { get; set; }
 
     [Column("investigated_gender")]
     public string InvestigatedGender { get; set; }
@@ -59,13 +59,13 @@ public partial class Process
     public DateOnly? CreatedAt { get; set; } = DateOnly.FromDateTime(DateTime.Now);
 
     [Column("created_by_id")]
-    public int? CreatedById { get; set; }
+    public string CreatedById { get; set; }
 
     [Column("modified_at")]
     public DateOnly? ModifiedAt { get; set; } = DateOnly.FromDateTime(DateTime.Now);
 
     [Column("modified_by_id")]
-    public int? ModifiedById { get; set; }
+    public string ModifiedById { get; set; }
 
     [Column("service_accident_id")]
     public int? ServiceAccidentId { get; set; }
@@ -86,13 +86,13 @@ public partial class Process
     public int? CrimeTypeId { get; set; }
 
     [Column("compensation_paid_by_unit")]
-    public bool CompensationPaid { get; set; }
+    public bool CompensationPaid { get; set; } = false;
 
     [Column("comunicated_pjm")]
-    public bool ComunicatedToPjm { get; set; }
+    public bool ComunicatedToPjm { get; set; } = false;
 
     [Column("pjm_comunication_date")]
-    public DateOnly ComunicationDate { get; set; }
+    public DateOnly? ComunicationDate { get; set; }
 
     [Column("military_security_id")]
     public int? MilitarySecurityId { get; set; }

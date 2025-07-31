@@ -19,7 +19,7 @@ builder.Configuration.AddUserSecrets<Program>();
 
 // Register Context
 var processosDj = builder.Configuration.GetConnectionString("processosDj")!;
-builder.Services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer(processosDj));
+builder.Services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer(processosDj).EnableSensitiveDataLogging().LogTo(Console.WriteLine, LogLevel.Debug));
 
 //httpClient
 builder.Services.AddHttpClient<ApisSvc>()

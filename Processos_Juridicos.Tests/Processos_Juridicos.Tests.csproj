@@ -20,12 +20,22 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.3" />
   </ItemGroup>
 
-  <ItemGroup>
+    <ItemGroup>
+        <None Include="TestFiles\DummyPDF.pdf">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+
+    <ItemGroup>
     <ProjectReference Include="..\Processos-Juridicos\Processos-Juridicos.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="TestData\" />
   </ItemGroup>
   <Target Name="RestoreDotnetTools" BeforeTargets="Build">
     <Exec Command="dotnet tool restore" StandardOutputImportance="Low" StandardErrorImportance="High" />

@@ -24,12 +24,12 @@ public partial class ProcessDto
 
     public int? CompensatingUnitId { get; set; }
 
-    public int? OficialInstId { get; set; }
+    public string OficialInstId { get; set; }
 
     [Phone(ErrorMessage = "Invalid phone number")]
     public string OficialInstTelephone { get; set; }
 
-    public int? InvestigatedId { get; set; }
+    public string InvestigatedId { get; set; }
 
     public string InvestigatedGender { get; set; }
 
@@ -37,7 +37,7 @@ public partial class ProcessDto
 
     public DateOnly? DispatchDate { get; set; }
 
-    [EntityFieldIsRequired("Descrição")]
+    //[EntityFieldIsRequired("Descrição")]
     [Unicode(false)]
     public string Description { get; set; }
 
@@ -53,11 +53,11 @@ public partial class ProcessDto
 
     public DateOnly? CreatedAt { get; set; }
 
-    public int? CreatedById { get; set; }
+    public string CreatedById { get; set; }
 
     public DateOnly? ModifiedAt { get; set; }
 
-    public int? ModifiedById { get; set; }
+    public string ModifiedById { get; set; }
 
     public int? ServiceAccidentId { get; set; }
 
@@ -72,16 +72,16 @@ public partial class ProcessDto
     public int? InfringementId { get; set; }
 
     [EntityFieldIsRequired("Compensação paga?")]
-    public required bool CompensationPaid { get; set; }
+    public required bool CompensationPaid { get; set; } = false;
 
     [EntityFieldIsRequired("Comunicado à PJM")]
-    public required bool ComunicatedToPjm { get; set; }
+    public required bool ComunicatedToPjm { get; set; } = false;
 
     public int? CrimeTypeId { get; set; }
 
     public int? MilitarySecurityId { get; set; }
 
-    public required DateOnly ComunicationDate { get; set; }
+    public DateOnly? ComunicationDate { get; set; }
 
     [ForeignKey("UnitId")]
     public virtual UnitDto Unit { get; set; }

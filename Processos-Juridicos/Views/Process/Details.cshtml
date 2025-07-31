@@ -1,4 +1,4 @@
-﻿@using Processos_Juridicos.DTOs;
+@using Processos_Juridicos.DTOs;
 @model Processos_Juridicos.DTOs.ProcessDto;
 
 
@@ -19,6 +19,13 @@
         </dt>
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.ProcessType.ProcessTypeName)
+        </dd>
+
+        <dt class="col-sm-2">
+            Unidade
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Unit.UnitName)
         </dd>
 
         <dt class="col-sm-2">
