@@ -1,16 +1,14 @@
-﻿@model Processos_Juridicos.DTOs.StateDto;
+@model Processos_Juridicos.DTOs.ProcessStateDto;
 @using Processos_Juridicos.DTOs;
 
 @{
-    ViewData["Title"] = "Editar Estado";
+    ViewData["Title"] = "Criar Estado";
 }
 
 <h1>@ViewData["Title"]</h1>
 
-<form asp-action="Edit">
+<form asp-action="Create">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-    <input type="hidden" asp-for="StateId" />
 
     <partial name="Shared/_Form" />
 

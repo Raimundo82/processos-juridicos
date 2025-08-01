@@ -32,7 +32,7 @@
                 <th scope="col">@Html.DisplayNameFor(m => m.First().DeadlineDate)</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().FinalDispatchDate)</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().SentenceId)</th>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().State)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().ProcessState)</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().CreatedAt)</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().CreatedById)</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().ModifiedAt)</th>
@@ -78,7 +78,7 @@
                         @(item.Sentence?.SentenceName ?? "-")
                     </td>
                     <td data-property="state">
-                        @(item.State?.StateName ?? "-")
+                        @(item.ProcessState?.StateName ?? "-")
                     </td>
                     <td data-property="creation-date">@Html.DisplayFor(m => item.CreatedAt)</td>
                     <td data-property="creator">@Html.DisplayFor(m => item.CreatedById)</td>

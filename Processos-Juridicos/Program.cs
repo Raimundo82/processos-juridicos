@@ -42,7 +42,7 @@ builder.Services.AddSingleton<IJsonTextManager>(sp =>
 builder.Services.AddScoped<IToastNotify, ToastNotify>();
 builder.Services.AddScoped<IUnitSvc, UnitSvc>();
 builder.Services.AddScoped<ISectorSvc, SectorSvc>();
-builder.Services.AddScoped<IStateSvc, StateSvc>();
+builder.Services.AddScoped<IProcessStateSvc, StateSvc>();
 builder.Services.AddScoped<ISentenceSvc, SentenceSvc>();
 builder.Services.AddScoped<IProcessTypeSvc, ProcessTypesSvc>();
 builder.Services.AddScoped<IApisSvc, ApisSvc>();

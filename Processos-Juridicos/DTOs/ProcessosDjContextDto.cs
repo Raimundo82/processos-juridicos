@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 using Microsoft.EntityFrameworkCore;
 
 namespace Processos_Juridicos.DTOs;
@@ -19,7 +19,7 @@ public partial class ProcessosDjContextDto(DbContextOptions<ProcessosDjContextDt
 
     public virtual DbSet<SentenceDto> Sentences { get; set; }
 
-    public virtual DbSet<StateDto> States { get; set; }
+    public virtual DbSet<ProcessStateDto> States { get; set; }
 
     public virtual DbSet<UnitDto> Units { get; set; }
 }

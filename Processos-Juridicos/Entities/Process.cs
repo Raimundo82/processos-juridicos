@@ -53,7 +53,7 @@ public partial class Process
     public int? SentenceId { get; set; }
 
     [Column("state_id")]
-    public int StateId { get; set; }
+    public int ProcessStateId { get; set; }
 
     [Column("created_at")]
     public DateOnly? CreatedAt { get; set; } = DateOnly.FromDateTime(DateTime.Now);
@@ -115,8 +115,8 @@ public partial class Process
     [ForeignKey("SentenceId")]
     public virtual Sentence Sentence { get; set; }
 
-    [ForeignKey("StateId")]
-    public virtual State State { get; set; }
+    [ForeignKey("ProcessStateId")]
+    public virtual ProcessState ProcessState { get; set; }
 
     [ForeignKey("ServiceAccidentId")]
     public virtual AccidentType AccidentType { get; set; }

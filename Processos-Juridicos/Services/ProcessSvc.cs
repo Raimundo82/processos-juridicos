@@ -72,7 +72,7 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
             .Include(x => x.Infringement)
             .Include(x => x.ProcessType)
             .Include(x => x.Sentence)
-            .Include(x => x.State)
+            .Include(x => x.ProcessState)
             .Include(x => x.AccidentType)
             .Include(x => x.MilitarySecurity)
             .Include(x => x.CrimeType).ToListAsync();
@@ -88,7 +88,7 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
             .Include(x => x.Infringement)
             .Include(x => x.ProcessType)
             .Include(x => x.Sentence)
-            .Include(x => x.State)
+            .Include(x => x.ProcessState)
             .Include(x => x.AccidentType)
             .Include(x => x.MilitarySecurity)
             .Include(x => x.CrimeType)

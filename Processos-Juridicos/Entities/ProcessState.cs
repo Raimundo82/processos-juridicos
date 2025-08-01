@@ -4,11 +4,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Processos_Juridicos.Entities;
 
-public partial class State
+public partial class ProcessState
 {
     [Key]
     [Column("state_id")]
-    public int? StateId { get; set; }
+    public int? ProcessStateId { get; set; }
 
     [Column("state_name")]
     public string StateName { get; set; }

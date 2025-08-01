@@ -5,9 +5,9 @@ namespace Processos_Juridicos.Tests.TestHelpers;
 
 internal static class TestUtilities
 {
-    public static State CreateState(string stateName)
+    public static ProcessState CreateState(string stateName)
     {
-        return new State { StateName = stateName };
+        return new ProcessState { StateName = stateName };
     }
 
     public static ProcessType CreateProcessType(string processTypeName, int deadline)
@@ -38,7 +38,7 @@ internal static class TestUtilities
         db.SaveChanges();
     }
 
-    public static List<State> GetSeedStates()
+    public static List<ProcessState> GetSeedStates()
     {
         return
         [

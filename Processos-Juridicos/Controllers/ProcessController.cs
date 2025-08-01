@@ -9,13 +9,13 @@ using Processos_Juridicos.Utilities.TextManager;
 
 namespace Processos_Juridicos.Controllers;
 
-public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmedOrCasualtySvc casualtiesSvc, IInfringementSvc infringementSvc, IProcessTypeSvc processTypeSvc, ISentenceSvc sentenceSvc, IStateSvc stateSvc, IAccidentTypeSvc accidentTypeSvc, IMilitarySecuritySvc militarySecuritySvc, ICrimeTypeSvc crimeTypeSvc, IProcessFileSvc processFileSvc, IToastNotify toastNotify) : Controller
+public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmedOrCasualtySvc casualtiesSvc, IInfringementSvc infringementSvc, IProcessTypeSvc processTypeSvc, ISentenceSvc sentenceSvc, IProcessStateSvc stateSvc, IAccidentTypeSvc accidentTypeSvc, IMilitarySecuritySvc militarySecuritySvc, ICrimeTypeSvc crimeTypeSvc, IProcessFileSvc processFileSvc, IToastNotify toastNotify) : Controller
 {
     private const string EntityName = "Processo";
 
     private readonly ICrimeTypeSvc _crimeTypeSvc = crimeTypeSvc;
     private readonly IMilitarySecuritySvc _militarySecuritySvc = militarySecuritySvc;
-    private readonly IStateSvc _stateSvc = stateSvc;
+    private readonly IProcessStateSvc _stateSvc = stateSvc;
     private readonly IAccidentTypeSvc _accidentTypeSvc = accidentTypeSvc;
     private readonly ISentenceSvc _sentenceSvc = sentenceSvc;
     private readonly IInfringementSvc _infringementSvc = infringementSvc;
@@ -250,11 +250,11 @@ public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmed
 
     private async Task PopulateStatesForViewBag()
     {
-        IEnumerable<StateDto> states = await _stateSvc.GetAllStates();
+        IEnumerable<ProcessStateDto> states = await _stateSvc.GetAllStates();
         var listStates = states.Select(x => new SelectListItem
         {
             Text = x.StateName,
-            Value = x.StateId.ToString()
+            Value = x.ProcessStateId.ToString()
         }).ToList();
 
         ViewBag.states = listStates;

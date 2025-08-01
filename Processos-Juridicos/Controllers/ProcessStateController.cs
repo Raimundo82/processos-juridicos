@@ -6,17 +6,17 @@ using Processos_Juridicos.Utilities.TextManager;
 
 namespace Processos_Juridicos.Controllers;
 
-public class StateController(IStateSvc stateSvc, IToastNotify toastNotify) : Controller
+public class ProcessStateController(IProcessStateSvc stateSvc, IToastNotify toastNotify) : Controller
 {
     private const string EntityName = "Estado";
 
-    private readonly IStateSvc _stateSvc = stateSvc;
+    private readonly IProcessStateSvc _stateSvc = stateSvc;
     private readonly IToastNotify _toastNotify = toastNotify;
 
     [HttpGet]
     public async Task<IActionResult> List()
     {
-        IEnumerable<StateDto> listStatesDto = await _stateSvc.GetAllStates();
+        IEnumerable<ProcessStateDto> listStatesDto = await _stateSvc.GetAllStates();
         return View(listStatesDto);
     }
 
@@ -25,7 +25,7 @@ public class StateController(IStateSvc stateSvc, IToastNotify toastNotify) : Con
     {
         if (ModelState.IsValid)
         {
-            StateDto state = await _stateSvc.GetStateById(id);
+            ProcessStateDto state = await _stateSvc.GetStateById(id);
             return View(state);
         }
 
@@ -39,7 +39,7 @@ public class StateController(IStateSvc stateSvc, IToastNotify toastNotify) : Con
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(StateDto model)
+    public async Task<IActionResult> Create(ProcessStateDto model)
     {
         if (ModelState.IsValid)
         {
@@ -56,7 +56,7 @@ public class StateController(IStateSvc stateSvc, IToastNotify toastNotify) : Con
     {
         if (ModelState.IsValid)
         {
-            StateDto model = await _stateSvc.GetStateById(id);
+            ProcessStateDto model = await _stateSvc.GetStateById(id);
             return View(model);
         }
 
@@ -64,7 +64,7 @@ public class StateController(IStateSvc stateSvc, IToastNotify toastNotify) : Con
     }
 
     [HttpPost]
-    public async Task<IActionResult> Edit(StateDto model)
+    public async Task<IActionResult> Edit(ProcessStateDto model)
     {
         if (ModelState.IsValid)
         {
@@ -88,13 +88,11 @@ public class StateController(IStateSvc stateSvc, IToastNotify toastNotify) : Con
 
             if (!success)
             {
-                _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("DeleteFailureMessage"), "o", EntityName));
-
-                return result;
+                _toastNotify.Error(string.Format(GlobalTextManager.GetString("DeleteFailureMessage"), "o", EntityName));
             }
             else
             {
-                _toastNotify.Error(string.Format(GlobalTextManager.GetString("DeleteSuccessMessage"), "O", EntityName, "o"));
+                _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("DeleteSuccessMessage"), "O", EntityName, "o"));
             }
         }
 

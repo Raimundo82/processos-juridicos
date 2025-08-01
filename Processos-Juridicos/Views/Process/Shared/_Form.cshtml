@@ -39,31 +39,34 @@
 
     <label for="investigated-gender" class="control-label">Sexo</label>
     <select id="investigated-gender" asp-for="InvestigatedGender" asp-items="ViewBag.genders" class="form-control">
-        
+
     </select>
     <span asp-validation-for="InvestigatedGender" class="text-danger"></span>
 
     <div>
-        <label for ="uncertainInvestigated">Averiguado Incerto</label>
+        <label for="uncertainInvestigated">Averiguado Incerto</label>
         <input type="checkbox" id="uncertainInvestigated" />
     </div>
 </div>
 
 <div class="form-group mt-3">
     <label for="created-at" asp-for="CreatedAt">Data de criação</label>
-    <input asp-for="CreatedAt" id="created-at" type="date" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+    <input asp-for="CreatedAt" id="created-at" type="date" class="form-control"
+        value="@DateTime.Now.ToString("yyyy-MM-dd")" />
     <span asp-validation-for="CreatedAt" class="text-danger"></span>
 </div>
 
 <div class="form-group mt-3">
     <label for="ocurrence-date" asp-for="OcurrenceDate">Data da Ocorrência</label>
-    <input id="ocurrence-date" asp-for="OcurrenceDate" type="date" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+    <input id="ocurrence-date" asp-for="OcurrenceDate" type="date" class="form-control"
+        value="@DateTime.Now.ToString("yyyy-MM-dd")" />
     <span asp-validation-for="OcurrenceDate" class="text-danger"></span>
 </div>
 
 <div class="form-group mt-3">
     <label for="nomination-date" asp-for="DispatchDate">Data de Despacho de Nomeação do Instrutor</label>
-    <input id="nomination-date" asp-for="DispatchDate" type="date" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+    <input id="nomination-date" asp-for="DispatchDate" type="date" class="form-control"
+        value="@DateTime.Now.ToString("yyyy-MM-dd")" />
     <span asp-validation-for="DispatchDate" class="text-danger"></span>
 </div>
 
@@ -74,14 +77,17 @@
 </div>
 
 <div class="form-group mt-3">
-    <label for="deadline-date" asp-for="DeadlineDate">Prazo Previsto para encerramento por parte do Of. Instrutor (Inicial / Prorrogação)</label>
-    <input id="deadline-date" asp-for="DeadlineDate" type="date" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+    <label for="deadline-date" asp-for="DeadlineDate">Prazo Previsto para encerramento por parte do Of. Instrutor
+        (Inicial / Prorrogação)</label>
+    <input id="deadline-date" asp-for="DeadlineDate" type="date" class="form-control"
+        value="@DateTime.Now.ToString("yyyy-MM-dd")" />
     <span asp-validation-for="DeadlineDate" class="text-danger"></span>
 </div>
 
 <div class="form-group mt-3">
     <label for="final-deadline-date" asp-for="FinalDispatchDate">Data de Despacho Final do Com./Dir./Chefe</label>
-    <input id="final-deadline-date" asp-for="FinalDispatchDate" type="date" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+    <input id="final-deadline-date" asp-for="FinalDispatchDate" type="date" class="form-control"
+        value="@DateTime.Now.ToString("yyyy-MM-dd")" />
     <span asp-validation-for="FinalDispatchDate" class="text-danger"></span>
 </div>
 
@@ -95,10 +101,10 @@
 
 <div class="form-group mt-3">
     <label for="state-id" class="control-label">Estado</label>
-    <select id="state-id" asp-for="StateId" asp-items="ViewBag.states" class="form-control">
+    <select id="state-id" asp-for="ProcessStateId" asp-items="ViewBag.states" class="form-control">
         <option value="">Selecione um Estado</option>
     </select>
-    <span asp-validation-for="StateId" class="text-danger"></span>
+    <span asp-validation-for="ProcessStateId" class="text-danger"></span>
 </div>
 
 <div class="form-group mt-3">
@@ -128,7 +134,8 @@
                                 <i class="bi bi-x"></i>
                             </button>
                             <!-- Download link -->
-                            <a asp-controller="ProcessFile" asp-action="DownloadFile" asp-route-id="@file.ProcessFileId" class="btn btn-secondary">
+                            <a asp-controller="ProcessFile" asp-action="DownloadFile" asp-route-id="@file.ProcessFileId"
+                                class="btn btn-secondary">
                                 <i class="bi bi-download"></i>
                             </a>
                         </div>
@@ -140,4 +147,3 @@
 }
 
 <div id="deletedFilesContainer"></div>
-

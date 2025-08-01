@@ -9,34 +9,34 @@ using Processos_Juridicos.Services.Interfaces;
 
 namespace Processos_Juridicos.Services;
 
-public class StateSvc(AppDbContext context) : IStateSvc
+public class StateSvc(AppDbContext context) : IProcessStateSvc
 {
     private readonly AppDbContext _context = context;
 
-    public async Task<IEnumerable<StateDto>> GetAllStates()
+    public async Task<IEnumerable<ProcessStateDto>> GetAllStates()
     {
-        List<State> states = await _context.States.ToListAsync();
+        List<ProcessState> states = await _context.States.ToListAsync();
         return Mapper.MapToToStateDtoEnum(states);
     }
 
-    public async Task<StateDto> GetStateById(int? id)
+    public async Task<ProcessStateDto> GetStateById(int? id)
     {
-        State? state = await _context.States.FindAsync(id);
+        ProcessState? state = await _context.States.FindAsync(id);
         return state != null ? Mapper.MapToStateDto(state) : throw new EntityNotFoundException("State not found");
     }
 
-    public async Task<StateDto> CreateState(StateDto state)
+    public async Task<ProcessStateDto> CreateState(ProcessStateDto state)
     {
-        State stateEntity = Mapper.MapToState(state);
+        ProcessState stateEntity = Mapper.MapToState(state);
 
         _context.States.Add(stateEntity);
         await _context.SaveChangesAsync();
         return Mapper.MapToStateDto(stateEntity);
     }
 
-    public async Task<StateDto> EditState(StateDto state)
+    public async Task<ProcessStateDto> EditState(ProcessStateDto state)
     {
-        State stateEntity = Mapper.MapToState(state);
+        ProcessState stateEntity = Mapper.MapToState(state);
         _context.States.Entry(stateEntity).State = EntityState.Modified;
 
         await _context.SaveChangesAsync();
@@ -45,7 +45,7 @@ public class StateSvc(AppDbContext context) : IStateSvc
 
     public async Task<bool> DeleteState(int? id)
     {
-        State? state = await _context.States.FindAsync(id);
+        ProcessState? state = await _context.States.FindAsync(id);
         if (state == null)
         {
             return false;

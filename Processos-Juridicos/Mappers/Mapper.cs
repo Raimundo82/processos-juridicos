@@ -22,9 +22,9 @@ public static partial class Mapper
 
     // States Map 
 
-    public static partial StateDto MapToStateDto(State entity);
-    public static partial State MapToState(StateDto dto);
-    public static partial IEnumerable<StateDto> MapToToStateDtoEnum(IEnumerable<State> entity);
+    public static partial ProcessStateDto MapToStateDto(ProcessState entity);
+    public static partial ProcessState MapToState(ProcessStateDto dto);
+    public static partial IEnumerable<ProcessStateDto> MapToToStateDtoEnum(IEnumerable<ProcessState> entity);
 
     // Process_Types map
 

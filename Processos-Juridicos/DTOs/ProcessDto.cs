@@ -49,7 +49,7 @@ public partial class ProcessDto
 
     public int? SentenceId { get; set; }
 
-    public required int StateId { get; set; }
+    public required int ProcessStateId { get; set; }
 
     public DateOnly? CreatedAt { get; set; }
 
@@ -98,8 +98,8 @@ public partial class ProcessDto
     [ForeignKey("SentenceId")]
     public virtual SentenceDto Sentence { get; set; }
 
-    [ForeignKey("StateId")]
-    public virtual StateDto State { get; set; }
+    [ForeignKey("ProcessStateId")]
+    public virtual ProcessStateDto ProcessState { get; set; }
 
     [ForeignKey("ServiceAccidentId")]
     public virtual AccidentTypeDto AccidentType { get; set; }
