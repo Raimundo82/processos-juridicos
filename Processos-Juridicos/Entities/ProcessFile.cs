@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Processos_Juridicos.Entities;
 
+[Table("Process_files")]
 public partial class ProcessFile
 {
     [Key]

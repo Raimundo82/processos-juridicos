@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Processos_Juridicos.Entities;
 
+[Table("Harmed_or_casualties")]
 public partial class HarmedOrCasualty
 {
     [Key]

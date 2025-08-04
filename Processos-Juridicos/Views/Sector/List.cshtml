@@ -30,8 +30,9 @@
             {
                 <tr data-id="@item.SectorId" @(item.Enable ? "data-enable" : "")>
                     <th scope="col">@count</th>
-                    <td data-property="name"=>@Html.DisplayFor(m => item.SectorName)</td>
-                    <td data-property="code"=>@Html.DisplayFor(m => item.SectorCode)</td>
+                    <td data-property="name">@Html.DisplayFor(m => item.SectorName)</td>
+                    <td data-property="code">@Html.DisplayFor(m => item.SectorCode)</td>
+                    <td data-property="enabled-state">@Html.DisplayFor(m => item.Enable)</td>
                     <td>
                         <div class="d-flex gap-2">
                             <form asp-controller="Sector" asp-action="Delete" method="post" data-action="delete">

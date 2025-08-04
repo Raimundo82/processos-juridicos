@@ -29,7 +29,8 @@
             {
                 <tr data-id="@item.CasualtyId">
                     <th scope="col">@count</th>
-                    <td data-property="name" =>@Html.DisplayFor(m => item.CasualtyName)</td>
+                    <td data-property="casualty-id">@Html.DisplayFor(m => item.CasualtyId)</td>
+                    <td data-property="name">@Html.DisplayFor(m => item.CasualtyName)</td>
                     <td>
                         <div class="d-flex gap-2">
                             <form asp-controller="HarmedOrCasualty" asp-action="Delete" method="post" data-action="delete">

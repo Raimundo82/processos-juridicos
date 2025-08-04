@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Processos_Juridicos.Entities;
 
+[Table("Process_types")]
 public partial class ProcessType
 {
     [Key]

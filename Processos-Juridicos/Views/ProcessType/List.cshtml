@@ -37,8 +37,13 @@
                                 <input type="hidden" name="id" value="@item.ProcessTypeId">
                                 <button type="submit" class="btn btn-danger js-delete-btn"></button>
                             </form>
-                            <a asp-controller="ProcessType" asp-action="Edit" asp-route-id="@item.ProcessTypeId"
-                               data-action="access-edit-form class="btn btn-warning"><i class="bi bi-pencil"></i></a>
+                            <a asp-controller="ProcessType"
+                               asp-action="Edit"
+                               asp-route-id="@item.ProcessTypeId"
+                               data-action="access-edit-form"
+                               class="btn btn-warning">
+                                <i class="bi bi-pencil"></i>
+                            </a>
                         </div>
                     </td>
                 </tr>

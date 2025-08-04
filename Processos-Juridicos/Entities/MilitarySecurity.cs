@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Processos_Juridicos.Entities;
 
+[Table("Military_securities")]
 public partial class MilitarySecurity
 {
     [Key]
