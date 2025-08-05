@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.Negotiate;
 using Microsoft.EntityFrameworkCore;
 
 using NToastNotify;
@@ -11,8 +12,18 @@ using Processos_Juridicos.Utilities.TextManager.Interfaces;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddAuthentication(NegotiateDefaults.AuthenticationScheme).AddNegotiate();
+
+builder.Services.AddAuthorization(options =>
+{
+    options.FallbackPolicy = options.DefaultPolicy;
+});
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Add IHttpContextAccessor so services and middleware can read HttpContext
+builder.Services.AddHttpContextAccessor();
 
 // Add User Secrets
 builder.Configuration.AddUserSecrets<Program>();
@@ -55,6 +66,12 @@ builder.Services.AddScoped<IAccidentTypeSvc, AccidentTypeSvc>();
 builder.Services.AddScoped<ICrimeTypeSvc, CrimeTypeSvc>();
 builder.Services.AddScoped<IMilitarySecuritySvc, MilitarySecuritySvc>();
 
+// Interface service only supported on windows
+if (OperatingSystem.IsWindows())
+{
+    builder.Services.AddScoped<IWindowsUserSvc, WindowsUserSvc>();
+}
+
 //Register NToastNotify
 builder.Services.AddMvc().AddNToastNotifyToastr(new ToastrOptions()
 {
@@ -92,6 +109,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
+app.UseAuthentication();
 app.UseAuthorization();
 app.UseNToastNotify();
 app.MapControllerRoute(

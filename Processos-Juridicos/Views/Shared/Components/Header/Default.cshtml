@@ -1,0 +1,13 @@
+@model UserDataModel
+@{
+	var displayName = Model.DisplayName ?? "Utilizador";
+	var photo = Model.PhotoBase64 ?? Url.Content("~/images/default-avatar.png");
+}
+
+<div class="d-flex align-items-center">
+	<span>@displayName</span>
+	<img src="@photo"
+		alt="Avatar de @displayName"
+		class="rounded-circle me-2"
+		style="height:40px; width:40px; object-fit:cover; border-radius:50%;" />
+</div>
