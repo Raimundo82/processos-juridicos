@@ -126,7 +126,7 @@
             @foreach (var file in Model.UploadedFiles)
             {
                 <tr id="file-row-@file.ProcessFileId">
-                    <td>@file.ProcessFileName</td>
+                    <td>@Html.Raw(file.ProcessFileTrustedName)</td>
                     <td>
                         <div class="d-flex gap-2">
                             <!-- Delete button "X": when clicked, removes the row and marks the file for deletion -->

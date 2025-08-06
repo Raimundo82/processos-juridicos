@@ -1,3 +1,5 @@
+using System.Net;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -26,6 +28,31 @@ public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmed
     private readonly IToastNotify _toastNotify = toastNotify;
     private readonly IProcessFileSvc _processFileSvc = processFileSvc;
 
+    private readonly string[] permittedFileExtensions = [".pdf", ".jpeg", ".png"];
+
+    private readonly int fileSizeLimit = 5242880; //5MB em base 2
+
+    private static readonly Dictionary<string, List<byte[]>> _fileSignature =
+    new()
+    {
+    { ".pdf", new List<byte[]>
+        {
+            "%PDF-"u8.ToArray()
+        }
+    },
+    { ".jpeg", new List<byte[]>
+        {
+            new byte[] { 0xFF, 0xD8, 0xFF, 0xE0 },
+            new byte[] { 0xFF, 0xD8, 0xFF, 0xE2 },
+            new byte[] { 0xFF, 0xD8, 0xFF, 0xE3 },
+        }
+    },
+    { ".png", new List<byte[]>
+        {
+            new byte[] { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A }
+        }
+    },
+};
 
     [HttpGet]
     public async Task<IActionResult> List()
@@ -68,20 +95,9 @@ public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmed
             {
                 foreach (IFormFile? file in model.ProcessFiles)
                 {
-                    if (file != null && file.Length > 0 && insertTarget.ProcessId != null)
+                    if (!await ValidateAndSaveFileAsync(insertTarget.ProcessId, file))
                     {
-                        using MemoryStream ms = new();
-                        await file.CopyToAsync(ms);
-
-                        ProcessFile fileRecord = new()
-                        {
-                            ProcessFileName = file.FileName,
-                            ProcessFileType = file.ContentType,
-                            ProcessFileContent = ms.ToArray(),
-                            ProcessId = (int)insertTarget.ProcessId
-                        };
-
-                        await _processFileSvc.CreateProcessFile(Mapper.MapToFilesDto(fileRecord));
+                        return View(model);
                     }
                 }
             }
@@ -123,28 +139,24 @@ public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmed
 
         await _processSvc.EditProcess(model);
 
-        if (model.ProcessFiles != null && model.ProcessFiles.Length > 0)
+        List<ProcessFileDto> uploadedFiles = await _processFileSvc.GetAllProcessFilesByProcessId(model.ProcessId);
+
+        if (model.ProcessFiles?.Length > 0)
         {
             foreach (IFormFile file in model.ProcessFiles)
             {
-                if (file != null && file.Length > 0 && model.ProcessId != null)
+
+                if (!await ValidateAndSaveFileAsync(model.ProcessId, file))
                 {
-                    using MemoryStream ms = new();
-                    await file.CopyToAsync(ms);
-                    ProcessFile fileRecord = new()
-                    {
-                        ProcessFileName = file.FileName,
-                        ProcessFileType = file.ContentType,
-                        ProcessFileContent = ms.ToArray(),
-                        ProcessId = (int)model.ProcessId,
-                        RowGuid = 1
-                    };
-                    await _processFileSvc.CreateProcessFile(Mapper.MapToFilesDto(fileRecord));
+                    model = await _processSvc.GetProcessById(model.ProcessId);
+                    model.UploadedFiles = uploadedFiles;
+                    await PopulateViewbags();
+                    return View(model);
                 }
             }
         }
 
-        if (model.FilesToRemove != null && model.FilesToRemove.Count != 0)
+        if (model.FilesToRemove?.Count > 0)
         {
             foreach (var fileId in model.FilesToRemove)
             {
@@ -153,7 +165,41 @@ public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmed
         }
 
         _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("EditSuccessMessage"), "O", EntityName, "o"));
+        await PopulateViewbags();
+        model = await _processSvc.GetProcessById(model.ProcessId);
+        uploadedFiles = await _processFileSvc.GetAllProcessFilesByProcessId(model.ProcessId);
+        model.UploadedFiles = uploadedFiles;
         return RedirectToAction("Edit", new { id = model.ProcessId });
+    }
+
+    private bool ValidateFile(IFormFile file, string ext, MemoryStream ms, out string errorMessage)
+    {
+        if (!permittedFileExtensions.Contains(ext))
+        {
+            errorMessage = GlobalTextManager.GetString("FileExtensionNotAllowedMessage");
+            return false;
+        }
+
+        if (!VerifyFileSignatureCorrect(ms, ext))
+        {
+            errorMessage = GlobalTextManager.GetString("FileExtensionNotAllowedMessage");
+            return false;
+        }
+
+        if (file == null || file.Length == 0)
+        {
+            errorMessage = GlobalTextManager.GetString("EmptyFileMessage");
+            return false;
+        }
+
+        if (ms.Length > fileSizeLimit)
+        {
+            errorMessage = GlobalTextManager.GetString("FileSizeTooLargeMessage");
+            return false;
+        }
+
+        errorMessage = string.Empty;
+        return true;
     }
 
     [HttpPost, ActionName("Delete")]
@@ -308,6 +354,66 @@ public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmed
 
 
         ViewBag.genders = selectGenders;
+    }
+
+    private static bool VerifyFileSignatureCorrect(MemoryStream file, string extension)
+    {
+        if (string.IsNullOrWhiteSpace(extension))
+        {
+            return false;
+        }
+
+        if (!_fileSignature.TryGetValue(extension, out List<byte[]>? signatures)
+            || signatures.Count == 0)
+        {
+            return false;
+        }
+
+        var maxSignatureLength = signatures.Max(sig => sig.Length);
+
+        file.Position = 0;
+
+        var headerBytes = new byte[maxSignatureLength];
+        var bytesRead = file.Read(headerBytes, 0, maxSignatureLength);
+
+        return signatures.Any(sig =>
+            bytesRead >= sig.Length &&
+            headerBytes.AsSpan(0, sig.Length).SequenceEqual(sig));
+    }
+
+
+    private async Task<bool> ValidateAndSaveFileAsync(int? processId, IFormFile file)
+    {
+        if (processId == null)
+        {
+            return false;
+        }
+
+        var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+
+        using var ms = new MemoryStream();
+        await file.CopyToAsync(ms);
+
+        if (!ValidateFile(file, ext, ms, out var error))
+        {
+            _toastNotify.Error(error);
+            return false;
+        }
+
+        var trustedName = WebUtility.HtmlEncode(file.FileName);
+
+        // build DTO inline, same as before
+        ProcessFileDto fileDto = Mapper.MapToFilesDto(new ProcessFile
+        {
+            ProcessFileName = file.FileName,
+            ProcessFileType = file.ContentType,
+            ProcessFileContent = ms.ToArray(),
+            ProcessFileTrustedName = trustedName,
+            ProcessId = processId.Value
+        });
+
+        await _processFileSvc.CreateProcessFile(fileDto);
+        return true;
     }
 
 }

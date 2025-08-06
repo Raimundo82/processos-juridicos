@@ -11,5 +11,9 @@
     "MustBeAPositiveNumberMessage": "O valor do campo {0} deve ser positivo.",
     "DateMustBeTodayOrLater": "A data inserida deve ser a data de hoje ou uma data futura",
     "FieldMustBeUnique": "O valor inserido não deve ser igual nem semelhante a outros já existentes.",
-    "EntityNotFound":  "A entidade com o ID fornecido não foi encontrada."
+    "EntityNotFound": "A entidade com o ID fornecido não foi encontrada.",
+    "EmptyFileMessage": "Pelo menos um dos ficheiros fornecidos encontra-se vazio.",
+    "FileExtensionNotAllowedMessage": "Pelo menos um ficheiro dos ficheiros fornecidos tem uma extensão não permitida.",
+    "FileSizeTooLargeMessage":  "Pelo menos um ficheiro dos ficheiros fornecidos é demasiado grande."
+       
 }

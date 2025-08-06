@@ -1,4 +1,4 @@
-﻿@using Processos_Juridicos.DTOs
+@using Processos_Juridicos.DTOs
 
 @{
     ViewData["Title"] = "Lista de ficheiros";
@@ -23,7 +23,6 @@
                 <th scope="col">@Html.DisplayNameFor(m => m.First().ProcessFileType)</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().ProcessFileContent)</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().ProcessId)</th>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().RowGuid)</th>
             </tr>
         </thead>
         <tbody>
@@ -33,12 +32,10 @@
                 <tr>
                     <th scope="row">@count</th>
                     <td>@Html.DisplayFor(m => item.ProcessFileId)</td>
-                    <td>@Html.DisplayFor(m => item.ProcessFileName)</td>
+                    <td>@Html.DisplayFor(m => item.ProcessFileTrustedName)</td>
                     <td>@Html.DisplayFor(m => item.ProcessFileType)</td>
                     <td>@Html.DisplayFor(m => item.ProcessFileContent)</td>
                     <td>@Html.DisplayFor(m => item.ProcessId)</td>
-                    <td>@Html.DisplayFor(m => item.RowGuid)</td>
-
                 </tr>
                 count++;
             }

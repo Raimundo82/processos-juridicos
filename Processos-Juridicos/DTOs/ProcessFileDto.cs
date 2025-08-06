@@ -19,7 +19,7 @@ public partial class ProcessFileDto
 
     public int ProcessId { get; set; }
 
-    public int RowGuid { get; set; }
+    public string ProcessFileTrustedName { get; set; }
 
     [ForeignKey("ProcessId")]
     public virtual Process Process { get; set; }

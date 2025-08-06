@@ -23,8 +23,8 @@ public partial class ProcessFile
     [Column("process_id")]
     public int ProcessId { get; set; }
 
-    [Column("row_guid")]
-    public int RowGuid { get; set; }
+    [Column("process_file_trusted_name")]
+    public string ProcessFileTrustedName { get; set; }
 
     [ForeignKey("ProcessId")]
     public virtual Process Process { get; set; }

@@ -29,8 +29,8 @@
             {
                 <tr data-id="@item.ProcessTypeId">
                     <th scope="col">@count</th>
-                    <td data-property="name"=>@Html.DisplayFor(m => item.ProcessTypeName)</td>
-                    <td data-property="deadline"=>@Html.DisplayFor(m => item.Deadline)</td>
+                    <td data-property="name">@Html.DisplayFor(m => item.ProcessTypeName)</td>
+                    <td data-property="deadline">@Html.DisplayFor(m => item.Deadline)</td>
                     <td>
                         <div class="d-flex gap-2">
                             <form asp-controller="ProcessType" asp-action="Delete" method="post" data-action="delete">

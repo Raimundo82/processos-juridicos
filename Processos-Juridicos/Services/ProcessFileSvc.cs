@@ -17,6 +17,8 @@ public class ProcessFileSvc(AppDbContext context) : IProcessFileSvc
     {
         ProcessFile processFileEntity = Mapper.MapToFiles(file);
 
+        processFileEntity.ProcessFileName = Path.GetFileName(processFileEntity.ProcessFileName);
+
         _context.ProcessFiles.Add(processFileEntity);
         await _context.SaveChangesAsync();
         return Mapper.MapToFilesDto(processFileEntity);
@@ -41,6 +43,7 @@ public class ProcessFileSvc(AppDbContext context) : IProcessFileSvc
     public async Task<ProcessFileDto> EditProcessFile(ProcessFileDto file)
     {
         ProcessFile processFileEntity = Mapper.MapToFiles(file);
+        processFileEntity.ProcessFileName = Path.GetFileName(processFileEntity.ProcessFileName);
         _context.ProcessFiles.Entry(processFileEntity).State = EntityState.Modified;
         await _context.SaveChangesAsync();
         return Mapper.MapToFilesDto(processFileEntity);
