@@ -58,14 +58,14 @@ public partial class Process
     [Column("created_at")]
     public DateOnly? CreatedAt { get; set; } = DateOnly.FromDateTime(DateTime.Now);
 
-    [Column("created_by_id")]
-    public string CreatedById { get; set; }
+    [Column("created_by")]
+    public string CreatedBy { get; set; }
 
     [Column("modified_at")]
     public DateOnly? ModifiedAt { get; set; } = DateOnly.FromDateTime(DateTime.Now);
 
-    [Column("modified_by_id")]
-    public string ModifiedById { get; set; }
+    [Column("modified_by")]
+    public string ModifiedBy { get; set; }
 
     [Column("service_accident_id")]
     public int? ServiceAccidentId { get; set; }

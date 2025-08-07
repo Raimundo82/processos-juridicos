@@ -34,9 +34,9 @@
                 <th scope="col">@Html.DisplayNameFor(m => m.First().SentenceId)</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().ProcessState)</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().CreatedAt)</th>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().CreatedById)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().CreatedBy)</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().ModifiedAt)</th>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().ModifiedById)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().ModifiedBy)</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().ServiceAccidentId)</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().HarmedOrCasualtiesId)</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().ThirdPartyCompensation)</th>
@@ -81,12 +81,12 @@
                         @(item.ProcessState?.StateName ?? "-")
                     </td>
                     <td data-property="creation-date">@Html.DisplayFor(m => item.CreatedAt)</td>
-                    <td data-property="creator">@Html.DisplayFor(m => item.CreatedById)</td>
+                    <td data-property="creator">@Html.DisplayFor(m => item.CreatedBy)</td>
                     <td data-property="last-modified-date">
                         @(item.ModifiedAt?.ToString("dd-MM-yyyy") ?? "-")
                     </td>
                     <td data-property="last-modified-by">
-                        @(item.ModifiedById?.ToString() ?? "-")
+                        @(item.ModifiedBy?.ToString() ?? "-")
                     </td>
                     <td data-property="accident-type">
                             @(item.AccidentType?.AccidentTypeName?? "-")

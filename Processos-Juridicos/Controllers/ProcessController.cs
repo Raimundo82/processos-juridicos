@@ -11,7 +11,7 @@ using Processos_Juridicos.Utilities.TextManager;
 
 namespace Processos_Juridicos.Controllers;
 
-public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmedOrCasualtySvc casualtiesSvc, IInfringementSvc infringementSvc, IProcessTypeSvc processTypeSvc, ISentenceSvc sentenceSvc, IProcessStateSvc stateSvc, IAccidentTypeSvc accidentTypeSvc, IMilitarySecuritySvc militarySecuritySvc, ICrimeTypeSvc crimeTypeSvc, IProcessFileSvc processFileSvc, IToastNotify toastNotify) : Controller
+public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmedOrCasualtySvc casualtiesSvc, IInfringementSvc infringementSvc, IProcessTypeSvc processTypeSvc, ISentenceSvc sentenceSvc, IProcessStateSvc stateSvc, IAccidentTypeSvc accidentTypeSvc, IMilitarySecuritySvc militarySecuritySvc, ICrimeTypeSvc crimeTypeSvc, IProcessFileSvc processFileSvc, IWindowsUserSvc windowsUserSvc, IToastNotify toastNotify) : Controller
 {
     private const string EntityName = "Processo";
 
@@ -27,6 +27,7 @@ public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmed
     private readonly IProcessSvc _processSvc = processSvc;
     private readonly IToastNotify _toastNotify = toastNotify;
     private readonly IProcessFileSvc _processFileSvc = processFileSvc;
+    private readonly IWindowsUserSvc _windowsUserSvc = windowsUserSvc;
 
     private readonly string[] permittedFileExtensions = [".pdf", ".jpeg", ".png"];
 
@@ -86,8 +87,7 @@ public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmed
 
         if (ModelState.IsValid)
         {
-            //TODO: replace this with currently logged in user
-            model.CreatedById = "1";
+            model.CreatedBy = _windowsUserSvc.GetUserData().DisplayName;
 
             ProcessDto insertTarget = await _processSvc.CreateProcess(model);
 
@@ -137,6 +137,7 @@ public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmed
             return View(model);
         }
 
+        model.ModifiedBy = _windowsUserSvc.GetUserData().DisplayName;
         await _processSvc.EditProcess(model);
 
         List<ProcessFileDto> uploadedFiles = await _processFileSvc.GetAllProcessFilesByProcessId(model.ProcessId);

@@ -53,11 +53,11 @@ public partial class ProcessDto
 
     public DateOnly? CreatedAt { get; set; }
 
-    public string CreatedById { get; set; }
+    public string CreatedBy { get; set; }
 
     public DateOnly? ModifiedAt { get; set; }
 
-    public string ModifiedById { get; set; }
+    public string ModifiedBy { get; set; }
 
     public int? ServiceAccidentId { get; set; }
 

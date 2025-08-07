@@ -51,9 +51,9 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
             _context.Entry(existingEntity).State = EntityState.Detached;
         }
 
-        if (process.CreatedById == null && existingEntity != null)
+        if (process.CreatedBy == null && existingEntity != null)
         {
-            process.CreatedById = existingEntity.CreatedById;
+            process.CreatedBy = existingEntity.CreatedBy;
         }
 
         Process processEntity = Mapper.MapToProcesses(process);
