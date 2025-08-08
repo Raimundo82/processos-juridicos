@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,8 @@ namespace Processos_Juridicos.DTOs;
 public partial class MilitarySecurityDto
 {
 
+    private const string _entityName = "Segurança Militar";
+
     [Key]
     public int? MilitarySecurityId { get; set; }
 
@@ -16,5 +19,6 @@ public partial class MilitarySecurityDto
     [Attributes.MaxLength(50, "Nome da Segurança Militar")]
     [Unicode(false)]
     [UniqueMilitarySecurityName]
+    [DisplayName(_entityName)]
     public required string MilitarySecurityName { get; set; }
 }

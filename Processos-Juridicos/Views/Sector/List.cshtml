@@ -2,7 +2,6 @@
 
 @{
     ViewData["Title"] = "Lista de Setores";
-    int count = 1;
 }
 
 @model IEnumerable<SectorDto>
@@ -17,10 +16,8 @@
     <table id="tableSectors" class="table table-striped-columns table-hover">
         <thead>
             <tr>
-                <th scope="col">#</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().SectorName)</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().SectorCode)</th>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().Enable)</th>
                 <th scope="col">Ações</th>
             </tr>
         </thead>
@@ -29,10 +26,8 @@
             @foreach (var item in Model.ToList())
             {
                 <tr data-id="@item.SectorId" @(item.Enable ? "data-enable" : "")>
-                    <th scope="col">@count</th>
                     <td data-property="name">@Html.DisplayFor(m => item.SectorName)</td>
                     <td data-property="code">@Html.DisplayFor(m => item.SectorCode)</td>
-                    <td data-property="enabled-state">@Html.DisplayFor(m => item.Enable)</td>
                     <td>
                         <div class="d-flex gap-2">
                             <form asp-controller="Sector" asp-action="Delete" method="post" data-action="delete">
@@ -44,7 +39,6 @@
                         </div>
                     </td>
                 </tr>
-                count++;
             }
         </tbody>
     </table>

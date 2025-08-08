@@ -1,4 +1,5 @@
 #nullable disable
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,7 @@ namespace Processos_Juridicos.DTOs;
 
 public partial class HarmedOrCasualtyDto
 {
+    private const string _entityName = "Categoria de Morto/Ferido";
 
     [Key]
     public int? CasualtyId { get; set; }
@@ -17,5 +19,6 @@ public partial class HarmedOrCasualtyDto
     [Attributes.MaxLength(50, "Nome da categoria de ferido")]
     [Unicode(false)]
     [UniqueHarmedOrCasualtyName]
+    [DisplayName(_entityName)]
     public required string CasualtyName { get; set; }
 }

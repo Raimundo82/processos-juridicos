@@ -17,7 +17,6 @@
     <table id="tableProcessTypes" class="table table-striped table-hover">
         <thead>
             <tr>
-                <th scope="col">#</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().ProcessTypeName)</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().Deadline)</th>
                 <th scope="col">Ações</th>
@@ -28,7 +27,6 @@
             @foreach (var item in Model.ToList())
             {
                 <tr data-id="@item.ProcessTypeId">
-                    <th scope="col">@count</th>
                     <td data-property="name">@Html.DisplayFor(m => item.ProcessTypeName)</td>
                     <td data-property="deadline">@Html.DisplayFor(m => item.Deadline)</td>
                     <td>

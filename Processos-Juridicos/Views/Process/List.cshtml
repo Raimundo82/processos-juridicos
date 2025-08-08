@@ -17,47 +17,26 @@
     <table id="tableStates" class="table table-striped-columns table-hover">
         <thead>
             <tr>
-                <th scope="col">@count</th>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().ProcessId)</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().Nuipm)</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().ProcessTypeId)</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().UnitId)</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().OficialInstId)</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().OficialInstTelephone)</th>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().InvestigatedId)</th>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().InvestigatedGender)</th>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().OcurrenceDate)</th>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().DispatchDate)</th>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().Description)</th>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().DeadlineDate)</th>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().FinalDispatchDate)</th>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().SentenceId)</th>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().ProcessState)</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().CreatedAt)</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().CreatedBy)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().Sentence)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().ProcessState)</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().ModifiedAt)</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().ModifiedBy)</th>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().ServiceAccidentId)</th>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().HarmedOrCasualtiesId)</th>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().ThirdPartyCompensation)</th>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().Reimbursement)</th>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().InfringementId)</th>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().CrimeType)</th>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().MilitarySecurity)</th>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().CompensationPaid)</th>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().CompensatingUnit)</th>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().ComunicatedToPjm)</th>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().ComunicationDate)</th>
+
                 <th scope="col">Ações</th>
-                </tr>
+            </tr>
         </thead>
         <tbody>
 
             @foreach (var item in Model.ToList())
             {
                 <tr data-id="@item.ProcessId">
-                    <th scope="col">@count</th>
-                    <td>@Html.DisplayFor(m => item.ProcessId)</td>
                     <td data-property="nuipm"><a asp-controller="Process" asp-action="Details" asp-route-id="@item.ProcessId">@Html.DisplayFor(m => item.Nuipm)</a></td>
                     <td data-property="process-type">
                         @(item.ProcessType?.ProcessTypeName ?? "-")
@@ -66,51 +45,21 @@
                         @(item.Unit?.UnitName ?? "-")
                     </td>
                     <td data-property="instructing-official">@Html.DisplayFor(m => item.OficialInstId)</td>
-                    <td data-property ="instructing-official-phone">@Html.DisplayFor(m => item.OficialInstTelephone)</td>
-                    <td data-property="name">@Html.DisplayFor(m => item.InvestigatedId)</td>
-                    <td data-property="gender">@Html.DisplayFor(m => item.InvestigatedGender)</td>
-                    <td data-property="ocurrence-date"> @Html.DisplayFor(m => item.OcurrenceDate)</td>
-                    <td data-property="dispatch-date">@Html.DisplayFor(m => item.DispatchDate)</td>
-                    <td data-property="gender">@Html.DisplayFor(m => item.Description)</td>
-                    <td data-property ="deadline-date">@Html.DisplayFor(m => item.DeadlineDate)</td>
-                    <td data-property="final-dispatch-date">@Html.DisplayFor(m => item.FinalDispatchDate)</td>
+                    <td data-property="instructing-official-phone">@Html.DisplayFor(m => item.OficialInstTelephone)</td>
+                    <td data-property="created-at">@Html.DisplayFor(m => item.CreatedAt)</td>
+                    <td data-property="created-by">@Html.DisplayFor(m => item.CreatedBy)</td>
                     <td data-property="sentence">
                         @(item.Sentence?.SentenceName ?? "-")
                     </td>
                     <td data-property="state">
                         @(item.ProcessState?.StateName ?? "-")
                     </td>
-                    <td data-property="creation-date">@Html.DisplayFor(m => item.CreatedAt)</td>
-                    <td data-property="creator">@Html.DisplayFor(m => item.CreatedBy)</td>
                     <td data-property="last-modified-date">
                         @(item.ModifiedAt?.ToString("dd-MM-yyyy") ?? "-")
                     </td>
                     <td data-property="last-modified-by">
                         @(item.ModifiedBy?.ToString() ?? "-")
                     </td>
-                    <td data-property="accident-type">
-                            @(item.AccidentType?.AccidentTypeName?? "-")
-                    </td>
-                    <td data-property="harmed-or-casualty">
-                        @(item.HarmedOrCasualties?.CasualtyName ?? "-")
-                    </td>
-                    <td data-property="third-party-compensation">@Html.DisplayFor(m => item.ThirdPartyCompensation)</td>
-                    <td data-property="reibursement">@Html.DisplayFor(m => item.Reimbursement)</td>
-                    <td data-property="infringement">
-                        @(item.Infringement?.InfringementName ?? "-")
-                    </td>
-                    <td data-property="crime-type">
-                        @(item.CrimeType?.CrimeTypeName ?? "-")
-                    </td>
-                    <td data-property="military-security">
-                        @(item.MilitarySecurity?.MilitarySecurityName ?? "-")
-                    </td>
-                    <td data-property="compensation-value">@Html.DisplayFor(m => item.CompensationPaid)</td>
-                    <td data-property="compensating-unit">
-                        @(item.CompensatingUnit?.UnitName ?? "-")
-                    </td>
-                    <td data-property="comunicated-to-pjm">@Html.DisplayFor(m => item.ComunicatedToPjm)</td>
-                    <td>@Html.DisplayFor(m => item.ComunicationDate)</td>
                     <td>
                         <div class="d-flex gap-2">
                             <form asp-controller="Process" asp-action="Delete" method="post" data-action="delete">
@@ -132,4 +81,4 @@
     <script>
         let table = createDataTable("#tableStates");
     </script>
-} 
+}

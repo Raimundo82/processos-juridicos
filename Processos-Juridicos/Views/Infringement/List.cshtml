@@ -2,7 +2,6 @@
 
 @{
     ViewData["Title"] = "Lista de Infrações";
-    int count = 1;
 }
 
 @model IEnumerable<InfringementDto>
@@ -17,7 +16,6 @@
     <table id="tableInfringements" class="table table-striped-columns table-hover">
         <thead>
             <tr>
-                <th scope="col">#</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().InfringementName)</th>
                 <th scope="col">Ações</th>
             </tr>
@@ -27,7 +25,6 @@
             @foreach (var item in Model.ToList())
             {
                 <tr data-id="@item.InfringementId">
-                    <th scope="col">@count</th>
                     <td data-property="name"=>@Html.DisplayFor(m => item.InfringementName)</td>
                     <td>
                         <div class="d-flex gap-2">
@@ -40,7 +37,6 @@
                         </div>
                     </td>
                 </tr>
-                count++;
             }
         </tbody>
     </table>

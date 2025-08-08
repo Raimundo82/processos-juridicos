@@ -11,7 +11,7 @@ namespace Processos_Juridicos.DTOs;
 public partial class CrimeTypeDto
 {
 
-    private const string _entityname = "Tipo de Crime";
+    private const string _entityName = "Tipo de Crime";
 
     [Key]
     public int? CrimeTypeId { get; set; }
@@ -19,7 +19,7 @@ public partial class CrimeTypeDto
     [Unicode(false)]
     [EntityFieldIsRequired("Nome do Tipo de Crime")]
     [Attributes.MaxLength(50, "Nome do Tipo de Crime")]
-    [DisplayName(_entityname)]
+    [DisplayName(_entityName)]
     [UniqueCrimeTypeName]
     public string CrimeTypeName { get; set; }
 }

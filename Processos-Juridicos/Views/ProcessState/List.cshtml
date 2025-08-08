@@ -2,7 +2,6 @@
 
 @{
     ViewData["Title"] = "Lista de Estados";
-    int count = 1;
 }
 
 @model IEnumerable<ProcessStateDto>
@@ -11,16 +10,11 @@
     <h1 class="display-4">Estados</h1>
 </div>
 
-<a asp-controller="ProcessState" asp-action="Create" class="btn btn-primary">Inserir Estado</a>
-
 <div>
     <table id="tableStates" class="table table-striped-columns table-hover">
         <thead>
             <tr>
-                <th scope="col">@count</th>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().ProcessStateId)</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().StateName)</th>
-                <th scope="col">Ações</th>
             </tr>
         </thead>
         <tbody>
@@ -28,22 +22,8 @@
             @foreach (var item in Model.ToList())
             {
                 <tr>
-                    <th scope="row">@count</th>
-                    <td>@Html.DisplayFor(m => item.ProcessStateId)</td>
                     <td>@Html.DisplayFor(m => item.StateName)</td>
-                    <td>
-                        <div class="d-flex gap-2">
-                            <form asp-controller="ProcessState" asp-action="Delete" method="post">
-                                <input type="hidden" name="id" value="@item.ProcessStateId">
-                                <button type="submit" class="btn btn-danger js-delete-btn"></button>
-                            </form>
-                            <a asp-controller="ProcessState" asp-action="Edit" asp-route-id="@item.ProcessStateId"
-                               class="btn btn-warning"><i class="bi bi-pencil"></i></a>
-                        </div>
-                    </td>
                 </tr>
-
-                count++;
             }
         </tbody>
     </table>
