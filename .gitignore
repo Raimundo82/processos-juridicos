@@ -40,6 +40,8 @@ bld/
 */wwwroot/lib/jquery
 */wwwroot/lib/jquery-*
 */wwwroot/lib/sweetalert2
+*/wwwroot/lib/fontsource/
+*/wwwroot/lib/font-awesome/
 
 # Visual Studio 2017 auto generated files
 Generated\ Files/

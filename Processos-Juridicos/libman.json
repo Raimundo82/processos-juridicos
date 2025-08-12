@@ -88,6 +88,21 @@
             "provider": "cdnjs",
             "library": "sweetalert2@11.22.1",
             "destination": "wwwroot/lib/sweetalert2/"
+        },
+        {
+            "provider": "jsdelivr",
+            "library": "@fontsource/prosto-one@5.2.6",
+            "destination": "wwwroot/lib/fontsource/prosto-one/"
+        },
+        {
+            "provider": "jsdelivr",
+            "library": "@fontsource/roboto@5.2.6",
+            "destination": "wwwroot/lib/fontsource/roboto/"
+        },
+        {
+            "provider": "cdnjs",
+            "library": "font-awesome@7.0.0",
+            "destination": "wwwroot/lib/font-awesome/"
         }
-  ]
+    ]
 }
