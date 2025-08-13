@@ -1,3 +1,12 @@
+/* APP COLOR SCHEME */
+:root {
+    --dark-blue: #182439;
+    --light-gray: #F3F4F6;
+    --gray: #DEE0E4;
+    --charcoal: #444C5A;
+    --white: #FFFFFF;
+}
+
 html {
   font-size: 14px;
 }
@@ -25,4 +34,26 @@ html {
 
 body {
   margin-bottom: 60px;
+}
+
+/* NAVBAR */
+.navbar {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.nav-title {
+    font-family: 'Prosto One';
+    font-size: 24px;
+}
+
+.fa-moon {
+    color: var(--charcoal);
+}
+
+.avatar {
+    height: 32px;
+    width: 32px;
+    object-fit: cover;
+    border-radius: 50%;
 }
