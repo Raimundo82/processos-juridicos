@@ -52,14 +52,12 @@ builder.Services.AddSingleton<IJsonTextManager>(sp =>
 //register Interfaces services
 builder.Services.AddScoped<IToastNotify, ToastNotify>();
 builder.Services.AddScoped<IUnitSvc, UnitSvc>();
-builder.Services.AddScoped<ISectorSvc, SectorSvc>();
 builder.Services.AddScoped<IProcessStateSvc, StateSvc>();
 builder.Services.AddScoped<ISentenceSvc, SentenceSvc>();
 builder.Services.AddScoped<IProcessTypeSvc, ProcessTypesSvc>();
 builder.Services.AddScoped<IApisSvc, ApisSvc>();
 builder.Services.AddScoped<IHarmedOrCasualtySvc, HarmedOrCasualtySvc>();
 builder.Services.AddScoped<IInfringementSvc, InfringementSvc>();
-builder.Services.AddScoped<ISectorSvc, SectorSvc>();
 builder.Services.AddScoped<IProcessFileSvc, ProcessFileSvc>();
 builder.Services.AddScoped<IProcessSvc, ProcessSvc>();
 builder.Services.AddScoped<IAccidentTypeSvc, AccidentTypeSvc>();

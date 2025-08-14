@@ -24,7 +24,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
     public DbSet<ProcessState> States { get; set; }
 
-    public DbSet<Sector> Sectors { get; set; }
     public DbSet<Unit> Units { get; set; }
 
     public DbSet<MilitarySecurity> MilitarySecurities { get; set; }

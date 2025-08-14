@@ -19,13 +19,7 @@ public class Unit
     [Column("unit_acronym")]
     public string UnitAcronym { get; set; }
 
-    [Column("sector_id")]
-    public required int SectorId { get; set; }
-
     [Column("enable")]
     public bool Enable { get; set; } = true;
-
-    [ForeignKey("SectorId")]
-    public Sector Sector { get; set; }
 
 }

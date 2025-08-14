@@ -1,5 +1,4 @@
 using AngleSharp.Dom;
-using AngleSharp.Html.Dom;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,9 +23,7 @@ public class UnitIntegrationTests(CustomWebApplicationFactory<Program> factory) 
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        Sector sector = dbContext.Sectors.First();
-
-        dbContext.AddRange(scenarioUnits.Select(CreateUnit(sector)));
+        dbContext.AddRange(scenarioUnits.Select(CreateUnit()));
 
         await dbContext.SaveChangesAsync();
 
@@ -55,10 +52,6 @@ public class UnitIntegrationTests(CustomWebApplicationFactory<Program> factory) 
             IElement? acronymCell = row.QuerySelector("td[data-property='acronym']");
             Assert.NotNull(acronymCell);
             Assert.Equal(acronymCell.TextContent.Trim(), dbItem.UnitAcronym);
-
-            IElement? sectorCell = row.QuerySelector($"td[data-property='sector']");
-            Assert.NotNull(sectorCell);
-            Assert.Equal(sectorCell.TextContent.Trim(), dbItem.Sector.SectorName);
         });
     }
 
@@ -70,12 +63,6 @@ public class UnitIntegrationTests(CustomWebApplicationFactory<Program> factory) 
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        IDocument createDoc = await _client.GetDocumentAsync("/Unit/Create");
-        var sectorOption = (IHtmlOptionElement?)createDoc.QuerySelector("select#sector-id > option:nth-child(2)");
-        Assert.NotNull(sectorOption);
-        var sectorId = sectorOption.Value;
-        await dbContext.Sectors.FindAsync(int.Parse(sectorId));
-
         // Act
         foreach (UnitTest unitTest in scenarioUnits)
         {
@@ -84,8 +71,7 @@ public class UnitIntegrationTests(CustomWebApplicationFactory<Program> factory) 
                 ["UnitName"] = unitTest.Name,
                 ["UnitCode"] = unitTest.Code,
                 ["UnitAcronym"] = unitTest.Acronym,
-                ["Enable"] = unitTest.IsEnabled.ToString(),
-                ["SectorId"] = sectorId,
+                ["Enable"] = unitTest.IsEnabled.ToString()
             };
             await _client.PostAsync("/Unit/Create", new FormUrlEncodedContent(formData));
         }
@@ -119,10 +105,6 @@ public class UnitIntegrationTests(CustomWebApplicationFactory<Program> factory) 
             Assert.NotNull(acronymCell);
             Assert.Equal(dbItem.UnitAcronym, scenarioUnit.Acronym);
             Assert.Equal(acronymCell.TextContent.Trim(), scenarioUnit.Acronym);
-
-            IElement? sectorCell = row.QuerySelector($"td[data-property='sector']");
-            Assert.NotNull(sectorCell);
-            Assert.Equal(sectorCell.TextContent.Trim(), dbItem.Sector.SectorName);
         });
     }
 
@@ -133,8 +115,7 @@ public class UnitIntegrationTests(CustomWebApplicationFactory<Program> factory) 
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        Sector sector = dbContext.Sectors.First();
-        Unit unit = CreateUnit(sector)(new UnitTest { Name = "Name", Acronym = "N", Code = "code", IsEnabled = true });
+        Unit unit = CreateUnit()(new UnitTest { Name = "Name", Acronym = "N", Code = "code", IsEnabled = true });
         dbContext.Add(unit);
         await dbContext.SaveChangesAsync();
 
@@ -159,12 +140,6 @@ public class UnitIntegrationTests(CustomWebApplicationFactory<Program> factory) 
         IElement? acronymField = form.QuerySelector("#unit-acronym");
         Assert.NotNull(acronymField);
         Assert.Equal(unit.UnitAcronym, acronymField.GetAttribute("value"));
-
-        IElement? sectorField = form.QuerySelector($"#sector-id option[selected='selected']");
-        Assert.NotNull(sectorField);
-        Assert.Equal(sectorField.GetAttribute("value"), unit.SectorId.ToString());
-        Assert.Equal(sectorField.TextContent.Trim(), sector.SectorName);
-
     }
 
     [Fact]
@@ -174,8 +149,7 @@ public class UnitIntegrationTests(CustomWebApplicationFactory<Program> factory) 
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        Sector sector = dbContext.Sectors.First();
-        Unit unit = CreateUnit(sector)(new UnitTest { Name = "Name", Acronym = "N", Code = "code", IsEnabled = true });
+        Unit unit = CreateUnit()(new UnitTest { Name = "Name", Acronym = "N", Code = "code", IsEnabled = true });
         dbContext.Units.Add(unit);
         await dbContext.SaveChangesAsync();
 
@@ -187,7 +161,6 @@ public class UnitIntegrationTests(CustomWebApplicationFactory<Program> factory) 
             ["UnitCode"] = unit.UnitCode,
             ["UnitAcronym"] = unit.UnitAcronym,
             ["Enable"] = unit.Enable.ToString(),
-            ["SectorId"] = unit.SectorId.ToString(),
         };
 
         await _client.PostAsync($"/Unit/Edit/{unit.UnitId}", new FormUrlEncodedContent(formData));
@@ -210,10 +183,6 @@ public class UnitIntegrationTests(CustomWebApplicationFactory<Program> factory) 
         IElement? acronymCell = row.QuerySelector("td[data-property='acronym']");
         Assert.NotNull(acronymCell);
         Assert.Equal(unit.UnitAcronym, acronymCell.TextContent.Trim());
-
-        IElement? sectorCell = row.QuerySelector($"td[data-property='sector']");
-        Assert.NotNull(sectorCell);
-        Assert.Equal(unit.Sector.SectorName, sectorCell.TextContent.Trim());
     }
 
     [Fact]
@@ -223,8 +192,7 @@ public class UnitIntegrationTests(CustomWebApplicationFactory<Program> factory) 
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        Sector sector = dbContext.Sectors.First();
-        Unit unit = CreateUnit(sector)(new UnitTest { Name = "Name", Acronym = "N", Code = "code", IsEnabled = false });
+        Unit unit = CreateUnit()(new UnitTest { Name = "Name", Acronym = "N", Code = "code", IsEnabled = false });
         dbContext.Units.Add(unit);
         await dbContext.SaveChangesAsync();
 
@@ -253,10 +221,6 @@ public class UnitIntegrationTests(CustomWebApplicationFactory<Program> factory) 
         IElement? acronymCell = row.QuerySelector("td[data-property='acronym']");
         Assert.NotNull(acronymCell);
         Assert.Equal(unit.UnitAcronym, acronymCell.TextContent.Trim());
-
-        IElement? sectorCell = row.QuerySelector($"td[data-property='sector']");
-        Assert.NotNull(sectorCell);
-        Assert.Equal(unit.Sector.SectorName, sectorCell.TextContent.Trim());
     }
 
     [Fact]
@@ -266,8 +230,7 @@ public class UnitIntegrationTests(CustomWebApplicationFactory<Program> factory) 
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        Sector sector = dbContext.Sectors.First();
-        Unit unit = CreateUnit(sector)(new UnitTest { Name = "Name", Acronym = "N", Code = "code", IsEnabled = false });
+        Unit unit = CreateUnit()(new UnitTest { Name = "Name", Acronym = "N", Code = "code", IsEnabled = false });
         dbContext.Units.Add(unit);
         await dbContext.SaveChangesAsync();
 
@@ -301,8 +264,7 @@ public class UnitIntegrationTests(CustomWebApplicationFactory<Program> factory) 
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        Sector sector = dbContext.Sectors.First();
-        Unit unit = CreateUnit(sector)(new UnitTest { Name = "Name", Acronym = "N", Code = "code", IsEnabled = false });
+        Unit unit = CreateUnit()(new UnitTest { Name = "Name", Acronym = "N", Code = "code", IsEnabled = false });
         dbContext.Units.Add(unit);
         await dbContext.SaveChangesAsync();
 
@@ -328,16 +290,14 @@ public class UnitIntegrationTests(CustomWebApplicationFactory<Program> factory) 
         Assert.NotNull(row);
     }
 
-    private static Func<UnitTest, Unit> CreateUnit(Sector sector)
+    private static Func<UnitTest, Unit> CreateUnit()
     {
         return unitTest => new Unit
         {
             Enable = unitTest.IsEnabled,
             UnitAcronym = unitTest.Acronym,
             UnitCode = unitTest.Code,
-            UnitName = unitTest.Name,
-            SectorId = sector.SectorId!.Value,
-            Sector = sector
+            UnitName = unitTest.Name
         };
     }
 
@@ -346,8 +306,6 @@ public class UnitIntegrationTests(CustomWebApplicationFactory<Program> factory) 
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         dbContext.RemoveRange(dbContext.Units);
-        dbContext.RemoveRange(dbContext.Sectors);
-        dbContext.Add(new Sector { SectorName = "Sector", SectorCode = "S", Enable = true });
         await dbContext.SaveChangesAsync();
     }
     public Task DisposeAsync()

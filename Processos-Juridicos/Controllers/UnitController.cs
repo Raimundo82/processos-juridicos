@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 
 using Processos_Juridicos.DTOs;
 using Processos_Juridicos.Services.Interfaces;
@@ -7,12 +6,11 @@ using Processos_Juridicos.Utilities.TextManager;
 
 namespace Processos_Juridicos.Controllers;
 
-public class UnitController(IUnitSvc unitSvc, ISectorSvc sectorSvc, IToastNotify toastNotify) : Controller
+public class UnitController(IUnitSvc unitSvc, IToastNotify toastNotify) : Controller
 {
     private const string EntityName = "Unidade";
 
     private readonly IUnitSvc _unitSvc = unitSvc;
-    private readonly ISectorSvc _sectorSvc = sectorSvc;
     private readonly IToastNotify _toastNotify = toastNotify;
 
     [HttpGet]
@@ -34,9 +32,8 @@ public class UnitController(IUnitSvc unitSvc, ISectorSvc sectorSvc, IToastNotify
     }
 
     [HttpGet]
-    public async Task<IActionResult> Create()
+    public IActionResult Create()
     {
-        await PopulateSectorsForViewBag();
         return View();
     }
 
@@ -50,7 +47,6 @@ public class UnitController(IUnitSvc unitSvc, ISectorSvc sectorSvc, IToastNotify
             return RedirectToAction(nameof(List));
         }
 
-        await PopulateSectorsForViewBag();
         return View(model);
     }
 
@@ -60,7 +56,6 @@ public class UnitController(IUnitSvc unitSvc, ISectorSvc sectorSvc, IToastNotify
         if (ModelState.IsValid)
         {
             UnitDto model = await _unitSvc.GetUnitById(id);
-            await PopulateSectorsForViewBag();
             return View(model);
         }
 
@@ -77,7 +72,6 @@ public class UnitController(IUnitSvc unitSvc, ISectorSvc sectorSvc, IToastNotify
             return RedirectToAction(nameof(List));
         }
 
-        await PopulateSectorsForViewBag();
         return View(model);
     }
 
@@ -98,18 +92,7 @@ public class UnitController(IUnitSvc unitSvc, ISectorSvc sectorSvc, IToastNotify
                 _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("DeleteSuccessMessage"), "A", EntityName, "a"));
             }
         }
+
         return RedirectToAction(nameof(List));
-    }
-
-    private async Task PopulateSectorsForViewBag()
-    {
-        IEnumerable<SectorDto> sectors = await _sectorSvc.GetAllSectors();
-        var listSectors = sectors.Select(x => new SelectListItem
-        {
-            Text = x.SectorName,
-            Value = x.SectorId.ToString()
-        }).ToList();
-
-        ViewBag.selectors = listSectors;
     }
 }

@@ -1,7 +1,6 @@
 #nullable disable
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 using Microsoft.EntityFrameworkCore;
 
@@ -31,11 +30,5 @@ public class UnitDto
     [UniqueUnitAcronym]
     public string UnitAcronym { get; set; }
 
-    [EntityFieldIsRequired("Setor")]
-    public required int SectorId { get; set; }
-
     public bool Enable { get; set; } = default;
-
-    [ForeignKey("SectorId")]
-    public SectorDto Sector { get; set; }
 }

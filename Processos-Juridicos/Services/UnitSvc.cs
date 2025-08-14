@@ -15,9 +15,7 @@ public class UnitSvc(AppDbContext context) : IUnitSvc
 
     public async Task<IEnumerable<UnitDto>> GetAllUnits()
     {
-        List<Unit> units = await _context.Units
-            .Include(x => x.Sector)
-            .ToListAsync();
+        List<Unit> units = await _context.Units.ToListAsync();
         return Mapper.MapToToUnitDtoEnum(units);
     }
 

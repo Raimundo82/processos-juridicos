@@ -17,11 +17,3 @@
     <input asp-for="UnitAcronym" id="unit-acronym" class="form-control" />
     <span asp-validation-for="UnitAcronym" class="text-danger"></span>
 </div>
-
-<div class="form-group mt-3">
-    <label for="sector-id" class="control-label">Setor</label>
-    <select id="sector-id" asp-for="SectorId" asp-items="ViewBag.selectors" class="form-control">
-        <option value="">Selecione um Setor</option>
-    </select>
-    <span asp-validation-for="SectorId" class="text-danger"></span>
-</div>
