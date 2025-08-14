@@ -9,4 +9,5 @@ public class UserDataModel
     public string? Unit { get; set; }
     public string? PhotoBase64 { get; set; }
     public List<string>? Groups { get; set; }
+    public string? Email { get; set; }
 }

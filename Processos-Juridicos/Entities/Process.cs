@@ -22,14 +22,14 @@ public partial class Process
     [Column("oficial_inst_telephone")]
     public string OficialInstTelephone { get; set; }
 
-    [Column("oficial_inst_id")]
-    public string OficialInstId { get; set; }
+    [Column("oficial_inst_name")]
+    public string OficialInstName { get; set; }
 
     [Column("compensating_unit_id")]
     public int? CompensatingUnitId { get; set; }
 
-    [Column("investigated_id")]
-    public string InvestigatedId { get; set; }
+    [Column("investigated_name")]
+    public string InvestigatedName { get; set; }
 
     [Column("investigated_gender")]
     public string InvestigatedGender { get; set; }

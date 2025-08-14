@@ -13,4 +13,3 @@ function markFileForDeletion(fileId) {
   input.value = fileId;
   container.appendChild(input);
 }
-

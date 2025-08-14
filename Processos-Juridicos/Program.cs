@@ -67,7 +67,7 @@ builder.Services.AddScoped<IMilitarySecuritySvc, MilitarySecuritySvc>();
 // Interface service only supported on windows
 if (OperatingSystem.IsWindows())
 {
-    builder.Services.AddScoped<IWindowsUserSvc, WindowsUserSvc>();
+    builder.Services.AddScoped<ILdapUserSvc, LdapUserSvc>();
 }
 
 //Register NToastNotify

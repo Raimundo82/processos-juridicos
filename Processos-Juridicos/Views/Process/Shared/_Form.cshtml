@@ -21,29 +21,52 @@
     </select>
     <span asp-validation-for="UnitId" class="text-danger"></span>
 </div>
-
+<!-- Oficial Instrutor -->
 <div class="form-group mt-3">
-    <label asp-for="OficialInstId" for="instructor-name" class="control-label">Oficial instrutor</label>
-    <input id="instructor-name" asp-for="OficialInstId" class="form-control" />
-    <span asp-validation-for="OficialInstId" class="text-danger"></span>
+    <input type="hidden" asp-for="OficialInstName" id="OficialInstName" />
 
-    <label asp-for="Nuipm" for="instructor-telephone" class="control-label">Telefone do oficial instrutor</label>
+    <label class="control-label">Oficial Instrutor</label>
+    <div class="input-group">
+        <input id="instructor-lookup" class="form-control" placeholder="Digite o ID do oficial, ex: a1234" />
+        <button type="button"
+                class="btn btn-outline-secondary ad-lookup-btn"
+                data-target-visible="instructor-lookup"
+                data-target-hidden="OficialInstName"
+                data-target-info="OficialInstInfo">
+            Procurar AD
+        </button>
+    </div>
+    <small id="OficialInstInfo" class="form-text text-muted"></small>
+
+    <label asp-for="OficialInstTelephone" for="instructor-telephone" class="control-label mt-3">
+        Telefone do oficial instrutor
+    </label>
     <input id="instructor-telephone" asp-for="OficialInstTelephone" class="form-control" />
     <span asp-validation-for="OficialInstTelephone" class="text-danger"></span>
 </div>
 
+<!-- Averiguado -->
 <div class="form-group mt-3">
-    <label asp-for="InvestigatedId" for="investigated-name" class="control-label">Averiguado</label>
-    <input id="investigated-name" asp-for="InvestigatedId" class="form-control" />
-    <span asp-validation-for="InvestigatedId" class="text-danger"></span>
+    <input type="hidden" asp-for="InvestigatedName" id="InvestigatedName" />
 
-    <label for="investigated-gender" class="control-label">Sexo</label>
-    <select id="investigated-gender" asp-for="InvestigatedGender" asp-items="ViewBag.genders" class="form-control">
+    <label class="control-label">Averiguado</label>
+    <div class="input-group">
+        <input id="investigated-lookup" class="form-control" placeholder="Digite o ID ou nome do averiguado" />
+        <button type="button"
+                class="btn btn-outline-secondary ad-lookup-btn"
+                data-target-visible="investigated-lookup"
+                data-target-hidden="InvestigatedName"
+                data-target-info="InvestigatedInfo">
+            Procurar AD
+        </button>
+    </div>
+    <small id="InvestigatedInfo" class="form-text text-muted"></small>
 
-    </select>
+    <label for="investigated-gender" class="control-label mt-3">Sexo</label>
+    <select id="investigated-gender" asp-for="InvestigatedGender" asp-items="ViewBag.genders" class="form-control"></select>
     <span asp-validation-for="InvestigatedGender" class="text-danger"></span>
 
-    <div>
+    <div class="mt-2">
         <label for="uncertainInvestigated">Averiguado Incerto</label>
         <input type="checkbox" id="uncertainInvestigated" />
     </div>
@@ -147,3 +170,48 @@
 }
 
 <div id="deletedFilesContainer"></div>
+
+
+<!-- Shared AD search modal (Bootstrap) -->
+<div class="modal fade" id="adPickerModal" tabindex="-1" aria-labelledby="adPickerLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="adPickerLabel">Procurar no AD</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group mb-3">
+                    <input id="adSearchBox" class="form-control" placeholder="Nome, ID (sAMAccountName) ou email" />
+                    <button id="adSearchBtn" class="btn btn-primary" type="button">Pesquisar</button>
+                </div>
+
+                <div id="adSearchStatus" class="text-muted mb-2"></div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>ID</th>
+                                <th>Email</th>
+                                <th>Unidade</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="adResultsBody">
+                            <!-- Rows injected via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="adClearBtn" type="button" class="btn btn-outline-secondary">Limpar</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="~/js/lookup.js"></script>

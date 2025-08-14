@@ -29,14 +29,14 @@ public partial class ProcessDto
     public int? CompensatingUnitId { get; set; }
 
     [DisplayName("Oficial Instrutor")]
-    public string OficialInstId { get; set; }
+    public string OficialInstName { get; set; }
 
     [DisplayName("Telefone do Oficial Instrutor")]
     [Phone(ErrorMessage = "Invalid phone number")]
     public string OficialInstTelephone { get; set; }
 
     [DisplayName("Averiguado")]
-    public string InvestigatedId { get; set; }
+    public string InvestigatedName { get; set; }
 
     [DisplayName("Sexo do Averiguado")]
     public string InvestigatedGender { get; set; }

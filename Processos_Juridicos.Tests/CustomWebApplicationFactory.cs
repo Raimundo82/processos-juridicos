@@ -18,13 +18,13 @@ namespace Processos_Juridicos.Tests;
 
 public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProgram> where TProgram : class
 {
-    public Mock<IWindowsUserSvc> WindowsAuthSvcMock { get; }
+    public Mock<ILdapUserSvc> WindowsAuthSvcMock { get; }
 
     public CustomWebApplicationFactory()
     {
-        WindowsAuthSvcMock = new Mock<IWindowsUserSvc>();
+        WindowsAuthSvcMock = new Mock<ILdapUserSvc>();
         WindowsAuthSvcMock
-            .Setup(s => s.GetUserData())
+            .Setup(s => s.GetLoggedUserData())
             .Returns(new UserDataModel
             {
                 DisplayName = "Mock User",
@@ -42,7 +42,7 @@ public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProg
             services.RemoveAll<DbConnection>();
             services.AddDbContextFactory<AppDbContext>(options => options.UseInMemoryDatabase(Guid.NewGuid().ToString()));
 
-            services.RemoveAll<IWindowsUserSvc>();
+            services.RemoveAll<ILdapUserSvc>();
             services.AddSingleton(WindowsAuthSvcMock.Object);
             services.PostConfigure<AuthenticationOptions>(options =>
             {

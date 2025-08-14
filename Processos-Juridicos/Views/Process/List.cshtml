@@ -20,7 +20,7 @@
                 <th scope="col">@Html.DisplayNameFor(m => m.First().Nuipm)</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().ProcessTypeId)</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().UnitId)</th>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().OficialInstId)</th>
+                <th scope="col">@Html.DisplayNameFor(m => m.First().OficialInstName)</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().OficialInstTelephone)</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().CreatedAt)</th>
                 <th scope="col">@Html.DisplayNameFor(m => m.First().CreatedBy)</th>
@@ -44,7 +44,7 @@
                     <td data-property="unit">
                         @(item.Unit?.UnitName ?? "-")
                     </td>
-                    <td data-property="instructing-official">@Html.DisplayFor(m => item.OficialInstId)</td>
+                    <td data-property="instructing-official">@Html.DisplayFor(m => item.OficialInstName)</td>
                     <td data-property="instructing-official-phone">@Html.DisplayFor(m => item.OficialInstTelephone)</td>
                     <td data-property="created-at">@Html.DisplayFor(m => item.CreatedAt)</td>
                     <td data-property="created-by">@Html.DisplayFor(m => item.CreatedBy)</td>
