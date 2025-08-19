@@ -21,8 +21,8 @@
 
             @foreach (var item in Model.ToList())
             {
-                <tr>
-                    <td>@Html.DisplayFor(m => item.StateName)</td>
+                <tr data-id="@item.ProcessStateId">
+                    <td data-property="name">@Html.DisplayFor(m => item.StateName)</td>
                 </tr>
             }
         </tbody>
