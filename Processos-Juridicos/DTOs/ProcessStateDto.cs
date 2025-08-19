@@ -17,5 +17,4 @@ public partial class ProcessStateDto
     [Unicode(false)]
     public string StateName { get; set; }
 
-
 }
