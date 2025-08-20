@@ -11,22 +11,15 @@ using Processos_Juridicos.Utilities.TextManager;
 
 namespace Processos_Juridicos.Controllers;
 
-public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmedOrCasualtySvc casualtiesSvc, IInfringementSvc infringementSvc, IProcessTypeSvc processTypeSvc, ISentenceSvc sentenceSvc, IProcessStateSvc stateSvc, IAccidentTypeSvc accidentTypeSvc, IMilitarySecuritySvc militarySecuritySvc, ICrimeTypeSvc crimeTypeSvc, IProcessFileSvc processFileSvc, ILdapUserSvc windowsUserSvc, IToastNotify toastNotify) : Controller
+public class ProcessController(ILegalReferenceSvc legalService, IContextSvc context, IProcessManagementSvc manager, ILdapUserSvc windowsUserSvc, IToastNotify toastNotify) : Controller
 {
     private const string EntityName = "Processo";
 
-    private readonly ICrimeTypeSvc _crimeTypeSvc = crimeTypeSvc;
-    private readonly IMilitarySecuritySvc _militarySecuritySvc = militarySecuritySvc;
-    private readonly IProcessStateSvc _stateSvc = stateSvc;
-    private readonly IAccidentTypeSvc _accidentTypeSvc = accidentTypeSvc;
-    private readonly ISentenceSvc _sentenceSvc = sentenceSvc;
-    private readonly IInfringementSvc _infringementSvc = infringementSvc;
-    private readonly IProcessTypeSvc _processTypeSvc = processTypeSvc;
-    private readonly IUnitSvc _unitSvc = unitSvc;
-    private readonly IHarmedOrCasualtySvc _casualtySvc = casualtiesSvc;
-    private readonly IProcessSvc _processSvc = processSvc;
+    private readonly ILegalReferenceSvc _legalRefs = legalService;
+    private readonly IContextSvc _context = context;
+    private readonly IProcessManagementSvc _pm = manager;
     private readonly IToastNotify _toastNotify = toastNotify;
-    private readonly IProcessFileSvc _processFileSvc = processFileSvc;
+
     private readonly ILdapUserSvc _windowsUserSvc = windowsUserSvc;
 
     private readonly string[] permittedFileExtensions = [".pdf", ".jpeg", ".png"];
@@ -58,7 +51,7 @@ public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmed
     [HttpGet]
     public async Task<IActionResult> List()
     {
-        IEnumerable<ProcessDto> processes = await _processSvc.GetAllProcesses();
+        IEnumerable<ProcessDto> processes = await _pm.Processes.GetAllProcesses();
         return View(processes);
     }
 
@@ -67,7 +60,7 @@ public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmed
     {
         if (ModelState.IsValid)
         {
-            ProcessDto process = await _processSvc.GetProcessById(id);
+            ProcessDto process = await _pm.Processes.GetProcessById(id);
             return View(process);
         }
 
@@ -89,7 +82,7 @@ public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmed
         {
             model.CreatedBy = _windowsUserSvc.GetLoggedUserData().DisplayName;
 
-            ProcessDto insertTarget = await _processSvc.CreateProcess(model);
+            ProcessDto insertTarget = await _pm.Processes.CreateProcess(model);
 
             if (model.ProcessFiles != null && model.ProcessFiles.Length > 0)
             {
@@ -115,8 +108,8 @@ public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmed
     {
         if (ModelState.IsValid)
         {
-            ProcessDto model = await _processSvc.GetProcessById(id);
-            List<ProcessFileDto> uploadedFiles = await _processFileSvc.GetAllProcessFilesByProcessId(id);
+            ProcessDto model = await _pm.Processes.GetProcessById(id);
+            List<ProcessFileDto> uploadedFiles = await _pm.ProcessFiles.GetAllProcessFilesByProcessId(id);
             model.UploadedFiles = uploadedFiles;
 
 
@@ -138,9 +131,9 @@ public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmed
         }
 
         model.ModifiedBy = _windowsUserSvc.GetLoggedUserData().DisplayName;
-        await _processSvc.EditProcess(model);
+        await _pm.Processes.EditProcess(model);
 
-        List<ProcessFileDto> uploadedFiles = await _processFileSvc.GetAllProcessFilesByProcessId(model.ProcessId);
+        List<ProcessFileDto> uploadedFiles = await _pm.ProcessFiles.GetAllProcessFilesByProcessId(model.ProcessId);
 
         if (model.ProcessFiles?.Length > 0)
         {
@@ -149,7 +142,7 @@ public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmed
 
                 if (!await ValidateAndSaveFileAsync(model.ProcessId, file))
                 {
-                    model = await _processSvc.GetProcessById(model.ProcessId);
+                    model = await _pm.Processes.GetProcessById(model.ProcessId);
                     model.UploadedFiles = uploadedFiles;
                     await PopulateViewbags();
                     return View(model);
@@ -161,14 +154,14 @@ public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmed
         {
             foreach (var fileId in model.FilesToRemove)
             {
-                await _processFileSvc.DeleteProcessFile(fileId);
+                await _pm.ProcessFiles.DeleteProcessFile(fileId);
             }
         }
 
         _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("EditSuccessMessage"), "O", EntityName, "o"));
         await PopulateViewbags();
-        model = await _processSvc.GetProcessById(model.ProcessId);
-        uploadedFiles = await _processFileSvc.GetAllProcessFilesByProcessId(model.ProcessId);
+        model = await _pm.Processes.GetProcessById(model.ProcessId);
+        uploadedFiles = await _pm.ProcessFiles.GetAllProcessFilesByProcessId(model.ProcessId);
         model.UploadedFiles = uploadedFiles;
         return RedirectToAction("Edit", new { id = model.ProcessId });
     }
@@ -209,7 +202,7 @@ public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmed
     {
         if (ModelState.IsValid)
         {
-            var success = await _processSvc.DeleteProcess(id);
+            var success = await _pm.Processes.DeleteProcess(id);
             if (!success)
             {
                 _toastNotify.Error(string.Format(GlobalTextManager.GetString("DeleteFailureMessage"), "o", EntityName));
@@ -239,7 +232,7 @@ public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmed
 
     private async Task PopulateUnitsForViewBag()
     {
-        IEnumerable<UnitDto> units = await _unitSvc.GetAllUnits();
+        IEnumerable<UnitDto> units = await _context.Units.GetAllUnits();
         var listUnits = units.Select(x => new SelectListItem
         {
             Text = x.UnitName,
@@ -251,7 +244,7 @@ public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmed
 
     private async Task PopulateCasualtiesForViewBag()
     {
-        IEnumerable<HarmedOrCasualtyDto> casualties = await _casualtySvc.GetAllCasualties();
+        IEnumerable<HarmedOrCasualtyDto> casualties = await _context.Casualties.GetAllCasualties();
         var listCasualties = casualties.Select(x => new SelectListItem
         {
             Text = x.CasualtyName,
@@ -263,7 +256,7 @@ public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmed
 
     private async Task PopulateInfringementsForViewBag()
     {
-        IEnumerable<InfringementDto> infringements = await _infringementSvc.GetAllInfringements();
+        IEnumerable<InfringementDto> infringements = await _legalRefs.Infringements.GetAllInfringements();
         var listInfringements = infringements.Select(x => new SelectListItem
         {
             Text = x.InfringementName,
@@ -274,7 +267,7 @@ public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmed
     }
     private async Task PopulateProcessTypesForViewBag()
     {
-        IEnumerable<ProcessTypeDto> processTypes = await _processTypeSvc.GetAllProcessTypes();
+        IEnumerable<ProcessTypeDto> processTypes = await _legalRefs.ProcessTypes.GetAllProcessTypes();
         var listProcessTypes = processTypes.Select(x => new SelectListItem
         {
             Text = x.ProcessTypeName,
@@ -285,7 +278,7 @@ public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmed
     }
     private async Task PopulateSentencesForViewBag()
     {
-        IEnumerable<SentenceDto> sentences = await _sentenceSvc.GetAllSentences();
+        IEnumerable<SentenceDto> sentences = await _legalRefs.Sentences.GetAllSentences();
         var listSentences = sentences.Select(x => new SelectListItem
         {
             Text = x.SentenceName,
@@ -297,7 +290,7 @@ public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmed
 
     private async Task PopulateStatesForViewBag()
     {
-        IEnumerable<ProcessStateDto> states = await _stateSvc.GetAllStates();
+        IEnumerable<ProcessStateDto> states = await _pm.ProcessStates.GetAllStates();
         var listStates = states.Select(x => new SelectListItem
         {
             Text = x.StateName,
@@ -309,7 +302,7 @@ public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmed
 
     private async Task PopulateAccidentTypesForViewBag()
     {
-        IEnumerable<AccidentTypeDto> accidentTypes = await _accidentTypeSvc.GetAllAccidentTypes();
+        IEnumerable<AccidentTypeDto> accidentTypes = await _legalRefs.AccidentTypes.GetAllAccidentTypes();
         var listAccidentTypes = accidentTypes.Select(x => new SelectListItem
         {
             Text = x.AccidentTypeName,
@@ -321,7 +314,7 @@ public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmed
 
     private async Task PopulateMilitarySecuritiesForViewBag()
     {
-        IEnumerable<MilitarySecurityDto> militarySecurities = await _militarySecuritySvc.GetAllMilitarySecurities();
+        IEnumerable<MilitarySecurityDto> militarySecurities = await _context.MilitarySecurity.GetAllMilitarySecurities();
         var listMilitarySecurities = militarySecurities.Select(x => new SelectListItem
         {
             Text = x.MilitarySecurityName,
@@ -333,7 +326,7 @@ public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmed
 
     private async Task PopulateCrimeTypesForViewBag()
     {
-        IEnumerable<CrimeTypeDto> crimeTypes = await _crimeTypeSvc.GetAllCrimeTypes();
+        IEnumerable<CrimeTypeDto> crimeTypes = await _legalRefs.CrimeTypes.GetAllCrimeTypes();
         var listCrimeTypes = crimeTypes.Select(x => new SelectListItem
         {
             Text = x.CrimeTypeName,
@@ -413,7 +406,7 @@ public class ProcessController(IProcessSvc processSvc, IUnitSvc unitSvc, IHarmed
             ProcessId = processId.Value
         });
 
-        await _processFileSvc.CreateProcessFile(fileDto);
+        await _pm.ProcessFiles.CreateProcessFile(fileDto);
         return true;
     }
 

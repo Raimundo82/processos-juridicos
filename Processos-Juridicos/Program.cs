@@ -63,6 +63,9 @@ builder.Services.AddScoped<IProcessSvc, ProcessSvc>();
 builder.Services.AddScoped<IAccidentTypeSvc, AccidentTypeSvc>();
 builder.Services.AddScoped<ICrimeTypeSvc, CrimeTypeSvc>();
 builder.Services.AddScoped<IMilitarySecuritySvc, MilitarySecuritySvc>();
+builder.Services.AddScoped<ILegalReferenceSvc, LegalReferenceSvc>();
+builder.Services.AddScoped<IContextSvc, ContextSvc>();
+builder.Services.AddScoped<IProcessManagementSvc, ProcessManagementSvc>();
 
 // Interface service only supported on windows
 if (OperatingSystem.IsWindows())
