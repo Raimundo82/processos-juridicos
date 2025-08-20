@@ -2,13 +2,13 @@
 
 @{
     ViewData["Title"] = "Tipos de Acidentes";
-    int count = 1;
+	    int count = 1;
 }
 
 @model IEnumerable<AccidentTypeDto>
 
 <div class="text-center">
-    <h1 class="display-4">Tipos de Acidente</h1>
+    <h1 class="display-4">@ViewData["Title"]</h1>
 </div>
 
 <a asp-controller="AccidentType" asp-action="Create" class="btn btn-primary">Inserir tipo de acidente</a>
@@ -22,7 +22,6 @@
             </tr>
         </thead>
         <tbody>
-
             @foreach (var item in Model.ToList())
             {
                 <tr data-id="@item.AccidentTypeId">
