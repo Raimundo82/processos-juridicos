@@ -1,0 +1,21 @@
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    
+    volumes:
+      - ..:/workspace:cached
+
+    env_file:
+      - .env
+
+    working_dir: /workspace/Processos-Juridicos
+    
+    command: sleep infinity
+    
+    environment:
+      ConnectionStrings__processosDj: "Server=${DB_HOST};Database=${DB_NAME};User Id=${DB_USER};Password=${DB_PASSWORD};TrustServerCertificate=True;"
+
+    ports:
+      - "5000:80" 

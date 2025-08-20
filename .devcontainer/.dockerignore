@@ -1,0 +1,16 @@
+bin/
+obj/
+node_modules/
+
+.vscode/
+*.user
+*.suo
+.git/
+.gitignore
+
+*.log
+*.tmp
+*.cache
+
+.dockerignore
+docker-compose*.yml

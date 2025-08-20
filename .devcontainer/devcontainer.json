@@ -1,0 +1,26 @@
+{
+  "name": "ASP.NET Core DevContainer",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspace/${localWorkspaceFolderBasename}",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-dotnettools.csdevkit",
+        "ms-dotnettools.csharp",
+        "esbenp.prettier-vscode",
+        "mtxr.sqltools",
+        "mtxr.sqltools-driver-pg",
+        "SonarSource.sonarlint-vscode",
+        "fernandoescolar.vscode-solution-explorer",
+        "me-dutour-mathieu.vscode-github-actions",
+        "EditorConfig.EditorConfig"
+      ],
+      "settings": {
+        "terminal.integrated.shell.linux": "/bin/bash"
+      }
+    }
+  },
+  "postCreateCommand": "bash .devcontainer/post-script.sh",
+  "forwardPorts": [5000]
+}
