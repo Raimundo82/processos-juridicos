@@ -1,0 +1,42 @@
+<nav class="navbar navbar-expand-sm menu-bar">
+    <div class="container-fluid mx-md-5">
+        <div class="offcanvas offcanvas-end" tabindex="-1" id="navbarOffcanvasLg" aria-labelledby="navbarOffcanvasLgLabel">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Processos Jurídicos</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                <ul class="navbar-nav justify-content-start flex-grow-1 pe-3 gap-3">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Home" asp-action="Index">Página Inicial</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Process" asp-action="List">Gestão de Processos</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <button class="nav-link dropdown-toggle"
+                            type="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            Direção Jurídica
+                        </button>
+
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" asp-controller="Unit" asp-action="List">Lista de Unidades</a></li>
+                            <li><a class="dropdown-item" asp-controller="ProcessState" asp-action="List">Lista de Estados</a></li>
+                            <li><a class="dropdown-item" asp-controller="ProcessType" asp-action="List">Lista de tipos de processos</a></li>
+                            <li><a class="dropdown-item" asp-controller="Sentence" asp-action="List">Lista de sentenças</a></li>
+                            <li><a class="dropdown-item" asp-controller="HarmedOrCasualty" asp-action="List">Lista de categorias de Mortos/Feridos</a></li>
+                            <li><a class="dropdown-item" asp-controller="Infringement" asp-action="List">Lista de Artigos Infringidos</a></li>
+                            <li><a class="dropdown-item" asp-controller="Sector" asp-action="List">Lista de Setores</a></li>
+                            <li><a class="dropdown-item" asp-controller="Process" asp-action="List">Lista de Processos</a></li>
+                            <li><a class="dropdown-item" asp-controller="AccidentType" asp-action="List">Tipo de Acidente</a></li>
+                            <li><a class="dropdown-item" asp-controller="MilitarySecurity" asp-action="List">Segurança militar</a></li>
+                            <li><a class="dropdown-item" asp-controller="CrimeType" asp-action="List">Tipos de Crime</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>

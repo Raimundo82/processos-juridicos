@@ -11,7 +11,12 @@
             <!-- Right: Title + User Info + Button -->
             <div class="d-flex align-items-center gap-md-5 gap-3">
                 <span class="nav-title d-none d-sm-inline">Processos Jurídicos</span>
-                <a id="nightModeToggle">
+                <a class="d-inline d-sm-none nav-icon"
+                    data-bs-toggle="offcanvas" data-bs-target="#navbarOffcanvasLg"
+                    aria-controls="navbarOffcanvasLg" aria-label="Toggle navigation">
+                    <i class="fa-solid fa-bars"></i>
+                </a>
+                <a class="nav-icon" id="nightModeToggle">
                     <i class="fa-solid fa-moon"></i>
                 </a>
                 @await Component.InvokeAsync("Header")

@@ -5,7 +5,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Processos_Juridicos</title>
+    <title>@ViewData["Title"] - Processos Jurídicos</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/lib/datatable/dataTables.min.css" asp-append-version="true" />
@@ -19,8 +19,10 @@
     <header>
         <partial name="_Header" />
     </header>
+
+     <partial name="_Menu" />
+
     <div class="container">
-        <partial name="_Navbar" />
         <main role="main" class="pb-3">
                 @RenderBody()
         </main>
