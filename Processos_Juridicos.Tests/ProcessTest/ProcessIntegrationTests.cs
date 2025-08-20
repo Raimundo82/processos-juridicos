@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Net.Http.Headers;
 
 using AngleSharp.Dom;
 
@@ -280,6 +281,492 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
         Assert.Single(dbContext.Processes);
     }
 
+    [Fact]
+    public async Task Edit_GetAndDownload_ObtainsFile()
+    {
+        // Arrange
+        await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
+        AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        Process process = dbContext.Add(CreateProcess()).Entity;
+        await dbContext.SaveChangesAsync();
+
+        var pdfBytes = CreatePdfBytes("DummyPDF.pdf");
+        var fileEntity = new ProcessFile
+        {
+            Process = process,
+            ProcessFileContent = pdfBytes,
+            ProcessFileName = "document.pdf",
+            ProcessFileType = "application/pdf"
+        };
+
+        dbContext.ProcessFiles.Add(fileEntity);
+        await dbContext.SaveChangesAsync();
+
+        // Act
+        IDocument doc = await _client.GetDocumentAsync($"/Process/Edit/{process.ProcessId}");
+
+        // Assert
+        var rowSelector = $"#file-row-{fileEntity.ProcessFileId}";
+        IElement? row = doc.QuerySelector(rowSelector);
+        Assert.NotNull(row);
+
+        IElement downloadLink = row.QuerySelector("a.btn.btn-secondary")!;
+        var href = downloadLink.GetAttribute("href")!;
+        Assert.Contains($"/ProcessFile/DownloadFile", href);
+        Assert.Contains(fileEntity.ProcessFileId.ToString()!, href);
+
+        HttpResponseMessage downloadResp = await _client.GetAsync(href);
+        Assert.True(downloadResp.IsSuccessStatusCode);
+        Assert.Equal("application/pdf",
+                    downloadResp.Content.Headers.ContentType!.MediaType);
+
+        var gotBytes = await downloadResp.Content.ReadAsByteArrayAsync();
+        Assert.Equal(pdfBytes, gotBytes);
+    }
+
+
+    [Fact]
+    public async Task Edit_Post_WhenModelIsValidAndFileUploaded_PersistsFile()
+    {
+        // Arrange
+        await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
+        AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        Process process = dbContext.Add(CreateProcess()).Entity;
+        await dbContext.SaveChangesAsync();
+
+        IDocument editDoc = await _client.GetDocumentAsync($"/Process/Edit/{process.ProcessId}");
+        IElement form = editDoc.QuerySelector("form[action^='/Process/Edit']")!;
+        var action = form.GetAttribute("action")!;
+
+        var allNames = editDoc
+          .QuerySelectorAll("form [name]")
+          .Select(e => e.GetAttribute("name")!)
+          .Distinct()
+          .ToList();
+
+        var pdfBytes = CreatePdfBytes("DummyPDF.pdf");
+        var pdfContent = new ByteArrayContent(pdfBytes);
+        pdfContent.Headers.ContentType = new MediaTypeHeaderValue("application/pdf");
+        pdfContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
+        {
+            Name = "\"ProcessFiles\"",
+            FileName = "\"document.pdf\"",
+        };
+
+        var multipart = new MultipartFormDataContent();
+
+        foreach (var name in allNames)
+        {
+            IElement input = editDoc.QuerySelector($"[name='{name}']")!;
+            var val = input.GetAttribute("value") ?? string.Empty;
+
+            switch (name)
+            {
+                case "Nuipm":
+                    val = "Atualizado";
+                    break;
+                case "ProcessStateId":
+                    val = process.ProcessStateId.ToString();
+                    break;
+                case "ProcessTypeId":
+                    val = process.ProcessTypeId.ToString();
+                    break;
+                case "CreatedBy":
+                    val = process.CreatedBy.ToString();
+                    break;
+                default:
+                    break;
+            }
+
+            multipart.Add(new StringContent(val!), name);
+        }
+
+        multipart.Add(pdfContent, "ProcessFiles", "document.pdf");
+
+        // Act
+        HttpResponseMessage response = await _client.PostAsync(action, multipart);
+        response.EnsureSuccessStatusCode();
+
+        IDocument listDoc = await _client.GetDocumentAsync("/Process/List");
+
+
+        // Assert
+        ProcessFile? savedFile = await dbContext.ProcessFiles.SingleOrDefaultAsync(f => f.ProcessFileName == "document.pdf");
+        Assert.NotNull(savedFile);
+
+        Assert.Equal("application/pdf", savedFile.ProcessFileType);
+        Assert.Equal(pdfBytes, savedFile.ProcessFileContent);
+    }
+
+    [Fact]
+    public async Task Edit_Post_FileUploadedHasUnallowedExtension_FileDoesNotPersist()
+    {
+        // Arrange
+        await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
+        AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        Process process = dbContext.Add(CreateProcess()).Entity;
+        await dbContext.SaveChangesAsync();
+
+        IDocument editDoc = await _client.GetDocumentAsync($"/Process/Edit/{process.ProcessId}");
+        IElement form = editDoc.QuerySelector("form[action^='/Process/Edit']")!;
+        var action = form.GetAttribute("action")!;
+
+        var allNames = editDoc
+          .QuerySelectorAll("form [name]")
+          .Select(e => e.GetAttribute("name")!)
+          .Distinct()
+          .ToList();
+
+        var fileBytes = CreatePdfBytes("TextFile.txt");
+        var pdfContent = new ByteArrayContent(fileBytes);
+        pdfContent.Headers.ContentType = new MediaTypeHeaderValue("application/txt");
+        pdfContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
+        {
+            Name = "\"ProcessFiles\"",
+            FileName = "\"document.txt\"",
+        };
+
+        var multipart = new MultipartFormDataContent();
+
+        foreach (var name in allNames)
+        {
+            IElement input = editDoc.QuerySelector($"[name='{name}']")!;
+            var val = input.GetAttribute("value") ?? string.Empty;
+
+            switch (name)
+            {
+                case "Nuipm":
+                    val = "Atualizado";
+                    break;
+                case "ProcessStateId":
+                    val = process.ProcessStateId.ToString();
+                    break;
+                case "ProcessTypeId":
+                    val = process.ProcessTypeId.ToString();
+                    break;
+                case "CreatedBy":
+                    val = process.CreatedBy.ToString();
+                    break;
+                default:
+                    break;
+            }
+
+            multipart.Add(new StringContent(val!), name);
+        }
+
+        multipart.Add(pdfContent, "ProcessFiles", "document.pdf");
+
+        // Act
+        HttpResponseMessage response = await _client.PostAsync(action, multipart);
+        response.EnsureSuccessStatusCode();
+
+        IDocument listDoc = await _client.GetDocumentAsync("/Process/List");
+
+
+        // Assert
+        ProcessFile? savedFile = await dbContext.ProcessFiles
+           .SingleOrDefaultAsync(f => f.ProcessFileName == "TextFile.txt");
+
+        Assert.Null(savedFile);
+    }
+
+    [Fact]
+    public async Task Edit_Post_WhenEmptyFileUploaded_DoesNotPersistFile()
+    {
+        // Arrange
+        await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
+        AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        Process process = dbContext.Add(CreateProcess()).Entity;
+        await dbContext.SaveChangesAsync();
+
+        IDocument editDoc = await _client.GetDocumentAsync($"/Process/Edit/{process.ProcessId}");
+        IElement form = editDoc.QuerySelector("form[action^='/Process/Edit']")!;
+        var action = form.GetAttribute("action")!;
+
+        var allNames = editDoc
+          .QuerySelectorAll("form [name]")
+          .Select(e => e.GetAttribute("name")!)
+          .Distinct()
+          .ToList();
+
+        var emptyBytes = Array.Empty<byte>();
+        var emptyContent = new ByteArrayContent(emptyBytes);
+        emptyContent.Headers.ContentType = new MediaTypeHeaderValue("application/pdf");
+        emptyContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
+        {
+            Name = "\"ProcessFiles\"",
+            FileName = "\"empty.pdf\"",
+        };
+
+        var multipart = new MultipartFormDataContent();
+        foreach (var name in allNames)
+        {
+            IElement input = editDoc.QuerySelector($"[name='{name}']")!;
+            var val = input.GetAttribute("value") ?? string.Empty;
+
+            switch (name)
+            {
+                case "Nuipm":
+                    val = "Atualizado";
+                    break;
+                case "ProcessStateId":
+                    val = process.ProcessStateId.ToString();
+                    break;
+                case "ProcessTypeId":
+                    val = process.ProcessTypeId.ToString();
+                    break;
+                case "CreatedBy":
+                    val = process.CreatedBy.ToString();
+                    break;
+                default:
+                    break;
+            }
+
+            multipart.Add(new StringContent(val!), name);
+        }
+
+        multipart.Add(emptyContent, "ProcessFiles", "empty.pdf");
+
+        // Act
+        HttpResponseMessage response = await _client.PostAsync(action, multipart);
+        response.EnsureSuccessStatusCode();
+
+        // Assert
+        ProcessFile? savedFile = await dbContext.ProcessFiles
+            .SingleOrDefaultAsync(f => f.ProcessFileName == "empty.pdf");
+
+        Assert.Null(savedFile);
+    }
+
+    [Fact]
+    public async Task Edit_Post_WhenFileTooLargeUploaded_DoesNotPersistFile()
+    {
+        // Arrange
+        await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
+        AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        Process process = dbContext.Add(CreateProcess()).Entity;
+        await dbContext.SaveChangesAsync();
+
+        IDocument editDoc = await _client.GetDocumentAsync($"/Process/Edit/{process.ProcessId}");
+        IElement form = editDoc.QuerySelector("form[action^='/Process/Edit']")!;
+        var action = form.GetAttribute("action")!;
+
+        var allNames = editDoc
+          .QuerySelectorAll("form [name]")
+          .Select(e => e.GetAttribute("name")!)
+          .Distinct()
+          .ToList();
+
+        var largeBytes = CreatePdfBytes("LargeFile.pdf");
+        var largeContent = new ByteArrayContent(largeBytes);
+        largeContent.Headers.ContentType = new MediaTypeHeaderValue("application/pdf");
+        largeContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
+        {
+            Name = "\"ProcessFiles\"",
+            FileName = "\"largefile.pdf\"",
+        };
+
+        var multipart = new MultipartFormDataContent();
+        foreach (var name in allNames)
+        {
+            IElement input = editDoc.QuerySelector($"[name='{name}']")!;
+            var val = input.GetAttribute("value") ?? string.Empty;
+
+            switch (name)
+            {
+                case "Nuipm":
+                    val = "Atualizado";
+                    break;
+                case "ProcessStateId":
+                    val = process.ProcessStateId.ToString();
+                    break;
+                case "ProcessTypeId":
+                    val = process.ProcessTypeId.ToString();
+                    break;
+                case "CreatedBy":
+                    val = process.CreatedBy.ToString();
+                    break;
+                default:
+                    break;
+            }
+
+            multipart.Add(new StringContent(val!), name);
+        }
+
+        multipart.Add(largeContent, "ProcessFiles", "largefile.pdf");
+
+        // Act
+        HttpResponseMessage response = await _client.PostAsync(action, multipart);
+        response.EnsureSuccessStatusCode();
+
+        //Assert
+        ProcessFile? savedFile = await dbContext.ProcessFiles
+            .SingleOrDefaultAsync(f => f.ProcessFileName == "largefile.pdf");
+
+        Assert.Null(savedFile);
+    }
+
+    [Fact]
+    public async Task Edit_Post_WhenFileSignatureUnallowed_DoesNotPersistFile()
+    {
+        // Arrange
+        await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
+        AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        Process process = dbContext.Add(CreateProcess()).Entity;
+        await dbContext.SaveChangesAsync();
+
+        IDocument editDoc = await _client.GetDocumentAsync($"/Process/Edit/{process.ProcessId}");
+        IElement form = editDoc.QuerySelector("form[action^='/Process/Edit']")!;
+        var action = form.GetAttribute("action")!;
+
+        var allNames = editDoc
+          .QuerySelectorAll("form [name]")
+          .Select(e => e.GetAttribute("name")!)
+          .Distinct()
+          .ToList();
+
+        var fakeBytes = CreatePdfBytes("FakePdf.pdf");
+        var fakeContent = new ByteArrayContent(fakeBytes);
+        fakeContent.Headers.ContentType = new MediaTypeHeaderValue("application/pdf");
+        fakeContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
+        {
+            Name = "\"ProcessFiles\"",
+            FileName = "\"fakepdf.pdf\"",
+        };
+
+        var multipart = new MultipartFormDataContent();
+        foreach (var name in allNames)
+        {
+            IElement input = editDoc.QuerySelector($"[name='{name}']")!;
+            var val = input.GetAttribute("value") ?? string.Empty;
+
+            switch (name)
+            {
+                case "Nuipm":
+                    val = "Atualizado";
+                    break;
+                case "ProcessStateId":
+                    val = process.ProcessStateId.ToString();
+                    break;
+                case "ProcessTypeId":
+                    val = process.ProcessTypeId.ToString();
+                    break;
+                case "CreatedBy":
+                    val = process.CreatedBy.ToString();
+                    break;
+                default:
+                    break;
+            }
+
+            multipart.Add(new StringContent(val!), name);
+        }
+
+        multipart.Add(fakeContent, "ProcessFiles", "fakepdf.pdf");
+
+        // Act
+        HttpResponseMessage response = await _client.PostAsync(action, multipart);
+        response.EnsureSuccessStatusCode();
+
+        // Assert
+        ProcessFile? savedFile = await dbContext.ProcessFiles
+            .SingleOrDefaultAsync(f => f.ProcessFileName == "fakepdf.pdf");
+
+        Assert.Null(savedFile);
+    }
+
+    [Fact]
+    public async Task Edit_GetThenDelete_DeletesFile()
+    {
+
+        //Arrange
+        await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
+        AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        Process process = dbContext.Add(CreateProcess()).Entity;
+
+        var initialProcessFileCount = dbContext.ProcessFiles.Count();
+
+        var pdfBytes = CreatePdfBytes("DummyPDF.pdf");
+
+        var fileEntity = new ProcessFile
+        {
+            Process = process,
+            ProcessFileContent = pdfBytes,
+            ProcessFileName = "document.pdf",
+            ProcessFileType = "application/pdf"
+        };
+
+        dbContext.ProcessFiles.Add(fileEntity);
+        await dbContext.SaveChangesAsync();
+
+        IDocument doc = await _client.GetDocumentAsync($"/Process/Edit/{process.ProcessId}");
+        IElement form = doc.QuerySelector("form[action^='/Process/Edit']")!;
+
+        Assert.NotNull(form);
+
+        var action = form.GetAttribute("action")!;
+
+        var rowSelector = $"#file-row-{fileEntity.ProcessFileId}";
+        IElement? row = doc.QuerySelector(rowSelector);
+        Assert.NotNull(row);
+
+        row = doc.QuerySelectorAll("tr[id^='file-row-']").First();
+
+        IElement container = doc.QuerySelector("#deletedFilesContainer")!;
+
+        var deleteId = row.Id;
+        var deleteIdSplit = deleteId!.Split('-');
+        var number = deleteIdSplit[^1];
+
+        IElement hidden = doc.CreateElement("input");
+        hidden.SetAttribute("type", "hidden");
+        hidden.SetAttribute("name", "FilesToRemove");
+        hidden.SetAttribute("value", number);
+
+        container.AppendChild(hidden);
+
+        row?.Remove();
+
+        var multipart = new MultipartFormDataContent();
+
+        var allNames = doc
+          .QuerySelectorAll("form [name]")
+          .Select(e => e.GetAttribute("name")!)
+          .Distinct()
+          .ToList();
+
+        foreach (var name in allNames)
+        {
+            IElement input = doc.QuerySelector($"[name='{name}']")!;
+            var val = input.GetAttribute("value") ?? string.Empty;
+
+            switch (name)
+            {
+                case "Nuipm":
+                    val = process.Nuipm;
+                    break;
+                case "ProcessStateId":
+                    val = process.ProcessStateId.ToString();
+                    break;
+                case "ProcessTypeId":
+                    val = process.ProcessTypeId.ToString();
+                    break;
+                case "CreatedBy":
+                    val = process.CreatedBy.ToString();
+                    break;
+                default:
+                    break;
+            }
+
+            multipart.Add(new StringContent(val!), name);
+        }
+
+        //Act
+        await _client.PostAsync(action, multipart);
+        IDocument afterDelete = await _client.GetDocumentAsync($"/Process/Edit/{process.ProcessId}");
+        //Assert
+        Assert.Equal(initialProcessFileCount, dbContext.ProcessFiles.Count());
+    }
+
     private static Process CreateProcess()
     {
         return new Process
@@ -288,7 +775,18 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
             ProcessType = new ProcessType { Deadline = 15, ProcessTypeName = "Tipo 1" },
             ProcessState = new ProcessState { StateName = "State 1" }
         };
+
     }
+    private static byte[] CreatePdfBytes(string fileName)
+    {
+        // AppContext.BaseDirectory resolves to the test assembly's output folder.
+        var baseDir = AppContext.BaseDirectory;
+        var pdfPath = Path.Combine(baseDir, "TestFiles", fileName);
+
+        return !File.Exists(pdfPath) ? throw new FileNotFoundException("Test PDF not found", pdfPath) : File.ReadAllBytes(pdfPath);
+    }
+
+
 
     public async Task InitializeAsync()
     {
