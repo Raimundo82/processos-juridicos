@@ -29,7 +29,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Configuration.AddUserSecrets<Program>();
 
 // Register Context
-var processosDj = builder.Configuration.GetConnectionString("processosDj")!;
+var processosDj = builder.Configuration.GetConnectionString("ProcessosDJ_Dev")!;
 builder.Services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer(processosDj).EnableSensitiveDataLogging().LogTo(Console.WriteLine, LogLevel.Debug));
 
 //httpClient
@@ -38,9 +38,6 @@ builder.Services.AddHttpClient<ApisSvc>()
     {
         UseProxy = false,
     });
-
-
-builder.Configuration.AddUserSecrets<Program>();
 
 builder.Services.AddSingleton<IJsonTextManager>(sp =>
 {
@@ -84,6 +81,18 @@ builder.Services.AddMvc().AddNToastNotifyToastr(new ToastrOptions()
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 WebApplication app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    using IServiceScope scope = app.Services.CreateScope();
+    AppDbContext db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+    if (db.Database.IsRelational())
+    {
+        db.Database.Migrate();
+    }
+}
+
 app.UseExceptionHandler("/Home/Error");
 
 GlobalTextManager.SetManager(app.Services.GetRequiredService<IJsonTextManager>());
