@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Net.Http.Headers;
 
 using AngleSharp.Dom;
@@ -72,15 +71,14 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
         dbContext.ProcessTypes.AddRange(scenarioProcesses.Select(s => s.ProcessType));
         await dbContext.SaveChangesAsync();
 
+
         // Act
         foreach (Process scenarioProcess in scenarioProcesses)
         {
             IDocument doc = await _client.GetDocumentAsync("/Process/Create");
 
-            var processStateId = doc.GetElementById("state-id")?
-                .QuerySelectorAll("option")
-                .First(option => option.TextContent.Trim() == scenarioProcess.ProcessState.StateName)
-                .GetAttribute("value");
+
+            var processStateId = doc.GetElementById("state-id")?.QuerySelectorAll("option").First().GetAttribute("value");
 
             var processTypeId = doc.GetElementById("process-type-id")?
                 .QuerySelectorAll("option")
@@ -93,15 +91,13 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
                 ["ProcessTypeId"] = processTypeId,
                 ["ProcessStateId"] = processStateId,
             };
-
             await _client.PostAsync("/Process/Create", new FormUrlEncodedContent(formData));
+
         }
 
         // Assert
         DbSet<Process> dbItems = dbContext.Processes;
         Assert.Equal(scenarioProcesses.Length, dbItems.Count());
-
-        Debug.WriteLine(dbItems.Count());
 
         Assert.All(scenarioProcesses, scenarioProcess =>
         {
@@ -153,15 +149,19 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        ProcessState newState = dbContext.Add(new ProcessState { StateName = "NewState" }).Entity;
+        ProcessState targetState = dbContext.Add(new ProcessState { StateName = "OldState" }).Entity;
+
         ProcessType newType = dbContext.Add(new ProcessType { ProcessTypeName = "NewType", Deadline = 15 }).Entity;
         Process process = dbContext.Add(CreateProcess()).Entity;
         await dbContext.SaveChangesAsync();
         dbContext.Entry(process).State = EntityState.Detached;
 
+        StateTransition stateTransition = dbContext.Add(new StateTransition { FromStateId = process.ProcessStateId, ToStateId = targetState.ProcessStateId }).Entity;
+        await dbContext.SaveChangesAsync();
         IDocument doc = await _client.GetDocumentAsync($"/Process/Edit/{process.ProcessId}");
         var newTypeId = doc.GetElementById("process-type-id")?.QuerySelector($"option[value='{newType.ProcessTypeId}']")?.GetAttribute("value");
-        var newStateId = doc.GetElementById("state-id")?.QuerySelector($"option[value='{newState.ProcessStateId}']")?.GetAttribute("value");
+        var newStateId = doc.GetElementById("state-id")?.QuerySelector($"option[value='{targetState.ProcessStateId}']")?.GetAttribute("value");
+
         var token = doc.QuerySelector("input[name=__RequestVerificationToken]")?.GetAttribute("value")!;
 
         // Act
@@ -182,13 +182,12 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
         Process underTest = dbItems.First();
 
         Assert.Equal("NewNuipm", underTest.Nuipm);
-        Assert.Equal(newState.ProcessStateId, underTest.ProcessStateId);
-        Assert.Equal(newState.StateName, underTest.ProcessState.StateName);
+        Assert.Equal(targetState.ProcessStateId, underTest.ProcessStateId);
+        Assert.Equal(targetState.StateName, underTest.ProcessState.StateName);
         Assert.Equal(newType.ProcessTypeId, underTest.ProcessTypeId);
         Assert.Equal(newType.ProcessTypeName, underTest.ProcessType.ProcessTypeName);
         Assert.Equal(newType.Deadline, underTest.ProcessType.Deadline);
     }
-
 
     [Fact]
     public async Task Edit_Post_WhenModelIsInvalid_DoesNotApplyChanges()

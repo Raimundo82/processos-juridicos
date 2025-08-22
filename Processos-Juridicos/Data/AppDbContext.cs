@@ -28,5 +28,23 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
     public DbSet<MilitarySecurity> MilitarySecurities { get; set; }
 
+    public DbSet<StateTransition> StateTransitions { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<StateTransition>()
+            .HasOne(st => st.FromState)
+            .WithMany()
+            .HasForeignKey(st => st.FromStateId)
+            .OnDelete(DeleteBehavior.Restrict); // prevent cascade from this side
+
+        modelBuilder.Entity<StateTransition>()
+            .HasOne(st => st.ToState)
+            .WithMany()
+            .HasForeignKey(st => st.ToStateId)
+            .OnDelete(DeleteBehavior.Cascade); // keep cascade (or use Restrict here instead)
+    }
 
 }

@@ -14,7 +14,7 @@ public static partial class Mapper
     public static partial Unit MapToUnit(UnitDto dto);
     public static partial IEnumerable<UnitDto> MapToToUnitDtoEnum(IEnumerable<Unit> entity);
 
-    // States Map 
+    // Process States Map 
 
     public static partial ProcessStateDto MapToStateDto(ProcessState entity);
     public static partial ProcessState MapToState(ProcessStateDto dto);
@@ -74,5 +74,11 @@ public static partial class Mapper
     public static partial MilitarySecurityDto MapToMilitarySecurityDto(MilitarySecurity entity);
     public static partial MilitarySecurity MapToMilitarySecurity(MilitarySecurityDto dto);
     public static partial IEnumerable<MilitarySecurityDto> MapToMilitarySecurityEnum(IEnumerable<MilitarySecurity> entity);
+
+    //Process state transition map
+
+    public static partial StateTransitionDto MapToStateTransitionDto(StateTransition entity);
+    public static partial StateTransition MapToStateTransition(StateTransitionDto dto);
+    public static partial IEnumerable<StateTransitionDto> MapToStateTransitionEnum(IEnumerable<StateTransition> entity);
 
 }

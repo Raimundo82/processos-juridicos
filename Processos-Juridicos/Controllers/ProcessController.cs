@@ -14,6 +14,7 @@ namespace Processos_Juridicos.Controllers;
 public class ProcessController(ILegalReferenceSvc legalService, IContextSvc context, IProcessManagementSvc manager, ILdapUserSvc windowsUserSvc, IToastNotify toastNotify) : Controller
 {
     private const string EntityName = "Processo";
+    private const string initialStateName = "Em Edição";
 
     private readonly ILegalReferenceSvc _legalRefs = legalService;
     private readonly IContextSvc _context = context;
@@ -70,7 +71,7 @@ public class ProcessController(ILegalReferenceSvc legalService, IContextSvc cont
     [HttpGet]
     public async Task<IActionResult> Create()
     {
-        await PopulateViewbags();
+        await PopulateViewbags(null);
         return View();
     }
 
@@ -99,7 +100,7 @@ public class ProcessController(ILegalReferenceSvc legalService, IContextSvc cont
             return RedirectToAction(nameof(List));
         }
 
-        await PopulateViewbags();
+        await PopulateViewbags(null);
         return View(model);
     }
 
@@ -113,7 +114,7 @@ public class ProcessController(ILegalReferenceSvc legalService, IContextSvc cont
             model.UploadedFiles = uploadedFiles;
 
 
-            await PopulateViewbags();
+            await PopulateViewbags(model.ProcessId);
             return View(model);
         }
 
@@ -126,11 +127,17 @@ public class ProcessController(ILegalReferenceSvc legalService, IContextSvc cont
     {
         if (!ModelState.IsValid)
         {
-            await PopulateViewbags();
+            await PopulateViewbags(model.ProcessId);
             return View(model);
         }
 
-        model.ModifiedBy = _windowsUserSvc.GetLoggedUserData().DisplayName;
+        if (!await _pm.Processes.CanChangeStateAsync((int)model.ProcessId!, model.ProcessStateId))
+        {
+            ModelState.AddModelError(nameof(model.ProcessStateId), GlobalTextManager.GetString("StateTransitionInvalidMessage"));
+            await PopulateViewbags(model.ProcessId);
+            return View(model);
+        }
+
         await _pm.Processes.EditProcess(model);
 
         List<ProcessFileDto> uploadedFiles = await _pm.ProcessFiles.GetAllProcessFilesByProcessId(model.ProcessId);
@@ -144,7 +151,7 @@ public class ProcessController(ILegalReferenceSvc legalService, IContextSvc cont
                 {
                     model = await _pm.Processes.GetProcessById(model.ProcessId);
                     model.UploadedFiles = uploadedFiles;
-                    await PopulateViewbags();
+                    await PopulateViewbags(model.ProcessId);
                     return View(model);
                 }
             }
@@ -159,7 +166,7 @@ public class ProcessController(ILegalReferenceSvc legalService, IContextSvc cont
         }
 
         _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("EditSuccessMessage"), "O", EntityName, "o"));
-        await PopulateViewbags();
+        await PopulateViewbags(model.ProcessId);
         model = await _pm.Processes.GetProcessById(model.ProcessId);
         uploadedFiles = await _pm.ProcessFiles.GetAllProcessFilesByProcessId(model.ProcessId);
         model.UploadedFiles = uploadedFiles;
@@ -216,7 +223,7 @@ public class ProcessController(ILegalReferenceSvc legalService, IContextSvc cont
         return RedirectToAction(nameof(List));
     }
 
-    private async Task PopulateViewbags()
+    private async Task PopulateViewbags(int? processid)
     {
         PopulateGendersForViewBag();
         await PopulateAccidentTypesForViewBag();
@@ -226,7 +233,15 @@ public class ProcessController(ILegalReferenceSvc legalService, IContextSvc cont
         await PopulateMilitarySecuritiesForViewBag();
         await PopulateProcessTypesForViewBag();
         await PopulateSentencesForViewBag();
-        await PopulateStatesForViewBag();
+        if (processid == null)
+        {
+            await PopulateStatesForViewBagCreate();
+        }
+        else
+        {
+            await PopulateStatesForViewBagEdit(processid);
+        }
+
         await PopulateUnitsForViewBag();
     }
 
@@ -288,17 +303,49 @@ public class ProcessController(ILegalReferenceSvc legalService, IContextSvc cont
         ViewBag.sentences = listSentences;
     }
 
-    private async Task PopulateStatesForViewBag()
+    private async Task PopulateStatesForViewBagEdit(int? processId)
     {
-        IEnumerable<ProcessStateDto> states = await _pm.ProcessStates.GetAllStates();
-        var listStates = states.Select(x => new SelectListItem
-        {
-            Text = x.StateName,
-            Value = x.ProcessStateId.ToString()
-        }).ToList();
+        // Get the current process
+        ProcessDto process = await _pm.Processes.GetProcessById(processId);
+        var sourceStateId = process.ProcessStateId;
 
+        IEnumerable<ProcessStateDto> states = await _pm.ProcessStates.GetAllStates();
+
+        // Get transitions starting from this state
+        List<StateTransitionDto> transitionList = await _pm.ProcessTransitions.GetAllTransitionsFromSource(sourceStateId);
+
+        // Extract all target state IDs from transitions
+        var allowedTargetIds = transitionList
+            .Select(t => t.ToStateId)
+            .ToHashSet();
+
+        // Filter states so we only include ones that are allowed targets
+        var listStates = states
+            .Where(s => allowedTargetIds.Contains(s.ProcessStateId) || s.ProcessStateId == sourceStateId)
+            .Select(s => new SelectListItem
+            {
+                Text = s.StateName,
+                Value = s.ProcessStateId.ToString()
+            })
+            .ToList();
+        ViewBag.DisableStateSelection = false;
         ViewBag.states = listStates;
     }
+
+    private async Task PopulateStatesForViewBagCreate()
+    {
+        ProcessStateDto state = await _pm.ProcessStates.GetStateByName(initialStateName);
+        ViewBag.DisableStateSelection = true;
+        ViewBag.states = state == null
+            ? Enumerable.Empty<SelectListItem>()
+            : [ new SelectListItem
+            {
+                Text = state.StateName,
+                Value = state.ProcessStateId.ToString(),
+                Selected = true
+            }];
+    }
+
 
     private async Task PopulateAccidentTypesForViewBag()
     {

@@ -58,6 +58,7 @@ builder.Services.AddScoped<IInfringementSvc, InfringementSvc>();
 builder.Services.AddScoped<IProcessFileSvc, ProcessFileSvc>();
 builder.Services.AddScoped<IProcessSvc, ProcessSvc>();
 builder.Services.AddScoped<IAccidentTypeSvc, AccidentTypeSvc>();
+builder.Services.AddScoped<IStateTransitionSvc, StateTransitionSvc>();
 builder.Services.AddScoped<ICrimeTypeSvc, CrimeTypeSvc>();
 builder.Services.AddScoped<IMilitarySecuritySvc, MilitarySecuritySvc>();
 builder.Services.AddScoped<ILegalReferenceSvc, LegalReferenceSvc>();

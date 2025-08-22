@@ -15,7 +15,7 @@ internal static class ProcessTestData
                             new Process
                             {
                                 Nuipm = "1234",
-                                ProcessState = new ProcessState { StateName = "State 1" },
+                                ProcessState = new ProcessState { StateName = "Em Edição" },
                                 ProcessType = new ProcessType { Deadline=15, ProcessTypeName = "Tipo 1"}
                             },
                         }
@@ -26,13 +26,13 @@ internal static class ProcessTestData
                             new Process
                             {
                                 Nuipm = "1234",
-                                ProcessState = new ProcessState { StateName = "State 1" },
+                                ProcessState = new ProcessState { StateName = "Em Edição" },
                                 ProcessType = new ProcessType { Deadline=15, ProcessTypeName = "Tipo 1"}
                             },
                             new Process
                             {
                                 Nuipm = "2345",
-                                ProcessState = new ProcessState { StateName = "State 2" },
+                                ProcessState = new ProcessState { StateName = "Em Edição" },
                                 ProcessType = new ProcessType { Deadline=15, ProcessTypeName = "Tipo 2" }
                             },
                         }

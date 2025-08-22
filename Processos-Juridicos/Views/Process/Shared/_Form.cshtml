@@ -1,4 +1,8 @@
 @model Processos_Juridicos.DTOs.ProcessDto;
+@{
+    var disableAttr = (bool)(ViewBag.DisableStateSelection ?? false) ? "disabled" : "";
+}
+
 
 <div class="form-group mt-3">
     <label asp-for="Nuipm" for="process-nuipm" class="control-label">@Html.DisplayNameFor(m => m.Nuipm)</label>
@@ -124,8 +128,16 @@
 
 <div class="form-group mt-3">
     <label for="state-id" class="control-label">Estado</label>
-    <select id="state-id" asp-for="ProcessStateId" asp-items="ViewBag.states" class="form-control">
-        <option value="">Selecione um Estado</option>
+    <select asp-for="ProcessStateId"
+            id="state-id"
+            asp-items="ViewBag.states"
+            class="form-control">
+        @if (@disableAttr == "true")
+        {
+            <option value="">Selecione um Estado</option>
+        }
+
+        
     </select>
     <span asp-validation-for="ProcessStateId" class="text-danger"></span>
 </div>
