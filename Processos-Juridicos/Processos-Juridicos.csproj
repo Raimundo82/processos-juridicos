@@ -30,7 +30,6 @@
     <None Include="efpt.config.json.user" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Migrations\" />
     <Folder Include="wwwroot\lib\datatable\" />
   </ItemGroup>
   <Target Name="Husky" BeforeTargets="Restore;CollectPackageReferences" Condition="'$(HUSKY)' != 0">

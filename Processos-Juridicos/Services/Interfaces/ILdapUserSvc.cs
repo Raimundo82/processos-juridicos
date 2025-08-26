@@ -8,4 +8,5 @@ public interface ILdapUserSvc
     public UserDataModel GetLoggedUserData();
     public UserDataModel GetUserDataByNii(string nii);
     public IReadOnlyList<UserDataModel> SearchUsers(string term, int take = 25);
+    public List<string> GetEmployeeIdsInGroup(string groupName);
 }

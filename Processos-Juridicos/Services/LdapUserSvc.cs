@@ -17,27 +17,35 @@ public class LdapUserSvc(IHttpContextAccessor httpContextAccessor) : ILdapUserSv
     private const string thumbnaiPhotoFieldName = "thumbnailPhoto";
     private const string departmentFieldName = "department";
     private const string directoryRoot = "LDAP://RootDSE";
+    private const string directoryEntry = "LDAP://DC=marinha,DC=pt";
+    private const string distinguishedNameLdap = "distinguishedName";
+
     public List<string> GetUserGroups(string username)
     {
-        if (string.IsNullOrWhiteSpace(username))
+        var groups = new List<string>();
+
+        using var entry = new DirectoryEntry(directoryEntry);
+        using var searcher = new DirectorySearcher(entry)
         {
-            return [];
+            Filter = $"(&(objectClass=user)(sAMAccountName={username}))",
+            PropertiesToLoad = { "memberOf" }
+        };
+
+        SearchResult? result = searcher.FindOne();
+        if (result != null && result.Properties.Contains("memberOf"))
+        {
+            foreach (var dn in result.Properties["memberOf"])
+            {
+                using var groupEntry = new DirectoryEntry($"LDAP://{dn}");
+                var name = groupEntry.Properties["cn"]?.Value?.ToString();
+                if (!string.IsNullOrWhiteSpace(name))
+                {
+                    groups.Add(name);
+                }
+            }
         }
 
-        using var pc = new PrincipalContext(ContextType.Domain);
-        var user = UserPrincipal.FindByIdentity(pc, username);
-        if (user == null)
-        {
-            return [];
-        }
-
-        var grupos = user
-            .GetAuthorizationGroups()
-            .OfType<GroupPrincipal>()
-            .Select(g => g.Name)
-            .ToList();
-
-        return grupos;
+        return groups;
     }
 
     public UserDataModel GetLoggedUserData()
@@ -124,7 +132,7 @@ public class LdapUserSvc(IHttpContextAccessor httpContextAccessor) : ILdapUserSv
             $"(&" +
               "(objectClass=user)" +
               "(!(objectClass=computer))" +
-              "(!(userAccountControl:1.2.840.113556.1.4.803:=2))" + // not disabled
+              "(!(userAccountControl:1.2.840.113556.1.4.803:=2))" +
               "(|" +
                  $"(employeeID=*{q}*)" +
                  $"(sAMAccountName=*{q}*)" +
@@ -136,7 +144,7 @@ public class LdapUserSvc(IHttpContextAccessor httpContextAccessor) : ILdapUserSv
 
         using var ds = new DirectorySearcher(root, filter,
         [
-            "displayName","sAMAccountName","userPrincipalName","mail",departmentFieldName,"employeeID",thumbnaiPhotoFieldName,"distinguishedName"
+            "displayName","sAMAccountName","userPrincipalName","mail",departmentFieldName,"employeeID",thumbnaiPhotoFieldName, distinguishedNameLdap
         ])
         {
             PageSize = 50,
@@ -158,7 +166,7 @@ public class LdapUserSvc(IHttpContextAccessor httpContextAccessor) : ILdapUserSv
             {
                 DisplayName = Prop("displayName"),
                 UserName = Prop("sAMAccountName"),
-                FullUser = Prop("distinguishedName"),
+                FullUser = Prop(distinguishedNameLdap),
                 Nii = Prop("employeeID"),
                 Unit = Prop(departmentFieldName),
                 Email = Prop("mail"),
@@ -174,6 +182,151 @@ public class LdapUserSvc(IHttpContextAccessor httpContextAccessor) : ILdapUserSv
     private static string EscapeLdap(string s)
     {
         return s.Replace("\\", "\\5c").Replace("*", "\\2a").Replace("(", "\\28").Replace(")", "\\29").Replace("\0", "\\00");
+    }
+
+    public List<string> GetEmployeeIdsInGroup(string groupName)
+    {
+        var results = new List<string>();
+        var visitedGroups = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        var groupDn = FindGroupDistinguishedName(groupName);
+        if (string.IsNullOrWhiteSpace(groupDn))
+        {
+            return results;
+        }
+
+        ProcessGroup(groupDn, results, visitedGroups);
+        return results;
+    }
+
+    private static string? FindGroupDistinguishedName(string groupName)
+    {
+        using var root = new DirectoryEntry(directoryEntry);
+        using var searcher = new DirectorySearcher(root)
+        {
+            Filter = $"(&(objectClass=group)(|(cn={groupName})(sAMAccountName={groupName})))",
+            SearchScope = SearchScope.Subtree
+        };
+        searcher.PropertiesToLoad.Add(distinguishedNameLdap);
+
+        SearchResult? groupResult = searcher.FindOne();
+        if (groupResult == null)
+        {
+            return null;
+        }
+
+        if (groupResult.Properties.Contains(distinguishedNameLdap))
+        {
+            return groupResult.Properties[distinguishedNameLdap][0]?.ToString();
+        }
+
+        var path = groupResult.Path;
+        return path.StartsWith("LDAP://", StringComparison.OrdinalIgnoreCase)
+            ? path["LDAP://".Length..]
+            : path;
+    }
+
+    private static void ProcessGroup(string rootGroupDn, List<string> results, HashSet<string> visitedGroups)
+    {
+        var queue = new Queue<string>();
+        queue.Enqueue(rootGroupDn);
+
+        const int step = 1500;
+
+        while (queue.Count > 0)
+        {
+            var currentGroupDn = queue.Dequeue();
+            if (!visitedGroups.Add(currentGroupDn))
+            {
+                continue;
+            }
+
+            var start = 0;
+            var done = false;
+
+            while (!done)
+            {
+                (List<string> members, var lastPage) = GetGroupMembers(currentGroupDn, start, step);
+
+                foreach (var dn in members)
+                {
+                    if (IsGroup(dn))
+                    {
+                        queue.Enqueue(dn);
+                    }
+                    else
+                    {
+                        using var entry = new DirectoryEntry($"LDAP://{dn}");
+                        AddEmployeeIdOrSam(entry, results);
+                    }
+                }
+
+                done = lastPage;
+                start += step;
+            }
+        }
+
+        static bool IsGroup(string dn)
+        {
+            using var entry = new DirectoryEntry($"LDAP://{dn}");
+            return entry.Properties["objectClass"]
+                .Cast<object>()
+                .Any(c => string.Equals(c.ToString(), "group", StringComparison.OrdinalIgnoreCase));
+        }
+    }
+
+    private static (List<string> Members, bool LastPage) GetGroupMembers(string groupDn, int start, int step)
+    {
+        using var groupEntry = new DirectoryEntry($"LDAP://{groupDn}");
+        using var searcher = new DirectorySearcher(groupEntry)
+        {
+            Filter = "(objectClass=group)",
+            SearchScope = SearchScope.Base
+        };
+        searcher.PropertiesToLoad.Clear();
+        searcher.PropertiesToLoad.Add($"member;range={start}-{start + step - 1}");
+
+        SearchResult? page = searcher.FindOne();
+        if (page == null)
+        {
+            return (new List<string>(), true);
+        }
+
+        var propName = page.Properties.PropertyNames
+            .Cast<string>()
+            .FirstOrDefault(p => p.StartsWith("member", StringComparison.OrdinalIgnoreCase));
+
+        if (propName == null)
+        {
+            return (new List<string>(), true);
+        }
+
+        List<string> members = page.Properties[propName]
+            .Cast<object?>()
+            .Select(o => o?.ToString())
+            .Where(dn => !string.IsNullOrWhiteSpace(dn))
+            .ToList()!;
+
+        var lastPage = propName.Equals("member", StringComparison.OrdinalIgnoreCase) ||
+                       propName.EndsWith("*", StringComparison.OrdinalIgnoreCase);
+
+        return (members, lastPage);
+    }
+
+
+    private static void AddEmployeeIdOrSam(DirectoryEntry entry, List<string> results)
+    {
+        var empId = entry.Properties["employeeID"]?.Value?.ToString();
+        var sam = entry.Properties["sAMAccountName"]?.Value?.ToString();
+
+        if (!string.IsNullOrWhiteSpace(empId))
+        {
+            results.Add(empId);
+        }
+        else if (!string.IsNullOrWhiteSpace(sam))
+        {
+            results.Add(sam);
+        }
     }
 }
 

@@ -61,6 +61,8 @@ builder.Services.AddScoped<IAccidentTypeSvc, AccidentTypeSvc>();
 builder.Services.AddScoped<IStateTransitionSvc, StateTransitionSvc>();
 builder.Services.AddScoped<ICrimeTypeSvc, CrimeTypeSvc>();
 builder.Services.AddScoped<IMilitarySecuritySvc, MilitarySecuritySvc>();
+builder.Services.AddScoped<RoleSyncService>();
+builder.Services.AddHostedService<TimedSyncService>();
 builder.Services.AddScoped<ILegalReferenceSvc, LegalReferenceSvc>();
 builder.Services.AddScoped<IContextSvc, ContextSvc>();
 builder.Services.AddScoped<IProcessManagementSvc, ProcessManagementSvc>();

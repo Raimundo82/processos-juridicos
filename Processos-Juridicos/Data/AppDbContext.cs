@@ -28,6 +28,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
     public DbSet<MilitarySecurity> MilitarySecurities { get; set; }
 
+    public DbSet<User> Users { get; set; }
+
     public DbSet<StateTransition> StateTransitions { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -47,4 +49,5 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .OnDelete(DeleteBehavior.Cascade); // keep cascade (or use Restrict here instead)
     }
 
+    public DbSet<Role> Roles { get; set; }
 }
