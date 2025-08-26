@@ -778,7 +778,6 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
     }
     private static byte[] CreatePdfBytes(string fileName)
     {
-        // AppContext.BaseDirectory resolves to the test assembly's output folder.
         var baseDir = AppContext.BaseDirectory;
         var pdfPath = Path.Combine(baseDir, "TestFiles", fileName);
 

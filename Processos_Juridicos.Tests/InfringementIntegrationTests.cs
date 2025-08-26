@@ -220,7 +220,6 @@ public class InfringementIntegrationTests(CustomWebApplicationFactory<Program> f
             .QuerySelector("input[name=__RequestVerificationToken]")!
             .GetAttribute("value")!;
 
-        // 2) POST the form with the correct Id & token
         var fields = new Dictionary<string, string?>
         {
             ["InfringementId"] = id.ToString(),

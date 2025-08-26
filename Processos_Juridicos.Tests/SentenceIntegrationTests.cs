@@ -221,7 +221,6 @@ public class SentenceIntegrationTests(CustomWebApplicationFactory<Program> facto
             .QuerySelector("input[name=__RequestVerificationToken]")!
             .GetAttribute("value")!;
 
-        // 2) POST the form with the correct Id & token
         var fields = new Dictionary<string, string?>
         {
             ["SentenceId"] = id.ToString(),

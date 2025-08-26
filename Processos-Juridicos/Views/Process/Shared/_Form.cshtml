@@ -164,11 +164,10 @@
                     <td>@Html.Raw(file.ProcessFileTrustedName)</td>
                     <td>
                         <div class="d-flex gap-2">
-                            <!-- Delete button "X": when clicked, removes the row and marks the file for deletion -->
                             <button type="button" class="btn btn-danger" onclick="markFileForDeletion('@file.ProcessFileId')">
                                 <i class="bi bi-x"></i>
                             </button>
-                            <!-- Download link -->
+
                             <a asp-controller="ProcessFile" asp-action="DownloadFile" asp-route-id="@file.ProcessFileId"
                                 class="btn btn-secondary">
                                 <i class="bi bi-download"></i>
@@ -184,7 +183,6 @@
 <div id="deletedFilesContainer"></div>
 
 
-<!-- Shared AD search modal (Bootstrap) -->
 <div class="modal fade" id="adPickerModal" tabindex="-1" aria-labelledby="adPickerLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content">

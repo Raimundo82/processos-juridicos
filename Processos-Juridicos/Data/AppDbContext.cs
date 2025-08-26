@@ -40,13 +40,13 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .HasOne(st => st.FromState)
             .WithMany()
             .HasForeignKey(st => st.FromStateId)
-            .OnDelete(DeleteBehavior.Restrict); // prevent cascade from this side
+            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<StateTransition>()
             .HasOne(st => st.ToState)
             .WithMany()
             .HasForeignKey(st => st.ToStateId)
-            .OnDelete(DeleteBehavior.Cascade); // keep cascade (or use Restrict here instead)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 
     public DbSet<Role> Roles { get; set; }

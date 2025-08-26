@@ -305,21 +305,17 @@ public class ProcessController(ILegalReferenceSvc legalService, IContextSvc cont
 
     private async Task PopulateStatesForViewBagEdit(int? processId)
     {
-        // Get the current process
         ProcessDto process = await _pm.Processes.GetProcessById(processId);
         var sourceStateId = process.ProcessStateId;
 
         IEnumerable<ProcessStateDto> states = await _pm.ProcessStates.GetAllStates();
 
-        // Get transitions starting from this state
         List<StateTransitionDto> transitionList = await _pm.ProcessTransitions.GetAllTransitionsFromSource(sourceStateId);
 
-        // Extract all target state IDs from transitions
         var allowedTargetIds = transitionList
             .Select(t => t.ToStateId)
             .ToHashSet();
 
-        // Filter states so we only include ones that are allowed targets
         var listStates = states
             .Where(s => allowedTargetIds.Contains(s.ProcessStateId) || s.ProcessStateId == sourceStateId)
             .Select(s => new SelectListItem
@@ -443,7 +439,6 @@ public class ProcessController(ILegalReferenceSvc legalService, IContextSvc cont
 
         var trustedName = WebUtility.HtmlEncode(file.FileName);
 
-        // build DTO inline, same as before
         ProcessFileDto fileDto = Mapper.MapToFilesDto(new ProcessFile
         {
             ProcessFileName = file.FileName,

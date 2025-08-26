@@ -22,20 +22,16 @@ public class ProcessFileController(IProcessFileSvc filesSvc, IToastNotify toastN
         return RedirectToAction("List", "Process");
     }
 
-    // Delete a file by its ID.
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteFile(int fileId, int processId)
     {
         if (ModelState.IsValid)
         {
-            // Call your file service to delete the file.
             await _filesSvc.DeleteProcessFile(fileId);
 
-            // Optionally add a toast notification here.
             _toastNotify.Sucesso("File successfully deleted.");
 
-            // Redirect back to the edit page of the same process.
             return RedirectToAction("Edit", new { id = processId });
         }
 

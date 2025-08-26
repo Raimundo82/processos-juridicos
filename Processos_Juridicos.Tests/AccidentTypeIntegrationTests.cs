@@ -221,7 +221,6 @@ public class AccidentTypeIntegrationTests(CustomWebApplicationFactory<Program> f
             .QuerySelector("input[name=__RequestVerificationToken]")!
             .GetAttribute("value")!;
 
-        // 2) POST the form with the correct Id & token
         var fields = new Dictionary<string, string?>
         {
             ["AccidentTypeId"] = id.ToString(),

@@ -47,7 +47,6 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
         Process? existingEntity = await _context.Processes.FindAsync(process.ProcessId);
         if (existingEntity != null)
         {
-            // Detach the entity so it is no longer tracked
             _context.Entry(existingEntity).State = EntityState.Detached;
         }
 

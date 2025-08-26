@@ -11,13 +11,12 @@ public class ErrorController : Controller
     {
         if (ModelState.IsValid)
         {
-            // Choose a partial view based on the error code.
             var partialName = code switch
             {
-                404 => "ErrorPartials/_NotFoundError",  // Handle 404 errors
-                500 => "ErrorPartials/_ServerError",    // Handle 500 errors 
-                403 => "ErrorPartials/_NotAllowedError", //Handle 403 errors
-                _ => "ErrorPartials/_Uncategorized"      // Default partial for other error codes
+                404 => "ErrorPartials/_NotFoundError",
+                500 => "ErrorPartials/_ServerError",
+                403 => "ErrorPartials/_NotAllowedError",
+                _ => "ErrorPartials/_Uncategorized"
             };
 
             var viewModel = new ErrorViewModel

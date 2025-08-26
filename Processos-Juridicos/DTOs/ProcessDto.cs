@@ -47,7 +47,6 @@ public partial class ProcessDto
     [DisplayName("Data de Despacho de Nomeação do Instrutor")]
     public DateOnly? DispatchDate { get; set; }
 
-    //[EntityFieldIsRequired("Descrição")]
     [DisplayName("Descrição da Ocorrência")]
     [Unicode(false)]
     public string Description { get; set; }

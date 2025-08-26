@@ -104,7 +104,6 @@ public static class UnitTestData
                     IsEnabled = true
                 }
             },
-            // delete target
             new UnitTest {
                 Name      = "Direcção de Pessoal",
                 Code      = "01",
@@ -113,7 +112,6 @@ public static class UnitTestData
             }
         },
         {
-            // original
             new[]
             {
                 new UnitTest {
@@ -129,7 +127,6 @@ public static class UnitTestData
                     IsEnabled = true
                 }
             },
-            // delete target
             new UnitTest {
                 Name      = string.Empty,
                 Code      = string.Empty,
