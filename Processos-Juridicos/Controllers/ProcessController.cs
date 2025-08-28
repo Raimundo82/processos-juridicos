@@ -7,6 +7,9 @@ using Processos_Juridicos.DTOs;
 using Processos_Juridicos.Entities;
 using Processos_Juridicos.Mappers;
 using Processos_Juridicos.Services.Interfaces;
+using Processos_Juridicos.Services.Interfaces.Auth;
+using Processos_Juridicos.Services.Interfaces.DomainData;
+using Processos_Juridicos.Services.Interfaces.ProcessManagement;
 using Processos_Juridicos.Utilities.TextManager;
 
 namespace Processos_Juridicos.Controllers;

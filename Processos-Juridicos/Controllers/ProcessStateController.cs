@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 
 using Processos_Juridicos.DTOs;
-using Processos_Juridicos.Services.Interfaces;
+using Processos_Juridicos.Services.Interfaces.DomainData;
 
 namespace Processos_Juridicos.Controllers;
 

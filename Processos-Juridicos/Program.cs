@@ -5,8 +5,14 @@ using NToastNotify;
 
 using Processos_Juridicos.Data;
 using Processos_Juridicos.Middleware.ExceptionHandlers;
-using Processos_Juridicos.Services;
+using Processos_Juridicos.Services.Auth;
+using Processos_Juridicos.Services.DomainData;
 using Processos_Juridicos.Services.Interfaces;
+using Processos_Juridicos.Services.Interfaces.Auth;
+using Processos_Juridicos.Services.Interfaces.DomainData;
+using Processos_Juridicos.Services.Interfaces.ProcessManagement;
+using Processos_Juridicos.Services.ProcessManagement;
+using Processos_Juridicos.Services.UiHelpers;
 using Processos_Juridicos.Utilities.TextManager;
 using Processos_Juridicos.Utilities.TextManager.Interfaces;
 
@@ -32,13 +38,6 @@ builder.Configuration.AddUserSecrets<Program>();
 var processosDj = builder.Configuration.GetConnectionString("ProcessosDJ_Dev")!;
 builder.Services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer(processosDj).EnableSensitiveDataLogging().LogTo(Console.WriteLine, LogLevel.Debug));
 
-//httpClient
-builder.Services.AddHttpClient<ApisSvc>()
-    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
-    {
-        UseProxy = false,
-    });
-
 builder.Services.AddSingleton<IJsonTextManager>(sp =>
 {
     IWebHostEnvironment env = sp.GetRequiredService<IWebHostEnvironment>();
@@ -52,7 +51,6 @@ builder.Services.AddScoped<IUnitSvc, UnitSvc>();
 builder.Services.AddScoped<IProcessStateSvc, StateSvc>();
 builder.Services.AddScoped<ISentenceSvc, SentenceSvc>();
 builder.Services.AddScoped<IProcessTypeSvc, ProcessTypesSvc>();
-builder.Services.AddScoped<IApisSvc, ApisSvc>();
 builder.Services.AddScoped<IHarmedOrCasualtySvc, HarmedOrCasualtySvc>();
 builder.Services.AddScoped<IInfringementSvc, InfringementSvc>();
 builder.Services.AddScoped<IProcessFileSvc, ProcessFileSvc>();

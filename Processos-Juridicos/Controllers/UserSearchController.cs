@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 
 using Processos_Juridicos.Models;
-using Processos_Juridicos.Services.Interfaces;
+using Processos_Juridicos.Services.Interfaces.Auth;
 
 namespace Processos_Juridicos.Controllers;
 

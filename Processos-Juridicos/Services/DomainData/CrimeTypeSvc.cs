@@ -1,0 +1,75 @@
+using Microsoft.EntityFrameworkCore;
+
+using Processos_Juridicos.Data;
+using Processos_Juridicos.DTOs;
+using Processos_Juridicos.Exceptions;
+using Processos_Juridicos.Mappers;
+using Processos_Juridicos.Services.Interfaces.DomainData;
+
+namespace Processos_Juridicos.Services.DomainData;
+
+public class CrimeTypeSvc(AppDbContext context) : ICrimeTypeSvc
+{
+    private readonly AppDbContext _context = context;
+
+    public async Task<IEnumerable<CrimeTypeDto>> GetAllCrimeTypes()
+    {
+        List<Entities.CrimeType> crimes = await _context.CrimeTypes.ToListAsync();
+        return Mapper.MapToCrimeTypeEnum(crimes);
+    }
+
+    public async Task<CrimeTypeDto> GetCrimeTypeById(int? id)
+    {
+        Entities.CrimeType? type = await _context.CrimeTypes.FindAsync(id);
+        return type != null ? Mapper.MapToCrimeTypeDto(type) : throw new EntityNotFoundException($"O CrimeType com o ID {id} não existe.");
+    }
+
+    public async Task<CrimeTypeDto> CreateCrimeType(CrimeTypeDto type)
+    {
+        var normalizedName = type.CrimeTypeName?.Trim();
+        var nameAlreadyExists = _context.CrimeTypes
+         .AsEnumerable()
+         .Any(c => string.Compare(
+             c.CrimeTypeName.Trim(),
+             normalizedName,
+             StringComparison.OrdinalIgnoreCase) == 0);
+
+        if (nameAlreadyExists)
+        {
+            throw new DuplicatedCrimeTypeException($"Já existe um tipo de crime com o nome '{type.CrimeTypeName}'.");
+        }
+
+        Entities.CrimeType typeEntity = Mapper.MapToCrimeType(type);
+
+        _context.CrimeTypes.Add(typeEntity);
+        await _context.SaveChangesAsync();
+        return Mapper.MapToCrimeTypeDto(typeEntity);
+    }
+
+    public async Task<CrimeTypeDto> EditCrimeType(CrimeTypeDto type)
+    {
+        Entities.CrimeType? existingCrimeType = await _context.CrimeTypes.FindAsync(type.CrimeTypeId);
+        if (existingCrimeType != null)
+        {
+            existingCrimeType.CrimeTypeName = type.CrimeTypeName;
+
+            await _context.SaveChangesAsync();
+            return Mapper.MapToCrimeTypeDto(existingCrimeType);
+        }
+
+        throw new EntityNotFoundException($"O CrimeType com o ID {type.CrimeTypeId} não existe.");
+    }
+
+    public async Task<bool> DeleteCrimeType(int? id)
+    {
+        Entities.CrimeType? type = await _context.CrimeTypes.FindAsync(id);
+        if (type == null)
+        {
+            return false;
+        }
+
+        _context.CrimeTypes.Remove(type);
+        await _context.SaveChangesAsync();
+        return true;
+    }
+}
