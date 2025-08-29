@@ -81,4 +81,15 @@ public static partial class Mapper
     public static partial StateTransition MapToStateTransition(StateTransitionDto dto);
     public static partial IEnumerable<StateTransitionDto> MapToStateTransitionEnum(IEnumerable<StateTransition> entity);
 
+    //User transition map
+
+    public static partial UserDto MapToUserDto(User entity);
+    public static partial User MapToUser(UserDto dto);
+    public static partial IEnumerable<UserDto> MapToUserEnum(IEnumerable<User> entity);
+
+    //Role transition map
+    public static partial RoleDto MapToRoleDto(Role entity);
+    public static partial Role MapToRole(RoleDto dto);
+    public static partial IEnumerable<RoleDto> MapToRoleEnum(IEnumerable<Role> entity);
+
 }

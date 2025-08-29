@@ -1,35 +1,14 @@
+import { markValid, markInvalid, clearValidity, shouldResolve, searchUsers, resolveId } from './lookup-utils.js';
+
 document.addEventListener('DOMContentLoaded', () => {
     const DEBOUNCE_MS = 1000;
 
-    // Utility functions
+    // Page-specific utility
     const escapeHtml = (s) => {
         const str = s == null ? '' : String(s);
         return str.replace(/[&<>"']/g, c => (
             { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
         ));
-    };
-    const markValid = (el) => { el.classList.add('is-valid'); el.classList.remove('is-invalid'); };
-    const markInvalid = (el) => { el.classList.add('is-invalid'); el.classList.remove('is-valid'); };
-    const clearValidity = (el) => el.classList.remove('is-valid', 'is-invalid');
-    const shouldResolve = (v) => {
-        if (!v) return false;
-        const raw = v.trim();
-        if (raw.length < 3) return false;
-        if (raw.includes('@') || raw.includes('\\')) return true;
-        if (!raw.includes(' ')) return true;
-        return false;
-    };
-
-    // API helpers
-    const searchUsers = async (q) => {
-        const res = await fetch(`/api/directory/search?query=${encodeURIComponent(q)}`);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json();
-    };
-    const resolveId = async (rawId) => {
-        const res = await fetch(`/api/directory/resolve/${encodeURIComponent(rawId)}`);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json();
     };
 
     // Modal search
@@ -53,12 +32,12 @@ document.addEventListener('DOMContentLoaded', () => {
         for (const u of items) {
             const tr = document.createElement('tr');
             tr.innerHTML = `
-        <td>${escapeHtml(u.displayName || '')}</td>
-        <td>${escapeHtml(u.samAccountName || '')}</td>
-        <td>${escapeHtml(u.email || '')}</td>
-        <td>${escapeHtml(u.department || u.company || '')}</td>
-        <td><button type="button" class="btn btn-sm btn-success">Selecionar</button></td>
-      `;
+                <td>${escapeHtml(u.displayName || '')}</td>
+                <td>${escapeHtml(u.samAccountName || '')}</td>
+                <td>${escapeHtml(u.email || '')}</td>
+                <td>${escapeHtml(u.department || u.company || '')}</td>
+                <td><button type="button" class="btn btn-sm btn-success">Selecionar</button></td>
+            `;
             tr.addEventListener('dblclick', () => applySelection(u));
             tr.querySelector('button').addEventListener('click', () => applySelection(u));
             resultsBody.appendChild(tr);
@@ -73,8 +52,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const display = user.displayName || user.cn || user.name || '';
         const id = user.samAccountName || user.userPrincipalName || user.employeeId || '';
 
-        if (visible) visible.value = display +" - " +id;
-        if (hidden) hidden.value = display + " - " + id;
+        if (visible) visible.value = `${display} - ${id}`;
+        if (hidden) hidden.value = `${display} - ${id}`;
         if (visible) markValid(visible);
         if (info) info.textContent = id ? `✅ ${display} (${id})` : `✅ ${display}`;
         if (adModal) adModal.hide();
@@ -148,8 +127,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (data && data.found) {
                     const display = data.displayName || raw;
                     const id = data.username || data.fullUser || raw;
-                    visibleEl.value = display + " - " + id;
-                    hiddenEl.value = display + " - " + id;
+                    visibleEl.value = `${display} - ${id}`;
+                    hiddenEl.value = `${display} - ${id}`;
                     markValid(visibleEl);
                     if (infoEl) infoEl.textContent = id ? `✅ ${display} (${id})` : `✅ ${display}`;
                 } else {
@@ -193,6 +172,5 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     setupLookup('instructor-lookup', 'OficialInstName', 'OficialInstInfo');
-
     setupLookup('investigated-lookup', 'InvestigatedName', 'InvestigatedInfo');
 });

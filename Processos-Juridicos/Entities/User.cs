@@ -1,13 +1,14 @@
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-using Microsoft.EntityFrameworkCore;
 
 namespace Processos_Juridicos.Entities;
 
-[PrimaryKey(nameof(UserNii), nameof(RoleId))]
+
+
 public class User
 {
-
+    [Key]
     [Column("user_nii")]
     public string? UserNii { get; set; }
 

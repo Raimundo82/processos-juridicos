@@ -8,7 +8,7 @@ namespace Processos_Juridicos.Services.Auth;
 public class TimedSyncService(IServiceProvider services, ILogger<TimedSyncService> logger) : BackgroundService
 {
     private readonly IServiceProvider _services = services;
-    private readonly TimeSpan _interval = TimeSpan.FromSeconds(5); // adjust as needed
+    private readonly TimeSpan _interval = TimeSpan.FromHours(24); // adjust as needed
     private readonly ILogger<TimedSyncService> _logger = logger;
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)

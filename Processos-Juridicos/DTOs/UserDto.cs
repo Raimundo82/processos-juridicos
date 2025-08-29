@@ -1,16 +1,28 @@
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-using Microsoft.EntityFrameworkCore;
+using Processos_Juridicos.Attributes;
+
+using Riok.Mapperly.Abstractions;
 
 namespace Processos_Juridicos.DTOs;
 
-[PrimaryKey(nameof(UserNii), nameof(RoleId))]
+
 public class UserDto
 {
-
+    [Key]
+    [UniqueUser]
+    [DisplayName("Utilizador")]
     public string? UserNii { get; set; }
 
-    public string? RoleId { get; set; }
+    [ScaffoldColumn(false)]
+    [NotMapped]
+    [MapperIgnore]
+    public string? OriginalUserNii { get; set; }
+
+    [DisplayName("Tipo de Permissão")]
+    public int? RoleId { get; set; }
 
     [ForeignKey("RoleId")]
     public RoleDto? UserRole { get; set; }

@@ -1,0 +1,62 @@
+@model Processos_Juridicos.DTOs.UserDto;
+@using Processos_Juridicos.DTOs;
+
+@{
+    ViewData["Title"] = "Atribuir nova permissão de acesso";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<form asp-action="Create">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="form-group mt-3">
+        <label for="user-name" class="control-label">Nome do utilizador</label>
+        <p id="user-name" class="form-control">Nenhum utilizador selecionado<p />
+        <span asp-validation-for="UserNii" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mt-3">
+        <input type="hidden" asp-for="UserNii" id="UserNii" />
+
+        <label for="nii-lookup"class="control-label">Nii do utilizador</label>
+        <div class="input-group">
+            <input id="nii-lookup" class="form-control" placeholder="Digite o NII do utilizador, ex: m1234" />
+            <button type="button"
+                    class="btn btn-outline-secondary ad-lookup-btn"
+                    data-target-visible="nii-lookup"
+                    data-target-hidden="UserNii"
+                    data-target-info="UserInfo">
+                Procurar AD
+            </button>
+        </div>
+        <small id="UserInfo" class="form-text text-muted"></small>
+
+    </div>
+
+    <div class="form-group mt-3">
+        <label for="role-id" class="control-label">Permissão</label>
+        <select id="role-id" asp-for="RoleId" asp-items="ViewBag.Roles" class="form-control">
+            <option value="">Selecione o tipo de permissão</option>
+        </select>
+        <span asp-validation-for="RoleId" class="text-danger"></span>
+    </div>
+
+
+    <div class="form-group mt-3">
+        <input type="submit" value="Guardar" class="btn btn-primary js-add-role-btn" />
+        <a asp-action="List">Voltar à Lista</a>
+    </div>
+</form>
+
+
+<partial name="~/Views/Shared/Components/ModalUserSearch/_UserSearchModal.cshtml" />
+
+
+<script type="module" src="~/js/user-role-search.js"></script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

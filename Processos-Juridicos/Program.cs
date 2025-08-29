@@ -5,6 +5,7 @@ using NToastNotify;
 
 using Processos_Juridicos.Data;
 using Processos_Juridicos.Middleware.ExceptionHandlers;
+using Processos_Juridicos.Services;
 using Processos_Juridicos.Services.Auth;
 using Processos_Juridicos.Services.DomainData;
 using Processos_Juridicos.Services.Interfaces;
@@ -59,6 +60,8 @@ builder.Services.AddScoped<IAccidentTypeSvc, AccidentTypeSvc>();
 builder.Services.AddScoped<IStateTransitionSvc, StateTransitionSvc>();
 builder.Services.AddScoped<ICrimeTypeSvc, CrimeTypeSvc>();
 builder.Services.AddScoped<IMilitarySecuritySvc, MilitarySecuritySvc>();
+builder.Services.AddScoped<IUserSvc, UserSvc>();
+builder.Services.AddScoped<IRoleSvc, RoleSvc>();
 builder.Services.AddScoped<RoleSyncService>();
 builder.Services.AddHostedService<TimedSyncService>();
 builder.Services.AddScoped<ILegalReferenceSvc, LegalReferenceSvc>();
