@@ -67,6 +67,8 @@ builder.Services.AddHostedService<TimedSyncService>();
 builder.Services.AddScoped<ILegalReferenceSvc, LegalReferenceSvc>();
 builder.Services.AddScoped<IContextSvc, ContextSvc>();
 builder.Services.AddScoped<IProcessManagementSvc, ProcessManagementSvc>();
+builder.Services.AddScoped<IProcessViewDataSvc, ProcessViewDataSvc>();
+builder.Services.AddScoped<IFileValidatorSvc, FileValidatorSvc>();
 
 // Interface service only supported on windows
 if (OperatingSystem.IsWindows())

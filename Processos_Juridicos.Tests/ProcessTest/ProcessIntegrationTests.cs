@@ -1,3 +1,4 @@
+using System.Net;
 using System.Net.Http.Headers;
 
 using AngleSharp.Dom;
@@ -58,6 +59,61 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
         });
     }
 
+    [Fact]
+    public async Task Details_Get_ShowsExpectedProcessFields()
+    {
+        // Arrange
+        await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
+        AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+        Process process = dbContext.Add(CreateProcess()).Entity;
+        await dbContext.SaveChangesAsync();
+
+        // Act
+        IDocument doc = await _client.GetDocumentAsync($"/Process/Details/{process.ProcessId}");
+
+        // Assert
+        IElement? mainDl = doc.QuerySelector("dl.main-data");
+        Assert.NotNull(mainDl);
+
+        IElement? nuipmDd = mainDl.QuerySelectorAll("dt")
+            .FirstOrDefault(dt => dt.TextContent.Trim() == "NUIPM")?.NextElementSibling;
+        Assert.NotNull(nuipmDd);
+        Assert.Equal(process.Nuipm, nuipmDd.TextContent.Trim());
+
+        IElement? processTypeDd = mainDl.QuerySelectorAll("dt")
+            .FirstOrDefault(dt => dt.TextContent.Trim() == "Tipo de Processo")?.NextElementSibling;
+        Assert.NotNull(processTypeDd);
+        Assert.Equal(process.ProcessType.ProcessTypeName, processTypeDd.TextContent.Trim());
+
+        IElement? stateDd = mainDl.QuerySelectorAll("dt")
+            .FirstOrDefault(dt => dt.TextContent.Trim() == "Estado")?.NextElementSibling;
+        Assert.NotNull(stateDd);
+        Assert.Equal(process.ProcessState.StateName, stateDd.TextContent.Trim());
+    }
+
+    [Fact]
+    public async Task Details_Get_WithInvalidIdParameter_GoesToListPage()
+    {
+        // Act
+        HttpResponseMessage response = await _client.GetAsync($"/Process/Details/abc");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var content = await response.Content.ReadAsStringAsync();
+        Assert.Contains("Lista de Processos", content);
+    }
+
+    [Fact]
+    public async Task Details_Get_WhenProcessDoesNotExist_RedirectsToList()
+    {
+        // Act
+        HttpResponseMessage response = await _client.GetAsync($"/Process/Details/9999");
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var content = await response.Content.ReadAsStringAsync();
+        Assert.Contains("Lista de Processos", content);
+    }
 
     [Theory]
     [MemberData(nameof(ProcessTestData.BaseScenario), MemberType = typeof(ProcessTestData))]

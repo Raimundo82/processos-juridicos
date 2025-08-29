@@ -1,4 +1,5 @@
 {
+    "DetailFailureMessage": "Não foi possivel obter {2} {1}.",
     "CreateSuccessMessage": "{0} {1} foi criad{2} com sucesso.",
     "CreateFailureMessage": "Ocorreu um erro ao criar {0} {1}.",
     "EditSuccessMessage": "{0} {1} foi atualizad{2} com sucesso.",
