@@ -4,6 +4,7 @@ using System.Runtime.Versioning;
 using System.Security.Authentication;
 using System.Security.Claims;
 using System.Security.Principal;
+using System.Text.RegularExpressions;
 
 using Processos_Juridicos.Models;
 using Processos_Juridicos.Services.Interfaces.Auth;
@@ -11,7 +12,7 @@ using Processos_Juridicos.Services.Interfaces.Auth;
 namespace Processos_Juridicos.Services.Auth;
 
 [SupportedOSPlatform("windows")]
-public class LdapUserSvc(IHttpContextAccessor httpContextAccessor) : ILdapUserSvc
+public partial class LdapUserSvc(IHttpContextAccessor httpContextAccessor) : ILdapUserSvc
 {
     private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
     private const string thumbnaiPhotoFieldName = "thumbnailPhoto";
@@ -19,6 +20,10 @@ public class LdapUserSvc(IHttpContextAccessor httpContextAccessor) : ILdapUserSv
     private const string directoryRoot = "LDAP://RootDSE";
     private const string directoryEntry = "LDAP://DC=marinha,DC=pt";
     private const string distinguishedNameLdap = "distinguishedName";
+
+
+    [GeneratedRegex(@"CN=([^,]+)")]
+    private static partial Regex CnRegex();
 
     public List<string> GetUserGroups(string username)
     {
@@ -34,13 +39,12 @@ public class LdapUserSvc(IHttpContextAccessor httpContextAccessor) : ILdapUserSv
         SearchResult? result = searcher.FindOne();
         if (result != null && result.Properties.Contains("memberOf"))
         {
-            foreach (var dn in result.Properties["memberOf"])
+            foreach (string dn in result.Properties["memberOf"])
             {
-                using var groupEntry = new DirectoryEntry($"LDAP://{dn}");
-                var name = groupEntry.Properties["cn"]?.Value?.ToString();
-                if (!string.IsNullOrWhiteSpace(name))
+                Match match = CnRegex().Match(dn);
+                if (match.Success)
                 {
-                    groups.Add(name);
+                    groups.Add(match.Groups[1].Value);
                 }
             }
         }
@@ -319,14 +323,15 @@ public class LdapUserSvc(IHttpContextAccessor httpContextAccessor) : ILdapUserSv
         var empId = entry.Properties["employeeID"]?.Value?.ToString();
         var sam = entry.Properties["sAMAccountName"]?.Value?.ToString();
 
-        if (!string.IsNullOrWhiteSpace(empId))
-        {
-            results.Add(empId);
-        }
-        else if (!string.IsNullOrWhiteSpace(sam))
+        if (!string.IsNullOrWhiteSpace(sam))
         {
             results.Add(sam);
         }
+        else if (!string.IsNullOrWhiteSpace(empId))
+        {
+            results.Add(empId);
+        }
+
     }
 }
 
