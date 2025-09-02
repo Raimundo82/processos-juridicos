@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using NToastNotify;
 
 using Processos_Juridicos.Data;
+using Processos_Juridicos.Middleware;
 using Processos_Juridicos.Middleware.ExceptionHandlers;
 using Processos_Juridicos.Services;
 using Processos_Juridicos.Services.Auth;
@@ -19,11 +20,23 @@ using Processos_Juridicos.Utilities.TextManager.Interfaces;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
+// Authentication SOO (via Negotiate)
 builder.Services.AddAuthentication(NegotiateDefaults.AuthenticationScheme).AddNegotiate();
 
+// Set Authorization
 builder.Services.AddAuthorization(options =>
 {
     options.FallbackPolicy = options.DefaultPolicy;
+});
+
+// Enable session 
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromHours(3);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Cookie.SameSite = SameSiteMode.Strict;
 });
 
 // Add services to the container.
@@ -124,8 +137,10 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.UseSession();
 app.UseRouting();
 app.UseAuthentication();
+app.UseMiddleware<CargoSessionMiddleware>();
 app.UseAuthorization();
 app.UseNToastNotify();
 app.MapControllerRoute(

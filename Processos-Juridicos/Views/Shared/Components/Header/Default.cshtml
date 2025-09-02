@@ -1,12 +1,32 @@
 @model UserDataModel
 @{
-	var displayName = Model.DisplayName ?? "Utilizador";
-	var photo = Model.PhotoBase64 ?? Url.Content("~/images/default-avatar.png");
+	var nii = Model.Nii ?? "Utilizador";
+	var photo = Model.PhotoBase64 ?? Url.Content("/images/default-avatar.webp");
+    var isCargoLogin = Context.Session.GetString("CargoUser") != null;
 }
 
-<div class="d-flex align-items-center">
-	@* <span>@displayName</span> *@
-	<img src="@photo"
-		alt="Avatar de @displayName"
-		class="rounded-circle avatar" />
+<div class="dropdown">
+    <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle"
+       id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
+        <img src="@photo" alt="Avatar de @nii"
+             class="rounded-circle" width="40" height="40" />
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+        @if (isCargoLogin)
+        {
+            <li>
+                <a class="dropdown-item bg-danger text-white" asp-controller="Auth" asp-action="Logout">
+                    @($"Terminar sessão da conta M{nii}")
+                </a>
+            </li>
+        }
+        else
+        {
+            <li>
+                <a class="dropdown-item" asp-controller="Auth" asp-action="Login">
+                    Iniciar sessão com outra conta
+                </a>
+            </li>
+        }
+    </ul>
 </div>

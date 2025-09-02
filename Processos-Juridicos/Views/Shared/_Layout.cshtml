@@ -20,7 +20,10 @@
         <partial name="_Header" />
     </header>
 
-     <partial name="_Menu" />
+    @if (ViewData["LoginView"] as bool? != true)
+    {
+        <partial name="_Menu" />
+    }
 
     <div class="container">
         <main role="main" class="pb-3">

@@ -25,6 +25,12 @@ public partial class LdapUserSvc(IHttpContextAccessor httpContextAccessor) : ILd
     [GeneratedRegex(@"CN=([^,]+)")]
     private static partial Regex CnRegex();
 
+    public bool ValidateAccount(string username, string password)
+    {
+        using var context = new PrincipalContext(ContextType.Domain);
+        return context.ValidateCredentials(username, password);
+    }
+
     public List<string> GetUserGroups(string username)
     {
         var groups = new List<string>();
@@ -54,38 +60,27 @@ public partial class LdapUserSvc(IHttpContextAccessor httpContextAccessor) : ILd
 
     public UserDataModel GetLoggedUserData()
     {
-        ClaimsPrincipal? windowsPrincipal = _httpContextAccessor.HttpContext?.User;
+        ClaimsPrincipal? principal = _httpContextAccessor.HttpContext?.User;
 
-        if (windowsPrincipal?.Identity is not WindowsIdentity identity || !identity.IsAuthenticated)
+        if (principal?.Identity == null || !principal.Identity.IsAuthenticated)
         {
             throw new AuthenticationException();
         }
 
-        var fullUser = identity.Name;
-        var parts = fullUser.Split('\\');
-        var userName = parts[^1];
-
-        using var pc = new PrincipalContext(ContextType.Domain);
-        UserPrincipal up = UserPrincipal.FindByIdentity(pc, userName) ?? throw new AuthenticationException(fullUser);
-
-        var de = up.GetUnderlyingObject() as DirectoryEntry;
-        var raw = de?.Properties[thumbnaiPhotoFieldName]?.Value as byte[];
-        var mime = raw?.Length > 0 ? "image/jpeg" : null;
-
-        var base64 = mime != null
-            ? $"data:{mime};base64,{Convert.ToBase64String(raw!)}"
-            : null;
-
-        return new UserDataModel
+        if (principal.Identity is WindowsIdentity winIdentity)
         {
-            DisplayName = up.DisplayName,
-            UserName = userName,
-            FullUser = fullUser,
-            Nii = de?.Properties["employeeid"]?.Value?.ToString(),
-            Unit = de?.Properties[departmentFieldName]?.Value?.ToString(),
-            PhotoBase64 = base64,
-            Groups = GetUserGroups(userName)
-        };
+            var fullUser = winIdentity.Name;
+            var parts = fullUser.Split('\\');
+            var userName = parts[^1];
+            return GetUserDataByNii(userName);
+        }
+
+        var nii = principal.Identity.Name
+                  ?? principal.Claims.FirstOrDefault(c => c.Type == "nii")?.Value;
+
+        return string.IsNullOrWhiteSpace(nii)
+            ? throw new AuthenticationException("NII não encontrado para o utilizador autenticado")
+            : GetUserDataByNii(nii);
     }
 
     public UserDataModel GetUserDataByNii(string nii)
@@ -119,8 +114,7 @@ public partial class LdapUserSvc(IHttpContextAccessor httpContextAccessor) : ILd
             FullUser = found.DistinguishedName,
             Nii = de?.Properties["employeeid"]?.Value?.ToString(),
             Unit = de?.Properties[departmentFieldName]?.Value?.ToString(),
-            PhotoBase64 = photoBase64,
-            Groups = GetUserGroups(found.SamAccountName)
+            PhotoBase64 = photoBase64
         };
     }
 

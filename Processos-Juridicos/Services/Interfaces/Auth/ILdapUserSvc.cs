@@ -4,6 +4,7 @@ namespace Processos_Juridicos.Services.Interfaces.Auth;
 
 public interface ILdapUserSvc
 {
+    public bool ValidateAccount(string username, string password);
     public List<string> GetUserGroups(string username);
     public UserDataModel GetLoggedUserData();
     public UserDataModel GetUserDataByNii(string nii);

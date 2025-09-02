@@ -16,6 +16,6 @@
     "EmptyFileMessage": "Pelo menos um dos ficheiros fornecidos encontra-se vazio.",
     "FileExtensionNotAllowedMessage": "Pelo menos um ficheiro dos ficheiros fornecidos tem uma extensão não permitida.",
     "FileSizeTooLargeMessage": "Pelo menos um ficheiro dos ficheiros fornecidos é demasiado grande.",
-    "StateTransitionInvalidMessage":  "Transição de estado Inválida."
-       
+    "StateTransitionInvalidMessage":  "Transição de estado Inválida.",
+    "InvalidLoginMessage": "Ocorreu um erro ao fazer login, tente novamente."
 }
