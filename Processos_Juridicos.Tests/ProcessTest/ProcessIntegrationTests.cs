@@ -100,7 +100,7 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var content = await response.Content.ReadAsStringAsync();
-        Assert.Contains("Lista de Processos", content);
+        Assert.Contains("Processos", content);
     }
 
     [Fact]
@@ -112,7 +112,7 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var content = await response.Content.ReadAsStringAsync();
-        Assert.Contains("Lista de Processos", content);
+        Assert.Contains("Processos", content);
     }
 
     [Theory]

@@ -26,6 +26,21 @@ builder.Services.AddAuthentication(NegotiateDefaults.AuthenticationScheme).AddNe
 builder.Services.AddAuthorization(options =>
 {
     options.FallbackPolicy = options.DefaultPolicy;
+
+    options.AddPolicy("OFICIAIS-INSTRUTORES", policy =>
+        policy.RequireRole("OFICIAIS-INSTRUTORES"));
+
+    options.AddPolicy("COMANDO-UNIDADE", policy =>
+        policy.RequireRole("COMANDO-UNIDADE"));
+
+    options.AddPolicy("DJ-PROCESSES", policy =>
+        policy.RequireRole("DJ-AUTHORIZED", "DJ-UNAUTHORIZED", "SUPERADMIN"));
+
+    options.AddPolicy("DJ-ADMINISTRATION", policy =>
+        policy.RequireRole("DJ-AUTHORIZED", "SUPERADMIN"));
+
+    options.AddPolicy("SUPER-ADMIN", policy =>
+        policy.RequireRole("SUPERADMIN"));
 });
 
 // Enable session 
@@ -85,6 +100,7 @@ builder.Services.AddScoped<IFileValidatorSvc, FileValidatorSvc>();
 // Interface service only supported on windows
 if (OperatingSystem.IsWindows())
 {
+    builder.Services.AddScoped<NegotiateRoleMiddleware>();
     builder.Services.AddScoped<ILdapUserSvc, LdapUserSvc>();
 }
 
@@ -139,6 +155,12 @@ app.UseStaticFiles();
 app.UseSession();
 app.UseRouting();
 app.UseAuthentication();
+
+if (OperatingSystem.IsWindows())
+{
+    app.UseMiddleware<NegotiateRoleMiddleware>();
+}
+
 app.UseMiddleware<CargoSessionMiddleware>();
 app.UseAuthorization();
 app.UseNToastNotify();

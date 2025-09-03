@@ -49,6 +49,16 @@ public class UserSvc(AppDbContext context) : IUserSvc
             : throw new EntityNotFoundException("User not found");
     }
 
+    public async Task<string> GetUserRoleByNii(string nii)
+    {
+        var roleId = await _context.Users
+            .Where(u => u.UserNii == nii)
+            .Select(u => u.UserRole!.RoleName)
+            .FirstOrDefaultAsync();
+
+        return roleId ?? throw new EntityNotFoundException("User not found");
+    }
+
     public async Task<bool> RemoveUser(string? id)
     {
         User? user = await _context.Users.FirstOrDefaultAsync(u => u.UserNii == id);

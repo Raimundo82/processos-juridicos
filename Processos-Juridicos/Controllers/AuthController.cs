@@ -6,9 +6,13 @@ using Processos_Juridicos.Utilities.TextManager;
 
 namespace Processos_Juridicos.Controllers;
 
-public class AuthController(ILdapUserSvc ldapUserSvc, IToastNotify toastNotify) : Controller
+public class AuthController(
+    ILdapUserSvc ldapUserSvc,
+    IUserSvc userSvc,
+    IToastNotify toastNotify) : Controller
 {
     private readonly ILdapUserSvc _ldapUserSvc = ldapUserSvc;
+    private readonly IUserSvc _userSvc = userSvc;
     private readonly IToastNotify _toastNotify = toastNotify;
 
     [HttpGet]
@@ -18,17 +22,20 @@ public class AuthController(ILdapUserSvc ldapUserSvc, IToastNotify toastNotify) 
     }
 
     [HttpPost]
-    public IActionResult Login(string username, string password)
+    public async Task<IActionResult> Login(string username, string password)
     {
-        if (_ldapUserSvc.ValidateAccount(username, password))
+        if (!_ldapUserSvc.ValidateAccount(username, password))
         {
-            HttpContext.Session.SetString("CargoUser", username);
-            HttpContext.Session.SetString("CargoRole", "ainda por definir");
-            return RedirectToAction("Index", "Home");
+            _toastNotify.Error(GlobalTextManager.GetString("InvalidLoginMessage"));
+            return View();
         }
 
-        _toastNotify.Error(GlobalTextManager.GetString("InvalidLoginMessage"));
-        return View();
+        var userRole = await _userSvc.GetUserRoleByNii(username);
+
+        HttpContext.Session.SetString("CargoUser", username);
+        HttpContext.Session.SetString("CargoRole", userRole);
+
+        return RedirectToAction("Index", "Home");
     }
 
     public IActionResult Logout()

@@ -1,6 +1,6 @@
 @model UserDataModel
 @{
-	var nii = Model.Nii ?? "Utilizador";
+	var nii = Model.Nii ?? Model.UserName ?? "Utilizador";
 	var photo = Model.PhotoBase64 ?? Url.Content("/images/default-avatar.webp");
     var isCargoLogin = Context.Session.GetString("CargoUser") != null;
 }
