@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 using Processos_Juridicos.Attributes;
+using Processos_Juridicos.Entities;
 
 using Riok.Mapperly.Abstractions;
 
@@ -24,6 +25,14 @@ public class UserDto
     [DisplayName("Tipo de Permissão")]
     public int? RoleId { get; set; }
 
+    [DisplayName("Nome do utilizador")]
+    public string? UserName { get; set; }
+
     [ForeignKey("RoleId")]
     public RoleDto? UserRole { get; set; }
+
+
+    public virtual ICollection<Unit> UnitsResponsibleFor { get; set; } = [];
+
+    public ICollection<UnitCommander> UnitCommanders { get; set; } = [];
 }

@@ -9,7 +9,7 @@ using Processos_Juridicos.Exceptions;
 using Processos_Juridicos.Mappers;
 using Processos_Juridicos.Services.Interfaces;
 
-namespace Processos_Juridicos.Services;
+namespace Processos_Juridicos.Services.DomainData;
 
 public class UserSvc(AppDbContext context) : IUserSvc
 {

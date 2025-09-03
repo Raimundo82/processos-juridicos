@@ -1,3 +1,4 @@
+@using Processos_Juridicos.Entities
 @model Processos_Juridicos.DTOs.UnitDto;
 
 <div class="form-group mt-3">
@@ -17,3 +18,31 @@
     <input asp-for="UnitAcronym" id="unit-acronym" class="form-control" />
     <span asp-validation-for="UnitAcronym" class="text-danger"></span>
 </div>
+
+<div class="form-group mt-3">
+    <label for="responsible-users-container">Responsible Users</label>
+    <div id="responsible-users-container" class="d-flex flex-wrap gap-2 mb-2">
+        @foreach (var user in Model?.ResponsibleUsers ?? Enumerable.Empty<User>())
+        {
+            <span class="badge bg-primary m-1 d-inline-flex align-items-center">
+                <input type="hidden" name="ResponsibleUserIds" value="@user.UserNii" />
+                <span>@user.UserName</span>
+                <button type="button" class="btn-close btn-close-white ms-2" aria-label="Remove"
+                        onclick="this.parentElement.remove()"></button>
+            </span>
+        }
+    </div>
+    <div class="input-group">
+        <input type="text" id="responsible-users-visible" class="form-control" placeholder="Type user ID..." />
+        <button type="button"
+                class="btn btn-outline-secondary ad-lookup-btn"
+                data-target-visible="responsible-users-visible"
+                data-target-hidden="responsible-users-container"
+                data-target-info="responsible-users-info">
+            Search AD
+        </button>
+    </div>
+    <small id="responsible-users-info" class="form-text text-muted"></small>
+</div>
+
+

@@ -39,11 +39,11 @@ public class UnitController(IUnitSvc unitSvc, IToastNotify toastNotify) : Contro
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(UnitDto model)
+    public async Task<IActionResult> Create(UnitDto model, List<string> responsibleUserIds)
     {
         if (ModelState.IsValid)
         {
-            await _unitSvc.CreateUnit(model);
+            await _unitSvc.CreateUnit(model, responsibleUserIds);
             _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("CreateSuccessMessage"), "A", EntityName, "a"));
             return RedirectToAction(nameof(List));
         }
@@ -64,16 +64,19 @@ public class UnitController(IUnitSvc unitSvc, IToastNotify toastNotify) : Contro
     }
 
     [HttpPost]
-    public async Task<IActionResult> Edit(UnitDto model)
+    public async Task<IActionResult> Edit(UnitDto model, List<string> responsibleUserIds)
     {
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid)
         {
-            await _unitSvc.EditUnit(model);
-            _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("EditSuccessMessage"), "A", EntityName, "a"));
-            return RedirectToAction(nameof(List));
+            return View(model);
         }
 
-        return View(model);
+        await _unitSvc.EditUnit(model, responsibleUserIds);
+
+        _toastNotify.Sucesso(string.Format(
+            GlobalTextManager.GetString("EditSuccessMessage"), "A", EntityName, "a"));
+
+        return RedirectToAction(nameof(List));
     }
 
     [HttpPost, ActionName("Delete")]

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Processos_Juridicos.Data;
 
@@ -11,9 +12,11 @@ using Processos_Juridicos.Data;
 namespace Processos_Juridicos.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250901130202_AddUsersResponsibleForUnits")]
+    partial class AddUsersResponsibleForUnits
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -426,23 +429,6 @@ namespace Processos_Juridicos.Migrations
                     b.ToTable("Units");
                 });
 
-            modelBuilder.Entity("Processos_Juridicos.Entities.UnitCommander", b =>
-                {
-                    b.Property<int>("UnitId")
-                        .HasColumnType("int")
-                        .HasColumnName("unit_id");
-
-                    b.Property<string>("UserNii")
-                        .HasColumnType("nvarchar(450)")
-                        .HasColumnName("user_nii");
-
-                    b.HasKey("UnitId", "UserNii");
-
-                    b.HasIndex("UserNii");
-
-                    b.ToTable("Unit_commanders", (string)null);
-                });
-
             modelBuilder.Entity("Processos_Juridicos.Entities.User", b =>
                 {
                     b.Property<string>("UserNii")
@@ -453,15 +439,26 @@ namespace Processos_Juridicos.Migrations
                         .HasColumnType("int")
                         .HasColumnName("user_role");
 
-                    b.Property<string>("UserName")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("user_name");
-
                     b.HasKey("UserNii");
 
                     b.HasIndex("RoleId");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("UnitUser", b =>
+                {
+                    b.Property<string>("ResponsibleUsersUserNii")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("UnitsResponsibleForUnitId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ResponsibleUsersUserNii", "UnitsResponsibleForUnitId");
+
+                    b.HasIndex("UnitsResponsibleForUnitId");
+
+                    b.ToTable("UnitUser");
                 });
 
             modelBuilder.Entity("Processos_Juridicos.Entities.Process", b =>
@@ -559,25 +556,6 @@ namespace Processos_Juridicos.Migrations
                     b.Navigation("ToState");
                 });
 
-            modelBuilder.Entity("Processos_Juridicos.Entities.UnitCommander", b =>
-                {
-                    b.HasOne("Processos_Juridicos.Entities.Unit", "Unit")
-                        .WithMany("UnitCommanders")
-                        .HasForeignKey("UnitId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Processos_Juridicos.Entities.User", "User")
-                        .WithMany("UnitCommanders")
-                        .HasForeignKey("UserNii")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Unit");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Processos_Juridicos.Entities.User", b =>
                 {
                     b.HasOne("Processos_Juridicos.Entities.Role", "UserRole")
@@ -587,14 +565,19 @@ namespace Processos_Juridicos.Migrations
                     b.Navigation("UserRole");
                 });
 
-            modelBuilder.Entity("Processos_Juridicos.Entities.Unit", b =>
+            modelBuilder.Entity("UnitUser", b =>
                 {
-                    b.Navigation("UnitCommanders");
-                });
+                    b.HasOne("Processos_Juridicos.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("ResponsibleUsersUserNii")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-            modelBuilder.Entity("Processos_Juridicos.Entities.User", b =>
-                {
-                    b.Navigation("UnitCommanders");
+                    b.HasOne("Processos_Juridicos.Entities.Unit", null)
+                        .WithMany()
+                        .HasForeignKey("UnitsResponsibleForUnitId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

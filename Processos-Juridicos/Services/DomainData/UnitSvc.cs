@@ -21,26 +21,52 @@ public class UnitSvc(AppDbContext context) : IUnitSvc
 
     public async Task<UnitDto> GetUnitById(int? id)
     {
-        Unit? unit = await _context.Units.FindAsync(id);
+        Unit? unit = await _context.Units.Include(uc => uc.UnitCommanders).ThenInclude(u => u.User).FirstOrDefaultAsync(u => u.UnitId == id);
         return unit != null ? Mapper.MapToUnitDto(unit) : throw new EntityNotFoundException("Unit not found");
     }
 
-    public async Task<UnitDto> CreateUnit(UnitDto unit)
+    public async Task<UnitDto> CreateUnit(UnitDto unit, List<string> responsibleUserIds)
     {
         Unit unitEntity = Mapper.MapToUnit(unit);
+
+        // Update responsible users
+        unit.ResponsibleUsers.Clear();
+        List<User> users = await _context.Users
+            .Where(u => responsibleUserIds.Contains(u.UserNii!)) // or UserId
+            .ToListAsync();
+
+        foreach (User? user in users)
+        {
+            unit.ResponsibleUsers.Add(user);
+        }
 
         _context.Units.Add(unitEntity);
         await _context.SaveChangesAsync();
         return Mapper.MapToUnitDto(unitEntity);
     }
 
-    public async Task<UnitDto> EditUnit(UnitDto unit)
+    public async Task EditUnit(UnitDto model, List<string> responsibleUserIds)
     {
-        Unit unitEntity = Mapper.MapToUnit(unit);
-        _context.Units.Entry(unitEntity).State = EntityState.Modified;
+        Unit? unit = await _context.Units
+            .Include(u => u.ResponsibleUsers)
+            .FirstOrDefaultAsync(u => u.UnitId == model.UnitId) ?? throw new EntityNotFoundException("Unit not found");
+
+        unit.UnitName = model.UnitName;
+        unit.UnitCode = model.UnitCode;
+        unit.UnitAcronym = model.UnitAcronym;
+
+        // Update responsible users
+        unit.ResponsibleUsers.Clear();
+        List<User> users = await _context.Users
+            .Where(u => responsibleUserIds.Contains(u.UserNii!)) // or UserId
+            .ToListAsync();
+
+        foreach (User? user in users)
+        {
+            unit.ResponsibleUsers.Add(user);
+        }
 
         await _context.SaveChangesAsync();
-        return Mapper.MapToUnitDto(unitEntity);
     }
 
     public async Task<bool> DeleteUnit(int? id)
@@ -52,6 +78,29 @@ public class UnitSvc(AppDbContext context) : IUnitSvc
         }
 
         _context.Units.Remove(unit);
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<bool> AssignResponsibleUsers(int unitId, List<string> userIds)
+    {
+        Unit? unit = await _context.Units
+               .Include(u => u.ResponsibleUsers)
+               .FirstOrDefaultAsync(u => u.UnitId == unitId) ?? throw new EntityNotFoundException("Unit not found");
+
+        // Clear existing assignments
+        unit.ResponsibleUsers.Clear();
+
+        // Add the new ones
+        List<User> users = await _context.Users
+            .Where(u => userIds.Contains(u.UserNii!))
+            .ToListAsync();
+
+        foreach (User? user in users)
+        {
+            unit.ResponsibleUsers.Add(user);
+        }
+
         await _context.SaveChangesAsync();
         return true;
     }

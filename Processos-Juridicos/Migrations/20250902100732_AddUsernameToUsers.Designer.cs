@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Processos_Juridicos.Data;
 
@@ -11,9 +12,11 @@ using Processos_Juridicos.Data;
 namespace Processos_Juridicos.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250902100732_AddUsernameToUsers")]
+    partial class AddUsernameToUsers
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -429,12 +432,10 @@ namespace Processos_Juridicos.Migrations
             modelBuilder.Entity("Processos_Juridicos.Entities.UnitCommander", b =>
                 {
                     b.Property<int>("UnitId")
-                        .HasColumnType("int")
-                        .HasColumnName("unit_id");
+                        .HasColumnType("int");
 
                     b.Property<string>("UserNii")
-                        .HasColumnType("nvarchar(450)")
-                        .HasColumnName("user_nii");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("UnitId", "UserNii");
 
@@ -454,8 +455,7 @@ namespace Processos_Juridicos.Migrations
                         .HasColumnName("user_role");
 
                     b.Property<string>("UserName")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("user_name");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("UserNii");
 

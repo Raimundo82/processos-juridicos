@@ -1,4 +1,4 @@
-﻿@model Processos_Juridicos.DTOs.UnitDto;
+@model Processos_Juridicos.DTOs.UnitDto;
 @using Processos_Juridicos.DTOs;
 
 @{
@@ -18,6 +18,9 @@
     </div>
 </form>
 
+<partial name="~/Views/Shared/Components/ModalUserSearch/_UserSearchModal.cshtml" />
+
+<script type="module" src="~/js/lookup-units.js" asp-append-version="true"></script>
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");

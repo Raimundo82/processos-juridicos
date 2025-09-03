@@ -96,7 +96,7 @@ public class RoleSyncService
         (List<int> toAdd, List<int> toRemove) = DiffSyncRoles(currentRoles, desiredRoles);
 
         // Apply changes
-        await ApplySyncRoleChangesAsync(userNii, toAdd, toRemove, ct);
+        await ApplySyncRoleChangesAsync(userNii, username, toAdd, toRemove, ct);
     }
 
     private List<int> CalculateSyncDesiredRoles(HashSet<string> groupSet, string? department)
@@ -124,13 +124,13 @@ public class RoleSyncService
         return (toAdd, toRemove);
     }
 
-    private async Task ApplySyncRoleChangesAsync(string userNii, List<int> toAdd, List<int> toRemove, CancellationToken ct)
+    private async Task ApplySyncRoleChangesAsync(string userNii, string userName, List<int> toAdd, List<int> toRemove, CancellationToken ct)
     {
         if (toAdd.Count > 0)
         {
             foreach (var roleId in toAdd)
             {
-                _db.Users.Add(new User { UserNii = userNii, RoleId = roleId });
+                _db.Users.Add(new User { UserNii = userNii, RoleId = roleId, UserName = userName });
             }
         }
 

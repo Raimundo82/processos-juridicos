@@ -6,7 +6,6 @@ using NToastNotify;
 using Processos_Juridicos.Data;
 using Processos_Juridicos.Middleware;
 using Processos_Juridicos.Middleware.ExceptionHandlers;
-using Processos_Juridicos.Services;
 using Processos_Juridicos.Services.Auth;
 using Processos_Juridicos.Services.DomainData;
 using Processos_Juridicos.Services.Interfaces;

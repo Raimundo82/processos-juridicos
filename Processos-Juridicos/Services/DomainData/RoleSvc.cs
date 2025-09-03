@@ -7,7 +7,7 @@ using Processos_Juridicos.Entities;
 using Processos_Juridicos.Mappers;
 using Processos_Juridicos.Services.Interfaces;
 
-namespace Processos_Juridicos.Services;
+namespace Processos_Juridicos.Services.DomainData;
 
 public class RoleSvc(AppDbContext context) : IRoleSvc
 {
