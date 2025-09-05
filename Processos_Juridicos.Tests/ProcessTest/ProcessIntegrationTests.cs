@@ -125,8 +125,10 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
 
         dbContext.States.AddRange(scenarioProcesses.Select(s => s.ProcessState));
         dbContext.ProcessTypes.AddRange(scenarioProcesses.Select(s => s.ProcessType));
-        await dbContext.SaveChangesAsync();
 
+        dbContext.Units.AddRange(scenarioProcesses.Select(s => s.Unit));
+
+        await dbContext.SaveChangesAsync();
 
         // Act
         foreach (Process scenarioProcess in scenarioProcesses)
@@ -136,6 +138,10 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
 
             var processStateId = doc.GetElementById("state-id")?.QuerySelectorAll("option").First().GetAttribute("value");
 
+            var unitId = doc.GetElementById("unit-id")?.QuerySelectorAll("option")
+                .First(option => option.TextContent.Trim() == scenarioProcess.Unit.UnitName)
+                .GetAttribute("value");
+
             var processTypeId = doc.GetElementById("process-type-id")?
                 .QuerySelectorAll("option")
                 .First(option => option.TextContent.Trim() == scenarioProcess.ProcessType.ProcessTypeName)
@@ -143,12 +149,14 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
 
             var formData = new Dictionary<string, string?>
             {
-                ["Nuipm"] = scenarioProcess.Nuipm,
+
                 ["ProcessTypeId"] = processTypeId,
                 ["ProcessStateId"] = processStateId,
+                ["UnitId"] = unitId,
+                ["CreatedAt"] = scenarioProcess.CreatedAt.ToString()
+
             };
             await _client.PostAsync("/Process/Create", new FormUrlEncodedContent(formData));
-
         }
 
         // Assert
@@ -163,7 +171,6 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
             Assert.Equal(expected.ProcessType.ProcessTypeName, scenarioProcess.ProcessType.ProcessTypeName);
             Assert.Equal(expected.ProcessType.Deadline, scenarioProcess.ProcessType.Deadline);
         });
-
     }
 
     [Fact]
@@ -208,15 +215,19 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
         ProcessState targetState = dbContext.Add(new ProcessState { StateName = "OldState" }).Entity;
 
         ProcessType newType = dbContext.Add(new ProcessType { ProcessTypeName = "NewType", Deadline = 15 }).Entity;
+
+        Unit newUnit = dbContext.Add(new Unit { UnitName = "Unidade 1", UnitCode = "UN01", UnitAcronym = "UN1" }).Entity;
+
         Process process = dbContext.Add(CreateProcess()).Entity;
         await dbContext.SaveChangesAsync();
         dbContext.Entry(process).State = EntityState.Detached;
 
-        StateTransition stateTransition = dbContext.Add(new StateTransition { FromStateId = process.ProcessStateId, ToStateId = targetState.ProcessStateId }).Entity;
+        dbContext.Add(new StateTransition { FromStateId = process.ProcessStateId, ToStateId = targetState.ProcessStateId });
         await dbContext.SaveChangesAsync();
         IDocument doc = await _client.GetDocumentAsync($"/Process/Edit/{process.ProcessId}");
         var newTypeId = doc.GetElementById("process-type-id")?.QuerySelector($"option[value='{newType.ProcessTypeId}']")?.GetAttribute("value");
         var newStateId = doc.GetElementById("state-id")?.QuerySelector($"option[value='{targetState.ProcessStateId}']")?.GetAttribute("value");
+        var newUnitId = doc.GetElementById("unit-id")?.QuerySelector($"option[value='{newUnit.UnitId}']")?.GetAttribute("value");
 
         var token = doc.QuerySelector("input[name=__RequestVerificationToken]")?.GetAttribute("value")!;
 
@@ -224,9 +235,9 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
         var formData = new Dictionary<string, string?>
         {
             ["ProcessId"] = process.ProcessId.ToString(),
-            ["Nuipm"] = "NewNuipm",
             ["ProcessTypeId"] = newTypeId,
             ["ProcessStateId"] = newStateId,
+            ["UnitId"] = newUnitId,
             ["__RequestVerificationToken"] = token
         };
 
@@ -237,9 +248,13 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
         Assert.Single(dbItems);
         Process underTest = dbItems.First();
 
-        Assert.Equal("NewNuipm", underTest.Nuipm);
+        var nuipmCheck = "0001/" + DateTime.Now.Year.ToString() + "/UN01";
+
+        Assert.Equal(nuipmCheck, underTest.Nuipm);
         Assert.Equal(targetState.ProcessStateId, underTest.ProcessStateId);
         Assert.Equal(targetState.StateName, underTest.ProcessState.StateName);
+        Assert.Equal(newUnit.UnitId, underTest.Unit.UnitId);
+
         Assert.Equal(newType.ProcessTypeId, underTest.ProcessTypeId);
         Assert.Equal(newType.ProcessTypeName, underTest.ProcessType.ProcessTypeName);
         Assert.Equal(newType.Deadline, underTest.ProcessType.Deadline);
@@ -314,11 +329,10 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
         // Arrange
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        Process process = dbContext.Add(CreateProcess()).Entity;
+        dbContext.Add(CreateProcess());
         await dbContext.SaveChangesAsync();
 
         IDocument listDoc = await _client.GetDocumentAsync("/Process/List");
-        IElement deleteForm = listDoc.QuerySelector("form[action='/Process/Delete']")!;
 
         var token = listDoc
             .QuerySelector("form[action='/Process/Delete'] input[name=__RequestVerificationToken]")!
@@ -442,9 +456,6 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
         HttpResponseMessage response = await _client.PostAsync(action, multipart);
         response.EnsureSuccessStatusCode();
 
-        IDocument listDoc = await _client.GetDocumentAsync("/Process/List");
-
-
         // Assert
         ProcessFile? savedFile = await dbContext.ProcessFiles.SingleOrDefaultAsync(f => f.ProcessFileName == "document.pdf");
         Assert.NotNull(savedFile);
@@ -514,9 +525,6 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
         // Act
         HttpResponseMessage response = await _client.PostAsync(action, multipart);
         response.EnsureSuccessStatusCode();
-
-        IDocument listDoc = await _client.GetDocumentAsync("/Process/List");
-
 
         // Assert
         ProcessFile? savedFile = await dbContext.ProcessFiles
@@ -817,7 +825,7 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
 
         //Act
         await _client.PostAsync(action, multipart);
-        IDocument afterDelete = await _client.GetDocumentAsync($"/Process/Edit/{process.ProcessId}");
+
         //Assert
         Assert.Equal(initialProcessFileCount, dbContext.ProcessFiles.Count());
     }
@@ -826,7 +834,7 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
     {
         return new Process
         {
-            Nuipm = "1234",
+            Nuipm = "0001/" + DateTime.Now.Year.ToString() + "/",
             ProcessType = new ProcessType { Deadline = 15, ProcessTypeName = "Tipo 1" },
             ProcessState = new ProcessState { StateName = "State 1" }
         };
@@ -850,6 +858,7 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
         dbContext.RemoveRange(dbContext.ProcessTypes);
         dbContext.RemoveRange(dbContext.States);
         dbContext.RemoveRange(dbContext.ProcessFiles);
+        dbContext.RemoveRange(dbContext.Units);
         await dbContext.SaveChangesAsync();
     }
 

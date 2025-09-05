@@ -1,6 +1,7 @@
 
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 using Processos_Juridicos.Data;
 using Processos_Juridicos.DTOs;
@@ -15,8 +16,46 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
 {
     private readonly AppDbContext _context = context;
 
+    private async Task<string> GenerateNuipm(ProcessDto process)
+    {
+        string countString;
+        var year = DateTime.Now.Year;
+
+        if (process.UnitId == null)
+        {
+            return "";
+        }
+
+        if (process.ProcessId == null)
+        {
+            var count = await GetNumOfProcessesCurrentYear();
+            count++;
+            countString = count.ToString("D4");
+        }
+        else if (process.Nuipm.IsNullOrEmpty())
+        {
+            var count = await GetNumOfProcessesCurrentYear();
+            countString = count.ToString("D4");
+        }
+        else
+        {
+            var splitNuipm = process.Nuipm.Split("/");
+            countString = splitNuipm[0];
+            year = int.Parse(splitNuipm[1]);
+        }
+
+        Unit? associatedUnit = await _context.Units.FindAsync(process.UnitId);
+
+        return $"{countString}/{year}/{associatedUnit!.UnitCode}";
+    }
+
     public async Task<ProcessDto> CreateProcess(ProcessDto process)
     {
+
+        var nuipm = await GenerateNuipm(process);
+
+        process.Nuipm = nuipm;
+
         Process processEntity = Mapper.MapToProcesses(process);
 
         _context.Processes.Add(processEntity);
@@ -43,7 +82,6 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
 
     public async Task<ProcessDto> EditProcess(ProcessDto process)
     {
-
         Process? existingEntity = await _context.Processes.FindAsync(process.ProcessId);
         if (existingEntity != null)
         {
@@ -54,6 +92,10 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
         {
             process.CreatedBy = existingEntity.CreatedBy;
         }
+
+        var nuipm = await GenerateNuipm(process);
+
+        process.Nuipm = nuipm;
 
         Process processEntity = Mapper.MapToProcesses(process);
         _context.Processes.Attach(processEntity);
@@ -109,9 +151,22 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
 
 
         var currentStateId = process!.ProcessStateId;
-        return currentStateId == newStateId || process != null && await _context.StateTransitions.AnyAsync(t =>
+        return currentStateId == newStateId || (process != null && await _context.StateTransitions.AnyAsync(t =>
             t.FromStateId == process.ProcessStateId &&
-            t.ToStateId == newStateId);
+            t.ToStateId == newStateId));
+    }
+
+    private async Task<int> GetNumOfProcessesCurrentYear()
+    {
+        var year = DateTime.Now.Year;
+        var startOfYear = new DateOnly(year, 1, 1);
+        DateOnly startOfNextYear = startOfYear.AddYears(1);
+
+        var count = await _context.Processes
+            .Where(e => e.CreatedAt >= startOfYear && e.CreatedAt < startOfNextYear)
+            .CountAsync();
+
+        return count;
     }
 }
 
