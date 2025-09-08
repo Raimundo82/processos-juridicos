@@ -29,6 +29,7 @@ public class UserController(IUserSvc userSvc, IRoleSvc roleSvc, IToastNotify toa
     {
         if (ModelState.IsValid)
         {
+            model.IsUserManuallySet = true;
             await _userSvc.CreateUser(model);
             _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("CreateSuccessMessage"), "A", EntityName, "a"));
             return RedirectToAction(nameof(List));
@@ -46,6 +47,7 @@ public class UserController(IUserSvc userSvc, IRoleSvc roleSvc, IToastNotify toa
 
 
             UserDto model = await _userSvc.GetUserByNii(id);
+
             model.OriginalUserNii = model.UserNii;
             return View(model);
         }
@@ -58,6 +60,7 @@ public class UserController(IUserSvc userSvc, IRoleSvc roleSvc, IToastNotify toa
     {
         if (ModelState.IsValid)
         {
+            model.IsUserManuallySet = true;
             await _userSvc.UpdateUser(model);
             _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("EditSuccessMessage"), "A", EntityName, "a"));
             return RedirectToAction(nameof(List));

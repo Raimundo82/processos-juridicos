@@ -31,6 +31,7 @@ public class UserDto
     [ForeignKey("RoleId")]
     public RoleDto? UserRole { get; set; }
 
+    public required bool IsUserManuallySet { get; set; }
 
     public virtual ICollection<Unit> UnitsResponsibleFor { get; set; } = [];
 

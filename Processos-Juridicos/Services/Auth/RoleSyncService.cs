@@ -82,10 +82,15 @@ public class RoleSyncService
             .Select(u => u.RoleId!.Value)
             .ToListAsync(ct);
 
+        var isOverride = await _db.Users
+            .Where(u => u.UserNii == userNii)
+            .Select(u => u.IsUserManuallySet)
+            .FirstOrDefaultAsync(ct);
+
         // Skip if has non-managed roles
-        if (currentRoles.Any(_nonManagedRoles.Contains))
+        if (currentRoles.Any(_nonManagedRoles.Contains) || isOverride)
         {
-            _logger.LogDebug("User {UserNii} has Super/Authorized; skipping sync.", userNii);
+            _logger.LogInformation("User {UserNii} has Super/Authorized or is a manual override; skipping sync.", userNii);
             return;
         }
 

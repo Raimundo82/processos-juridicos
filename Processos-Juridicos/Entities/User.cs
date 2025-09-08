@@ -18,6 +18,9 @@ public class User
     [Column("user_name")]
     public string? UserName { get; set; }
 
+    [Column("is_manually_set")]
+    public bool IsUserManuallySet { get; set; } = false;
+
     // Navigation property for many-to-many
     public virtual ICollection<Unit> UnitsResponsibleFor { get; set; } = [];
 
