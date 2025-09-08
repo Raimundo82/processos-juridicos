@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 using Processos_Juridicos.Data;
 using Processos_Juridicos.Entities;
+using Processos_Juridicos.Tests.TestHelpers;
 
 namespace Processos_Juridicos.Tests.UnitTest;
 
@@ -20,6 +21,7 @@ public class UnitIntegrationTests(CustomWebApplicationFactory<Program> factory) 
     public async Task List_ReturnsExpectedItems(UnitTest[] scenarioUnits)
     {
         // Arrange
+        TestAuthContext.Roles = ["DJ-AUTHORIZED"];
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
@@ -60,6 +62,7 @@ public class UnitIntegrationTests(CustomWebApplicationFactory<Program> factory) 
     public async Task Create_Post_CreatesExpectedItems(UnitTest[] scenarioUnits)
     {
         // Arrange
+        TestAuthContext.Roles = ["DJ-AUTHORIZED"];
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
@@ -112,6 +115,7 @@ public class UnitIntegrationTests(CustomWebApplicationFactory<Program> factory) 
     public async Task Edit_Get_WhenModelExists_ShowsFormAndFields()
     {
         // Arrange
+        TestAuthContext.Roles = ["DJ-AUTHORIZED"];
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
@@ -146,6 +150,7 @@ public class UnitIntegrationTests(CustomWebApplicationFactory<Program> factory) 
     public async Task Edit_Post_WhenModelIsValid_UpdatesAndRedirects()
     {
         // Arrange
+        TestAuthContext.Roles = ["DJ-AUTHORIZED"];
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
@@ -189,6 +194,7 @@ public class UnitIntegrationTests(CustomWebApplicationFactory<Program> factory) 
     public async Task Edit_Post_WhenModelIsInvalid_DoesNotApplyChanges()
     {
         // Arrange
+        TestAuthContext.Roles = ["DJ-AUTHORIZED"];
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
@@ -227,6 +233,7 @@ public class UnitIntegrationTests(CustomWebApplicationFactory<Program> factory) 
     public async Task Delete_Successful_RemovesItemAndRedirects()
     {
         // Arrange
+        TestAuthContext.Roles = ["DJ-AUTHORIZED"];
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
@@ -261,6 +268,7 @@ public class UnitIntegrationTests(CustomWebApplicationFactory<Program> factory) 
     public async Task Delete_NonExistent_ItemRemainsAndRedirects()
     {
         // Arrange
+        TestAuthContext.Roles = ["DJ-AUTHORIZED"];
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 

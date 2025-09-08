@@ -4,6 +4,8 @@ using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+
+using Processos_Juridicos.Tests.TestHelpers;
 namespace Processos_Juridicos.Tests;
 
 public class TestAuthHandler(IOptionsMonitor<AuthenticationSchemeOptions> options, ILoggerFactory logger, UrlEncoder encoder)
@@ -12,7 +14,15 @@ public class TestAuthHandler(IOptionsMonitor<AuthenticationSchemeOptions> option
     public const string SchemeName = "Test";
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        Claim[] claims = [new Claim("DisplayName", "User Test")];
+        var claims = new List<Claim>
+        {
+            new ("DisplayName", "User Test")
+        };
+
+        foreach (var role in TestAuthContext.Roles)
+        {
+            claims.Add(new Claim(ClaimTypes.Role, role));
+        }
 
         var identity = new ClaimsIdentity(claims, Scheme.Name);
         var principal = new ClaimsPrincipal(identity);

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -6,6 +7,8 @@ using Processos_Juridicos.Services.Interfaces;
 using Processos_Juridicos.Utilities.TextManager;
 
 namespace Processos_Juridicos.Controllers;
+
+[Authorize(Policy = "SUPER-ADMIN")]
 public class UserController(IUserSvc userSvc, IRoleSvc roleSvc, IToastNotify toastNotify) : Controller
 {
     private readonly string EntityName = "Permissão de utilizador";

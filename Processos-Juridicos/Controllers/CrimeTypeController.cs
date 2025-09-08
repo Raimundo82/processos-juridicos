@@ -1,4 +1,5 @@
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using Processos_Juridicos.DTOs;
@@ -8,6 +9,7 @@ using Processos_Juridicos.Utilities.TextManager;
 
 namespace Processos_Juridicos.Controllers;
 
+[Authorize(Policy = "DJ-ADMINISTRATION")]
 public class CrimeTypeController(ICrimeTypeSvc crimeTypeSvc, IToastNotify toastNotify) : Controller
 {
     private const string EntityName = "Tipo de Crime";

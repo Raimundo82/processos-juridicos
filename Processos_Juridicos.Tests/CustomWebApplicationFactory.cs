@@ -2,6 +2,7 @@ using System.Data.Common;
 
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Negotiate;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -52,6 +53,19 @@ public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProg
                 }
                 options.DefaultScheme = NegotiateDefaults.AuthenticationScheme;
             });
+
+            services.AddAuthorizationBuilder()
+                .SetDefaultPolicy(new AuthorizationPolicyBuilder(TestAuthHandler.SchemeName).RequireAuthenticatedUser().Build())
+                    .AddPolicy("OFICIAIS-INSTRUTORES", policy =>
+                        policy.RequireRole("OFICIAIS-INSTRUTORES"))
+                    .AddPolicy("COMANDO-UNIDADE", policy =>
+                        policy.RequireRole("COMANDO-UNIDADE"))
+                    .AddPolicy("DJ-PROCESSES", policy =>
+                        policy.RequireRole("DJ-AUTHORIZED", "DJ-UNAUTHORIZED", "SUPERADMIN"))
+                    .AddPolicy("DJ-ADMINISTRATION", policy =>
+                        policy.RequireRole("DJ-AUTHORIZED", "SUPERADMIN"))
+                    .AddPolicy("SUPER-ADMIN", policy =>
+                        policy.RequireRole("SUPERADMIN"));
 
             ServiceProvider sp = services.BuildServiceProvider();
             using IServiceScope scope = sp.CreateScope();

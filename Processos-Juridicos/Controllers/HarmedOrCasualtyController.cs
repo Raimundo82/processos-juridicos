@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using Processos_Juridicos.DTOs;
@@ -8,6 +9,7 @@ using Processos_Juridicos.Utilities.TextManager;
 
 namespace Processos_Juridicos.Controllers;
 
+[Authorize(Policy = "DJ-ADMINISTRATION")]
 public class HarmedOrCasualtyController(IHarmedOrCasualtySvc casualtiesSvc, IToastNotify toastNotification) : Controller
 {
     private const string EntityName = "Categoria de ferido";

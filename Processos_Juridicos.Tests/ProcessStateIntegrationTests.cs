@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 using Processos_Juridicos.Data;
 using Processos_Juridicos.Entities;
+using Processos_Juridicos.Tests.TestHelpers;
 
 namespace Processos_Juridicos.Tests;
 public class ProcessStateIntegrationTests(CustomWebApplicationFactory<Program> factory) :
@@ -25,6 +26,7 @@ public class ProcessStateIntegrationTests(CustomWebApplicationFactory<Program> f
     public async Task List_ReturnsExpectedItems(params string[] namesInput)
     {
         // Arrange
+        TestAuthContext.Roles = ["DJ-AUTHORIZED"];
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
