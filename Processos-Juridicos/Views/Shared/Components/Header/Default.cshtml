@@ -1,8 +1,8 @@
 @model UserDataModel
 @{
-	var nii = Model.Nii ?? Model.UserName ?? "Utilizador";
+	var nii = Model.UserName ?? "Utilizador";
 	var photo = Model.PhotoBase64 ?? Url.Content("/images/default-avatar.webp");
-    var isCargoLogin = Context.Session.GetString("CargoUser") != null;
+    var isSessionLogin = Context.Session.GetString("SessionUser") != null;
 }
 
 <div class="dropdown">
@@ -12,18 +12,18 @@
              class="rounded-circle" width="40" height="40" />
     </a>
     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
-        @if (isCargoLogin)
+        @if (isSessionLogin)
         {
             <li>
-                <a class="dropdown-item bg-danger text-white" asp-controller="Auth" asp-action="Logout">
-                    @($"Terminar sessão da conta M{nii}")
+                <a class="dropdown-item bg-danger text-white" asp-controller="Account" asp-action="Logout">
+                    @($"Terminar sessão de {nii}")
                 </a>
             </li>
         }
         else
         {
             <li>
-                <a class="dropdown-item" asp-controller="Auth" asp-action="Login">
+                <a class="dropdown-item" asp-controller="Account" asp-action="Login">
                     Iniciar sessão com outra conta
                 </a>
             </li>

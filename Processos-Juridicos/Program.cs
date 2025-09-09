@@ -161,7 +161,7 @@ if (OperatingSystem.IsWindows())
     app.UseMiddleware<NegotiateRoleMiddleware>();
 }
 
-app.UseMiddleware<CargoSessionMiddleware>();
+app.UseMiddleware<SessionRoleMiddleware>();
 app.UseAuthorization();
 app.UseNToastNotify();
 app.MapControllerRoute(

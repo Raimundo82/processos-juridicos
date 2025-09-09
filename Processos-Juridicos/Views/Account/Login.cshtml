@@ -1,0 +1,41 @@
+@using Processos_Juridicos.ViewModels
+@model LoginViewModel
+
+@{
+    ViewData["LoginView"] = true;
+    ViewData["Title"] = "Login";
+}
+
+<div class="d-flex justify-content-center align-items-center">
+    <div class="card shadow-sm" style="max-width: 400px; width: 100%;">
+        <div class="card-body">
+            <h4 class="card-title mb-4">Autenticação</h4>
+
+            <form asp-action="Login" method="post">
+                @Html.AntiForgeryToken()
+
+                <div class="mb-3">
+                    <label asp-for="Username" class="form-label w-100">@Html.DisplayNameFor(m => m.Username)
+                        <input asp-for="Username" class="form-control" placeholder="Digite o seu NII" />
+                    </label>
+                    <span asp-validation-for="Username" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Password" class="form-label w-100">@Html.DisplayNameFor(m => m.Password)
+                        <input asp-for="Password" class="form-control" placeholder="Digite a sua palavra-passe" />
+                    </label>
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">Entrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
