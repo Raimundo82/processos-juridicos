@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Processos_Juridicos.DTOs;
 using Processos_Juridicos.Services.Interfaces;
 using Processos_Juridicos.Services.Interfaces.Auth;
+using Processos_Juridicos.Services.Interfaces.DomainData;
 using Processos_Juridicos.Services.Interfaces.ProcessManagement;
 using Processos_Juridicos.Utilities.TextManager;
 
@@ -13,6 +14,7 @@ public class ProcessController(
     IProcessViewDataSvc viewDataSvc,
     IFileValidatorSvc fileValidatorSvc,
     ILdapUserSvc ldapUserSvc,
+    ILegalReferenceSvc legalSvc,
     IToastNotify toastNotify) : Controller
 {
     private const string EntityName = "Processo";
@@ -21,6 +23,7 @@ public class ProcessController(
     private readonly IProcessViewDataSvc _viewDataSvc = viewDataSvc;
     private readonly IFileValidatorSvc _fileValidatorSvc = fileValidatorSvc;
     private readonly ILdapUserSvc _ldapUserSvc = ldapUserSvc;
+    private readonly ILegalReferenceSvc _legalSvc = legalSvc;
 
     private readonly IToastNotify _toastNotify = toastNotify;
 
@@ -52,13 +55,13 @@ public class ProcessController(
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(ProcessDto model)
+    public async Task<IActionResult> Create(ProcessDto model, int?[] selectedInfringements)
     {
         if (ModelState.IsValid)
         {
             model.CreatedBy = _ldapUserSvc.GetLoggedUserData().DisplayName;
 
-            ProcessDto insertTarget = await _processManagement.Processes.CreateProcess(model);
+            ProcessDto insertTarget = await _processManagement.Processes.CreateProcess(model, selectedInfringements);
 
             if (model.ProcessFiles != null && model.ProcessFiles.Length > 0)
             {
@@ -86,8 +89,9 @@ public class ProcessController(
         {
             ProcessDto model = await _processManagement.Processes.GetProcessById(id);
             List<ProcessFileDto> uploadedFiles = await _processManagement.ProcessFiles.GetAllProcessFilesByProcessId(id);
+            List<InfringementDto> infringements = await _legalSvc.Infringements.GetAllInfringementsByProcessId(id);
             model.UploadedFiles = uploadedFiles;
-
+            model.Infringements = infringements;
 
             await _viewDataSvc.PopulateForEditAsync(ViewData, model.ProcessId);
             return View(model);
@@ -98,7 +102,7 @@ public class ProcessController(
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(ProcessDto model)
+    public async Task<IActionResult> Edit(ProcessDto model, int?[] selectedInfringements)
     {
         if (!ModelState.IsValid)
         {
@@ -113,7 +117,7 @@ public class ProcessController(
             return View(model);
         }
 
-        await _processManagement.Processes.EditProcess(model);
+        await _processManagement.Processes.EditProcess(model, selectedInfringements);
 
         List<ProcessFileDto> uploadedFiles = await _processManagement.ProcessFiles.GetAllProcessFilesByProcessId(model.ProcessId);
 

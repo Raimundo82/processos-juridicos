@@ -91,9 +91,6 @@ public partial class ProcessDto
     [DisplayName("Valor Ressarcido à Marinha")]
     public double? Reimbursement { get; set; }
 
-    [DisplayName("Infração")]
-    public int? InfringementId { get; set; }
-
     [EntityFieldIsRequired("Compensação paga?")]
     [DisplayName("Compensação Paga")]
     public required bool CompensationPaid { get; set; } = false;
@@ -117,8 +114,7 @@ public partial class ProcessDto
     [ForeignKey("HarmedOrCasualtiesId")]
     public virtual HarmedOrCasualtyDto HarmedOrCasualties { get; set; }
 
-    [ForeignKey("InfringementId")]
-    public virtual InfringementDto Infringement { get; set; }
+    public virtual ICollection<InfringementDto> Infringements { get; set; } = [];
 
     [ForeignKey("ProcessTypeId")]
     public virtual ProcessTypeDto ProcessType { get; set; }

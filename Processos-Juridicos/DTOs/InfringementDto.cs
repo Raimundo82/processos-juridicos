@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 
 using Processos_Juridicos.Attributes;
+using Processos_Juridicos.Entities;
 
 namespace Processos_Juridicos.DTOs;
 
@@ -21,4 +22,6 @@ public partial class InfringementDto
     [DisplayName(_entityName)]
     [UniqueInfringementName]
     public string InfringementName { get; set; }
+
+    public ICollection<Process> Processes { get; set; } = [];
 }

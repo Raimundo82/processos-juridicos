@@ -11,4 +11,6 @@ public partial class Infringement
     public int? InfringementId { get; set; }
     [Column("infringement_name")]
     public string InfringementName { get; set; }
+
+    public ICollection<Process> Processes { get; set; } = [];
 }

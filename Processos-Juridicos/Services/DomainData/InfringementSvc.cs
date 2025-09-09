@@ -51,6 +51,16 @@ public class InfringementSvc(AppDbContext context) : IInfringementSvc
         return Mapper.MapToToInfringementsEnum(infringements);
     }
 
+    public async Task<List<InfringementDto>> GetAllInfringementsByProcessId(int? id)
+    {
+        return await _context.Processes
+            .Where(p => p.ProcessId == id)
+            .SelectMany(p => p.Infringements)
+            .Select(i => Mapper.MapToInfringementsDto(i))
+            .ToListAsync();
+    }
+
+
     public async Task<InfringementDto> GetInfringementById(int? id)
     {
         Infringement? infringement = await _context.Infringements.FindAsync(id);

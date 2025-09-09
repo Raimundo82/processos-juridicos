@@ -1,3 +1,4 @@
+
 using Processos_Juridicos.DTOs;
 
 namespace Processos_Juridicos.Services.Interfaces.DomainData;
@@ -9,4 +10,5 @@ public interface IInfringementSvc
     public Task<InfringementDto> CreateInfringement(InfringementDto infringement);
     public Task<InfringementDto> EditInfringement(InfringementDto infringement);
     public Task<bool> DeleteInfringement(int? id);
+    public Task<List<InfringementDto>> GetAllInfringementsByProcessId(int? id);
 }

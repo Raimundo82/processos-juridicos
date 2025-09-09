@@ -79,9 +79,6 @@ public partial class Process
     [Column("reimbursement")]
     public double? Reimbursement { get; set; }
 
-    [Column("infringement_id")]
-    public int? InfringementId { get; set; }
-
     [Column("crime_type_id")]
     public int? CrimeTypeId { get; set; }
 
@@ -106,8 +103,7 @@ public partial class Process
     [ForeignKey("HarmedOrCasualtiesId")]
     public virtual HarmedOrCasualty HarmedOrCasualties { get; set; }
 
-    [ForeignKey("InfringementId")]
-    public virtual Infringement Infringement { get; set; }
+    public virtual ICollection<Infringement> Infringements { get; set; } = [];
 
     [ForeignKey("ProcessTypeId")]
     public virtual ProcessType ProcessType { get; set; }

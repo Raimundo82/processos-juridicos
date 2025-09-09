@@ -49,14 +49,29 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
         return $"{countString}/{year}/{associatedUnit!.UnitCode}";
     }
 
-    public async Task<ProcessDto> CreateProcess(ProcessDto process)
+    public async Task<ProcessDto> CreateProcess(ProcessDto process, int?[] selectedInfringements)
     {
 
         var nuipm = await GenerateNuipm(process);
 
         process.Nuipm = nuipm;
 
+
+
         Process processEntity = Mapper.MapToProcesses(process);
+
+        if (selectedInfringements != null && selectedInfringements.Length > 0)
+        {
+            List<Infringement> infringements = await _context.Infringements
+                .Where(i => selectedInfringements.Contains(i.InfringementId))
+                .ToListAsync();
+
+            foreach (Infringement? infr in infringements)
+            {
+                processEntity.Infringements.Add(infr);
+            }
+
+        }
 
         _context.Processes.Add(processEntity);
         await _context.SaveChangesAsync();
@@ -80,9 +95,12 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
         return true;
     }
 
-    public async Task<ProcessDto> EditProcess(ProcessDto process)
+    public async Task<ProcessDto> EditProcess(ProcessDto process, int?[] selectedInfringements)
     {
-        Process? existingEntity = await _context.Processes.FindAsync(process.ProcessId);
+        Process? existingEntity = await _context.Processes.Include(p => p.Infringements).FirstOrDefaultAsync(p => p.ProcessId == process.ProcessId);
+        existingEntity!.Infringements.Clear();
+        await _context.SaveChangesAsync();
+
         if (existingEntity != null)
         {
             _context.Entry(existingEntity).State = EntityState.Detached;
@@ -98,8 +116,25 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
         process.Nuipm = nuipm;
 
         Process processEntity = Mapper.MapToProcesses(process);
+
+        processEntity!.Infringements.Clear();
+
         _context.Processes.Attach(processEntity);
         _context.Entry(processEntity).State = EntityState.Modified;
+
+        if (selectedInfringements != null && selectedInfringements.Length > 0)
+        {
+            List<Infringement> infringements = await _context.Infringements
+                .Where(i => selectedInfringements.Contains(i.InfringementId))
+                .ToListAsync();
+
+            foreach (Infringement? infr in infringements)
+            {
+                processEntity.Infringements.Add(infr);
+            }
+
+        }
+
 
         await _context.SaveChangesAsync();
         return Mapper.MapToProcessesDto(processEntity);
@@ -110,7 +145,7 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
         List<Process> processes = await _context.Processes.Include(x => x.Unit)
             .Include(x => x.CompensatingUnit)
             .Include(x => x.HarmedOrCasualties)
-            .Include(x => x.Infringement)
+            .Include(x => x.Infringements)
             .Include(x => x.ProcessType)
             .Include(x => x.Sentence)
             .Include(x => x.ProcessState)
@@ -126,7 +161,7 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
             .Include(x => x.Unit)
             .Include(x => x.CompensatingUnit)
             .Include(x => x.HarmedOrCasualties)
-            .Include(x => x.Infringement)
+            .Include(x => x.Infringements)
             .Include(x => x.ProcessType)
             .Include(x => x.Sentence)
             .Include(x => x.ProcessState)
