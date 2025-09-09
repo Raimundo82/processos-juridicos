@@ -1,10 +1,13 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using Processos_Juridicos.DTOs;
+using Processos_Juridicos.Models;
 using Processos_Juridicos.Services.Interfaces;
 using Processos_Juridicos.Services.Interfaces.Auth;
 using Processos_Juridicos.Services.Interfaces.DomainData;
 using Processos_Juridicos.Services.Interfaces.ProcessManagement;
+using Processos_Juridicos.Utilities;
 using Processos_Juridicos.Utilities.TextManager;
 
 namespace Processos_Juridicos.Controllers;
@@ -27,13 +30,35 @@ public class ProcessController(
 
     private readonly IToastNotify _toastNotify = toastNotify;
 
+    [Authorize(Policy = "PROCESS-VIEW")]
     [HttpGet]
     public async Task<IActionResult> List()
     {
-        IEnumerable<ProcessDto> processes = await _processManagement.Processes.GetAllProcesses();
-        return View(processes);
+        if (!User.IsInstrutor() && !User.IsComando() && !User.IsDj())
+        {
+            return View(new ProcessListViewModel
+            {
+                Title = "Sem Permissões",
+                Processes = [],
+                CanInsertProcess = false,
+                HasRole = false
+            });
+        }
+
+        IEnumerable<ProcessDto> processes = await _processManagement.Processes.GetAllProcesses(User);
+
+        var vm = new ProcessListViewModel
+        {
+            Title = GetProcessPageTitle(),
+            Processes = processes,
+            CanInsertProcess = User.IsInstrutor() || User.IsDj(),
+            HasRole = true
+        };
+
+        return View(vm);
     }
 
+    [Authorize(Policy = "PROCESS-VIEW")]
     [HttpGet]
     public async Task<IActionResult> Details(int? id)
     {
@@ -47,6 +72,7 @@ public class ProcessController(
         return process == null ? RedirectToAction(nameof(List)) : View(process);
     }
 
+    [Authorize(Policy = "PROCESS-MANAGEMENT")]
     [HttpGet]
     public async Task<IActionResult> Create()
     {
@@ -54,6 +80,7 @@ public class ProcessController(
         return View();
     }
 
+    [Authorize(Policy = "PROCESS-MANAGEMENT")]
     [HttpPost]
     public async Task<IActionResult> Create(ProcessDto model, int?[] selectedInfringements)
     {
@@ -82,6 +109,7 @@ public class ProcessController(
         return View(model);
     }
 
+    [Authorize(Policy = "PROCESS-MANAGEMENT")]
     [HttpGet]
     public async Task<IActionResult> Edit(int? id)
     {
@@ -100,6 +128,7 @@ public class ProcessController(
         return RedirectToAction(nameof(List));
     }
 
+    [Authorize(Policy = "PROCESS-MANAGEMENT")]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(ProcessDto model, int?[] selectedInfringements)
@@ -153,6 +182,7 @@ public class ProcessController(
         return RedirectToAction("Edit", new { id = model.ProcessId });
     }
 
+    [Authorize(Policy = "DJ-ADMINISTRATION")]
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(int? id)
@@ -171,5 +201,15 @@ public class ProcessController(
         }
 
         return RedirectToAction(nameof(List));
+    }
+
+    private string GetProcessPageTitle()
+    {
+        return User switch
+        {
+            var u when u.IsInstrutor() => "Os meus Processos",
+            var u when u.IsComando() => "Processos da Unidade",
+            _ => "Todos os Processos"
+        };
     }
 }

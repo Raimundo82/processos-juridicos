@@ -1,5 +1,7 @@
 
 
+using System.Security.Claims;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -9,6 +11,7 @@ using Processos_Juridicos.Entities;
 using Processos_Juridicos.Exceptions;
 using Processos_Juridicos.Mappers;
 using Processos_Juridicos.Services.Interfaces.ProcessManagement;
+using Processos_Juridicos.Utilities;
 
 namespace Processos_Juridicos.Services.ProcessManagement;
 
@@ -140,9 +143,10 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
         return Mapper.MapToProcessesDto(processEntity);
     }
 
-    public async Task<IEnumerable<ProcessDto>> GetAllProcesses()
+    public async Task<IEnumerable<ProcessDto>> GetAllProcesses(ClaimsPrincipal User)
     {
-        List<Process> processes = await _context.Processes.Include(x => x.Unit)
+        IQueryable<Process> query = _context.Processes
+            .Include(x => x.Unit)
             .Include(x => x.CompensatingUnit)
             .Include(x => x.HarmedOrCasualties)
             .Include(x => x.Infringements)
@@ -151,7 +155,26 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
             .Include(x => x.ProcessState)
             .Include(x => x.AccidentType)
             .Include(x => x.MilitarySecurity)
-            .Include(x => x.CrimeType).ToListAsync();
+            .Include(x => x.CrimeType);
+
+        var nii = User.Identity?.Name;
+
+        if (User.IsInstrutor())
+        {
+            query = query.Where(p => p.OficialInstName != null &&
+                p.OficialInstName.EndsWith(" - " + nii));
+        }
+        else if (User.IsComando())
+        {
+            var unitId = _context.UnitCommanders
+                .Where(u => u.UserNii == nii)
+                .Select(u => u.UnitId)
+                .FirstOrDefault();
+
+            query = query.Where(p => p.UnitId == unitId);
+        }
+
+        List<Process> processes = await query.ToListAsync();
         return Mapper.MapToToProcessesEnum(processes);
     }
 

@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 using Processos_Juridicos.Data;
 using Processos_Juridicos.Entities;
+using Processos_Juridicos.Tests.TestHelpers;
 
 using Process = Processos_Juridicos.Entities.Process;
 
@@ -28,6 +29,8 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
     public async Task List_ReturnsExpectedItems(Process[] scenarioProcesses)
     {
         // Arrange
+        TestAuthContext.Roles = ["DJ-AUTHORIZED"];
+
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
@@ -63,6 +66,7 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
     public async Task Details_Get_ShowsExpectedProcessFields()
     {
         // Arrange
+        TestAuthContext.Roles = ["DJ-AUTHORIZED"];
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
@@ -96,6 +100,7 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
     public async Task Details_Get_WithInvalidIdParameter_GoesToListPage()
     {
         // Act
+        TestAuthContext.Roles = ["DJ-AUTHORIZED"];
         HttpResponseMessage response = await _client.GetAsync($"/Process/Details/abc");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -107,6 +112,7 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
     public async Task Details_Get_WhenProcessDoesNotExist_RedirectsToList()
     {
         // Act
+        TestAuthContext.Roles = ["DJ-AUTHORIZED"];
         HttpResponseMessage response = await _client.GetAsync($"/Process/Details/9999");
 
         // Assert
@@ -120,6 +126,7 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
     public async Task Create_Post_CreatesExpectedItems(Process[] scenarioProcesses)
     {
         // Arrange
+        TestAuthContext.Roles = ["DJ-AUTHORIZED"];
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
@@ -177,6 +184,7 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
     public async Task Edit_Get_WhenModelExists_ShowsFormAndFields()
     {
         // Arrange
+        TestAuthContext.Roles = ["DJ-AUTHORIZED"];
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         Process process = dbContext.Add(CreateProcess()).Entity;
@@ -209,6 +217,7 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
     public async Task Edit_Post_WhenModelIsValid_Updates()
     {
         // Arrange
+        TestAuthContext.Roles = ["DJ-AUTHORIZED"];
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
@@ -264,6 +273,7 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
     public async Task Edit_Post_WhenModelIsInvalid_DoesNotApplyChanges()
     {
         // Arrange
+        TestAuthContext.Roles = ["DJ-AUTHORIZED"];
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
@@ -296,6 +306,7 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
     public async Task Delete_Successful_RemovesItem()
     {
         // Arrange
+        TestAuthContext.Roles = ["DJ-AUTHORIZED"];
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
@@ -327,6 +338,7 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
     public async Task Delete_InvalidModel_ItemRemains()
     {
         // Arrange
+        TestAuthContext.Roles = ["DJ-AUTHORIZED"];
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         dbContext.Add(CreateProcess());
@@ -354,6 +366,7 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
     public async Task Edit_GetAndDownload_ObtainsFile()
     {
         // Arrange
+        TestAuthContext.Roles = ["DJ-AUTHORIZED"];
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         Process process = dbContext.Add(CreateProcess()).Entity;
@@ -398,6 +411,7 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
     public async Task Edit_Post_WhenModelIsValidAndFileUploaded_PersistsFile()
     {
         // Arrange
+        TestAuthContext.Roles = ["DJ-AUTHORIZED"];
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         Process process = dbContext.Add(CreateProcess()).Entity;
@@ -468,6 +482,7 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
     public async Task Edit_Post_FileUploadedHasUnallowedExtension_FileDoesNotPersist()
     {
         // Arrange
+        TestAuthContext.Roles = ["DJ-AUTHORIZED"];
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         Process process = dbContext.Add(CreateProcess()).Entity;
@@ -537,6 +552,7 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
     public async Task Edit_Post_WhenEmptyFileUploaded_DoesNotPersistFile()
     {
         // Arrange
+        TestAuthContext.Roles = ["DJ-AUTHORIZED"];
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         Process process = dbContext.Add(CreateProcess()).Entity;
@@ -605,6 +621,7 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
     public async Task Edit_Post_WhenFileTooLargeUploaded_DoesNotPersistFile()
     {
         // Arrange
+        TestAuthContext.Roles = ["DJ-AUTHORIZED"];
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         Process process = dbContext.Add(CreateProcess()).Entity;
@@ -673,6 +690,7 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
     public async Task Edit_Post_WhenFileSignatureUnallowed_DoesNotPersistFile()
     {
         // Arrange
+        TestAuthContext.Roles = ["DJ-AUTHORIZED"];
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         Process process = dbContext.Add(CreateProcess()).Entity;
@@ -740,8 +758,8 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
     [Fact]
     public async Task Edit_GetThenDelete_DeletesFile()
     {
-
         //Arrange
+        TestAuthContext.Roles = ["DJ-AUTHORIZED"];
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         Process process = dbContext.Add(CreateProcess()).Entity;

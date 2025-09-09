@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.Negotiate;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 
 using NToastNotify;
@@ -14,6 +15,7 @@ using Processos_Juridicos.Services.Interfaces.DomainData;
 using Processos_Juridicos.Services.Interfaces.ProcessManagement;
 using Processos_Juridicos.Services.ProcessManagement;
 using Processos_Juridicos.Services.UiHelpers;
+using Processos_Juridicos.Utilities;
 using Processos_Juridicos.Utilities.TextManager;
 using Processos_Juridicos.Utilities.TextManager.Interfaces;
 
@@ -23,25 +25,9 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddAuthentication(NegotiateDefaults.AuthenticationScheme).AddNegotiate();
 
 // Set Authorization
-builder.Services.AddAuthorization(options =>
-{
-    options.FallbackPolicy = options.DefaultPolicy;
-
-    options.AddPolicy("OFICIAIS-INSTRUTORES", policy =>
-        policy.RequireRole("OFICIAIS-INSTRUTORES"));
-
-    options.AddPolicy("COMANDO-UNIDADE", policy =>
-        policy.RequireRole("COMANDO-UNIDADE"));
-
-    options.AddPolicy("DJ-PROCESSES", policy =>
-        policy.RequireRole("DJ-AUTHORIZED", "DJ-UNAUTHORIZED", "SUPERADMIN"));
-
-    options.AddPolicy("DJ-ADMINISTRATION", policy =>
-        policy.RequireRole("DJ-AUTHORIZED", "SUPERADMIN"));
-
-    options.AddPolicy("SUPER-ADMIN", policy =>
-        policy.RequireRole("SUPERADMIN"));
-});
+AuthorizationBuilder authBuilder = builder.Services.AddAuthorizationBuilder();
+authBuilder.AddCustomPolicies();
+builder.Services.ConfigureFallbackPolicy();
 
 // Enable session 
 builder.Services.AddDistributedMemoryCache();

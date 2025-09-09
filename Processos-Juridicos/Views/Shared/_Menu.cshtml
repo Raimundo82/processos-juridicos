@@ -1,3 +1,5 @@
+@using Processos_Juridicos.Utilities
+
 <nav class="navbar navbar-expand-sm menu-bar">
     <div class="container-fluid mx-md-5">
         <div class="offcanvas offcanvas-end" tabindex="-1" id="navbarOffcanvasLg" aria-labelledby="navbarOffcanvasLgLabel">
@@ -14,7 +16,7 @@
                         <a class="nav-link" asp-controller="Process" asp-action="List">Gestão de Processos</a>
                     </li>
                     
-                    @if (User.IsInRole("SUPERADMIN") || User.IsInRole("DJ-AUTHORIZED"))
+                    @if (User.IsDj())
                     {
                         <li class="nav-item dropdown">
                             <button class="nav-link dropdown-toggle"
@@ -37,7 +39,7 @@
                                 <li><a class="dropdown-item" asp-controller="MilitarySecurity" asp-action="List">Segurança militar</a></li>
                                 <li><a class="dropdown-item" asp-controller="CrimeType" asp-action="List">Tipos de Crime</a></li>
                                 
-                                @if (User.IsInRole("SUPERADMIN"))
+                                @if (User.IsSuperAdmin())
                                 {
                                     <li><a class="dropdown-item" asp-controller="User" asp-action="List">Permissões dos Utilizadores</a></li>
                                 }

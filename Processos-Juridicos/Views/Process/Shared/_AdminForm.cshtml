@@ -4,6 +4,8 @@
     var allInfringements = ViewData["infringements"] as List<SelectListItem>;
 }
 
+<h3 class="mt-5 text-center">A preencher pela Direção Jurídica após o "Fecho" do Processo</h3>
+
 <div class="form-group mt-3">
     <label for="accident-id" class="control-label">Acidente em serviço</label>
     <select id="accident-id" asp-for="ServiceAccidentId" asp-items="ViewBag.accidentTypes" class="form-control">

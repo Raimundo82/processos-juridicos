@@ -56,12 +56,10 @@ public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProg
 
             services.AddAuthorizationBuilder()
                 .SetDefaultPolicy(new AuthorizationPolicyBuilder(TestAuthHandler.SchemeName).RequireAuthenticatedUser().Build())
-                    .AddPolicy("OFICIAIS-INSTRUTORES", policy =>
-                        policy.RequireRole("OFICIAIS-INSTRUTORES"))
-                    .AddPolicy("COMANDO-UNIDADE", policy =>
-                        policy.RequireRole("COMANDO-UNIDADE"))
-                    .AddPolicy("DJ-PROCESSES", policy =>
-                        policy.RequireRole("DJ-AUTHORIZED", "DJ-UNAUTHORIZED", "SUPERADMIN"))
+                    .AddPolicy("PROCESS-VIEW", policy =>
+                        policy.RequireRole("OFICIAIS-INSTRUTORES", "COMANDO-UNIDADE", "DJ-AUTHORIZED", "DJ-UNAUTHORIZED", "SUPERADMIN"))
+                    .AddPolicy("PROCESS-MANAGEMENT", policy =>
+                        policy.RequireRole("OFICIAIS-INSTRUTORES", "DJ-AUTHORIZED", "DJ-UNAUTHORIZED", "SUPERADMIN"))
                     .AddPolicy("DJ-ADMINISTRATION", policy =>
                         policy.RequireRole("DJ-AUTHORIZED", "SUPERADMIN"))
                     .AddPolicy("SUPER-ADMIN", policy =>

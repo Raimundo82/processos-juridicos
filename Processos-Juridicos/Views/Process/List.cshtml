@@ -1,81 +1,97 @@
-@using Processos_Juridicos.DTOs
-
+@using Processos_Juridicos.Utilities
+@model ProcessListViewModel
 @{
     ViewData["Title"] = "Lista de processos";
-    int count = 1;
 }
 
-@model IEnumerable<ProcessDto>
+@if (!Model.HasRole)
+{
+    <div class="alert alert-info text-center">
+        Não tem permissões para visualizar processos.
+    </div>
+}
+else {
+    <div class="text-center">
+        <h1 class="display-4">@Model.Title</h1>
+    </div>
 
-<div class="text-center">
-    <h1 class="display-4">Processos</h1>
-</div>
+    @if (Model.CanInsertProcess)
+    {
+        <a asp-controller="Process" asp-action="Create" class="btn btn-primary">
+            Inserir Processo
+        </a>
+    }
 
-<a asp-controller="Process" asp-action="Create" class="btn btn-primary">Inserir Processo</a>
+    @if (Model.Processes != null && Model.Processes.Any())
+    {
+        <div class="table-responsive-md" style="max-width: calc(100vw-200px);margin: 0 auto; overflow-x: auto;">
+            <table id="tableStates" class="table table-striped-columns table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">@Html.DisplayNameFor(m => m.Processes.First().Nuipm)</th>
+                        <th scope="col">@Html.DisplayNameFor(m => m.Processes.First().ProcessTypeId)</th>
+                        <th scope="col">@Html.DisplayNameFor(m => m.Processes.First().UnitId)</th>
+                        <th scope="col">@Html.DisplayNameFor(m => m.Processes.First().OficialInstName)</th>
+                        <th scope="col">@Html.DisplayNameFor(m => m.Processes.First().OficialInstTelephone)</th>
+                        <th scope="col">@Html.DisplayNameFor(m => m.Processes.First().CreatedAt)</th>
+                        <th scope="col">@Html.DisplayNameFor(m => m.Processes.First().CreatedBy)</th>
+                        <th scope="col">@Html.DisplayNameFor(m => m.Processes.First().Sentence)</th>
+                        <th scope="col">@Html.DisplayNameFor(m => m.Processes.First().ProcessState)</th>
+                        <th scope="col">@Html.DisplayNameFor(m => m.Processes.First().ModifiedAt)</th>
+                        <th scope="col">@Html.DisplayNameFor(m => m.Processes.First().ModifiedBy)</th>
 
-<div class="table-responsive-md" style="max-width: calc(100vw-200px);margin: 0 auto; overflow-x: auto;">
-    <table id="tableStates" class="table table-striped-columns table-hover">
-        <thead>
-            <tr>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().Nuipm)</th>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().ProcessTypeId)</th>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().UnitId)</th>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().OficialInstName)</th>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().OficialInstTelephone)</th>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().CreatedAt)</th>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().CreatedBy)</th>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().Sentence)</th>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().ProcessState)</th>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().ModifiedAt)</th>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().ModifiedBy)</th>
+                        <th scope="col">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
 
-                <th scope="col">Ações</th>
-            </tr>
-        </thead>
-        <tbody>
+                    @foreach (var item in Model.Processes.ToList())
+                    {
+                        <tr data-id="@item.ProcessId">
+                            <td data-property="nuipm">
+                                <a asp-controller="Process" asp-action="Details" asp-route-id="@item.ProcessId">
+                                    @Html.DisplayFor(m => item.Nuipm)
+                                </a>
+                            </td>
 
-            @foreach (var item in Model.ToList())
-            {
-                <tr data-id="@item.ProcessId">
-                    <td data-property="nuipm"><a asp-controller="Process" asp-action="Details" asp-route-id="@item.ProcessId">@Html.DisplayFor(m => item.Nuipm)</a></td>
-                    <td data-property="process-type">
-                        @(item.ProcessType?.ProcessTypeName ?? "-")
-                    </td>
-                    <td data-property="unit">
-                        @(item.Unit?.UnitName ?? "-")
-                    </td>
-                    <td data-property="instructing-official">@Html.DisplayFor(m => item.OficialInstName)</td>
-                    <td data-property="instructing-official-phone">@Html.DisplayFor(m => item.OficialInstTelephone)</td>
-                    <td data-property="created-at">@Html.DisplayFor(m => item.CreatedAt)</td>
-                    <td data-property="created-by">@Html.DisplayFor(m => item.CreatedBy)</td>
-                    <td data-property="sentence">
-                        @(item.Sentence?.SentenceName ?? "-")
-                    </td>
-                    <td data-property="state">
-                        @(item.ProcessState?.StateName ?? "-")
-                    </td>
-                    <td data-property="last-modified-date">
-                        @(item.ModifiedAt?.ToString("dd-MM-yyyy") ?? "-")
-                    </td>
-                    <td data-property="last-modified-by">
-                        @(item.ModifiedBy?.ToString() ?? "-")
-                    </td>
-                    <td>
-                        <div class="d-flex gap-2">
-                            <form asp-controller="Process" asp-action="Delete" method="post" data-action="delete">
-                                <input type="hidden" name="id" value="@item.ProcessId">
-                                <button type="submit" class="btn btn-danger js-delete-btn"></button>
-                            </form>
-                            <a asp-controller="Process" asp-action="Edit" asp-route-id="@item.ProcessId"
-                               data-action="access-edit-form" class="btn btn-warning"><i class="bi bi-pencil"></i></a>
-                        </div>
-                    </td>
-                </tr>
-                count++;
-            }
-        </tbody>
-    </table>
-</div>
+                            <td data-property="process-type">@(item.ProcessType?.ProcessTypeName ?? "-")</td>
+                            <td data-property="unit">@(item.Unit?.UnitName ?? "-")</td>
+                            <td data-property="instructing-official">@Html.DisplayFor(m => item.OficialInstName)</td>
+                            <td data-property="instructing-official-phone">@Html.DisplayFor(m => item.OficialInstTelephone)</td>
+                            <td data-property="created-at">@Html.DisplayFor(m => item.CreatedAt)</td>
+                            <td data-property="created-by">@Html.DisplayFor(m => item.CreatedBy)</td>
+                            <td data-property="sentence">@(item.Sentence?.SentenceName ?? "-")</td>
+                            <td data-property="state">@(item.ProcessState?.StateName ?? "-")</td>
+                            <td data-property="last-modified-date">@(item.ModifiedAt?.ToString("dd-MM-yyyy") ?? "-")</td>
+                            <td data-property="last-modified-by">@(item.ModifiedBy?.ToString() ?? "-")</td>
+                            
+                            <td>
+                                <div class="d-flex gap-2">
+                                    @if (User.IsDjAdministration())
+                                    {
+                                        <form asp-controller="Process" asp-action="Delete" method="post" data-action="delete">
+                                            <input type="hidden" name="id" value="@item.ProcessId">
+                                            <button type="submit" class="btn btn-danger js-delete-btn"></button>
+                                        </form>
+                                    }
+
+                                    <a asp-controller="Process" asp-action="Edit" asp-route-id="@item.ProcessId"
+                                    data-action="access-edit-form" class="btn btn-warning"><i class="bi bi-pencil"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-center">
+            Não existem processos.
+        </div>
+    }
+}
 
 @section Scripts {
     <script>

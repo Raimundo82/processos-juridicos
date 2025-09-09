@@ -1,5 +1,5 @@
 @model Processos_Juridicos.DTOs.ProcessDto;
-@using Processos_Juridicos.DTOs;
+@using Processos_Juridicos.Utilities
 
 @{
     ViewData["Title"] = "Editar Processo";
@@ -14,7 +14,10 @@
 
     <partial name="Shared/_Form" />
 
-    <partial name="Shared/_AdminForm" />
+    @if (User.IsDj())
+    {
+        <partial name="Shared/_AdminForm" />
+    }
 
     <div class="form-group mt-3">
         <input type="submit" value="Guardar" class="btn btn-primary" />
