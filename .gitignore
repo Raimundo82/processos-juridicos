@@ -46,6 +46,8 @@ bld/
 */wwwroot/lib/sweetalert2
 */wwwroot/lib/fontsource/
 */wwwroot/lib/font-awesome/
+*/wwwroot/lib/select2/
+*/wwwroot/lib/datatable/
 
 # Visual Studio 2017 auto generated files
 Generated\ Files/
@@ -370,3 +372,4 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+"Processos-Juridicos/wwwroot/lib/select2" 

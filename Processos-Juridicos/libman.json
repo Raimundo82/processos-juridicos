@@ -103,6 +103,11 @@
             "provider": "cdnjs",
             "library": "font-awesome@7.0.0",
             "destination": "wwwroot/lib/font-awesome/"
-        }
+        },
+        {
+            "provider": "cdnjs",
+            "library": "select2@4.0.13",
+            "destination": "wwwroot/lib/select2/"
+        }   
     ]
 }

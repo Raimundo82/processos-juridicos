@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="~/lib/fontsource/prosto-one/latin.css" />
     <link rel="stylesheet" href="~/lib/fontsource/roboto/index.css" />
     <link rel="stylesheet" href="~/lib/font-awesome/css/all.css" />
+    <link rel="stylesheet" href="~/lib/select2/css/select2.min.css" /> 
 </head>
 <body>
     <header>
@@ -39,14 +40,25 @@
     <script src="~/lib/datatable/dataTables.min.js" asp-append-version="true"></script>
     <script src="~/lib/sweetalert2/sweetalert2.js" asp-append-version="true"></script>
     <script src="~/lib/font-awesome/js/all.js"></script>
+    <script src="~/lib/select2/js/select2.min.js"></script>
     
     <!-- JavaScript for Night Mode -->
     <script>
         document.getElementById('nightModeToggle').addEventListener('click', function() {
           document.body.classList.toggle('bg-dark');
           document.body.classList.toggle('text-light');
-          // Add additional logic here if needed, for example saving user preferences.
+
         });
+
+        $(function () {
+            $('#unit-id').select2({
+                placeholder: "Selecione uma Unidade",
+                allowClear: true,
+                width: '100%',
+                minimumResultsForSearch: 0 
+            });
+        });
+
     </script>
     @await RenderSectionAsync("Scripts", required: false)
     @await Component.InvokeAsync("NToastNotify")
