@@ -2,11 +2,11 @@ using Microsoft.EntityFrameworkCore;
 
 using Processos_Juridicos.Data;
 using Processos_Juridicos.Entities;
-using Processos_Juridicos.Services.Interfaces.Auth;
+using Processos_Juridicos.Services.Interfaces.Ldap;
 
-namespace Processos_Juridicos.Services.Auth;
+namespace Processos_Juridicos.Services.Ldap;
 
-public class RoleSyncService
+public class RoleSyncSvc
 {
     private const string oficialInstrutorRoleName = "OFICIAIS-INSTRUTORES";
     private const string comandoUnidadeRoleName = "COMANDO-UNIDADE";
@@ -16,7 +16,7 @@ public class RoleSyncService
 
     private readonly AppDbContext _db;
     private readonly ILdapUserSvc _ldap;
-    private readonly ILogger<RoleSyncService> _logger;
+    private readonly ILogger<RoleSyncSvc> _logger;
 
     private readonly int _djUnallowedRoleId;
 
@@ -24,7 +24,7 @@ public class RoleSyncService
 
     private readonly Dictionary<string, int> _groupRoleMap;
 
-    public RoleSyncService(AppDbContext db, ILdapUserSvc ldap, ILogger<RoleSyncService> logger)
+    public RoleSyncSvc(AppDbContext db, ILdapUserSvc ldap, ILogger<RoleSyncSvc> logger)
     {
         _db = db;
         _ldap = ldap;

@@ -13,7 +13,7 @@ using Moq;
 
 using Processos_Juridicos.Data;
 using Processos_Juridicos.Models;
-using Processos_Juridicos.Services.Interfaces.Auth;
+using Processos_Juridicos.Services.Interfaces.Ldap;
 
 namespace Processos_Juridicos.Tests;
 

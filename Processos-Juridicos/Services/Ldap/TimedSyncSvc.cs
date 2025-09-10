@@ -1,15 +1,15 @@
 using Microsoft.EntityFrameworkCore;
 
 using Processos_Juridicos.Data;
-using Processos_Juridicos.Services.Interfaces.Auth;
+using Processos_Juridicos.Services.Interfaces.Ldap;
 
-namespace Processos_Juridicos.Services.Auth;
+namespace Processos_Juridicos.Services.Ldap;
 
-public class TimedSyncService(IServiceProvider services, ILogger<TimedSyncService> logger) : BackgroundService
+public class TimedSyncSvc(IServiceProvider services, ILogger<TimedSyncSvc> logger) : BackgroundService
 {
     private readonly IServiceProvider _services = services;
     private readonly TimeSpan _interval = TimeSpan.FromHours(24); // adjust as needed
-    private readonly ILogger<TimedSyncService> _logger = logger;
+    private readonly ILogger<TimedSyncSvc> _logger = logger;
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -43,7 +43,7 @@ public class TimedSyncService(IServiceProvider services, ILogger<TimedSyncServic
     {
         using IServiceScope scope = _services.CreateScope();
         AppDbContext db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        RoleSyncService roleSync = scope.ServiceProvider.GetRequiredService<RoleSyncService>();
+        RoleSyncSvc roleSync = scope.ServiceProvider.GetRequiredService<RoleSyncSvc>();
         ILdapUserSvc ldap = scope.ServiceProvider.GetRequiredService<ILdapUserSvc>();
 
         // Get NIIs from DB

@@ -1,6 +1,6 @@
 using Processos_Juridicos.Models;
 
-namespace Processos_Juridicos.Services.Interfaces.Auth;
+namespace Processos_Juridicos.Services.Interfaces.Ldap;
 
 public interface ILdapUserSvc
 {

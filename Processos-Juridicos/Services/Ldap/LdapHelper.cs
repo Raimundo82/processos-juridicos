@@ -1,41 +1,49 @@
 using System.DirectoryServices;
-using System.DirectoryServices.AccountManagement;
 using System.Runtime.Versioning;
-using System.Security.Authentication;
-using System.Security.Claims;
-using System.Security.Principal;
 using System.Text.RegularExpressions;
 
 using Processos_Juridicos.Models;
-using Processos_Juridicos.Services.Interfaces.Auth;
 
-namespace Processos_Juridicos.Services.Auth;
+namespace Processos_Juridicos.Services.Ldap;
 
 [SupportedOSPlatform("windows")]
-public partial class LdapUserSvc(IHttpContextAccessor httpContextAccessor) : ILdapUserSvc
+public static partial class LdapHelper
 {
-    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
-    private const string thumbnaiPhotoFieldName = "thumbnailPhoto";
-    private const string departmentFieldName = "department";
-    private const string directoryRoot = "LDAP://RootDSE";
-    private const string directoryEntry = "LDAP://DC=marinha,DC=pt";
-    private const string distinguishedNameLdap = "distinguishedName";
+    private static readonly IConfigurationRoot _config = new ConfigurationBuilder()
+        .AddJsonFile("appsettings.json")
+        .Build();
+
+    private static readonly string DirectoryEntryPath = _config["LdapSettings:DirectoryEntryPath"]!;
+    private static readonly string DirectoryRootPath = _config["LdapSettings:DirectoryRootPath"]!;
+    private const string ThumbnailPhoto = "thumbnailPhoto";
+    private const string Department = "department";
+    private const string DistinguishedName = "distinguishedName";
 
 
     [GeneratedRegex(@"CN=([^,]+)")]
     private static partial Regex CnRegex();
 
-    public bool ValidateAccount(string username, string password)
+    public static string? GetPhoto(DirectoryEntry? entry)
     {
-        using var context = new PrincipalContext(ContextType.Domain);
-        return context.ValidateCredentials(username, password);
+        return entry?.Properties[ThumbnailPhoto]?.Value is byte[] rawPhoto && rawPhoto.Length > 0
+            ? $"data:image/jpeg;base64,{Convert.ToBase64String(rawPhoto)}"
+            : null;
     }
 
-    public List<string> GetUserGroups(string username)
+    public static string EscapeLdap(string s)
+    {
+        return s.Replace("\\", "\\5c")
+         .Replace("*", "\\2a")
+         .Replace("(", "\\28")
+         .Replace(")", "\\29")
+         .Replace("\0", "\\00");
+    }
+
+    public static List<string> GetGroups(string username)
     {
         var groups = new List<string>();
 
-        using var entry = new DirectoryEntry(directoryEntry);
+        using var entry = new DirectoryEntry(DirectoryEntryPath);
         using var searcher = new DirectorySearcher(entry)
         {
             Filter = $"(&(objectClass=user)(sAMAccountName={username}))",
@@ -58,74 +66,15 @@ public partial class LdapUserSvc(IHttpContextAccessor httpContextAccessor) : ILd
         return groups;
     }
 
-    public UserDataModel GetLoggedUserData()
+    public static IReadOnlyList<UserDataModel> SearchUsers(string term, int take = 25)
     {
-        ClaimsPrincipal? principal = _httpContextAccessor.HttpContext?.User;
-
-        if (principal?.Identity == null || !principal.Identity.IsAuthenticated)
-        {
-            throw new AuthenticationException();
-        }
-
-        if (principal.Identity is WindowsIdentity winIdentity)
-        {
-            var fullUser = winIdentity.Name;
-            var parts = fullUser.Split('\\');
-            var userName = parts[^1];
-            return GetUserDataByNii(userName);
-        }
-
-        var nii = principal.Identity.Name
-                  ?? principal.Claims.FirstOrDefault(c => c.Type == "nii")?.Value;
-
-        return string.IsNullOrWhiteSpace(nii)
-            ? throw new AuthenticationException("NII não encontrado para o utilizador autenticado")
-            : GetUserDataByNii(nii);
-    }
-
-    public UserDataModel GetUserDataByNii(string nii)
-    {
-        if (string.IsNullOrWhiteSpace(nii))
-        {
-            throw new ArgumentException("Nii must be provided", nameof(nii));
-        }
-
-        using var pc = new PrincipalContext(ContextType.Domain);
-
-        var filter = new UserPrincipal(pc)
-        {
-            SamAccountName = nii
-        };
-
-        using var searcher = new PrincipalSearcher(filter);
-        UserPrincipal found = searcher.FindOne() as UserPrincipal
-                   ?? throw new KeyNotFoundException($"No user found with Nii = {nii}");
-
-        var de = found.GetUnderlyingObject() as DirectoryEntry;
-
-        var photoBase64 = de?.Properties[thumbnaiPhotoFieldName]?.Value is byte[] rawPhoto && rawPhoto.Length > 0
-            ? $"data:image/jpeg;base64,{Convert.ToBase64String(rawPhoto)}"
-            : null;
-
-        return new UserDataModel
-        {
-            DisplayName = found.DisplayName,
-            UserName = found.SamAccountName,
-            FullUser = found.DistinguishedName,
-            Nii = de?.Properties["employeeid"]?.Value?.ToString(),
-            Unit = de?.Properties[departmentFieldName]?.Value?.ToString(),
-            PhotoBase64 = photoBase64
-        };
-    }
-
-    public IReadOnlyList<UserDataModel> SearchUsers(string term, int take = 25)
-    {
-        using var rootDse = new DirectoryEntry(directoryRoot);
+        using var rootDse = new DirectoryEntry(DirectoryRootPath);
         var baseDn = rootDse.Properties["defaultNamingContext"]?.Value?.ToString()
-                     ?? throw new InvalidOperationException("Cannot determine defaultNamingContext");
-        using var root = new DirectoryEntry($"LDAP://{baseDn}");
+                     ?? throw new InvalidOperationException("Não foi possível obter defaultNamingContext");
 
+        using var root = new DirectoryEntry($"LDAP://{baseDn}");
         var q = EscapeLdap(term);
+
         var filter =
             $"(&" +
               "(objectClass=user)" +
@@ -142,7 +91,8 @@ public partial class LdapUserSvc(IHttpContextAccessor httpContextAccessor) : ILd
 
         using var ds = new DirectorySearcher(root, filter,
         [
-            "displayName","sAMAccountName","userPrincipalName","mail",departmentFieldName,"employeeID",thumbnaiPhotoFieldName, distinguishedNameLdap
+            "displayName","sAMAccountName","userPrincipalName","mail",
+            Department,"employeeID",ThumbnailPhoto,DistinguishedName
         ])
         {
             PageSize = 50,
@@ -158,31 +108,20 @@ public partial class LdapUserSvc(IHttpContextAccessor httpContextAccessor) : ILd
                 return r.Properties[n]?.Count > 0 ? r.Properties[n][0]?.ToString() ?? "" : "";
             }
 
-            var photo = r.Properties[thumbnaiPhotoFieldName]?.Count > 0 ? (byte[])r.Properties[thumbnaiPhotoFieldName][0] : null;
-
             list.Add(new UserDataModel
             {
                 DisplayName = Prop("displayName"),
                 UserName = Prop("sAMAccountName"),
-                FullUser = Prop(distinguishedNameLdap),
+                FullUser = Prop(DistinguishedName),
                 Nii = Prop("employeeID"),
-                Unit = Prop(departmentFieldName),
-                Email = Prop("mail"),
-                PhotoBase64 = photo != null && photo.Length > 0
-                    ? $"data:image/jpeg;base64,{Convert.ToBase64String(photo)}"
-                    : null,
-                Groups = []
+                Unit = Prop(Department),
+                Email = Prop("mail")
             });
         }
         return list;
     }
 
-    private static string EscapeLdap(string s)
-    {
-        return s.Replace("\\", "\\5c").Replace("*", "\\2a").Replace("(", "\\28").Replace(")", "\\29").Replace("\0", "\\00");
-    }
-
-    public List<string> GetEmployeeIdsInGroup(string groupName)
+    public static List<string> GetEmployeeIdsInGroup(string groupName)
     {
         var results = new List<string>();
         var visitedGroups = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -197,15 +136,16 @@ public partial class LdapUserSvc(IHttpContextAccessor httpContextAccessor) : ILd
         return results;
     }
 
+
     private static string? FindGroupDistinguishedName(string groupName)
     {
-        using var root = new DirectoryEntry(directoryEntry);
+        using var root = new DirectoryEntry(DirectoryEntryPath);
         using var searcher = new DirectorySearcher(root)
         {
             Filter = $"(&(objectClass=group)(|(cn={groupName})(sAMAccountName={groupName})))",
             SearchScope = SearchScope.Subtree
         };
-        searcher.PropertiesToLoad.Add(distinguishedNameLdap);
+        searcher.PropertiesToLoad.Add(DistinguishedName);
 
         SearchResult? groupResult = searcher.FindOne();
         if (groupResult == null)
@@ -213,9 +153,9 @@ public partial class LdapUserSvc(IHttpContextAccessor httpContextAccessor) : ILd
             return null;
         }
 
-        if (groupResult.Properties.Contains(distinguishedNameLdap))
+        if (groupResult.Properties.Contains(DistinguishedName))
         {
-            return groupResult.Properties[distinguishedNameLdap][0]?.ToString();
+            return groupResult.Properties[DistinguishedName][0]?.ToString();
         }
 
         var path = groupResult.Path;
@@ -328,5 +268,3 @@ public partial class LdapUserSvc(IHttpContextAccessor httpContextAccessor) : ILd
 
     }
 }
-
-

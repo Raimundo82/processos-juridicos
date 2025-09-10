@@ -7,12 +7,12 @@ using NToastNotify;
 using Processos_Juridicos.Data;
 using Processos_Juridicos.Middleware;
 using Processos_Juridicos.Middleware.ExceptionHandlers;
-using Processos_Juridicos.Services.Auth;
 using Processos_Juridicos.Services.DomainData;
 using Processos_Juridicos.Services.Interfaces;
-using Processos_Juridicos.Services.Interfaces.Auth;
 using Processos_Juridicos.Services.Interfaces.DomainData;
+using Processos_Juridicos.Services.Interfaces.Ldap;
 using Processos_Juridicos.Services.Interfaces.ProcessManagement;
+using Processos_Juridicos.Services.Ldap;
 using Processos_Juridicos.Services.ProcessManagement;
 using Processos_Juridicos.Services.UiHelpers;
 using Processos_Juridicos.Utilities;
@@ -21,16 +21,21 @@ using Processos_Juridicos.Utilities.TextManager.Interfaces;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-// Authentication SOO (via Negotiate)
-builder.Services.AddAuthentication(NegotiateDefaults.AuthenticationScheme).AddNegotiate();
+// Enable Windows/Negotiate authentication (SSO)
+builder.Services
+    .AddAuthentication(NegotiateDefaults.AuthenticationScheme)
+    .AddNegotiate();
 
-// Set Authorization
+// Configure role-based authorization policies
 AuthorizationBuilder authBuilder = builder.Services.AddAuthorizationBuilder();
 authBuilder.AddCustomPolicies();
 builder.Services.ConfigureFallbackPolicy();
 
-// Enable session 
+
+// In-memory cache to support session state
 builder.Services.AddDistributedMemoryCache();
+
+// Session configuration
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromHours(3);
@@ -39,19 +44,31 @@ builder.Services.AddSession(options =>
     options.Cookie.SameSite = SameSiteMode.Strict;
 });
 
-// Add services to the container.
+
+// MVC pattern
 builder.Services.AddControllersWithViews();
 
-// Add IHttpContextAccessor so services and middleware can read HttpContext
+// Allows services to access HttpContext
 builder.Services.AddHttpContextAccessor();
 
-// Add User Secrets
+// Load development secrets
 builder.Configuration.AddUserSecrets<Program>();
 
-// Register Context
-var processosDj = builder.Configuration.GetConnectionString("ProcessosDJ_Dev")!;
-builder.Services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer(processosDj).EnableSensitiveDataLogging().LogTo(Console.WriteLine, LogLevel.Debug));
+// Global Exception Handling
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
+
+// Connection string from configuration
+var processosDj = builder.Configuration.GetConnectionString("ProcessosDJ_Dev")!;
+
+// Register DbContext with SQL Server and detailed logging
+builder.Services.AddDbContext<AppDbContext>(opt =>
+    opt.UseSqlServer(processosDj)
+        .EnableSensitiveDataLogging()
+        .LogTo(Console.WriteLine, LogLevel.Debug));
+
+
+// JSON text manager for system text (systemtext.json)
 builder.Services.AddSingleton<IJsonTextManager>(sp =>
 {
     IWebHostEnvironment env = sp.GetRequiredService<IWebHostEnvironment>();
@@ -59,7 +76,8 @@ builder.Services.AddSingleton<IJsonTextManager>(sp =>
     return new JsonTextManager(filePath);
 });
 
-//register Interfaces services
+
+// Register Interfaces services
 builder.Services.AddScoped<IToastNotify, ToastNotify>();
 builder.Services.AddScoped<IUnitSvc, UnitSvc>();
 builder.Services.AddScoped<IProcessStateSvc, StateSvc>();
@@ -75,8 +93,8 @@ builder.Services.AddScoped<ICrimeTypeSvc, CrimeTypeSvc>();
 builder.Services.AddScoped<IMilitarySecuritySvc, MilitarySecuritySvc>();
 builder.Services.AddScoped<IUserSvc, UserSvc>();
 builder.Services.AddScoped<IRoleSvc, RoleSvc>();
-builder.Services.AddScoped<RoleSyncService>();
-builder.Services.AddHostedService<TimedSyncService>();
+builder.Services.AddScoped<RoleSyncSvc>();
+builder.Services.AddHostedService<TimedSyncSvc>();
 builder.Services.AddScoped<ILegalReferenceSvc, LegalReferenceSvc>();
 builder.Services.AddScoped<IContextSvc, ContextSvc>();
 builder.Services.AddScoped<IProcessManagementSvc, ProcessManagementSvc>();
@@ -90,7 +108,8 @@ if (OperatingSystem.IsWindows())
     builder.Services.AddScoped<ILdapUserSvc, LdapUserSvc>();
 }
 
-//Register NToastNotify
+
+// Register NToastNotify (Notifications)
 builder.Services.AddMvc().AddNToastNotifyToastr(new ToastrOptions()
 {
     ProgressBar = true,
@@ -98,10 +117,10 @@ builder.Services.AddMvc().AddNToastNotifyToastr(new ToastrOptions()
     TimeOut = 5000
 });
 
-builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 WebApplication app = builder.Build();
 
+// Automatic Migrations (Development Only)
 if (app.Environment.IsDevelopment())
 {
     using IServiceScope scope = app.Services.CreateScope();
@@ -113,15 +132,17 @@ if (app.Environment.IsDevelopment())
     }
 }
 
+
+// Error & Exception Configuration
 app.UseExceptionHandler("/Home/Error");
 
+// Set the global text manager
 GlobalTextManager.SetManager(app.Services.GetRequiredService<IJsonTextManager>());
 
 
+// Global unhandled exception logging (Production only)
 if (!app.Environment.IsDevelopment())
 {
-
-
     AppDomain.CurrentDomain.UnhandledException += (sender, eventArgs) =>
     {
         var ex = (Exception)eventArgs.ExceptionObject;
@@ -130,18 +151,19 @@ if (!app.Environment.IsDevelopment())
 
     TaskScheduler.UnobservedTaskException += (sender, eventArgs) =>
     {
-        // Log exception details
         Console.WriteLine("Unobserved task exception: " + eventArgs.Exception.ToString());
-        eventArgs.SetObserved(); // prevents the process from terminating
+        eventArgs.SetObserved();
     };
 }
 
+// HTTP Pipeline
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseSession();
 app.UseRouting();
 app.UseAuthentication();
 
+// Middleware only supported on windows
 if (OperatingSystem.IsWindows())
 {
     app.UseMiddleware<NegotiateRoleMiddleware>();
@@ -150,6 +172,8 @@ if (OperatingSystem.IsWindows())
 app.UseMiddleware<SessionRoleMiddleware>();
 app.UseAuthorization();
 app.UseNToastNotify();
+
+// Default route mapping
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
