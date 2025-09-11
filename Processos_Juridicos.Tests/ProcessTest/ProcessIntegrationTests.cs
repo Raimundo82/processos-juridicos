@@ -130,6 +130,7 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
+
         dbContext.States.AddRange(scenarioProcesses.Select(s => s.ProcessState));
         dbContext.ProcessTypes.AddRange(scenarioProcesses.Select(s => s.ProcessType));
 

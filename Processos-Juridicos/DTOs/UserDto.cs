@@ -33,6 +33,8 @@ public class UserDto
 
     public required bool IsUserManuallySet { get; set; }
 
+
+
     public virtual ICollection<Unit> UnitsResponsibleFor { get; set; } = [];
 
     public ICollection<UnitCommander> UnitCommanders { get; set; } = [];

@@ -16,6 +16,8 @@
     "EmptyFileMessage": "Pelo menos um dos ficheiros fornecidos encontra-se vazio.",
     "FileExtensionNotAllowedMessage": "Pelo menos um ficheiro dos ficheiros fornecidos tem uma extensão não permitida.",
     "FileSizeTooLargeMessage": "Pelo menos um ficheiro dos ficheiros fornecidos é demasiado grande.",
-    "StateTransitionInvalidMessage":  "Transição de estado Inválida.",
-    "InvalidLoginMessage": "Ocorreu um erro ao fazer login, tente novamente."
+    "StateTransitionInvalidMessage": "Transição de estado Inválida.",
+    "InvalidLoginMessage": "Ocorreu um erro ao fazer login, tente novamente.",
+    "UserDoesNotExistMessage": "Pelo menos um dos utilizadores que tentou adicionar não pode ser adicionado.",
+    "UserCannotBeOfInst":  "O utilizador selectionado não pode ser oficial instrutor."
 }

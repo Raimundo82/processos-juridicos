@@ -1,7 +1,5 @@
 @model Processos_Juridicos.DTOs.ProcessDto;
-@{
-    var disableAttr = (bool)(ViewBag.DisableStateSelection ?? false) ? "disabled" : "";
-}
+
 
 
 <div class="form-group mt-3">
@@ -31,7 +29,7 @@
 
     <label class="control-label">Oficial Instrutor</label>
     <div class="input-group">
-        <input id="instructor-lookup" class="form-control" placeholder="Digite o ID do oficial, ex: a1234" />
+        <input id="instructor-lookup" class="form-control" placeholder="Digite o ID do oficial, ex: a1234" value="@Model?.OficialInstName ?? string.Empty" />
         <button type="button"
                 class="btn btn-outline-secondary ad-lookup-btn"
                 data-target-visible="instructor-lookup"
@@ -41,6 +39,7 @@
         </button>
     </div>
     <small id="OficialInstInfo" class="form-text text-muted"></small>
+    <span asp-validation-for="OficialInstName" class="text-danger"></span>
 
     <label asp-for="OficialInstTelephone" for="instructor-telephone" class="control-label mt-3">
         Telefone do oficial instrutor
@@ -132,10 +131,7 @@
             id="state-id"
             asp-items="ViewBag.states"
             class="form-control">
-        @if (@disableAttr == "true")
-        {
-            <option value="">Selecione um Estado</option>
-        }
+
 
         
     </select>

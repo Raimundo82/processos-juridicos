@@ -29,6 +29,7 @@ public partial class ProcessDto
     public int? CompensatingUnitId { get; set; }
 
     [DisplayName("Oficial Instrutor")]
+    [UserMustBeAllowedToBeOfInst]
     public string OficialInstName { get; set; }
 
     [DisplayName("Telefone do Oficial Instrutor")]

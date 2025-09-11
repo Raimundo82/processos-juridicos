@@ -1,10 +1,13 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 using Microsoft.EntityFrameworkCore;
 
 using Processos_Juridicos.Attributes;
 using Processos_Juridicos.Entities;
+
+using Riok.Mapperly.Abstractions;
 
 namespace Processos_Juridicos.DTOs;
 
@@ -31,6 +34,11 @@ public class UnitDto
     public string UnitAcronym { get; set; } = null!;
 
     public bool Enable { get; set; } = default;
+
+    [UserMustExistInDatabase]
+    [NotMapped]
+    [MapperIgnore]
+    public List<string> ResponsibleUserIds { get; set; } = [];
 
     public virtual ICollection<User> ResponsibleUsers { get; set; } = [];
 

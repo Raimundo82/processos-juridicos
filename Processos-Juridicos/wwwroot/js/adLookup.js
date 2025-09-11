@@ -1,5 +1,5 @@
 // adLookup.js
-import { clearValidity, shouldResolve, searchUsers, resolveId } from './lookup-utils.js';
+import { clearValidity, shouldResolve, searchUsers, resolveId, markInvalid } from './lookup-utils.js';
 
 export const escapeHtml = (s) => {
     const str = s == null ? '' : String(s);
@@ -112,7 +112,7 @@ export function initAdLookup({ applySelection, setupIds, debounceMs = 1000 }) {
                     };
                     currentTarget = { visibleId, hiddenId, infoId };
                     applySelection(user, currentTarget, adModal);
-                    visibleEl.value = '';
+                    visibleEl.value = user.displayName + ' - ' + user.samAccountName;
                     clearValidity(visibleEl);
                 } else {
                     markInvalid(visibleEl);

@@ -71,7 +71,6 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
             {
                 processEntity.Infringements.Add(infr);
             }
-
         }
 
         _context.Processes.Add(processEntity);
