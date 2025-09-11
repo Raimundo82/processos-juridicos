@@ -59,8 +59,6 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
 
         process.Nuipm = nuipm;
 
-
-
         Process processEntity = Mapper.MapToProcesses(process);
 
         if (selectedInfringements != null && selectedInfringements.Length > 0)

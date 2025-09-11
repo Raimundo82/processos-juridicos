@@ -17,6 +17,7 @@ public class ProcessViewDataSvc(
 
     private static readonly List<string> Genders = ["Masculino", "Feminino", "Incerto"];
     private const string InitialStateName = "Em Edição";
+    private const string SecondStateName = "Em Validação";
 
     public async Task PopulateForCreateAsync(ViewDataDictionary viewData)
     {
@@ -78,11 +79,35 @@ public class ProcessViewDataSvc(
 
     private async Task PopulateStatesForCreateAsync(ViewDataDictionary viewData)
     {
-        DTOs.ProcessStateDto state = await _processManagement.ProcessStates.GetStateByName(InitialStateName);
+        var allStates = (await _processManagement.ProcessStates.GetAllStates()).ToList();
+        var statesList = new List<SelectListItem>();
+
+        DTOs.ProcessStateDto? initialState = allStates.FirstOrDefault(s => s.StateName == InitialStateName);
+        if (initialState != null)
+        {
+            statesList.Add(new SelectListItem
+            {
+                Text = initialState.StateName,
+                Value = initialState.ProcessStateId.ToString(),
+                Selected = true
+            });
+        }
+
+        if (allStates.Count > 1)
+        {
+            DTOs.ProcessStateDto? secondState = allStates.FirstOrDefault(s => s.StateName == SecondStateName);
+            if (secondState != null)
+            {
+                statesList.Add(new SelectListItem
+                {
+                    Text = secondState.StateName,
+                    Value = secondState.ProcessStateId.ToString()
+                });
+            }
+        }
+
         viewData["DisableStateSelection"] = true;
-        viewData["states"] = state == null
-            ? Enumerable.Empty<SelectListItem>()
-            : [new() { Text = state.StateName, Value = state.ProcessStateId.ToString(), Selected = true }];
+        viewData["states"] = statesList;
     }
 
     private async Task PopulateStatesForEditAsync(ViewDataDictionary viewData, int? processId)

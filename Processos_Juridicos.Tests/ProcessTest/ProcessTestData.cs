@@ -29,7 +29,7 @@ internal static class ProcessTestData
                             {
                                 Nuipm = $"0001/{DateTime.Now.Year}/UN01",
                                 CreatedAt = DateOnly.FromDateTime(DateTime.Today),
-                                ProcessState = new ProcessState { StateName = "Em Edição" },
+                                ProcessState = new ProcessState { StateName = "Em Validação" },
                                 ProcessType = new ProcessType { Deadline=15, ProcessTypeName = "Tipo 1"},
                                 Unit = new Unit {UnitName ="Unidade 1", UnitCode = "UN01", UnitAcronym = "UN1"}
                             },
