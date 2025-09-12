@@ -146,6 +146,9 @@ public class ProcessController(
             return View(model);
         }
 
+        ProcessStateDto states = await _processManagement.ProcessStates.GetStateById(model.ProcessStateId);
+        model.ProcessState = states;
+
         await _processManagement.Processes.EditProcess(model, selectedInfringements);
 
         List<ProcessFileDto> uploadedFiles = await _processManagement.ProcessFiles.GetAllProcessFilesByProcessId(model.ProcessId);

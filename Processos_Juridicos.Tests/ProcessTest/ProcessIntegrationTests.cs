@@ -127,9 +127,9 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
     {
         // Arrange
         TestAuthContext.Roles = ["DJ-AUTHORIZED"];
+
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
 
         dbContext.States.AddRange(scenarioProcesses.Select(s => s.ProcessState));
         dbContext.ProcessTypes.AddRange(scenarioProcesses.Select(s => s.ProcessType));
@@ -142,7 +142,6 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
         foreach (Process scenarioProcess in scenarioProcesses)
         {
             IDocument doc = await _client.GetDocumentAsync("/Process/Create");
-
 
             var processStateId = doc.GetElementById("state-id")?.QuerySelectorAll("option").First().GetAttribute("value");
 
@@ -157,13 +156,13 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
 
             var formData = new Dictionary<string, string?>
             {
-
                 ["ProcessTypeId"] = processTypeId,
                 ["ProcessStateId"] = processStateId,
                 ["UnitId"] = unitId,
                 ["CreatedAt"] = scenarioProcess.CreatedAt.ToString()
 
             };
+
             await _client.PostAsync("/Process/Create", new FormUrlEncodedContent(formData));
         }
 
@@ -173,7 +172,10 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
 
         Assert.All(scenarioProcesses, scenarioProcess =>
         {
-            Process? expected = dbItems.FirstOrDefault(dbItem => dbItem.Nuipm == scenarioProcess.Nuipm);
+            Process? expected = dbItems.FirstOrDefault(dbItem =>
+                dbItem.ProcessType.ProcessTypeName == scenarioProcess.ProcessType!.ProcessTypeName &&
+                dbItem.Unit.UnitName == scenarioProcess.Unit.UnitName);
+
             Assert.NotNull(expected);
             Assert.True(
                 expected.ProcessState.StateName is "Em Edição" or
@@ -224,6 +226,7 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
     {
         // Arrange
         TestAuthContext.Roles = ["DJ-AUTHORIZED"];
+
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
@@ -263,9 +266,6 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
         Assert.Single(dbItems);
         Process underTest = dbItems.First();
 
-        var nuipmCheck = "0001/" + DateTime.Now.Year.ToString() + "/UN01";
-
-        Assert.Equal(nuipmCheck, underTest.Nuipm);
         Assert.Equal(targetState.ProcessStateId, underTest.ProcessStateId);
         Assert.Equal(targetState.StateName, underTest.ProcessState.StateName);
         Assert.Equal(newUnit.UnitId, underTest.Unit.UnitId);
@@ -306,7 +306,6 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
         Assert.Equal(process.ProcessState.StateName, underTest.ProcessState.StateName);
         Assert.Equal(process.ProcessType.ProcessTypeName, underTest.ProcessType.ProcessTypeName);
     }
-
 
     [Fact]
     public async Task Delete_Successful_RemovesItem()

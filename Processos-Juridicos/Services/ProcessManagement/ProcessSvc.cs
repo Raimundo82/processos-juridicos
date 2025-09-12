@@ -3,7 +3,6 @@
 using System.Security.Claims;
 
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 
 using Processos_Juridicos.Data;
 using Processos_Juridicos.DTOs;
@@ -19,46 +18,8 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
 {
     private readonly AppDbContext _context = context;
 
-    private async Task<string> GenerateNuipm(ProcessDto process)
-    {
-        string countString;
-        var year = DateTime.Now.Year;
-
-        if (process.UnitId == null)
-        {
-            return "";
-        }
-
-        if (process.ProcessId == null)
-        {
-            var count = await GetNumOfProcessesCurrentYear();
-            count++;
-            countString = count.ToString("D4");
-        }
-        else if (process.Nuipm.IsNullOrEmpty())
-        {
-            var count = await GetNumOfProcessesCurrentYear();
-            countString = count.ToString("D4");
-        }
-        else
-        {
-            var splitNuipm = process.Nuipm.Split("/");
-            countString = splitNuipm[0];
-            year = int.Parse(splitNuipm[1]);
-        }
-
-        Unit? associatedUnit = await _context.Units.FindAsync(process.UnitId);
-
-        return $"{countString}/{year}/{associatedUnit!.UnitCode}";
-    }
-
     public async Task<ProcessDto> CreateProcess(ProcessDto process, int?[] selectedInfringements)
     {
-
-        var nuipm = await GenerateNuipm(process);
-
-        process.Nuipm = nuipm;
-
         Process processEntity = Mapper.MapToProcesses(process);
 
         if (selectedInfringements != null && selectedInfringements.Length > 0)
@@ -75,6 +36,7 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
 
         _context.Processes.Add(processEntity);
         await _context.SaveChangesAsync();
+
         return Mapper.MapToProcessesDto(processEntity);
     }
 
@@ -119,6 +81,7 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
 
         processEntity!.Infringements.Clear();
 
+        _context.ChangeTracker.Clear();
         _context.Processes.Attach(processEntity);
         _context.Entry(processEntity).State = EntityState.Modified;
 
@@ -209,6 +172,19 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
         return currentStateId == newStateId || (process != null && await _context.StateTransitions.AnyAsync(t =>
             t.FromStateId == process.ProcessStateId &&
             t.ToStateId == newStateId));
+    }
+
+    private async Task<string> GenerateNuipm(ProcessDto process)
+    {
+        if (!string.IsNullOrEmpty(process.Nuipm) || process.ProcessState.StateName != "Aberto")
+        {
+            return string.Empty;
+        }
+
+        var count = await GetNumOfProcessesCurrentYear() + 1;
+        Unit? associatedUnit = await _context.Units.FindAsync(process.UnitId);
+
+        return $"{count}/{DateTime.Now.Year}/{associatedUnit!.UnitCode}";
     }
 
     private async Task<int> GetNumOfProcessesCurrentYear()
