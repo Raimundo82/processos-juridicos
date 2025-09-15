@@ -24,9 +24,7 @@ public class UserMustBeAllowedToBeOfInstAttribute : ValidationAttribute
             return ValidationResult.Success;
         }
 
-        var parts = raw.Split('-');
-
-        var employeeId = parts[1].Trim();
+        var employeeId = value.ToString();
 
         var dbContext = validationContext.GetService(typeof(AppDbContext)) as AppDbContext;
         return !dbContext!.Users.Any(u => u.UserNii == employeeId)

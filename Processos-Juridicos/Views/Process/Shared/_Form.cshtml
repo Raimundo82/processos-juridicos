@@ -26,20 +26,26 @@
 <!-- Oficial Instrutor -->
 <div class="form-group mt-3">
     <input type="hidden" asp-for="OficialInstName" id="OficialInstName" />
+    <input type="hidden" asp-for="OficialInstNii" id="OficialInstNii" />
 
     <label class="control-label">Oficial Instrutor</label>
     <div class="input-group">
-        <input id="instructor-lookup" class="form-control" placeholder="Digite o ID do oficial, ex: a1234" value="@Model?.OficialInstName ?? string.Empty" />
+        <input id="instructor-lookup"
+               class="form-control"
+               placeholder="Digite o ID do oficial, ex: a1234"
+               value="@( (Model?.OficialInstName ?? string.Empty) + " - " + (Model?.OficialInstNii ?? string.Empty) )" />
+
         <button type="button"
-                class="btn btn-outline-secondary ad-lookup-btn"
+                class="btn btn-secondary ad-lookup-btn"
                 data-target-visible="instructor-lookup"
                 data-target-hidden="OficialInstName"
+                data-target-hidden2="OficialInstNii"
                 data-target-info="OficialInstInfo">
-            Procurar AD
+            Procurar na AD
         </button>
     </div>
     <small id="OficialInstInfo" class="form-text text-muted"></small>
-    <span asp-validation-for="OficialInstName" class="text-danger"></span>
+    <span asp-validation-for="OficialInstNii" class="text-danger"></span>
 
     <label asp-for="OficialInstTelephone" for="instructor-telephone" class="control-label mt-3">
         Telefone do oficial instrutor

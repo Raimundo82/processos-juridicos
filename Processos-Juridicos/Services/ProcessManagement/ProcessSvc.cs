@@ -68,9 +68,10 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
             _context.Entry(existingEntity).State = EntityState.Detached;
         }
 
-        if (process.CreatedBy == null && existingEntity != null)
+        if (process.CreatedByName == null && existingEntity != null)
         {
-            process.CreatedBy = existingEntity.CreatedBy;
+            process.CreatedByName = existingEntity.CreatedByName;
+            process.CreatedByNii = existingEntity.CreatedByNii;
         }
 
         var nuipm = await GenerateNuipm(process);

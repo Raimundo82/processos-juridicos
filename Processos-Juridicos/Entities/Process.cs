@@ -25,11 +25,16 @@ public partial class Process
     [Column("oficial_inst_name")]
     public string OficialInstName { get; set; }
 
+    [Column("oficial_inst_nii")]
+    public string OficialInstNii { get; set; }
+
     [Column("compensating_unit_id")]
     public int? CompensatingUnitId { get; set; }
 
     [Column("investigated_name")]
     public string InvestigatedName { get; set; }
+
+
 
     [Column("investigated_gender")]
     public string InvestigatedGender { get; set; }
@@ -58,14 +63,20 @@ public partial class Process
     [Column("created_at")]
     public DateOnly? CreatedAt { get; set; } = DateOnly.FromDateTime(DateTime.Now);
 
-    [Column("created_by")]
-    public string CreatedBy { get; set; }
+    [Column("created_by_name")]
+    public string CreatedByName { get; set; }
+
+    [Column("created_by_nii")]
+    public string CreatedByNii { get; set; }
 
     [Column("modified_at")]
     public DateOnly? ModifiedAt { get; set; } = DateOnly.FromDateTime(DateTime.Now);
 
-    [Column("modified_by")]
-    public string ModifiedBy { get; set; }
+    [Column("modified_by_name")]
+    public string ModifiedByName { get; set; }
+
+    [Column("modified_by_nii")]
+    public string ModifiedByNii { get; set; }
 
     [Column("service_accident_id")]
     public int? ServiceAccidentId { get; set; }
@@ -123,5 +134,13 @@ public partial class Process
     [ForeignKey("CrimeTypeId")]
     public virtual CrimeType CrimeType { get; set; }
 
+    [ForeignKey("CreatedByNii")]
+    public virtual User CreatedBy { get; set; }
+
+    [ForeignKey("ModifiedByNii")]
+    public User ModifiedBy { get; set; }
+
+    [ForeignKey("OficialInstNii")]
+    public virtual User OficialInstrutor { get; set; }
 
 }

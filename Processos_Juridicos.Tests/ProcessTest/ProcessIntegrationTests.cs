@@ -460,7 +460,7 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
                     val = process.ProcessTypeId.ToString();
                     break;
                 case "CreatedBy":
-                    val = process.CreatedBy.ToString();
+                    val = process.CreatedByName.ToString();
                     break;
                 default:
                     break;
@@ -531,7 +531,7 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
                     val = process.ProcessTypeId.ToString();
                     break;
                 case "CreatedBy":
-                    val = process.CreatedBy.ToString();
+                    val = process.CreatedByName.ToString();
                     break;
                 default:
                     break;
@@ -600,7 +600,7 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
                     val = process.ProcessTypeId.ToString();
                     break;
                 case "CreatedBy":
-                    val = process.CreatedBy.ToString();
+                    val = process.CreatedByName.ToString();
                     break;
                 default:
                     break;
@@ -669,7 +669,7 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
                     val = process.ProcessTypeId.ToString();
                     break;
                 case "CreatedBy":
-                    val = process.CreatedBy.ToString();
+                    val = process.CreatedByName.ToString();
                     break;
                 default:
                     break;
@@ -738,7 +738,7 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
                     val = process.ProcessTypeId.ToString();
                     break;
                 case "CreatedBy":
-                    val = process.CreatedBy.ToString();
+                    val = process.CreatedByName.ToString();
                     break;
                 default:
                     break;
@@ -837,7 +837,7 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
                     val = process.ProcessTypeId.ToString();
                     break;
                 case "CreatedBy":
-                    val = process.CreatedBy.ToString();
+                    val = process.CreatedByName.ToString();
                     break;
                 default:
                     break;

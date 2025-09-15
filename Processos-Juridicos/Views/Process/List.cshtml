@@ -34,11 +34,11 @@ else {
                         <th scope="col">@Html.DisplayNameFor(m => m.Processes.First().OficialInstName)</th>
                         <th scope="col">@Html.DisplayNameFor(m => m.Processes.First().OficialInstTelephone)</th>
                         <th scope="col">@Html.DisplayNameFor(m => m.Processes.First().CreatedAt)</th>
-                        <th scope="col">@Html.DisplayNameFor(m => m.Processes.First().CreatedBy)</th>
+                        <th scope="col">@Html.DisplayNameFor(m => m.Processes.First().CreatedByName)</th>
                         <th scope="col">@Html.DisplayNameFor(m => m.Processes.First().Sentence)</th>
                         <th scope="col">@Html.DisplayNameFor(m => m.Processes.First().ProcessState)</th>
                         <th scope="col">@Html.DisplayNameFor(m => m.Processes.First().ModifiedAt)</th>
-                        <th scope="col">@Html.DisplayNameFor(m => m.Processes.First().ModifiedBy)</th>
+                        <th scope="col">@Html.DisplayNameFor(m => m.Processes.First().ModifiedByName)</th>
 
                         <th scope="col">Ações</th>
                     </tr>
@@ -59,17 +59,18 @@ else {
                             <td data-property="instructing-official">@Html.DisplayFor(m => item.OficialInstName)</td>
                             <td data-property="instructing-official-phone">@Html.DisplayFor(m => item.OficialInstTelephone)</td>
                             <td data-property="created-at">@Html.DisplayFor(m => item.CreatedAt)</td>
-                            <td data-property="created-by">@Html.DisplayFor(m => item.CreatedBy)</td>
+                            <td data-property="created-by">@Html.DisplayFor(m => item.CreatedByName)</td>
                             <td data-property="sentence">@(item.Sentence?.SentenceName ?? "-")</td>
                             <td data-property="state">@(item.ProcessState?.StateName ?? "-")</td>
                             <td data-property="last-modified-date">@(item.ModifiedAt?.ToString("dd-MM-yyyy") ?? "-")</td>
-                            <td data-property="last-modified-by">@(item.ModifiedBy?.ToString() ?? "-")</td>
+                            <td data-property="last-modified-by">@(item.ModifiedByName?.ToString() ?? "-")</td> 
                             
                             <td>
                                 <div class="d-flex gap-2">
                                     @if (User.IsDjAdministration())
                                     {
                                         <form asp-controller="Process" asp-action="Delete" method="post" data-action="delete">
+                                            @Html.AntiForgeryToken()
                                             <input type="hidden" name="id" value="@item.ProcessId">
                                             <button type="submit" class="btn btn-danger js-delete-btn"></button>
                                         </form>

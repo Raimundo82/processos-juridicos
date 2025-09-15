@@ -86,7 +86,9 @@ public class ProcessController(
     {
         if (ModelState.IsValid)
         {
-            model.CreatedBy = _ldapUserSvc.GetLoggedUserData().DisplayName;
+            model.CreatedByName = _ldapUserSvc.GetLoggedUserData().DisplayName;
+            model.CreatedByNii = "M" + _ldapUserSvc.GetLoggedUserData().Nii;
+
 
             ProcessDto insertTarget = await _processManagement.Processes.CreateProcess(model, selectedInfringements);
 
@@ -145,6 +147,11 @@ public class ProcessController(
             await _viewDataSvc.PopulateForEditAsync(ViewData, model.ProcessId);
             return View(model);
         }
+
+
+        model.ModifiedByName = _ldapUserSvc.GetLoggedUserData().DisplayName;
+        model.ModifiedByNii = "M" + _ldapUserSvc.GetLoggedUserData().Nii;
+        model.ModifiedAt = DateOnly.FromDateTime(DateTime.Now);
 
         ProcessStateDto states = await _processManagement.ProcessStates.GetStateById(model.ProcessStateId);
         model.ProcessState = states;

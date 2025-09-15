@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Processos_Juridicos.Data;
 
@@ -11,9 +12,11 @@ using Processos_Juridicos.Data;
 namespace Processos_Juridicos.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250912132946_OfInstNiiFKAdded")]
+    partial class OfInstNiiFKAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -159,13 +162,9 @@ namespace Processos_Juridicos.Migrations
                         .HasColumnType("date")
                         .HasColumnName("created_at");
 
-                    b.Property<string>("CreatedByName")
+                    b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)")
-                        .HasColumnName("created_by_name");
-
-                    b.Property<string>("CreatedByNii")
-                        .HasColumnType("nvarchar(450)")
-                        .HasColumnName("created_by_nii");
+                        .HasColumnName("created_by");
 
                     b.Property<int?>("CrimeTypeId")
                         .HasColumnType("int")
@@ -207,13 +206,9 @@ namespace Processos_Juridicos.Migrations
                         .HasColumnType("date")
                         .HasColumnName("modified_at");
 
-                    b.Property<string>("ModifiedByName")
+                    b.Property<string>("ModifiedBy")
                         .HasColumnType("nvarchar(max)")
-                        .HasColumnName("modified_by_name");
-
-                    b.Property<string>("ModifiedByNii")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("modified_by_nii");
+                        .HasColumnName("modified_by");
 
                     b.Property<string>("Nuipm")
                         .HasColumnType("nvarchar(max)")
@@ -266,8 +261,6 @@ namespace Processos_Juridicos.Migrations
                     b.HasKey("ProcessId");
 
                     b.HasIndex("CompensatingUnitId");
-
-                    b.HasIndex("CreatedByNii");
 
                     b.HasIndex("CrimeTypeId");
 
@@ -514,10 +507,6 @@ namespace Processos_Juridicos.Migrations
                         .WithMany()
                         .HasForeignKey("CompensatingUnitId");
 
-                    b.HasOne("Processos_Juridicos.Entities.User", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedByNii");
-
                     b.HasOne("Processos_Juridicos.Entities.CrimeType", "CrimeType")
                         .WithMany()
                         .HasForeignKey("CrimeTypeId");
@@ -559,8 +548,6 @@ namespace Processos_Juridicos.Migrations
                     b.Navigation("AccidentType");
 
                     b.Navigation("CompensatingUnit");
-
-                    b.Navigation("CreatedBy");
 
                     b.Navigation("CrimeType");
 

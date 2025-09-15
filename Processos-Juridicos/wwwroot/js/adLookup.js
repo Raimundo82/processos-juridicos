@@ -77,6 +77,7 @@ export function initAdLookup({ applySelection, setupIds, debounceMs = 1000 }) {
             currentTarget = {
                 visibleId: btn.dataset.targetVisible,
                 hiddenId: btn.dataset.targetHidden,
+                hiddenId2: btn.dataset.targetHidden2, // may be undefined
                 infoId: btn.dataset.targetInfo
             };
             if (!adModal) return;

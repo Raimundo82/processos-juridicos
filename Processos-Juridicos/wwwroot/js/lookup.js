@@ -5,16 +5,22 @@ import { initAdLookup } from './adLookup.js';
 // Fills one visible + one hidden input, and sets info text
 const applySelectionSingle = (user, target, adModal) => {
     const visible = document.getElementById(target.visibleId);
-    const hidden = document.getElementById(target.hiddenId);
+    const hidden1 = document.getElementById(target.hiddenId);   // always present
+    const hidden2 = target.hiddenId2 ? document.getElementById(target.hiddenId2) : null;
     const info = document.getElementById(target.infoId);
 
     const display = user.displayName || user.cn || user.name || '';
-    const id = user.samAccountName || user.userPrincipalName || user.employeeId || '';
+    const empId = user.employeeId || user.samAccountName || user.userPrincipalName || '';
 
-    if (visible) visible.value = `${display} - ${id}`;
-    if (hidden) hidden.value = `${display} - ${id}`;
+    if (visible) visible.value = `${display} - M${empId}`;
+    hidden1.value = `${display}`;
+
+    if (hidden2) {
+        hidden2.value = `M${empId}`;   // second hidden gets the employee ID
+    }
+
     if (visible) markValid(visible);
-    if (info) info.textContent = id ? `✅ ${display} (${id})` : `✅ ${display}`;
+    if (info) info.textContent = empId ? `✅ ${display} (${empId})` : `✅ ${display}`;
 
     if (adModal) adModal.hide();
 };

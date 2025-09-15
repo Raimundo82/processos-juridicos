@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
 using Processos_Juridicos.Attributes;
+using Processos_Juridicos.Entities;
 
 using Riok.Mapperly.Abstractions;
 
@@ -29,8 +30,11 @@ public partial class ProcessDto
     public int? CompensatingUnitId { get; set; }
 
     [DisplayName("Oficial Instrutor")]
-    [UserMustBeAllowedToBeOfInst]
     public string OficialInstName { get; set; }
+
+    [DisplayName("Oficial Instrutor Nii")]
+    [UserMustBeAllowedToBeOfInst]
+    public string OficialInstNii { get; set; }
 
     [DisplayName("Telefone do Oficial Instrutor")]
     [Phone(ErrorMessage = "Invalid phone number")]
@@ -70,13 +74,17 @@ public partial class ProcessDto
     public DateOnly? CreatedAt { get; set; }
 
     [DisplayName("Criado por")]
-    public string CreatedBy { get; set; }
+    public string CreatedByName { get; set; }
+
+    public string CreatedByNii { get; set; }
 
     [DisplayName("Modificado")]
     public DateOnly? ModifiedAt { get; set; }
 
     [DisplayName("Modificado por")]
-    public string ModifiedBy { get; set; }
+    public string ModifiedByName { get; set; }
+
+    public string ModifiedByNii { get; set; }
 
     [DisplayName("Acident em serviço")]
     public int? ServiceAccidentId { get; set; }
@@ -139,6 +147,15 @@ public partial class ProcessDto
 
     [ForeignKey("CompensatingUnit")]
     public virtual UnitDto CompensatingUnit { get; set; }
+
+    [ForeignKey("OficialInstNii")]
+    public virtual UserDto OficialInstrutor { get; set; }
+
+    [ForeignKey("ModifiedByNii")]
+    public UserDto ModifiedBy { get; set; }
+
+    [ForeignKey("CreatedByNii")]
+    public virtual User CreatedBy { get; set; }
 
     [MapperIgnore]
     public IFormFile[] ProcessFiles { get; set; }
