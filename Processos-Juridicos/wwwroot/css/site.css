@@ -85,3 +85,18 @@ body {
     border: none;
     background: none;
 }
+
+/* footer */
+.footer {
+    bottom: 0;
+    position: absolute;
+    background-color: var(--white);
+    align-items: center;
+    display: flex;
+    height: 40px;
+    font-family: var(--font-base);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--dark-blue);
+    width: 100%;
+}
