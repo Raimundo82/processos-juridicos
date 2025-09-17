@@ -153,7 +153,9 @@
             Artigos Infringidos
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Infringements)
+            @(Model.InfringementDetails != null && Model.InfringementDetails.Any()
+                ? string.Join(", ", Model.InfringementDetails.Select(i => i.InfringementName))
+                : "Nenhum artigo infringido")
         </dd>
 
         <dt class="col-sm-2">

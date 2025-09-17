@@ -36,28 +36,12 @@
 
 <div class="form-group mt-3">
     <label for="articles-infringed">Artigos Infringidos:</label>
-    <div>
-        @foreach (var infr in allInfringements!)
-        {
-
-            var isChecked = false;
-
-            if(Model != null)
-            {
-                 isChecked = Model.Infringements.Any(sel => (int)sel.InfringementId! == Int32.Parse(infr.Value));
-            }
-
-
-            <div>
-                <input type="checkbox"
-                       name="selectedInfringements"
-                       value="@infr.Value"
-                       @(isChecked ? "checked" : "") />
-                @infr.Text
-            </div>
-        }
-
-    </div>
+    <select id="articles-infringed"
+            asp-for="Infringements"
+            asp-items="ViewBag.Infringements"
+            multiple="multiple"
+            class="form-control">
+    </select>
 </div>
 
 <div class="form-group mt-3">

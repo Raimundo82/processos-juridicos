@@ -104,3 +104,13 @@ function createDataTable(elementId) {
         });
     }
 }
+
+// Select2 initializers
+$(function () {
+    $('#unit-id').select2({
+        allowClear: true
+    });
+    $('#articles-infringed').select2({
+        allowClear: true, closeOnSelect: false
+    });
+});

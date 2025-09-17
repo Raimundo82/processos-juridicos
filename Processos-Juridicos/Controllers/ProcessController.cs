@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 using Processos_Juridicos.DTOs;
 using Processos_Juridicos.Models;
 using Processos_Juridicos.Services.Interfaces;
-using Processos_Juridicos.Services.Interfaces.DomainData;
 using Processos_Juridicos.Services.Interfaces.Ldap;
 using Processos_Juridicos.Services.Interfaces.ProcessManagement;
 using Processos_Juridicos.Utilities;
@@ -17,7 +17,6 @@ public class ProcessController(
     IProcessViewDataSvc viewDataSvc,
     IFileValidatorSvc fileValidatorSvc,
     ILdapUserSvc ldapUserSvc,
-    ILegalReferenceSvc legalSvc,
     IToastNotify toastNotify) : Controller
 {
     private const string EntityName = "Processo";
@@ -26,7 +25,6 @@ public class ProcessController(
     private readonly IProcessViewDataSvc _viewDataSvc = viewDataSvc;
     private readonly IFileValidatorSvc _fileValidatorSvc = fileValidatorSvc;
     private readonly ILdapUserSvc _ldapUserSvc = ldapUserSvc;
-    private readonly ILegalReferenceSvc _legalSvc = legalSvc;
 
     private readonly IToastNotify _toastNotify = toastNotify;
 
@@ -82,58 +80,66 @@ public class ProcessController(
 
     [Authorize(Policy = "PROCESS-MANAGEMENT")]
     [HttpPost]
-    public async Task<IActionResult> Create(ProcessDto model, int?[] selectedInfringements)
+    public async Task<IActionResult> Create(ProcessDto model)
     {
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid)
         {
-            model.CreatedByName = _ldapUserSvc.GetLoggedUserData().DisplayName;
-            model.CreatedByNii = "M" + _ldapUserSvc.GetLoggedUserData().Nii;
-
-
-            ProcessDto insertTarget = await _processManagement.Processes.CreateProcess(model, selectedInfringements);
-
-            if (model.ProcessFiles != null && model.ProcessFiles.Length > 0)
-            {
-                foreach (IFormFile? file in model.ProcessFiles)
-                {
-                    if (!await _fileValidatorSvc.ValidateAndSaveFileAsync(insertTarget.ProcessId, file))
-                    {
-                        return View(model);
-                    }
-                }
-            }
-
-            _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("CreateSuccessMessage"), "O", EntityName, "o"));
-            return RedirectToAction(nameof(List));
+            await _viewDataSvc.PopulateForCreateAsync(ViewData);
+            return View(model);
         }
 
-        await _viewDataSvc.PopulateForCreateAsync(ViewData);
-        return View(model);
+        UserDataModel userData = _ldapUserSvc.GetLoggedUserData();
+        model.CreatedByName = userData.DisplayName;
+        model.CreatedByNii = "M" + userData.Nii;
+
+        ProcessDto insertTarget = await _processManagement.Processes.CreateProcess(model);
+
+        if (model.ProcessFiles != null && model.ProcessFiles.Length > 0)
+        {
+            foreach (IFormFile? file in model.ProcessFiles)
+            {
+                if (!await _fileValidatorSvc.ValidateAndSaveFileAsync(insertTarget.ProcessId, file))
+                {
+                    return View(model);
+                }
+            }
+        }
+
+        _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("CreateSuccessMessage"), "O", EntityName, "o"));
+        return RedirectToAction(nameof(List));
     }
 
     [Authorize(Policy = "PROCESS-MANAGEMENT")]
     [HttpGet]
     public async Task<IActionResult> Edit(int? id)
     {
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid)
         {
-            ProcessDto model = await _processManagement.Processes.GetProcessById(id);
-            List<ProcessFileDto> uploadedFiles = await _processManagement.ProcessFiles.GetAllProcessFilesByProcessId(id);
-            List<InfringementDto> infringements = await _legalSvc.Infringements.GetAllInfringementsByProcessId(id);
-            model.UploadedFiles = uploadedFiles;
-            model.Infringements = infringements;
-
-            await _viewDataSvc.PopulateForEditAsync(ViewData, model.ProcessId);
-            return View(model);
+            return RedirectToAction(nameof(List));
         }
 
-        return RedirectToAction(nameof(List));
+        ProcessDto model = await _processManagement.Processes.GetProcessById(id);
+        model.UploadedFiles = await _processManagement.ProcessFiles.GetAllProcessFilesByProcessId(id);
+
+        await _viewDataSvc.PopulateForEditAsync(ViewData, model.ProcessId);
+
+        if (ViewData["infringements"] is List<SelectListItem> infrList)
+        {
+            foreach (SelectListItem? item in from SelectListItem item in infrList
+                                             where model.Infringements.Contains(int.Parse(item.Value))
+                                             select item)
+            {
+                item.Selected = true;
+            }
+        }
+
+        return View(model);
     }
 
     [Authorize(Policy = "PROCESS-MANAGEMENT")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(ProcessDto model, int?[] selectedInfringements)
+    public async Task<IActionResult> Edit(ProcessDto model)
     {
         if (!ModelState.IsValid)
         {
@@ -148,15 +154,15 @@ public class ProcessController(
             return View(model);
         }
 
-
-        model.ModifiedByName = _ldapUserSvc.GetLoggedUserData().DisplayName;
-        model.ModifiedByNii = "M" + _ldapUserSvc.GetLoggedUserData().Nii;
+        UserDataModel userData = _ldapUserSvc.GetLoggedUserData();
+        model.ModifiedByName = userData.DisplayName;
+        model.ModifiedByNii = "M" + userData.Nii;
         model.ModifiedAt = DateOnly.FromDateTime(DateTime.Now);
 
         ProcessStateDto states = await _processManagement.ProcessStates.GetStateById(model.ProcessStateId);
         model.ProcessState = states;
 
-        await _processManagement.Processes.EditProcess(model, selectedInfringements);
+        await _processManagement.Processes.EditProcess(model);
 
         List<ProcessFileDto> uploadedFiles = await _processManagement.ProcessFiles.GetAllProcessFilesByProcessId(model.ProcessId);
 

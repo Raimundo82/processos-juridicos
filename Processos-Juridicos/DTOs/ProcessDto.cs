@@ -123,7 +123,8 @@ public partial class ProcessDto
     [ForeignKey("HarmedOrCasualtiesId")]
     public virtual HarmedOrCasualtyDto HarmedOrCasualties { get; set; }
 
-    public virtual ICollection<InfringementDto> Infringements { get; set; } = [];
+    public List<int?> Infringements { get; set; } = [];
+    public List<InfringementDto> InfringementDetails { get; set; } = [];
 
     [ForeignKey("ProcessTypeId")]
     public virtual ProcessTypeDto ProcessType { get; set; }

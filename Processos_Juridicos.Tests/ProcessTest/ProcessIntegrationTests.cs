@@ -3,6 +3,7 @@ using System.Net.Http.Headers;
 
 using AngleSharp.Dom;
 
+using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -21,7 +22,10 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
     IAsyncLifetime
 {
     private readonly CustomWebApplicationFactory<Program> _factory = factory;
-    private readonly HttpClient _client = factory.CreateClient();
+    private readonly HttpClient _client = factory.CreateClient(new WebApplicationFactoryClientOptions
+    {
+        HandleCookies = true
+    });
 
 
     [Theory]
@@ -417,6 +421,7 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
     {
         // Arrange
         TestAuthContext.Roles = ["DJ-AUTHORIZED"];
+
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         Process process = dbContext.Add(CreateProcess()).Entity;
@@ -760,13 +765,17 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
         Assert.Null(savedFile);
     }
 
+
+
     [Fact]
     public async Task Edit_GetThenDelete_DeletesFile()
     {
-        //Arrange
+        // Arrange
         TestAuthContext.Roles = ["DJ-AUTHORIZED"];
+
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
         Process process = dbContext.Add(CreateProcess()).Entity;
 
         var initialProcessFileCount = dbContext.ProcessFiles.Count();
@@ -784,13 +793,20 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
         dbContext.ProcessFiles.Add(fileEntity);
         await dbContext.SaveChangesAsync();
 
-        IDocument doc = await _client.GetDocumentAsync($"/Process/Edit/{process.ProcessId}");
-        IElement form = doc.QuerySelector("form[action^='/Process/Edit']")!;
+        dbContext.ChangeTracker.Clear();
+        ProcessFile loaded = dbContext.ProcessFiles
+            .Include(f => f.Process)
+            .First(f => f.ProcessFileId == fileEntity.ProcessFileId);
 
+
+        // Load edit page
+        IDocument doc = await _client.GetDocumentAsync($"/Process/Edit/{process.ProcessId}");
+        IElement? form = doc.QuerySelector("form[action^='/Process/Edit']");
         Assert.NotNull(form);
 
-        var action = form.GetAttribute("action")!;
+        var action = form!.GetAttribute("action")!;
 
+        // Find the file row and prepare deletion
         var rowSelector = $"#file-row-{fileEntity.ProcessFileId}";
         IElement? row = doc.QuerySelector(rowSelector);
         Assert.NotNull(row);
@@ -798,20 +814,21 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
         row = doc.QuerySelectorAll("tr[id^='file-row-']").First();
 
         IElement container = doc.QuerySelector("#deletedFilesContainer")!;
-
-        var deleteId = row.Id;
-        var deleteIdSplit = deleteId!.Split('-');
+        var deleteId = row.Id!;
+        var deleteIdSplit = deleteId.Split('-');
         var number = deleteIdSplit[^1];
 
+        // Add hidden input FilesToRemove
         IElement hidden = doc.CreateElement("input");
         hidden.SetAttribute("type", "hidden");
         hidden.SetAttribute("name", "FilesToRemove");
         hidden.SetAttribute("value", number);
-
         container.AppendChild(hidden);
 
-        row?.Remove();
+        // Remove the row from DOM (simulating UI deletion)
+        row.Remove();
 
+        // Build multipart from all form fields
         var multipart = new MultipartFormDataContent();
 
         var allNames = doc
@@ -820,6 +837,7 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
           .Distinct()
           .ToList();
 
+
         foreach (var name in allNames)
         {
             IElement input = doc.QuerySelector($"[name='{name}']")!;
@@ -827,31 +845,59 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
 
             switch (name)
             {
-                case "Nuipm":
-                    val = process.Nuipm;
-                    break;
                 case "ProcessStateId":
-                    val = process.ProcessStateId.ToString();
+                    val = process.ProcessStateId.ToString(); // ensure it's a valid int
                     break;
-                case "ProcessTypeId":
-                    val = process.ProcessTypeId.ToString();
-                    break;
-                case "CreatedBy":
-                    val = process.CreatedByName.ToString();
+                case "Infringements":
+                    // If process.Infringements is List<int>
+                    foreach (Infringement? id in process.Infringements)
+                    {
+                        multipart.Add(new StringContent(id.ToString()!), "Infringements");
+                    }
                     break;
                 default:
                     break;
             }
 
-            multipart.Add(new StringContent(val!), name);
+            multipart.Add(new StringContent(val), name);
         }
 
-        //Act
-        await _client.PostAsync(action, multipart);
+        if (!allNames.Contains("FilesToRemove"))
+        {
+            multipart.Add(new StringContent(number), "FilesToRemove");
+        }
 
-        //Assert
-        Assert.Equal(initialProcessFileCount, dbContext.ProcessFiles.Count());
+        var postUrl = new Uri(_client.BaseAddress!, action);
+
+        using var request = new HttpRequestMessage(HttpMethod.Post, postUrl)
+        {
+            Content = multipart
+        };
+
+
+        // Act
+        HttpResponseMessage response = await _client.SendAsync(request);
+
+        // Assert
+        dbContext.ChangeTracker.Clear(); // ensure we don't read cached entities
+        var finalCount = dbContext.ProcessFiles.Count();
+
+        Assert.Equal(initialProcessFileCount, finalCount);
     }
+
+    // Helper handler to log outgoing request body
+    public class LoggingHandler(HttpMessageHandler innerHandler) : DelegatingHandler(innerHandler)
+    {
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            if (request.Content != null)
+            {
+                await request.Content.ReadAsStringAsync(cancellationToken);
+            }
+            return await base.SendAsync(request, cancellationToken);
+        }
+    }
+
 
     private static Process CreateProcess()
     {

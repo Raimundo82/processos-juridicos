@@ -1,5 +1,3 @@
-
-
 using System.Security.Claims;
 
 using Microsoft.EntityFrameworkCore;
@@ -18,21 +16,9 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
 {
     private readonly AppDbContext _context = context;
 
-    public async Task<ProcessDto> CreateProcess(ProcessDto process, int?[] selectedInfringements)
+    public async Task<ProcessDto> CreateProcess(ProcessDto process)
     {
         Process processEntity = Mapper.MapToProcesses(process);
-
-        if (selectedInfringements != null && selectedInfringements.Length > 0)
-        {
-            List<Infringement> infringements = await _context.Infringements
-                .Where(i => selectedInfringements.Contains(i.InfringementId))
-                .ToListAsync();
-
-            foreach (Infringement? infr in infringements)
-            {
-                processEntity.Infringements.Add(infr);
-            }
-        }
 
         _context.Processes.Add(processEntity);
         await _context.SaveChangesAsync();
@@ -57,51 +43,41 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
         return true;
     }
 
-    public async Task<ProcessDto> EditProcess(ProcessDto process, int?[] selectedInfringements)
+    public async Task<ProcessDto> EditProcess(ProcessDto process)
     {
-        Process? existingEntity = await _context.Processes.Include(p => p.Infringements).FirstOrDefaultAsync(p => p.ProcessId == process.ProcessId);
-        existingEntity!.Infringements.Clear();
-        await _context.SaveChangesAsync();
+        Process existingEntity = await _context.Processes
+            .Include(p => p.Infringements)
+            .FirstOrDefaultAsync(p => p.ProcessId == process.ProcessId)
+            ?? throw new EntityNotFoundException("Process not found");
 
-        if (existingEntity != null)
+        process.CreatedBy ??= existingEntity.CreatedBy;
+        process.CreatedByNii ??= existingEntity.CreatedByNii;
+
+        if (process.Nuipm == null)
         {
-            _context.Entry(existingEntity).State = EntityState.Detached;
+            var nuipm = await GenerateNuipm(process);
+            process.Nuipm = nuipm;
         }
 
-        if (process.CreatedByName == null && existingEntity != null)
-        {
-            process.CreatedByName = existingEntity.CreatedByName;
-            process.CreatedByNii = existingEntity.CreatedByNii;
-        }
+        existingEntity.Infringements.Clear();
 
-        var nuipm = await GenerateNuipm(process);
-
-        process.Nuipm = nuipm;
-
-        Process processEntity = Mapper.MapToProcesses(process);
-
-        processEntity!.Infringements.Clear();
-
-        _context.ChangeTracker.Clear();
-        _context.Processes.Attach(processEntity);
-        _context.Entry(processEntity).State = EntityState.Modified;
-
-        if (selectedInfringements != null && selectedInfringements.Length > 0)
+        if (process.Infringements != null && process.Infringements.Count > 0)
         {
             List<Infringement> infringements = await _context.Infringements
-                .Where(i => selectedInfringements.Contains(i.InfringementId))
+                .Where(i => process.Infringements.Contains(i.InfringementId!.Value))
                 .ToListAsync();
 
-            foreach (Infringement? infr in infringements)
+            foreach (Infringement infr in infringements)
             {
-                processEntity.Infringements.Add(infr);
+                existingEntity.Infringements.Add(infr);
             }
-
         }
 
+        _context.Entry(existingEntity).CurrentValues.SetValues(process);
 
         await _context.SaveChangesAsync();
-        return Mapper.MapToProcessesDto(processEntity);
+
+        return Mapper.MapToProcessesDto(existingEntity);
     }
 
     public async Task<IEnumerable<ProcessDto>> GetAllProcesses(ClaimsPrincipal User)
@@ -153,9 +129,20 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
             .Include(x => x.MilitarySecurity)
             .Include(x => x.CrimeType)
             .AsSplitQuery()
-            .FirstOrDefaultAsync(x => x.ProcessId == id);
+            .FirstOrDefaultAsync(x => x.ProcessId == id)
+            ?? throw new EntityNotFoundException("Process not found");
 
-        return process != null ? Mapper.MapToProcessesDto(process) : throw new EntityNotFoundException("Process not found");
+        ProcessDto dto = Mapper.MapToProcessesDto(process);
+
+        dto.Infringements = [.. process.Infringements.Select(i => i.InfringementId ?? 0)];
+
+        dto.InfringementDetails = [.. process.Infringements.Select(i => new InfringementDto
+        {
+            InfringementId = i.InfringementId,
+            InfringementName = i.InfringementName
+        })];
+
+        return dto;
     }
 
     public async Task<bool> CanChangeStateAsync(int processId, int? newStateId)
