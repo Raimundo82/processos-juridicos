@@ -9,18 +9,18 @@ namespace Processos_Juridicos.Services.DomainData;
 
 public class StateTransitionSvc(AppDbContext context) : IStateTransitionSvc
 {
-
     private readonly AppDbContext _context = context;
-    public async Task<List<StateTransitionDto>> GetAllTransitionsFromSource(int? idSource)
+    public async Task<List<StateTransitionDto>> GetAllTransitionsFromSource(int? idSource, string userRole)
     {
         return !idSource.HasValue
             ? []
             : await _context.StateTransitions
-            .Where(t => t.FromStateId == idSource.Value)
+            .Where(t => t.FromStateId == idSource.Value &&
+                        t.Roles.Any(r => r.Role!.RoleName == userRole))
             .Select(t => new StateTransitionDto
             {
                 FromStateId = t.FromStateId,
-                ToStateId = t.ToStateId,
+                ToStateId = t.ToStateId
             })
             .ToListAsync();
     }

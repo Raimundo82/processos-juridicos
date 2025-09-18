@@ -32,6 +32,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
     public DbSet<StateTransition> StateTransitions { get; set; }
 
+    public DbSet<StateTransitionRole> StateTransitionRoles { get; set; }
+
     public DbSet<UnitCommander> UnitCommanders { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

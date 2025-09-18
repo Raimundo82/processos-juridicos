@@ -244,8 +244,21 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
         await dbContext.SaveChangesAsync();
         dbContext.Entry(process).State = EntityState.Detached;
 
-        dbContext.Add(new StateTransition { FromStateId = process.ProcessStateId, ToStateId = targetState.ProcessStateId });
+        StateTransition transition = dbContext.Add(new StateTransition
+        {
+            FromStateId = process.ProcessStateId,
+            ToStateId = targetState.ProcessStateId
+        }).Entity;
+
+        Role role = dbContext.Add(new Role { RoleName = "DJ-AUTHORIZED" }).Entity;
+        dbContext.Add(new StateTransitionRole
+        {
+            StateTransition = transition,
+            RoleId = (int)role.RoleId!
+        });
+
         await dbContext.SaveChangesAsync();
+
         IDocument doc = await _client.GetDocumentAsync($"/Process/Edit/{process.ProcessId}");
         var newTypeId = doc.GetElementById("process-type-id")?.QuerySelector($"option[value='{newType.ProcessTypeId}']")?.GetAttribute("value");
         var newStateId = doc.GetElementById("state-id")?.QuerySelector($"option[value='{targetState.ProcessStateId}']")?.GetAttribute("value");

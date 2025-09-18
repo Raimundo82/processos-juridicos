@@ -1,3 +1,5 @@
+using System.Security.Claims;
+
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
@@ -9,11 +11,14 @@ namespace Processos_Juridicos.Services.ProcessManagement;
 public class ProcessViewDataSvc(
     ILegalReferenceSvc legalRefs,
     IContextSvc context,
-    IProcessManagementSvc processManagement) : IProcessViewDataSvc
+    IProcessManagementSvc processManagement,
+    IHttpContextAccessor httpContextAccessor) : IProcessViewDataSvc
 {
     private readonly ILegalReferenceSvc _legalRefs = legalRefs;
     private readonly IContextSvc _context = context;
     private readonly IProcessManagementSvc _processManagement = processManagement;
+
+    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
     private static readonly List<string> Genders = ["Masculino", "Feminino", "Incerto"];
     private const string InitialStateName = "Em Edição";
@@ -115,8 +120,10 @@ public class ProcessViewDataSvc(
         DTOs.ProcessDto process = await _processManagement.Processes.GetProcessById(processId);
         var sourceStateId = process.ProcessStateId;
 
+        var userRole = _httpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.Role)?.Value;
+
         IEnumerable<DTOs.ProcessStateDto> states = await _processManagement.ProcessStates.GetAllStates();
-        List<DTOs.StateTransitionDto> transitions = await _processManagement.ProcessTransitions.GetAllTransitionsFromSource(sourceStateId);
+        List<DTOs.StateTransitionDto> transitions = await _processManagement.ProcessTransitions.GetAllTransitionsFromSource(sourceStateId, userRole!);
 
         var allowedTargetIds = transitions.Select(t => t.ToStateId).ToHashSet();
 

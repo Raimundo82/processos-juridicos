@@ -4,5 +4,5 @@ namespace Processos_Juridicos.Services.Interfaces.DomainData;
 
 public interface IStateTransitionSvc
 {
-    public Task<List<StateTransitionDto>> GetAllTransitionsFromSource(int? idSource);
+    public Task<List<StateTransitionDto>> GetAllTransitionsFromSource(int? idSource, string userRole);
 }
