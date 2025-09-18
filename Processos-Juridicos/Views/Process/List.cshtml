@@ -25,7 +25,23 @@ else {
     @if (Model.Processes != null && Model.Processes.Any())
     {
         <div class="table-responsive-md" style="max-width: calc(100vw-200px);margin: 0 auto; overflow-x: auto;">
-            <table id="tableStates" class="table table-striped-columns table-hover">
+            <select id="unitFilter">
+                <option value="">Todas as unidades</option>
+
+            </select>
+
+            <select id="typeFilter">
+                <option value="">Todos os tipos</option>
+
+            </select>
+
+            <select id="stateFilter">
+                <option value="">Todos os estados</option>
+
+            </select>
+
+
+            <table id="processesTable" class="table table-striped-columns table-hover">
                 <thead>
                     <tr>
                         <th scope="col">@Html.DisplayNameFor(m => m.Processes.First().Nuipm)</th>
@@ -96,6 +112,48 @@ else {
 
 @section Scripts {
     <script>
-        let table = createDataTable("#tableStates");
+        // Function to load filter values from API and populate selects
+        function loadProcessFilters(apiUrl, unitSelector, typeSelector, stateSelector) {
+            $.getJSON(apiUrl, function (data) {
+                fillSelect(unitSelector, data.units);
+                fillSelect(typeSelector, data.types);
+                fillSelect(stateSelector, data.states);
+            });
+        }
+
+        // Helper to fill a select with options
+        function fillSelect(selector, values) {
+            var $select = $(selector);
+            $select.empty().append('<option value="">Todos</option>');
+            (values || []).forEach(function (v) {
+                if (v) {
+                    $select.append('<option value="' + v + '">' + v + '</option>');
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            var table = $('#processesTable').DataTable();
+
+            // Load filter values from your controller endpoint
+            loadProcessFilters('/Process/GetFilterValues', '#unitFilter', '#typeFilter', '#stateFilter');
+
+            // Bind filter change events to correct columns
+            $('#unitFilter').on('change', function () {
+                table.column(2).search(this.value).draw();
+            });
+            $('#typeFilter').on('change', function () {
+                table.column(1).search(this.value).draw();
+            });
+            $('#stateFilter').on('change', function () {
+                table.column(8).search(this.value).draw();
+            });
+        });
+
+        $('#unitFilter').select2({
+            placeholder: "Todas as unidades",
+            allowClear: true,
+            width: 'resolve' // or 'style' to match Bootstrap styling
+        });
     </script>
 }

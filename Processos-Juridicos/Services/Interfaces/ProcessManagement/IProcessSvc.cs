@@ -12,4 +12,5 @@ public interface IProcessSvc
     public Task<ProcessDto> EditProcess(ProcessDto process);
     public Task<bool> DeleteProcess(int? id);
     public Task<bool> CanChangeStateAsync(int processId, int? newStateId);
+    public Task<ProcessFilterValuesDto> GetFilterValuesAsync();
 }

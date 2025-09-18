@@ -187,5 +187,37 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
 
         return count;
     }
+
+    public async Task<ProcessFilterValuesDto> GetFilterValuesAsync()
+    {
+        List<string> units = await _context.Processes
+            .Where(p => p.Unit != null)
+            .Select(p => p.Unit.UnitName)
+            .Distinct()
+            .OrderBy(x => x)
+            .ToListAsync();
+
+        List<string> types = await _context.Processes
+            .Where(p => p.ProcessType != null)
+            .Select(p => p.ProcessType.ProcessTypeName)
+            .Distinct()
+            .OrderBy(x => x)
+            .ToListAsync();
+
+        List<string> states = await _context.Processes
+            .Where(p => p.ProcessState != null)
+            .Select(p => p.ProcessState.StateName)
+            .Distinct()
+            .OrderBy(x => x)
+            .ToListAsync();
+
+        return new ProcessFilterValuesDto
+        {
+            Units = units,
+            Types = types,
+            States = states
+        };
+    }
 }
+
 

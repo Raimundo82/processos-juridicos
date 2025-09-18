@@ -198,6 +198,14 @@ public class ProcessController(
         return RedirectToAction("Edit", new { id = model.ProcessId });
     }
 
+
+    [HttpGet]
+    public async Task<IActionResult> GetFilterValues()
+    {
+        ProcessFilterValuesDto values = await _processManagement.Processes.GetFilterValuesAsync();
+        return Json(values);
+    }
+
     [Authorize(Policy = "DJ-ADMINISTRATION")]
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
