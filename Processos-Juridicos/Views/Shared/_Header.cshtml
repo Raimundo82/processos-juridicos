@@ -2,7 +2,7 @@
     <div class="container-fluid mx-md-5">
         <div class="d-flex w-100 align-items-center justify-content-between">
             <!-- Left: Logo -->
-            <div class="d-flex align-items-center bg-white">
+            <div class="d-flex align-items-center">
                 <a class="navbar-brand me-3" asp-controller="Home" asp-action="Index">
                     <img src="/images/logo-marinha.webp" alt="Processos Jurí­dicos" width="154">
                 </a>
@@ -10,12 +10,17 @@
 
             <!-- Right: Title + User Info + Button -->
             <div class="d-flex align-items-center gap-md-5 gap-3">
-                <span class="nav-title d-none d-sm-inline">Processos Jurídicos</span>
-                <a class="d-inline d-sm-none nav-icon"
-                    data-bs-toggle="offcanvas" data-bs-target="#navbarOffcanvasLg"
-                    aria-controls="navbarOffcanvasLg" aria-label="Toggle navigation">
-                    <i class="fa-solid fa-bars"></i>
-                </a>
+                <h1 class="d-none d-sm-inline m-0">Processos Jurídicos</h1>
+
+                @if (ViewData["LoginView"] as bool? != true)
+                {
+                    <a class="d-inline d-sm-none nav-icon"
+                       data-bs-toggle="offcanvas" data-bs-target="#navbarOffcanvasLg"
+                       aria-controls="navbarOffcanvasLg" aria-label="Toggle navigation">
+                        <i class="fa-solid fa-bars"></i>
+                    </a>
+                }
+               
                 <a class="nav-icon" id="nightModeToggle">
                     <i class="fa-solid fa-moon"></i>
                 </a>

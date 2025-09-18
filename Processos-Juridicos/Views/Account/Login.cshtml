@@ -6,32 +6,45 @@
     ViewData["Title"] = "Login";
 }
 
-<div class="d-flex justify-content-center align-items-center">
-    <div class="card shadow-sm" style="max-width: 400px; width: 100%;">
-        <div class="card-body">
-            <h4 class="card-title mb-4">Autenticação</h4>
+<div class="row justify-content-center align-items-center" style="min-height: calc(100vh - 156px);">
+    <div class="col-lg-4 col-md-6 col-12 mx-auto">
+        <div class="card login-card">
+            <div class="card-body">
+                <h1 class="card-title mb-4">Autenticação</h1>
 
-            <form asp-action="Login" method="post">
-                @Html.AntiForgeryToken()
+                <form asp-action="Login" method="post">
+                    @Html.AntiForgeryToken()
 
-                <div class="mb-3">
-                    <label asp-for="Username" class="form-label w-100">@Html.DisplayNameFor(m => m.Username)
-                        <input asp-for="Username" class="form-control" placeholder="Digite o seu NII" />
-                    </label>
-                    <span asp-validation-for="Username" class="text-danger"></span>
-                </div>
+                    <div class="mb-4">
+                        <label asp-for="Username" class="form-label w-100 d-grid gap-2">
+                            <span class="text-label">@Html.DisplayNameFor(m => m.Username)</span>
+                            <div class="input-icon-wrapper">
+                                <i class="bi bi-person-fill"></i>
+                                <input asp-for="Username" class="form-control" placeholder="NII (Utilizador)" />
+                            </div>
+                        </label>
+                        <span asp-validation-for="Username" class="text-danger"></span>
+                    </div>
 
-                <div class="mb-3">
-                    <label asp-for="Password" class="form-label w-100">@Html.DisplayNameFor(m => m.Password)
-                        <input asp-for="Password" class="form-control" placeholder="Digite a sua palavra-passe" />
-                    </label>
-                    <span asp-validation-for="Password" class="text-danger"></span>
-                </div>
+                    <div class="mb-4">
+                        <label asp-for="Password" class="form-label w.100 d-grid gap-2">
+                            <span class="text-label">@Html.DisplayNameFor(m => m.Password)</span>
+                            <div class="input-icon-wrapper">
+                                <i class="bi bi-lock-fill"></i>
+                                <input asp-for="Password" type="password" class="form-control" placeholder="Palavra-passe" />
+                            </div>
+                        </label>
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
 
-                <div class="d-grid">
-                    <button type="submit" class="btn btn-primary">Entrar</button>
-                </div>
-            </form>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">
+                            Entrar
+                            <i class="bi bi-arrow-right ms-2"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
