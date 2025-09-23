@@ -107,10 +107,10 @@ function createDataTable(elementId) {
 
 // Select2 initializers
 $(function () {
-    $('#unit-id').select2({
-        allowClear: true
+    $('#UnitId').select2({
+        allowClear: true, theme: 'bootstrap-5', width: '100%',
     });
-    $('#articles-infringed').select2({
-        allowClear: true, closeOnSelect: false
+    $('#Infringements').select2({
+        allowClear: true, closeOnSelect: false, theme: 'bootstrap-5', width: '100%',
     });
 });

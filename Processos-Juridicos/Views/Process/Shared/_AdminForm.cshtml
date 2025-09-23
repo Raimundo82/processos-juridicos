@@ -4,75 +4,113 @@
     var allInfringements = ViewData["infringements"] as List<SelectListItem>;
 }
 
-<h3 class="mt-5 text-center">A preencher pela Direção Jurídica após o "Fecho" do Processo</h3>
-
-<div class="form-group mt-3">
-    <label for="accident-id" class="control-label">Acidente em serviço</label>
-    <select id="accident-id" asp-for="ServiceAccidentId" asp-items="ViewBag.accidentTypes" class="form-control">
-        <option value="">Selecione um Acidente em Serviço</option>
-    </select>
-    <span asp-validation-for="ServiceAccidentId" class="text-danger"></span>
+<div class="mt-5 mb-3 d-grid gap-5">
+    <div class="border-box"></div>
+    <h2 class="text-center">A preencher pela Direção Jurídica após o "Fecho" do Processo</h2>
 </div>
 
-<div class="form-group mt-3">
-    <label for="casualties-id" class="control-label">Mortos/Feridos</label>
-    <select id="casualties-id" asp-for="HarmedOrCasualtiesId" asp-items="ViewBag.casualties" class="form-control">
-        <option value="">Mortos/Feridos</option>
-    </select>
-    <span asp-validation-for="HarmedOrCasualtiesId" class="text-danger"></span>
+
+<div class="row mb-3">
+    <div class="col-lg-4 col-md-12 offset-lg-2">
+        <div class="form-group mt-3">
+            <label asp-for="ServiceAccidentId" class="form-label"></label>
+            <select asp-for="ServiceAccidentId" asp-items="ViewBag.accidentTypes" class="form-select">
+                <option value="">Selecione o acidente</option>
+            </select>
+            <span asp-validation-for="ServiceAccidentId" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="col-lg-4 col-md-12">
+        <div class="form-group mt-3">
+            <label asp-for="HarmedOrCasualtiesId" class="form-label"></label>
+            <select asp-for="HarmedOrCasualtiesId" asp-items="ViewBag.casualties" class="form-select">
+                <option value="">Selecione a categoria</option>
+            </select>
+            <span asp-validation-for="HarmedOrCasualtiesId" class="text-danger"></span>
+        </div>
+    </div>
 </div>
 
-<div class="form-group mt-3">
-    <label asp-for="ThirdPartyCompensation" for="third-party-compensation" class="control-label">Valor Indemnizado a Terceiros</label>
-    <input id="third-party-compensation" asp-for="ThirdPartyCompensation" class="form-control" />
-    <span asp-validation-for="ThirdPartyCompensation" class="text-danger"></span>
+<div class="row mb-3">
+    <div class="col-lg-4 col-md-12 offset-lg-2">
+        <div class="form-group mt-3">
+            <label asp-for="ThirdPartyCompensation" class="form-label"></label>
+            <div class="input-icon-wrapper icon-left">
+                <i class="bi bi-currency-euro"></i>
+                <input asp-for="ThirdPartyCompensation" type="number" class="form-control" />
+            </div>
+            <span asp-validation-for="ThirdPartyCompensation" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="col-lg-4 col-md-12">
+        <div class="form-group mt-3">
+            <label asp-for="Reimbursement" class="form-label"></label>
+            <div class="input-icon-wrapper icon-left">
+                <i class="bi bi-currency-euro"></i>
+                <input asp-for="Reimbursement" type="number" class="form-control" />
+            </div>
+            <span asp-validation-for="Reimbursement" class="text-danger"></span>
+        </div>
+    </div>
 </div>
 
-<div class="form-group mt-3">
-    <label asp-for="Reimbursement" for="investigated-name" class="control-label">Valor Ressarcido à Marinha</label>
-    <input id="investigated-name" asp-for="Reimbursement" class="form-control" />
-    <span asp-validation-for="Reimbursement" class="text-danger"></span>
+<div class="row mb-3">
+    <div class="col-lg-8 col-md-12 offset-lg-2">
+        <div class="form-group mt-3">
+            <label asp-for="Infringements" class="form-label"></label>
+            <select asp-for="Infringements" asp-items="ViewBag.Infringements" multiple class="form-select"></select>
+        </div>
+    </div>
 </div>
 
-<div class="form-group mt-3">
-    <label for="articles-infringed">Artigos Infringidos:</label>
-    <select id="articles-infringed"
-            asp-for="Infringements"
-            asp-items="ViewBag.Infringements"
-            multiple="multiple"
-            class="form-control">
-    </select>
+<div class="row mb-3">
+    <div class="col-lg-4 col-md-12 offset-lg-4">
+        <div class="form-group mt-3">
+            <div class="form-check mt-2">
+                <input asp-for="ComunicatedToPjm" type="checkbox" class="form-check-input" />
+                <label asp-for ="ComunicatedToPjm" class="form-check-label"></label>
+            </div>
+            <label asp-for="ComunicationDate" class="form-label"></label>
+            <input asp-for="ComunicationDate" type="date" class="form-control" />
+            <span asp-validation-for="ComunicationDate" class="text-danger"></span>
+        </div>
+    </div>
 </div>
 
-<div class="form-group mt-3">
-    <label asp-for="ComunicatedToPjm" for="uncertainInvestigated">Comunicado à PJM?</label>
-    <input asp-for="ComunicatedToPjm" type="checkbox" id="communicated-to-pjm" />
-
-    <label for="communication-date" asp-for="ComunicationDate">Data da comunicação</label>
-    <input asp-for="ComunicationDate" id="communication-date" type="date" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
-    <span asp-validation-for="ComunicationDate" class="text-danger"></span>
+<div class="row mb-3">
+    <div class="col-lg-4 col-md-12 offset-lg-4">
+        <div class="form-group mt-3">
+            <label asp-for="CrimeTypeId" class="form-label"></label>
+            <select asp-for="CrimeTypeId" asp-items="ViewBag.crimeTypes" class="form-select">
+                <option value="">Selecione um tipo</option>
+            </select>
+            <span asp-validation-for="CrimeTypeId" class="text-danger"></span>
+        </div>
+    </div>
 </div>
 
-<div class="form-group mt-3">
-    <label for="crime-type">Tipo de crime</label>
-    <select id="crime-type" asp-for="CrimeTypeId" asp-items="ViewBag.crimeTypes" class="form-control">
-        <option value="">Selecione um Tipo de Crime</option>
-    </select>
-    <span asp-validation-for="CrimeTypeId" class="text-danger"></span>
+<div class="row mb-3">
+    <div class="col-lg-4 col-md-12 offset-lg-4">
+        <div class="form-group mt-3">
+            <label asp-for="MilitarySecurityId" class="form-label"></label>
+            <select asp-for="MilitarySecurityId" asp-items="ViewBag.militarySecurities" class="form-select">
+                <option value="">Selecione uma opção</option>
+            </select>
+            <span asp-validation-for="MilitarySecurityId" class="text-danger"></span>
+        </div>
+    </div>
 </div>
 
-<div class="form-group mt-3">
-    <label for="military-security">Segurança Militar</label>
-    <select id="military-security" asp-for="MilitarySecurityId" asp-items="ViewBag.militarySecurities" class="form-control">
-        <option value="">Selecione uma opção</option>
-    </select>
-    <span asp-validation-for="MilitarySecurityId" class="text-danger"></span>
-</div>
-
-<div class="form-group mt-3">
-    <label for="responsible-unit">Unidade responsável pela indeminização</label>
-    <select id="responsible-unit" asp-for="CompensatingUnitId" asp-items="ViewBag.units" class="form-control">
-        <option value="">Selecione uma opção</option>
-    </select>
-    <span asp-validation-for="CompensatingUnitId" class="text-danger"></span>
+<div class="row mb-3">
+    <div class="col-lg-4 col-md-12 offset-lg-4">
+        <div class="form-group mt-3">
+            <label asp-for="CompensatingUnitId" class="form-label"></label>
+            <select asp-for="CompensatingUnitId" asp-items="ViewBag.units" class="form-select">
+                <option value="">Selecione uma unidade</option>
+            </select>
+            <span asp-validation-for="CompensatingUnitId" class="text-danger"></span>
+        </div>
+    </div>
 </div>

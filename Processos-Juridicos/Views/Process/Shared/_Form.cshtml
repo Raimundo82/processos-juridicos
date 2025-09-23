@@ -1,190 +1,255 @@
-@model Processos_Juridicos.DTOs.ProcessDto;
+@model Processos_Juridicos.DTOs.ProcessDto
 
-
-
-<div class="form-group mt-3">
-    <label asp-for="Nuipm" for="process-nuipm" class="control-label">@Html.DisplayNameFor(m => m.Nuipm)</label>
-    <input id="process-nuipm" asp-for="Nuipm" class="form-control " readonly />
-    <span asp-validation-for="Nuipm" class="text-danger"></span>
-</div>
-
-<div class="form-group mt-3">
-    <label for="process-type-id" class="control-label">Tipo de Processo</label>
-    <select id="process-type-id" asp-for="ProcessTypeId" asp-items="ViewBag.processTypes" class="form-control">
-        <option value="">Selecione um Tipo de Processo</option>
-    </select>
-    <span asp-validation-for="ProcessTypeId" class="text-danger"></span>
-</div>
-
-<div class="form-group mt-3">
-    <label for="unit-id" class="control-label">Unidade</label>
-    <select id="unit-id" asp-for="UnitId" asp-items="ViewBag.units" class="form-control">
-        <option value="">Selecione uma Unidade</option>
-    </select>
-    <span asp-validation-for="UnitId" class="text-danger"></span>
-</div>
-
-<div class="form-group mt-3">
-    <input type="hidden" asp-for="OficialInstName" id="OficialInstName" />
-    <input type="hidden" asp-for="OficialInstNii" id="OficialInstNii" />
-
-    <label class="control-label">Oficial Instrutor</label>
-    <div class="input-group">
-        <input id="instructor-lookup"
-               class="form-control"
-               placeholder="Digite o ID do oficial, ex: a1234"
-               value="@( (Model?.OficialInstName ?? string.Empty) + " - " + (Model?.OficialInstNii ?? string.Empty) )" />
-
-        <button type="button"
-                class="btn btn-secondary ad-lookup-btn"
-                data-target-visible="instructor-lookup"
-                data-target-hidden="OficialInstName"
-                data-target-hidden2="OficialInstNii"
-                data-target-info="OficialInstInfo">
-            Procurar na AD
-        </button>
+<div class="row mb-3">
+    <div class="col-lg-4 col-md-6">
+        <div class="form-group mt-3">
+            <label asp-for="Nuipm" class="form-label"></label>
+            <input asp-for="Nuipm" class="form-control" readonly />
+            <span class="form-text">Gerado automaticamente</span>
+            <span asp-validation-for="Nuipm" class="text-danger"></span>
+        </div>
     </div>
-    <small id="OficialInstInfo" class="form-text text-muted"></small>
-    <span asp-validation-for="OficialInstNii" class="text-danger"></span>
 
-    <label asp-for="OficialInstTelephone" for="instructor-telephone" class="control-label mt-3">
-        Telefone do oficial instrutor
-    </label>
-    <input id="instructor-telephone" asp-for="OficialInstTelephone" class="form-control" />
-    <span asp-validation-for="OficialInstTelephone" class="text-danger"></span>
-</div>
-
-<div class="form-group mt-3">
-    <input type="hidden" asp-for="InvestigatedName" id="InvestigatedName" />
-
-    <label class="control-label">Averiguado</label>
-    <div class="input-group">
-        <input id="investigated-lookup" class="form-control" placeholder="Digite o ID ou nome do averiguado" />
-        <button type="button"
-                class="btn btn-outline-secondary ad-lookup-btn"
-                data-target-visible="investigated-lookup"
-                data-target-hidden="InvestigatedName"
-                data-target-info="InvestigatedInfo">
-            Procurar AD
-        </button>
+    <div class="col-lg-4 col-md-6">
+        <div class="form-group mt-3">
+            <label asp-for="ProcessTypeId" class="form-label"></label>
+            <select asp-for="ProcessTypeId" asp-items="ViewBag.processTypes" class="form-select">
+                <option value="">Selecione um tipo</option>
+            </select>
+            <span asp-validation-for="ProcessTypeId" class="text-danger"></span>
+        </div>
     </div>
-    <small id="InvestigatedInfo" class="form-text text-muted"></small>
 
-    <label for="investigated-gender" class="control-label mt-3">Sexo</label>
-    <select id="investigated-gender" asp-for="InvestigatedGender" asp-items="ViewBag.genders" class="form-control"></select>
-    <span asp-validation-for="InvestigatedGender" class="text-danger"></span>
-
-    <div class="mt-2">
-        <label for="uncertainInvestigated">Averiguado Incerto</label>
-        <input type="checkbox" id="uncertainInvestigated" />
+    <div class="col-lg-4 col-md-12">
+        <div class="form-group mt-3">
+            <label asp-for="UnitId" class="form-label"></label>
+            <select asp-for="UnitId" asp-items="ViewBag.units" class="form-select">
+                <option value="">Selecione uma unidade</option>
+            </select>
+            <span asp-validation-for="UnitId" class="text-danger"></span>
+        </div>
     </div>
 </div>
 
-<div class="form-group mt-3">
-    <label for="created-at" asp-for="CreatedAt">Data de criação</label>
-    <input asp-for="CreatedAt" id="created-at" type="date" class="form-control"
-        value="@DateTime.Now.ToString("yyyy-MM-dd")" />
-    <span asp-validation-for="CreatedAt" class="text-danger"></span>
+<div class="row mb-3">
+    <div class="col-lg-8 col-md-12">
+        <div class="form-group mt-3">
+            <input type="hidden" asp-for="OficialInstName" />
+            <input type="hidden" asp-for="OficialInstNii" />
+
+            <label asp-for="OficialInstName" class="form-label"></label>
+            <div class="input-group">
+                <input id="instructor-lookup"
+                       class="form-control"
+                       placeholder="Digite o ID do oficial, ex: a1234"
+                       value="@($"{Model?.OficialInstName} - {Model?.OficialInstNii}")" />
+
+                <button type="button"
+                        class="btn btn-secondary ad-lookup-btn"
+                        data-target-visible="instructor-lookup"
+                        data-target-hidden="OficialInstName"
+                        data-target-hidden2="OficialInstNii"
+                        data-target-info="OficialInstInfo">
+                    <i class="bi bi-search"></i>
+                </button>
+            </div>
+            <span id="OficialInstInfo" class="form-text"></span>
+            <span asp-validation-for="OficialInstNii" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="col-lg-4 col-md-12">
+        <div class="form-group mt-3">
+            <label asp-for="OficialInstTelephone" class="form-label"></label>
+            <div class="input-icon-wrapper icon-left">
+                <i class="bi bi-telephone-fill"></i>
+                <input asp-for="OficialInstTelephone" type="number" class="form-control" />
+            </div>
+            <span asp-validation-for="OficialInstTelephone" class="text-danger"></span>
+        </div>
+    </div>
 </div>
 
-<div class="form-group mt-3">
-    <label for="ocurrence-date" asp-for="OcurrenceDate">Data da Ocorrência</label>
-    <input id="ocurrence-date" asp-for="OcurrenceDate" type="date" class="form-control"
-        value="@DateTime.Now.ToString("yyyy-MM-dd")" />
-    <span asp-validation-for="OcurrenceDate" class="text-danger"></span>
+<div class="row mb-3">
+    <div class="col-lg-8 col-md-12">
+        <div class="form-group mt-3">
+            <input type="hidden" asp-for="InvestigatedName" />
+
+            <label asp-for="InvestigatedName" class="form-label"></label>
+            <div class="input-group">
+                <input id="investigated-lookup" class="form-control" />
+                <button type="button"
+                        class="btn btn-secondary ad-lookup-btn"
+                        data-target-visible="investigated-lookup"
+                        data-target-hidden="InvestigatedName"
+                        data-target-info="InvestigatedInfo">
+                    <i class="bi bi-search"></i>
+                </button>
+            </div>
+            <span id="InvestigatedInfo" class="form-text"></span>
+            <span asp-validation-for="InvestigatedName" class="text-danger"></span>
+
+            <div class="form-check mt-2">
+                <input type="checkbox" id="uncertainInvestigated" class="form-check-input" />
+                <label for="uncertainInvestigated" class="form-check-label">Averiguado incerto</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4 col-md-12">
+        <div class="form-group mt-3">
+            <label asp-for="InvestigatedGender" class="form-label"></label>
+            <select asp-for="InvestigatedGender" asp-items="ViewBag.genders" class="form-select">
+                <option value="">Selecione o género</option>
+            </select>
+            <span asp-validation-for="InvestigatedGender" class="text-danger"></span>
+        </div>
+    </div>
 </div>
 
-<div class="form-group mt-3">
-    <label for="nomination-date" asp-for="DispatchDate">Data de Despacho de Nomeação do Instrutor</label>
-    <input id="nomination-date" asp-for="DispatchDate" type="date" class="form-control"
-        value="@DateTime.Now.ToString("yyyy-MM-dd")" />
-    <span asp-validation-for="DispatchDate" class="text-danger"></span>
+<div class="row mb-3">
+    <div class="col-lg-4 col-md-12">
+        <div class="form-group mt-3">
+            <label asp-for="CreatedAt" class="form-label"></label>
+            <input asp-for="CreatedAt" type="date" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")"/>
+            <span asp-validation-for="CreatedAt" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="col-lg-4 col-md-12">
+        <div class="form-group mt-3">
+            <label asp-for="OcurrenceDate" class="form-label"></label>
+            <input asp-for="OcurrenceDate" type="date" class="form-control" />
+            <span asp-validation-for="OcurrenceDate" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="col-lg-4 col-md-12">
+        <div class="form-group mt-3">
+            <label asp-for="DispatchDate" class="form-label"></label>
+            <input asp-for="DispatchDate" type="date" class="form-control" />
+            <span asp-validation-for="DispatchDate" class="text-danger"></span>
+        </div>
+    </div>
 </div>
 
-<div class="form-group mt-3">
-    <label asp-for="Description" for="description" class="control-label">Descrição da Ocorrência</label>
-    <textarea id="description" asp-for="Description" class="form-control"> </textarea>
-    <span asp-validation-for="Description" class="text-danger"></span>
+<div class="row mb-3">
+    <div class="col-md-12">
+        <div class="form-group mt-3">
+            <label asp-for="Description" class="form-label"></label>
+            <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+    </div>
 </div>
 
-<div class="form-group mt-3">
-    <label for="deadline-date" asp-for="DeadlineDate">Prazo Previsto para encerramento por parte do Of. Instrutor
-        (Inicial / Prorrogação)</label>
-    <input id="deadline-date" asp-for="DeadlineDate" type="date" class="form-control"
-        value="@DateTime.Now.ToString("yyyy-MM-dd")" />
-    <span asp-validation-for="DeadlineDate" class="text-danger"></span>
+<div class="row mb-3">
+    <div class="col-lg-4">
+        <div class="form-group mt-3">
+            <label asp-for="DeadlineDate" class="form-label"></label>
+            <input asp-for="DeadlineDate" type="date" class="form-control" />
+            <span asp-validation-for="DeadlineDate" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="form-group mt-3">
+            <label asp-for="FinalDispatchDate" class="form-label"></label>
+            <input asp-for="FinalDispatchDate" type="date" class="form-control" />
+            <span asp-validation-for="FinalDispatchDate" class="text-danger"></span>
+        </div>
+    </div>
 </div>
 
-<div class="form-group mt-3">
-    <label for="final-deadline-date" asp-for="FinalDispatchDate">Data de Despacho Final do Com./Dir./Chefe</label>
-    <input id="final-deadline-date" asp-for="FinalDispatchDate" type="date" class="form-control"
-        value="@DateTime.Now.ToString("yyyy-MM-dd")" />
-    <span asp-validation-for="FinalDispatchDate" class="text-danger"></span>
+<div class="row mb-3">
+    <div class="col-lg-4">
+        <div class="form-group mt-3">
+            <label asp-for="SentenceId" class="form-label"></label>
+            <select asp-for="SentenceId" asp-items="ViewBag.sentences" class="form-select">
+                <option value="">Selecione uma sentença</option>
+            </select>
+            <span asp-validation-for="SentenceId" class="text-danger"></span>
+        </div>
+    </div>
 </div>
 
-<div class="form-group mt-3">
-    <label for="sentence-id" class="control-label">Pena Aplicada </label>
-    <select id="sentence-id" asp-for="SentenceId" asp-items="ViewBag.sentences" class="form-control">
-        <option value="">Selecione uma Pena</option>
-    </select>
-    <span asp-validation-for="SentenceId" class="text-danger"></span>
+<div class="row mb-3">
+    <div class="col-lg-4">
+        <div class="form-group mt-3">
+            <label asp-for="ProcessStateId" class="form-label"></label>
+            <select asp-for="ProcessStateId" asp-items="ViewBag.states" class="form-select"></select>
+            <span asp-validation-for="ProcessStateId" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="form-group mt-3">
+            <label class="form-label">Estado atual</label>
+            <input class="form-control" value="@Model?.ProcessStateId" readonly />
+        </div>
+    </div>
 </div>
 
-<div class="form-group mt-3">
-    <label for="state-id" class="control-label">Estado</label>
-    <select asp-for="ProcessStateId"
-            id="state-id"
-            asp-items="ViewBag.states"
-            class="form-control">
-
-
-        
-    </select>
-    <span asp-validation-for="ProcessStateId" class="text-danger"></span>
-</div>
-
-<div class="form-group mt-3">
-    <label for="ProcessFiles" class="control-label">Upload Files</label>
-    <input type="file" asp-for="ProcessFiles" class="form-control" multiple />
-    <span asp-validation-for="ProcessFiles" class="text-danger"></span>
+<div class="row mb-3">
+    <div class="col-lg-4">
+        <div class="form-group mt-3">
+            <label asp-for="ProcessFiles" class="form-label">Anexos</label>
+            <input type="file" asp-for="ProcessFiles" class="form-control" multiple />
+            <span asp-validation-for="ProcessFiles" class="text-danger"></span>
+        </div>
+    </div>
 </div>
 
 @if (Model?.UploadedFiles?.Any() == true)
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>File Name</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var file in Model.UploadedFiles)
-            {
-                <tr id="file-row-@file.ProcessFileId">
-                    <td>@Html.Raw(file.ProcessFileTrustedName)</td>
-                    <td>
-                        <div class="d-flex gap-2">
-                            <!-- Delete button "X": when clicked, removes the row and marks the file for deletion -->
-                            <button type="button" class="btn btn-danger" onclick="markFileForDeletion('@file.ProcessFileId')">
-                                <i class="bi bi-x"></i>
-                            </button>
-                            <!-- Download link -->
-                            <a asp-controller="ProcessFile" asp-action="DownloadFile" asp-route-id="@file.ProcessFileId"
-                                class="btn btn-secondary">
-                                <i class="bi bi-download"></i>
-                            </a>
+    <div class="row mb-3">
+        <div class="col-lg-4">
+            <div class="d-grid gap-2">
+                @foreach (var file in Model.UploadedFiles)
+                {
+                    var extension = System.IO.Path.GetExtension(file.ProcessFileTrustedName)?.ToLower();
+                    string iconClass = "bi-file-earmark";
+
+                    if (extension == ".pdf")
+                    {
+                        iconClass = "bi-file-earmark-pdf text-danger";
+                    }
+                    else if (extension == ".jpg" || extension == ".jpeg" || extension == ".png" || extension == ".gif")
+                    {
+                        iconClass = "bi-file-earmark-image text-primary";
+                    }
+                    else if (extension == ".doc" || extension == ".docx")
+                    {
+                        iconClass = "bi-file-earmark-word text-info";
+                    }
+
+                    <div class="card file-card" id="file-row-@file.ProcessFileId">
+                        <div class="card-body d-flex align-items-center gap-2">
+                            <i class="bi @iconClass" style="font-size: 1.2rem;"></i>
+
+                            <p class="m-0 flex-grow-1 text-truncate" title="@file.ProcessFileTrustedName">
+                                @file.ProcessFileTrustedName
+                            </p>
+
+                            <div class="d-flex gap-2 ms-auto align-items-center">
+                                <a asp-controller="ProcessFile" asp-action="DownloadFile" asp-route-id="@file.ProcessFileId" class="text-decoration-none text-primary" id="download-file" title="Descarregar">
+                                    <i class="bi bi-download"></i>
+                                </a>
+                                <button type="button" onclick="markFileForDeletion('@file.ProcessFileId')" class="btn btn-link text-danger p-0" title="Eliminar">
+                                    <i class="bi bi-trash-fill"></i>
+                                </button>
+                            </div>
                         </div>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+                    </div>
+
+                }
+            </div>
+        </div>
+    </div>
 }
 
+
 <div id="deletedFilesContainer"></div>
-
-
 
 <partial name="~/Views/Shared/Components/ModalUserSearch/_UserSearchModal.cshtml" />
 

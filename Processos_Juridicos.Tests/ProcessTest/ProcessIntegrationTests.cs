@@ -147,15 +147,19 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
         {
             IDocument doc = await _client.GetDocumentAsync("/Process/Create");
 
-            var processStateId = doc.GetElementById("state-id")?.QuerySelectorAll("option").First().GetAttribute("value");
-
-            var unitId = doc.GetElementById("unit-id")?.QuerySelectorAll("option")
-                .First(option => option.TextContent.Trim() == scenarioProcess.Unit.UnitName)
+            var processStateId = doc.QuerySelector("select[name=ProcessStateId]")?
+                .QuerySelectorAll("option")
+                .FirstOrDefault()?
                 .GetAttribute("value");
 
-            var processTypeId = doc.GetElementById("process-type-id")?
+            var unitId = doc.QuerySelector("select[name=UnitId]")?
                 .QuerySelectorAll("option")
-                .First(option => option.TextContent.Trim() == scenarioProcess.ProcessType.ProcessTypeName)
+                .FirstOrDefault(option => option.TextContent.Trim() == scenarioProcess.Unit.UnitName)?
+                .GetAttribute("value");
+
+            var processTypeId = doc.QuerySelector("select[name=ProcessTypeId]")?
+                .QuerySelectorAll("option")
+                .FirstOrDefault(option => option.TextContent.Trim() == scenarioProcess.ProcessType.ProcessTypeName)?
                 .GetAttribute("value");
 
             var formData = new Dictionary<string, string?>
@@ -164,7 +168,6 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
                 ["ProcessStateId"] = processStateId,
                 ["UnitId"] = unitId,
                 ["CreatedAt"] = scenarioProcess.CreatedAt.ToString()
-
             };
 
             await _client.PostAsync("/Process/Create", new FormUrlEncodedContent(formData));
@@ -206,23 +209,23 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
         IDocument doc = await _client.GetDocumentAsync($"/Process/Edit/{process.ProcessId}");
 
         // Assert
-        IElement? form = doc.QuerySelector($"main form");
+        IElement? form = doc.QuerySelector("main form");
         Assert.NotNull(form);
-        Assert.Equal(form.GetAttribute("action"), $"/Process/Edit/{process.ProcessId}");
+        Assert.Equal($"/Process/Edit/{process.ProcessId}", form.GetAttribute("action"));
 
-        IElement? nuipmField = form.QuerySelector("#process-nuipm");
+        IElement? nuipmField = form.QuerySelector("input[name=Nuipm]");
         Assert.NotNull(nuipmField);
         Assert.Equal(process.Nuipm, nuipmField.GetAttribute("value"));
 
-        IElement? stateField = form.QuerySelector("#state-id option[selected='selected']");
+        IElement? stateField = form.QuerySelector("select[name=ProcessStateId] option[selected]");
         Assert.NotNull(stateField);
-        Assert.Equal(stateField.GetAttribute("value"), process.ProcessStateId.ToString());
-        Assert.Equal(stateField.TextContent.Trim(), process.ProcessState.StateName);
+        Assert.Equal(process.ProcessStateId.ToString(), stateField.GetAttribute("value"));
+        Assert.Equal(process.ProcessState.StateName, stateField.TextContent.Trim());
 
-        IElement? processTypeField = form.QuerySelector($"#process-type-id option[selected='selected']");
+        IElement? processTypeField = form.QuerySelector("select[name=ProcessTypeId] option[selected]");
         Assert.NotNull(processTypeField);
-        Assert.Equal(processTypeField.GetAttribute("value"), process.ProcessTypeId.ToString());
-        Assert.Equal(processTypeField.TextContent.Trim(), process.ProcessType.ProcessTypeName);
+        Assert.Equal(process.ProcessTypeId.ToString(), processTypeField.GetAttribute("value"));
+        Assert.Equal(process.ProcessType.ProcessTypeName, processTypeField.TextContent.Trim());
     }
 
     [Fact]
@@ -260,9 +263,18 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
         await dbContext.SaveChangesAsync();
 
         IDocument doc = await _client.GetDocumentAsync($"/Process/Edit/{process.ProcessId}");
-        var newTypeId = doc.GetElementById("process-type-id")?.QuerySelector($"option[value='{newType.ProcessTypeId}']")?.GetAttribute("value");
-        var newStateId = doc.GetElementById("state-id")?.QuerySelector($"option[value='{targetState.ProcessStateId}']")?.GetAttribute("value");
-        var newUnitId = doc.GetElementById("unit-id")?.QuerySelector($"option[value='{newUnit.UnitId}']")?.GetAttribute("value");
+
+        var newTypeId = doc.QuerySelector("select[name=ProcessTypeId]")?
+            .QuerySelector($"option[value='{newType.ProcessTypeId}']")?
+            .GetAttribute("value");
+
+        var newStateId = doc.QuerySelector("select[name=ProcessStateId]")?
+            .QuerySelector($"option[value='{targetState.ProcessStateId}']")?
+            .GetAttribute("value");
+
+        var newUnitId = doc.QuerySelector("select[name=UnitId]")?
+            .QuerySelector($"option[value='{newUnit.UnitId}']")?
+            .GetAttribute("value");
 
         var token = doc.QuerySelector("input[name=__RequestVerificationToken]")?.GetAttribute("value")!;
 
@@ -414,7 +426,7 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
         IElement? row = doc.QuerySelector(rowSelector);
         Assert.NotNull(row);
 
-        IElement downloadLink = row.QuerySelector("a.btn.btn-secondary")!;
+        IElement downloadLink = row.QuerySelector("#download-file")!;
         var href = downloadLink.GetAttribute("href")!;
         Assert.Contains($"/ProcessFile/DownloadFile", href);
         Assert.Contains(fileEntity.ProcessFileId.ToString()!, href);
@@ -824,7 +836,7 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
         IElement? row = doc.QuerySelector(rowSelector);
         Assert.NotNull(row);
 
-        row = doc.QuerySelectorAll("tr[id^='file-row-']").First();
+        row = doc.QuerySelectorAll("div[id^='file-row-']").First();
 
         IElement container = doc.QuerySelector("#deletedFilesContainer")!;
         var deleteId = row.Id!;

@@ -18,9 +18,10 @@ public partial class ProcessDto
     public int? ProcessId { get; set; }
 
     [UniqueProcessNiupm]
+    [DisplayName("NUIPM")]
     public string Nuipm { get; set; }
 
-    [DisplayName("Tipo de Processo")]
+    [DisplayName("Tipo de processo")]
     public int? ProcessTypeId { get; set; }
 
     [DisplayName("Unidade")]
@@ -43,7 +44,7 @@ public partial class ProcessDto
     [DisplayName("Averiguado")]
     public string InvestigatedName { get; set; }
 
-    [DisplayName("Sexo do Averiguado")]
+    [DisplayName("Sexo do averiguado")]
     public string InvestigatedGender { get; set; }
 
     [DisplayName("Data da Ocorrência")]
@@ -67,10 +68,10 @@ public partial class ProcessDto
     [DisplayName("Pena aplicada")]
     public int? SentenceId { get; set; }
 
-    [DisplayName("Estado do processo")]
+    [DisplayName("Estado")]
     public required int ProcessStateId { get; set; }
 
-    [DisplayName("Criado")]
+    [DisplayName("Data de criação")]
     public DateOnly? CreatedAt { get; set; }
 
     [DisplayName("Criado por")]
@@ -78,7 +79,7 @@ public partial class ProcessDto
 
     public string CreatedByNii { get; set; }
 
-    [DisplayName("Modificado")]
+    [DisplayName("Data de Modificação")]
     public DateOnly? ModifiedAt { get; set; }
 
     [DisplayName("Modificado por")]
@@ -89,15 +90,15 @@ public partial class ProcessDto
     [DisplayName("Acident em serviço")]
     public int? ServiceAccidentId { get; set; }
 
-    [DisplayName("Categoria de Morto/Ferido")]
+    [DisplayName("Morto/Ferido")]
     public int? HarmedOrCasualtiesId { get; set; }
 
     [PositiveValue("Valor Indemnizado a Terceiros")]
-    [DisplayName("Valor Indeminizado a Terceiros")]
+    [DisplayName("Valor indeminizado a terceiros")]
     public double? ThirdPartyCompensation { get; set; }
 
     [PositiveValue("Valor Ressarcido à Marinha")]
-    [DisplayName("Valor Ressarcido à Marinha")]
+    [DisplayName("Valor ressarcido à Marinha")]
     public double? Reimbursement { get; set; }
 
     [EntityFieldIsRequired("Compensação paga?")]
@@ -105,13 +106,13 @@ public partial class ProcessDto
     public required bool CompensationPaid { get; set; } = false;
 
     [EntityFieldIsRequired("Comunicado à PJM")]
-    [DisplayName("Cominicado à PJM")]
+    [DisplayName("Comunicado à PJM")]
     public required bool ComunicatedToPjm { get; set; } = false;
 
-    [DisplayName("Tipo de Crime")]
+    [DisplayName("Tipo de crime")]
     public int? CrimeTypeId { get; set; }
 
-    [DisplayName("Segurança Militar")]
+    [DisplayName("Segurança militar")]
     public int? MilitarySecurityId { get; set; }
 
     [DisplayName("Data da comunicação à PJM")]
@@ -123,6 +124,7 @@ public partial class ProcessDto
     [ForeignKey("HarmedOrCasualtiesId")]
     public virtual HarmedOrCasualtyDto HarmedOrCasualties { get; set; }
 
+    [DisplayName("Artigos infrigidos")]
     public List<int?> Infringements { get; set; } = [];
     public List<InfringementDto> InfringementDetails { get; set; } = [];
 
