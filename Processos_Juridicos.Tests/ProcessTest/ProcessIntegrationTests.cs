@@ -81,23 +81,17 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
         IDocument doc = await _client.GetDocumentAsync($"/Process/Details/{process.ProcessId}");
 
         // Assert
-        IElement? mainDl = doc.QuerySelector("dl.main-data");
-        Assert.NotNull(mainDl);
+        IElement? nuipmInput = doc.QuerySelector("input[name=Nuipm]");
+        Assert.NotNull(nuipmInput);
+        Assert.Equal(process.Nuipm, nuipmInput.GetAttribute("value")?.Trim());
 
-        IElement? nuipmDd = mainDl.QuerySelectorAll("dt")
-            .FirstOrDefault(dt => dt.TextContent.Trim() == "NUIPM")?.NextElementSibling;
-        Assert.NotNull(nuipmDd);
-        Assert.Equal(process.Nuipm, nuipmDd.TextContent.Trim());
+        IElement? processTypeInput = doc.QuerySelector("input[name='ProcessType.ProcessTypeName']");
+        Assert.NotNull(processTypeInput);
+        Assert.Equal(process.ProcessType.ProcessTypeName, processTypeInput.GetAttribute("value")?.Trim());
 
-        IElement? processTypeDd = mainDl.QuerySelectorAll("dt")
-            .FirstOrDefault(dt => dt.TextContent.Trim() == "Tipo de Processo")?.NextElementSibling;
-        Assert.NotNull(processTypeDd);
-        Assert.Equal(process.ProcessType.ProcessTypeName, processTypeDd.TextContent.Trim());
-
-        IElement? stateDd = mainDl.QuerySelectorAll("dt")
-            .FirstOrDefault(dt => dt.TextContent.Trim() == "Estado")?.NextElementSibling;
-        Assert.NotNull(stateDd);
-        Assert.Equal(process.ProcessState.StateName, stateDd.TextContent.Trim());
+        IElement? stateInput = doc.QuerySelector("input[name='ProcessState.StateName']");
+        Assert.NotNull(stateInput);
+        Assert.Equal(process.ProcessState.StateName, stateInput.GetAttribute("value")?.Trim());
     }
 
     [Fact]

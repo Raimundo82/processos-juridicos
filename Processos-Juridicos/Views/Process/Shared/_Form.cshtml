@@ -45,7 +45,7 @@
                        value="@($"{Model?.OficialInstName} - {Model?.OficialInstNii}")" />
 
                 <button type="button"
-                        class="btn btn-secondary ad-lookup-btn"
+                        class="btn btn-primary ad-lookup-btn"
                         data-target-visible="instructor-lookup"
                         data-target-hidden="OficialInstName"
                         data-target-hidden2="OficialInstNii"
@@ -79,7 +79,7 @@
             <div class="input-group">
                 <input id="investigated-lookup" class="form-control" />
                 <button type="button"
-                        class="btn btn-secondary ad-lookup-btn"
+                        class="btn btn-primary ad-lookup-btn"
                         data-target-visible="investigated-lookup"
                         data-target-hidden="InvestigatedName"
                         data-target-info="InvestigatedInfo">
@@ -204,50 +204,10 @@
 {
     <div class="row mb-3">
         <div class="col-lg-4">
-            <div class="d-grid gap-2">
-                @foreach (var file in Model.UploadedFiles)
-                {
-                    var extension = System.IO.Path.GetExtension(file.ProcessFileTrustedName)?.ToLower();
-                    string iconClass = "bi-file-earmark";
-
-                    if (extension == ".pdf")
-                    {
-                        iconClass = "bi-file-earmark-pdf text-danger";
-                    }
-                    else if (extension == ".jpg" || extension == ".jpeg" || extension == ".png" || extension == ".gif")
-                    {
-                        iconClass = "bi-file-earmark-image text-primary";
-                    }
-                    else if (extension == ".doc" || extension == ".docx")
-                    {
-                        iconClass = "bi-file-earmark-word text-info";
-                    }
-
-                    <div class="card file-card" id="file-row-@file.ProcessFileId">
-                        <div class="card-body d-flex align-items-center gap-2">
-                            <i class="bi @iconClass" style="font-size: 1.2rem;"></i>
-
-                            <p class="m-0 flex-grow-1 text-truncate" title="@file.ProcessFileTrustedName">
-                                @file.ProcessFileTrustedName
-                            </p>
-
-                            <div class="d-flex gap-2 ms-auto align-items-center">
-                                <a asp-controller="ProcessFile" asp-action="DownloadFile" asp-route-id="@file.ProcessFileId" class="text-decoration-none text-primary" id="download-file" title="Descarregar">
-                                    <i class="bi bi-download"></i>
-                                </a>
-                                <button type="button" onclick="markFileForDeletion('@file.ProcessFileId')" class="btn btn-link text-danger p-0" title="Eliminar">
-                                    <i class="bi bi-trash-fill"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                }
-            </div>
+            @await Html.PartialAsync("Shared/_FileList", Model.UploadedFiles, new ViewDataDictionary(ViewData) { { "AllowDelete", true } })
         </div>
     </div>
 }
-
 
 <div id="deletedFilesContainer"></div>
 

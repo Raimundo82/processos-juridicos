@@ -67,6 +67,7 @@ public class ProcessController(
         }
 
         ProcessDto process = await _processManagement.Processes.GetProcessById(id);
+        process.UploadedFiles = await _processManagement.ProcessFiles.GetAllProcessFilesByProcessId(id);
         return process == null ? RedirectToAction(nameof(List)) : View(process);
     }
 
