@@ -60,8 +60,11 @@ public static partial class Mapper
     // Accident Types map
 
     public static partial AccidentTypeDto MapToAccidenTypeDto(AccidentType entity);
+    public static partial void MapToAccidentType(AccidentTypeDto dto, AccidentType entity);
     public static partial AccidentType MapToAccidentType(AccidentTypeDto dto);
     public static partial IEnumerable<AccidentTypeDto> MapToAccidentTypeEnum(IEnumerable<AccidentType> entity);
+
+
 
     // Crime Types map
 

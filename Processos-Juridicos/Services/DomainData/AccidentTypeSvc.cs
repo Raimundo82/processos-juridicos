@@ -16,14 +16,18 @@ public class AccidentTypeSvc(AppDbContext context) : IAccidentTypeSvc
 
     public async Task<IEnumerable<AccidentTypeDto>> GetAllAccidentTypes()
     {
-        List<AccidentType> accidents = await _context.AccidentTypes.ToListAsync();
+        List<AccidentType> accidents = await _context.AccidentTypes.AsNoTracking().ToListAsync();
         return Mapper.MapToAccidentTypeEnum(accidents);
     }
 
     public async Task<AccidentTypeDto> GetAccidentTypeById(int? id)
     {
-        AccidentType? accident = await _context.AccidentTypes.FindAsync(id);
-        return accident != null ? Mapper.MapToAccidenTypeDto(accident) : throw new EntityNotFoundException(GlobalTextManager.GetString("EntityNotFound"));
+        AccidentType accident = await _context.AccidentTypes
+       .AsNoTracking()
+       .FirstOrDefaultAsync(a => a.AccidentTypeId == id)
+       ?? throw new EntityNotFoundException(GlobalTextManager.GetString("EntityNotFound"));
+
+        return Mapper.MapToAccidenTypeDto(accident);
     }
 
     public async Task<AccidentTypeDto> CreateAccidentType(AccidentTypeDto type)
@@ -37,18 +41,20 @@ public class AccidentTypeSvc(AppDbContext context) : IAccidentTypeSvc
 
     public async Task<AccidentTypeDto> EditAccidentType(AccidentTypeDto type)
     {
-        AccidentType typeEntity = Mapper.MapToAccidentType(type);
-        _context.AccidentTypes.Entry(typeEntity).State = EntityState.Modified;
+        AccidentType existing = await _context.AccidentTypes.FindAsync(type.AccidentTypeId)
+            ?? throw new EntityNotFoundException(GlobalTextManager.GetString("EntityNotFound"));
 
+        Mapper.MapToAccidentType(type, existing); // overload to update existing entity
         await _context.SaveChangesAsync();
-        return Mapper.MapToAccidenTypeDto(typeEntity);
+
+        return Mapper.MapToAccidenTypeDto(existing);
     }
 
     public async Task<bool> DeleteAccidentType(int? id)
     {
         List<Process> deps = await _context.Processes
-        .Where(p => p.ServiceAccidentId == id)
-        .ToListAsync();
+            .Where(p => p.ServiceAccidentId == id)
+            .ToListAsync();
 
         deps.ForEach(p => p.ServiceAccidentId = null);
 
