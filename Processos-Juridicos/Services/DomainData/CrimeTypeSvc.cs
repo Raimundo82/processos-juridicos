@@ -25,7 +25,7 @@ public class CrimeTypeSvc(AppDbContext context) : ICrimeTypeSvc
         CrimeType? type = await _context.CrimeTypes.AsNoTracking().FirstOrDefaultAsync(a => a.CrimeTypeId == id)
        ?? throw new EntityNotFoundException(GlobalTextManager.GetString("EntityNotFound"));
 
-        return type != null ? Mapper.MapToCrimeTypeDto(type) : throw new EntityNotFoundException($"O CrimeType com o ID {id} não existe.");
+        return Mapper.MapToCrimeTypeDto(type);
     }
 
     public async Task<CrimeTypeDto> CreateCrimeType(CrimeTypeDto type)
