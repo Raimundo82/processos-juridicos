@@ -24,6 +24,7 @@ public static partial class Mapper
 
     public static partial ProcessTypeDto MapToProcessTypeDto(ProcessType entity);
     public static partial ProcessType MapToProcessType(ProcessTypeDto dto);
+    public static partial void MapToProcessType(ProcessTypeDto dto, ProcessType entity);
     public static partial IEnumerable<ProcessTypeDto> MapToToProcessTypeDtoEnum(IEnumerable<ProcessType> entity);
 
     // Sentences map
