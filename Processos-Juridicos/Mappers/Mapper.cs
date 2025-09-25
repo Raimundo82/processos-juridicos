@@ -42,6 +42,7 @@ public static partial class Mapper
 
     public static partial InfringementDto MapToInfringementsDto(Infringement entity);
     public static partial Infringement MapToInfringements(InfringementDto dto);
+    public static partial void MapToInfringements(InfringementDto dto, Infringement entity);
     public static partial IEnumerable<InfringementDto> MapToToInfringementsEnum(IEnumerable<Infringement> entity);
 
     // Files map
