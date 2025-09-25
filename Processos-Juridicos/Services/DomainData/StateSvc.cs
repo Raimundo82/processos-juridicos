@@ -16,19 +16,16 @@ public class StateSvc(AppDbContext context) : IProcessStateSvc
 
     public async Task<IEnumerable<ProcessStateDto>> GetAllStates()
     {
-        List<ProcessState> states = await _context.States.ToListAsync();
+        List<ProcessState> states = await _context.States.AsNoTracking().ToListAsync();
         return Mapper.MapToToStateDtoEnum(states);
     }
 
     public async Task<ProcessStateDto> GetStateById(int id)
     {
-        ProcessState? state = await _context.States.FindAsync(id);
-        return state != null ? Mapper.MapToStateDto(state) : throw new EntityNotFoundException(GlobalTextManager.GetString("EntityNotFound"));
+        ProcessState state = await _context.States.AsNoTracking().FirstOrDefaultAsync(a => a.ProcessStateId == id)
+            ?? throw new EntityNotFoundException(GlobalTextManager.GetString("EntityNotFound"));
+
+        return Mapper.MapToStateDto(state);
     }
 
-    public async Task<ProcessStateDto> GetStateByName(string name)
-    {
-        ProcessState? state = await _context.States.FirstOrDefaultAsync(s => s.StateName == name);
-        return state != null ? Mapper.MapToStateDto(state) : throw new EntityNotFoundException(GlobalTextManager.GetString("EntityNotFound"));
-    }
 }
