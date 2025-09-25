@@ -175,6 +175,10 @@ h2 {
     font-weight: 500;
 }
 
+.btn-sm {
+    padding: 0 !important;
+}
+
 .btn.btn-primary {
     background-color: var(--dark-blue);
 }
@@ -371,6 +375,60 @@ select .form-select option {
     margin-right: -20px;
     margin-left: -20px;
 }
+
+/* table */
+.table {
+    font-family: var(--font-base);
+}
+
+.table > :not(:last-child) > :last-child > * {
+    border-bottom: 3px solid var(--gray);
+}
+
+.table th {
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.table td {
+    vertical-align: middle;
+    font-size: 14px;
+}
+
+.table i {
+    font-size: 18px;
+}
+
+/* pagination */
+.page-item:first-child .page-link {
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+}
+
+.page-item:last-child .page-link {
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+.page-item.active .page-link {
+    background-color: var(--dark-blue);
+    border-color: var(--dark-blue);
+}
+
+.page-link {
+    color: var(--dark-blue);
+    border: 1px solid var(--gray);
+}
+
+.page-link:hover,
+.page-link:focus {
+    z-index: 2;
+    color: var(--dark-blue);
+    background-color: var(--light-gray);
+    border-color: var(--gray);
+    box-shadow: none;
+}
+
 
 /* footer */
 .footer {

@@ -5,31 +5,33 @@
     ViewData["Title"] = "Editar Processo";
 }
 
-<div class="card mb-3">
-    <h2>@ViewData["Title"]</h2>
-</div>
+<div class="container-lg my-3">
+    <div class="card mb-3">
+        <h2>@ViewData["Title"]</h2>
+    </div>
 
-<div class="card">
-    <form asp-action="Edit" method="post" enctype="multipart/form-data">
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="card">
+        <form asp-action="Edit" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-        <input type="hidden" asp-for="ProcessId" />
+            <input type="hidden" asp-for="ProcessId" />
 
-        <partial name="Shared/_Form" />
+            <partial name="Shared/_Form" />
 
-        @if (User.IsDj())
-        {
-            <partial name="Shared/_AdminForm" />
-        }
+            @if (User.IsDj())
+            {
+                <partial name="Shared/_AdminForm" />
+            }
 
-        <div class="d-flex justify-content-center mb-4">
-            <div class="form-group mt-3 text-center">
-                <input type="submit" value="Guardar" class="btn btn-primary me-2" />
-                <a asp-action="List" class="btn btn-secondary">Voltar à Lista</a>
+            <div class="d-flex justify-content-center mb-4">
+                <div class="form-group mt-3 text-center">
+                    <input type="submit" value="Guardar" class="btn btn-primary me-2" />
+                    <a asp-action="List" class="btn btn-secondary">Voltar à Lista</a>
+                </div>
             </div>
-        </div>
 
-    </form>
+        </form>
+    </div>
 </div>
 
 <script src="~/js/forms.js" asp-append-version="true"></script>

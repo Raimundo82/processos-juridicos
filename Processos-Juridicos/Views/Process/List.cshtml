@@ -1,159 +1,136 @@
 @using Processos_Juridicos.Utilities
 @model ProcessListViewModel
 @{
-    ViewData["Title"] = "Lista de processos";
+    ViewData["Title"] = "Lista de Processos";
 }
 
-@if (!Model.HasRole)
-{
-    <div class="alert alert-info text-center">
-        Não tem permissões para visualizar processos.
-    </div>
-}
-else {
-    <div class="text-center">
-        <h1 class="display-4">@Model.Title</h1>
-    </div>
+<div class="container-fluid">
+    <div class="mx-lg-5 my-3">
 
-    @if (Model.CanInsertProcess)
-    {
-        <a asp-controller="Process" asp-action="Create" class="btn btn-primary">
-            Inserir Processo
-        </a>
-    }
+        @if (Model.CanInsertProcess)
+        {
+            <div class="card card-action mb-3">
+                <div class="d-flex align-items-center justify-content-between">
+                    <h2>@ViewData["Title"]</h2>
+                    <a asp-controller="Process" asp-action="Create" class="btn btn-primary">Inserir Processo</a>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="card mb-3">
+                <div class="d-flex align-items-center justify-content-between">
+                    <h2>@ViewData["Title"]</h2>
+                </div>
+            </div>
+        }
 
-    @if (Model.Processes != null && Model.Processes.Any())
-    {
-        <div class="table-responsive-md" style="max-width: calc(100vw-200px);margin: 0 auto; overflow-x: auto;">
-            <select id="unitFilter">
-                <option value="">Todas as unidades</option>
+        <div class="card">
+            <div id="tableLoader" class="d-flex justify-content-center my-5">
+                <output class="spinner-border text-primary">
+                    <span class="visually-hidden">A carregar...</span>
+                </output>
+            </div>
 
-            </select>
+            <div id="tableContent" class="d-none">
+                @if (Model.Processes != null && Model.Processes.Any())
+                {
+                
+                    <div class="row mb-2">
+                        <div class="col-lg-4 col-md-12">
+                            <div class="form-group mt-3">
+                                <select class="form-select" id="unitFilter">
+                                    <option value="">Todas as unidades</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-6">
+                            <div class="form-group mt-3">
+                                <select class="form-select" id="typeFilter">
+                                    <option value="">Todos os tipos</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-6">
+                            <div class="form-group mt-3">
+                                <select class="form-select" id="stateFilter">
+                                    <option value="">Todos os estados</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
 
-            <select id="typeFilter">
-                <option value="">Todos os tipos</option>
+                    <div class="table-responsive">
+                        <table id="processesTable" class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">@Html.DisplayNameFor(m => m.Processes.First().Nuipm)</th>
+                                    <th scope="col">@Html.DisplayNameFor(m => m.Processes.First().ProcessTypeId)</th>
+                                    <th scope="col">@Html.DisplayNameFor(m => m.Processes.First().UnitId)</th>
+                                    <th scope="col">@Html.DisplayNameFor(m => m.Processes.First().OficialInstName)</th>
+                                    <th scope="col">@Html.DisplayNameFor(m => m.Processes.First().OficialInstTelephone)</th>
+                                    <th scope="col">@Html.DisplayNameFor(m => m.Processes.First().CreatedAt)</th>
+                                    <th scope="col">@Html.DisplayNameFor(m => m.Processes.First().CreatedByName)</th>
+                                    <th scope="col">@Html.DisplayNameFor(m => m.Processes.First().Sentence)</th>
+                                    <th scope="col">@Html.DisplayNameFor(m => m.Processes.First().ProcessState)</th>
+                                    <th scope="col">@Html.DisplayNameFor(m => m.Processes.First().ModifiedAt)</th>
+                                    <th scope="col">@Html.DisplayNameFor(m => m.Processes.First().ModifiedByName)</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
 
-            </select>
+                                @foreach (var item in Model.Processes.ToList())
+                                {
+                                    <tr data-id="@item.ProcessId">
+                                        <td data-property="nuipm"><strong>@Html.DisplayFor(m => item.Nuipm)</strong></td>
+                                        <td data-property="process-type">@(item.ProcessType?.ProcessTypeName ?? "-")</td>
+                                        <td data-property="unit">@(item.Unit?.UnitAcronym ?? "-")</td>
+                                        <td data-property="instructing-official">@Html.DisplayFor(m => item.OficialInstName)</td>
+                                        <td data-property="instructing-official-phone">@Html.DisplayFor(m => item.OficialInstTelephone)</td>
+                                        <td data-property="created-at">@Html.DisplayFor(m => item.CreatedAt)</td>
+                                        <td data-property="created-by">@Html.DisplayFor(m => item.CreatedByName)</td>
+                                        <td data-property="sentence"><strong>@(item.Sentence?.SentenceName ?? "-")</strong></td>
+                                        <td data-property="state"><strong>@(item.ProcessState?.StateName ?? "-")</strong></td>
+                                        <td data-property="last-modified-date">@(item.ModifiedAt?.ToString("dd-MM-yyyy") ?? "-")</td>
+                                        <td data-property="last-modified-by">@(item.ModifiedByName?.ToString() ?? "-")</td>
 
-            <select id="stateFilter">
-                <option value="">Todos os estados</option>
+                                        <td>
+                                            <div class="d-flex gap-3">
+                                                <a asp-controller="Process" asp-action="Details" asp-route-id="@item.ProcessId"
+                                                   data-action="access-edit-form" class="text-primary"><i class="bi bi-search"></i></a>
+                                                <a asp-controller="Process" asp-action="Edit" asp-route-id="@item.ProcessId"
+                                                   data-action="access-edit-form" class="text-primary"><i class="bi bi-pencil-square"></i></a>
 
-            </select>
-
-
-            <table id="processesTable" class="table table-striped-columns table-hover">
-                <thead>
-                    <tr>
-                        <th scope="col">@Html.DisplayNameFor(m => m.Processes.First().Nuipm)</th>
-                        <th scope="col">@Html.DisplayNameFor(m => m.Processes.First().ProcessTypeId)</th>
-                        <th scope="col">@Html.DisplayNameFor(m => m.Processes.First().UnitId)</th>
-                        <th scope="col">@Html.DisplayNameFor(m => m.Processes.First().OficialInstName)</th>
-                        <th scope="col">@Html.DisplayNameFor(m => m.Processes.First().OficialInstTelephone)</th>
-                        <th scope="col">@Html.DisplayNameFor(m => m.Processes.First().CreatedAt)</th>
-                        <th scope="col">@Html.DisplayNameFor(m => m.Processes.First().CreatedByName)</th>
-                        <th scope="col">@Html.DisplayNameFor(m => m.Processes.First().Sentence)</th>
-                        <th scope="col">@Html.DisplayNameFor(m => m.Processes.First().ProcessState)</th>
-                        <th scope="col">@Html.DisplayNameFor(m => m.Processes.First().ModifiedAt)</th>
-                        <th scope="col">@Html.DisplayNameFor(m => m.Processes.First().ModifiedByName)</th>
-
-                        <th scope="col">Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-
-                    @foreach (var item in Model.Processes.ToList())
-                    {
-                        <tr data-id="@item.ProcessId">
-                            <td data-property="nuipm">
-                                <a asp-controller="Process" asp-action="Details" asp-route-id="@item.ProcessId">
-                                    @Html.DisplayFor(m => item.Nuipm)
-                                </a>
-                            </td>
-
-                            <td data-property="process-type">@(item.ProcessType?.ProcessTypeName ?? "-")</td>
-                            <td data-property="unit">@(item.Unit?.UnitName ?? "-")</td>
-                            <td data-property="instructing-official">@Html.DisplayFor(m => item.OficialInstName)</td>
-                            <td data-property="instructing-official-phone">@Html.DisplayFor(m => item.OficialInstTelephone)</td>
-                            <td data-property="created-at">@Html.DisplayFor(m => item.CreatedAt)</td>
-                            <td data-property="created-by">@Html.DisplayFor(m => item.CreatedByName)</td>
-                            <td data-property="sentence">@(item.Sentence?.SentenceName ?? "-")</td>
-                            <td data-property="state">@(item.ProcessState?.StateName ?? "-")</td>
-                            <td data-property="last-modified-date">@(item.ModifiedAt?.ToString("dd-MM-yyyy") ?? "-")</td>
-                            <td data-property="last-modified-by">@(item.ModifiedByName?.ToString() ?? "-")</td> 
-                            
-                            <td>
-                                <div class="d-flex gap-2">
-                                    @if (User.IsDjAdministration())
-                                    {
-                                        <form asp-controller="Process" asp-action="Delete" method="post" data-action="delete">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="id" value="@item.ProcessId">
-                                            <button type="submit" class="btn btn-danger js-delete-btn"></button>
-                                        </form>
-                                    }
-
-                                    <a asp-controller="Process" asp-action="Edit" asp-route-id="@item.ProcessId"
-                                    data-action="access-edit-form" class="btn btn-warning"><i class="bi bi-pencil"></i></a>
-                                </div>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+                                                @if (User.IsDjAdministration())
+                                                {
+                                                    <form asp-action="Delete" method="post" data-action="delete">
+                                                        @Html.AntiForgeryToken()
+                                                        <input type="hidden" name="id" value="@item.ProcessId">
+                                                        <button type="submit" class="btn btn-sm text-danger js-delete-btn"><i class="bi bi-trash-fill"></i></button>
+                                                    </form>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center">
+                        <span>Não existem processos.</span>
+                    </div>
+                }
+            </div>
         </div>
-    }
-    else
-    {
-        <div class="alert alert-info text-center">
-            Não existem processos.
-        </div>
-    }
-}
+    </div>
+</div>
 
 @section Scripts {
     <script>
-        // Function to load filter values from API and populate selects
-        function loadProcessFilters(apiUrl, unitSelector, typeSelector, stateSelector) {
-            $.getJSON(apiUrl, function (data) {
-                fillSelect(unitSelector, data.units);
-                fillSelect(typeSelector, data.types);
-                fillSelect(stateSelector, data.states);
-            });
-        }
-
-        // Helper to fill a select with options
-        function fillSelect(selector, values) {
-            var $select = $(selector);
-            $select.empty().append('<option value="">Todos</option>');
-            (values || []).forEach(function (v) {
-                if (v) {
-                    $select.append('<option value="' + v + '">' + v + '</option>');
-                }
-            });
-        }
-
-        $(document).ready(function () {
-            var table = $('#processesTable').DataTable();
-
-            // Load filter values from your controller endpoint
-            loadProcessFilters('/Process/GetFilterValues', '#unitFilter', '#typeFilter', '#stateFilter');
-
-            // Bind filter change events to correct columns
-            $('#unitFilter').on('change', function () {
-                table.column(2).search(this.value).draw();
-            });
-            $('#typeFilter').on('change', function () {
-                table.column(1).search(this.value).draw();
-            });
-            $('#stateFilter').on('change', function () {
-                table.column(8).search(this.value).draw();
-            });
-        });
-
-        $('#unitFilter').select2({
-            placeholder: "Todas as unidades",
-            allowClear: true,
-            width: 'resolve' // or 'style' to match Bootstrap styling
-        });
+        createDataTable('#processesTable');
     </script>
 }

@@ -49,6 +49,7 @@ bld/
 */wwwroot/lib/select2/
 */wwwroot/lib/datatable/
 */wwwroot/lib/datatables/
+*/wwwroot/lib/datatables.net-bs5/
 */wwwroot/lib/select2-bootstrap-5-theme/
 
 # Visual Studio 2017 auto generated files

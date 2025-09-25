@@ -1,70 +1,71 @@
 @{
     ViewData["Title"] = "Página Inicial";
 }
+<div class="container-lg my-3">
+    <div class="card">
+        <div class="card-body text-justify">
+            <div class="content-section">
+                <h4 class="text-center mb-4">Gestão de Processos</h4>
+                <p>
+                    Com este novo serviço da Direção Jurídica (DJ), que substitui o anterior Portal da Unidade,
+                    inicia-se uma nova fase de relacionamento entre as unidades, organismos e estabelecimentos militares e o apoio jurídico prestado pela DSJ
+                    aos intervenientes processuais, maxime aos órgãos competentes para a decisão e aos instrutores.
+                </p>
+                <p>
+                    Através deste novo portal pretende-se, por um lado, reforçar o controlo centralizado dos processos na Marinha,
+                    como forma de garantir um apoio jurídico mais eficaz, e, por outro lado, permitir aos intervenientes processuais
+                    e a cada unidade reforçar a fiscalização da tramitação, tornando-a, por conseguinte, mais célere e eficaz.
+                </p>
+                <p>
+                    Daí que entre os aspetos a relevar se encontre a inclusão de peças processuais no portal, a criação de alertas
+                    para um maior controlo do cumprimento dos prazos e a simplificação do NUIPM que permitirá facilmente identificar
+                    o tipo e a unidade em que decorre o processo.
+                </p>
+                <p>
+                    Pretende-se igualmente, através dos meios eletrónicos, caminhar no sentido de permitir uma maior disponibilidade e
+                    um acesso mais fácil a informação e peças processuais, sem prejuízo de garantir a necessária integridade e autenticidade,
+                    bem como as indispensáveis confidencialidade, conservação e segurança processuais.
+                </p>
+                <p>
+                    Recomenda-se consultar o Capítulo 19 da publicação MASUP 4, que descreve o procedimento de registo do processo e obtenção do NUIPM.
+                </p>
+            </div>
 
-<div class="card">
-    <div class="card-body text-justify">
-        <div class="content-section">
-            <h4 class="text-center mb-4">Gestão de Processos</h4>
-            <p>
-                Com este novo serviço da Direção Jurídica (DJ), que substitui o anterior Portal da Unidade,
-                inicia-se uma nova fase de relacionamento entre as unidades, organismos e estabelecimentos militares e o apoio jurídico prestado pela DSJ
-                aos intervenientes processuais, maxime aos órgãos competentes para a decisão e aos instrutores.
-            </p>
-            <p>
-                Através deste novo portal pretende-se, por um lado, reforçar o controlo centralizado dos processos na Marinha,
-                como forma de garantir um apoio jurídico mais eficaz, e, por outro lado, permitir aos intervenientes processuais
-                e a cada unidade reforçar a fiscalização da tramitação, tornando-a, por conseguinte, mais célere e eficaz.
-            </p>
-            <p>
-                Daí que entre os aspetos a relevar se encontre a inclusão de peças processuais no portal, a criação de alertas
-                para um maior controlo do cumprimento dos prazos e a simplificação do NUIPM que permitirá facilmente identificar
-                o tipo e a unidade em que decorre o processo.
-            </p>
-            <p>
-                Pretende-se igualmente, através dos meios eletrónicos, caminhar no sentido de permitir uma maior disponibilidade e
-                um acesso mais fácil a informação e peças processuais, sem prejuízo de garantir a necessária integridade e autenticidade,
-                bem como as indispensáveis confidencialidade, conservação e segurança processuais.
-            </p>
-            <p>
-                Recomenda-se consultar o Capítulo 19 da publicação MASUP 4, que descreve o procedimento de registo do processo e obtenção do NUIPM.
-            </p>
-        </div>
+            <div class="text-center">
+                <img class="diagram-image" src="/images/process-flow-diagram.webp" alt="Diagrama de Gestão de Processos">
+            </div>
 
-        <div class="text-center">
-            <img class="diagram-image" src="/images/process-flow-diagram.webp" alt="Diagrama de Gestão de Processos">
-        </div>
+            <h4 class="text-center my-4">Competências / Atribuições</h4>
 
-        <h4 class="text-center my-4">Competências / Atribuições</h4>
+            <div class="section">
+                <div class="role-title">Oficial Instrutor</div>
+                <ul>
+                    <li>Iniciar o processo no estado "Em Edição"</li>
+                    <li>Preencher os campos do formulário</li>
+                    <li>Transitar o estado do processo para "Em Validação"</li>
+                </ul>
+            </div>
 
-        <div class="section">
-            <div class="role-title">Oficial Instrutor</div>
-            <ul>
-                <li>Iniciar o processo no estado "Em Edição"</li>
-                <li>Preencher os campos do formulário</li>
-                <li>Transitar o estado do processo para "Em Validação"</li>
-            </ul>
-        </div>
+            <div class="section">
+                <div class="role-title">DJ</div>
+                <ul>
+                    <li>Validar o processo e transitar para o estado "Aberto" ou para "Em Edição"</li>
+                    <li>Gerar o NUIPM</li>
+                    <li>Gerir os processos no estado "Em Recurso"</li>
+                    <li>Fechar processos (transitar para o estado "Fechado")</li>
+                    <li>Adicionar/remover utilizadores aos grupos de Of. Instrutor e dos Comandos de Unidade</li>
+                    <li>Carregamento manual de processos</li>
+                    <li>Gerar e analisar dados estatísticos</li>
+                </ul>
+            </div>
 
-        <div class="section">
-            <div class="role-title">DJ</div>
-            <ul>
-                <li>Validar o processo e transitar para o estado "Aberto" ou para "Em Edição"</li>
-                <li>Gerar o NUIPM</li>
-                <li>Gerir os processos no estado "Em Recurso"</li>
-                <li>Fechar processos (transitar para o estado "Fechado")</li>
-                <li>Adicionar/remover utilizadores aos grupos de Of. Instrutor e dos Comandos de Unidade</li>
-                <li>Carregamento manual de processos</li>
-                <li>Gerar e analisar dados estatísticos</li>
-            </ul>
-        </div>
-
-        <div class="section">
-            <div class="role-title">Com./Dir./Chefe da Unidade</div>
-            <ul>
-                <li>Transitar entre o estado "Aberto" e "Despachado"</li>
-                <li>Prorrogação do prazo</li>
-            </ul>
+            <div class="section">
+                <div class="role-title">Com./Dir./Chefe da Unidade</div>
+                <ul>
+                    <li>Transitar entre o estado "Aberto" e "Despachado"</li>
+                    <li>Prorrogação do prazo</li>
+                </ul>
+            </div>
         </div>
     </div>
 </div>

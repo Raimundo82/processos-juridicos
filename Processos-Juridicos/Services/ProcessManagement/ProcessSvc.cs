@@ -192,7 +192,7 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
     {
         List<string> units = await _context.Processes
             .Where(p => p.Unit != null)
-            .Select(p => p.Unit.UnitName)
+            .Select(p => p.Unit.UnitAcronym)
             .Distinct()
             .OrderBy(x => x)
             .ToListAsync();

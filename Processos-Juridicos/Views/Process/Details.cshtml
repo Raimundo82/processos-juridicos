@@ -5,236 +5,238 @@
     ViewData["Title"] = "Visualização do Processo";
 }
 
-<div class="card card-action mb-3">
-    <div class="d-flex align-items-center justify-content-between">
-        <h2>@ViewData["Title"]</h2>
-        <a asp-action="Edit" asp-route-id="@Model.ProcessId" class="btn btn-primary">Editar Processo</a>
-    </div>
-</div>
-
-<div class="card mb-3">
-    <div class="row mb-3">
-        <div class="col-lg-4">
-            <div class="form-group mt-3">
-                <label asp-for="Nuipm" class="form-label"></label>
-                <input asp-for="Nuipm" class="form-control" readonly />
-            </div>
-        </div>
-        <div class="col-lg-4">
-            <div class="form-group mt-3">
-                <label asp-for="ProcessType.ProcessTypeName" class="form-label"></label>
-                <input asp-for="ProcessType.ProcessTypeName" class="form-control" readonly />
-            </div>
-        </div>
-        <div class="col-lg-4">
-            <div class="form-group mt-3">
-                <label asp-for="Unit.UnitName" class="form-label">Unidade</label>
-                <input asp-for="Unit.UnitName" class="form-control" readonly />
-            </div>
+<div class="container-lg my-3">
+    <div class="card card-action mb-3">
+        <div class="d-flex align-items-center justify-content-between">
+            <h2>@ViewData["Title"]</h2>
+            <a asp-action="Edit" asp-route-id="@Model.ProcessId" class="btn btn-primary">Editar Processo</a>
         </div>
     </div>
 
-    <div class="row mb-3">
-        <div class="col-lg-8">
-            <div class="form-group mt-3">
-                <label asp-for="OficialInstName" class="form-label"></label>
-                <input asp-for="OficialInstName" class="form-control" readonly />
-            </div>
-        </div>
-        <div class="col-lg-4">
-            <div class="form-group mt-3">
-                <label asp-for="OficialInstTelephone" class="form-label"></label>
-                <div class="input-icon-wrapper icon-left">
-                    <i class="bi bi-telephone-fill"></i>
-                    <input asp-for="OficialInstTelephone" type="text" class="form-control" readonly />
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row mb-3">
-        <div class="col-lg-8">
-            <div class="form-group mt-3">
-                <label asp-for="InvestigatedName" class="form-label"></label>
-                <input asp-for="InvestigatedName" class="form-control" readonly />
-            </div>
-        </div>
-        <div class="col-lg-4">
-            <div class="form-group mt-3">
-                <label asp-for="InvestigatedGender" class="form-label"></label>
-                <input asp-for="InvestigatedGender" class="form-control" readonly />
-            </div>
-        </div>
-    </div>
-
-    <div class="row mb-3">
-        <div class="col-lg-4">
-            <div class="form-group mt-3">
-                <label asp-for="CreatedAt" class="form-label"></label>
-                <input asp-for="CreatedAt" type="date" class="form-control" readonly />
-            </div>
-        </div>
-        <div class="col-lg-4">
-            <div class="form-group mt-3">
-                <label asp-for="OcurrenceDate" class="form-label"></label>
-                <input asp-for="OcurrenceDate" type="date" class="form-control" readonly />
-            </div>
-        </div>
-        <div class="col-lg-4">
-            <div class="form-group mt-3">
-                <label asp-for="DispatchDate" class="form-label"></label>
-                <input asp-for="DispatchDate" type="date" class="form-control" readonly />
-            </div>
-        </div>
-    </div>
-
-    <div class="row mb-3">
-        <div class="col-12">
-            <div class="form-group mt-3">
-                <label asp-for="Description" class="form-label"></label>
-                <textarea asp-for="Description" class="form-control" rows="4" readonly></textarea>
-            </div>
-        </div>
-    </div>
-
-    <div class="row mb-3">
-        <div class="col-lg-4">
-            <div class="form-group mt-3">
-                <label asp-for="DeadlineDate" class="form-label"></label>
-                <input asp-for="DeadlineDate" type="date" class="form-control" readonly />
-            </div>
-        </div>
-        <div class="col-lg-4">
-            <div class="form-group mt-3">
-                <label asp-for="FinalDispatchDate" class="form-label"></label>
-                <input asp-for="FinalDispatchDate" type="date" class="form-control" readonly />
-            </div>
-        </div>
-    </div>
-
-    <div class="row mb-3">
-        <div class="col-lg-4">
-            <div class="form-group mt-3">
-                <label asp-for="Sentence.SentenceName" class="form-label">Pena aplicada</label>
-                <input asp-for="Sentence.SentenceName" class="form-control" readonly />
-            </div>
-        </div>
-    </div>
-
-    <div class="row mb-3">
-        <div class="col-lg-4">
-            <div class="form-group mt-3">
-                <label asp-for="ProcessState.StateName" class="form-label">Estado</label>
-                <input asp-for="ProcessState.StateName" class="form-control" readonly />
-            </div>
-        </div>
-    </div>
-
-    @if (Model?.UploadedFiles?.Any() == true)
-    {
+    <div class="card mb-3">
         <div class="row mb-3">
             <div class="col-lg-4">
-                @await Html.PartialAsync("Shared/_FileList", Model.UploadedFiles, new ViewDataDictionary(ViewData) { { "AllowDelete", false } })
-            </div>
-        </div>
-    }
-
-    @if (User.IsDj())
-    {
-        <div class="mt-5 mb-3 d-grid gap-5">
-            <div class="border-box"></div>
-            <h2 class="text-center">Preenchido pela Direção Jurídica</h2>
-        </div>
-
-        <div class="row mb-3">
-            <div class="col-lg-4 col-md-12 offset-lg-2">
                 <div class="form-group mt-3">
-                    <label asp-for="AccidentType.AccidentTypeName" class="form-label"></label>
-                    <input asp-for="AccidentType.AccidentTypeName" class="form-control" readonly />
+                    <label asp-for="Nuipm" class="form-label"></label>
+                    <input asp-for="Nuipm" class="form-control" readonly />
                 </div>
             </div>
-            <div class="col-lg-4 col-md-12">
+            <div class="col-lg-4">
                 <div class="form-group mt-3">
-                    <label asp-for="HarmedOrCasualties.CasualtyName" class="form-label"></label>
-                    <input asp-for="HarmedOrCasualties.CasualtyName" class="form-control" readonly />
+                    <label asp-for="ProcessType.ProcessTypeName" class="form-label"></label>
+                    <input asp-for="ProcessType.ProcessTypeName" class="form-control" readonly />
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="form-group mt-3">
+                    <label asp-for="Unit.UnitName" class="form-label">Unidade</label>
+                    <input asp-for="Unit.UnitName" class="form-control" readonly />
                 </div>
             </div>
         </div>
 
         <div class="row mb-3">
-            <div class="col-lg-4 col-md-12 offset-lg-2">
+            <div class="col-lg-8">
                 <div class="form-group mt-3">
-                    <label asp-for="ThirdPartyCompensation" class="form-label"></label>
-                    <div class="input-icon-wrapper icon-left">
-                        <i class="bi bi-currency-euro"></i>
-                        <input asp-for="ThirdPartyCompensation" type="text" class="form-control" readonly />
-                    </div>
+                    <label asp-for="OficialInstName" class="form-label"></label>
+                    <input asp-for="OficialInstName" class="form-control" readonly />
                 </div>
             </div>
-            <div class="col-lg-4 col-md-12">
+            <div class="col-lg-4">
                 <div class="form-group mt-3">
-                    <label asp-for="Reimbursement" class="form-label"></label>
+                    <label asp-for="OficialInstTelephone" class="form-label"></label>
                     <div class="input-icon-wrapper icon-left">
-                        <i class="bi bi-currency-euro"></i>
-                        <input asp-for="Reimbursement" type="text" class="form-control" readonly />
+                        <i class="bi bi-telephone-fill"></i>
+                        <input asp-for="OficialInstTelephone" type="text" class="form-control" readonly />
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="row mb-3">
-            <div class="col-lg-8 col-md-12 offset-lg-2">
+            <div class="col-lg-8">
                 <div class="form-group mt-3">
-                    <label asp-for="Infringements" class="form-label"></label>
-                    <textarea class="form-control" rows="2" readonly>
+                    <label asp-for="InvestigatedName" class="form-label"></label>
+                    <input asp-for="InvestigatedName" class="form-control" readonly />
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="form-group mt-3">
+                    <label asp-for="InvestigatedGender" class="form-label"></label>
+                    <input asp-for="InvestigatedGender" class="form-control" readonly />
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-lg-4">
+                <div class="form-group mt-3">
+                    <label asp-for="CreatedAt" class="form-label"></label>
+                    <input asp-for="CreatedAt" type="date" class="form-control" readonly />
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="form-group mt-3">
+                    <label asp-for="OcurrenceDate" class="form-label"></label>
+                    <input asp-for="OcurrenceDate" type="date" class="form-control" readonly />
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="form-group mt-3">
+                    <label asp-for="DispatchDate" class="form-label"></label>
+                    <input asp-for="DispatchDate" type="date" class="form-control" readonly />
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="form-group mt-3">
+                    <label asp-for="Description" class="form-label"></label>
+                    <textarea asp-for="Description" class="form-control" rows="4" readonly></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-lg-4">
+                <div class="form-group mt-3">
+                    <label asp-for="DeadlineDate" class="form-label"></label>
+                    <input asp-for="DeadlineDate" type="date" class="form-control" readonly />
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="form-group mt-3">
+                    <label asp-for="FinalDispatchDate" class="form-label"></label>
+                    <input asp-for="FinalDispatchDate" type="date" class="form-control" readonly />
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-lg-4">
+                <div class="form-group mt-3">
+                    <label asp-for="Sentence.SentenceName" class="form-label">Pena aplicada</label>
+                    <input asp-for="Sentence.SentenceName" class="form-control" readonly />
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-lg-4">
+                <div class="form-group mt-3">
+                    <label asp-for="ProcessState.StateName" class="form-label">Estado</label>
+                    <input asp-for="ProcessState.StateName" class="form-control" readonly />
+                </div>
+            </div>
+        </div>
+
+        @if (Model?.UploadedFiles?.Any() == true)
+        {
+            <div class="row mb-3">
+                <div class="col-lg-4">
+                    @await Html.PartialAsync("Shared/_FileList", Model.UploadedFiles, new ViewDataDictionary(ViewData) { { "AllowDelete", false } })
+                </div>
+            </div>
+        }
+
+        @if (User.IsDj())
+        {
+            <div class="mt-5 mb-3 d-grid gap-5">
+                <div class="border-box"></div>
+                <h2 class="text-center">Preenchido pela Direção Jurídica</h2>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-lg-4 col-md-12 offset-lg-2">
+                    <div class="form-group mt-3">
+                        <label asp-for="AccidentType.AccidentTypeName" class="form-label"></label>
+                        <input asp-for="AccidentType.AccidentTypeName" class="form-control" readonly />
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-12">
+                    <div class="form-group mt-3">
+                        <label asp-for="HarmedOrCasualties.CasualtyName" class="form-label"></label>
+                        <input asp-for="HarmedOrCasualties.CasualtyName" class="form-control" readonly />
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-lg-4 col-md-12 offset-lg-2">
+                    <div class="form-group mt-3">
+                        <label asp-for="ThirdPartyCompensation" class="form-label"></label>
+                        <div class="input-icon-wrapper icon-left">
+                            <i class="bi bi-currency-euro"></i>
+                            <input asp-for="ThirdPartyCompensation" type="text" class="form-control" readonly />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-12">
+                    <div class="form-group mt-3">
+                        <label asp-for="Reimbursement" class="form-label"></label>
+                        <div class="input-icon-wrapper icon-left">
+                            <i class="bi bi-currency-euro"></i>
+                            <input asp-for="Reimbursement" type="text" class="form-control" readonly />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-lg-8 col-md-12 offset-lg-2">
+                    <div class="form-group mt-3">
+                        <label asp-for="Infringements" class="form-label"></label>
+                        <textarea class="form-control" rows="2" readonly>
                     @string.Join(", ", Model?.InfringementDetails?.Select(i => i.InfringementName) ?? Array.Empty<string>())
                 </textarea>
-                </div>
-            </div>
-        </div>
-
-        <div class="row mb-3">
-            <div class="col-lg-4 col-md-12 offset-lg-4">
-                <div class="form-group mt-3">
-                    <div class="form-check mt-2">
-                        <input asp-for="ComunicatedToPjm" type="checkbox" class="form-check-input" disabled />
-                        <label asp-for="ComunicatedToPjm" class="form-check-label"></label>
                     </div>
-
-                    <label asp-for="ComunicationDate" class="form-label mt-3"></label>
-                    <input asp-for="ComunicationDate" class="form-control" readonly />
                 </div>
             </div>
-        </div>
 
-        <div class="row mb-3">
-            <div class="col-lg-4 col-md-12 offset-lg-4">
-                <div class="form-group mt-3">
-                    <label asp-for="CrimeType.CrimeTypeName" class="form-label"></label>
-                    <input asp-for="CrimeType.CrimeTypeName" class="form-control" readonly />
+            <div class="row mb-3">
+                <div class="col-lg-4 col-md-12 offset-lg-4">
+                    <div class="form-group mt-3">
+                        <div class="form-check mt-2">
+                            <input asp-for="ComunicatedToPjm" type="checkbox" class="form-check-input" disabled />
+                            <label asp-for="ComunicatedToPjm" class="form-check-label"></label>
+                        </div>
+
+                        <label asp-for="ComunicationDate" class="form-label mt-3"></label>
+                        <input asp-for="ComunicationDate" class="form-control" readonly />
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="row mb-3">
-            <div class="col-lg-4 col-md-12 offset-lg-4">
-                <div class="form-group mt-3">
-                    <label asp-for="MilitarySecurity.MilitarySecurityName" class="form-label"></label>
-                    <input asp-for="MilitarySecurity.MilitarySecurityName" class="form-control" readonly />
+            <div class="row mb-3">
+                <div class="col-lg-4 col-md-12 offset-lg-4">
+                    <div class="form-group mt-3">
+                        <label asp-for="CrimeType.CrimeTypeName" class="form-label"></label>
+                        <input asp-for="CrimeType.CrimeTypeName" class="form-control" readonly />
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="row mb-3">
-            <div class="col-lg-4 col-md-12 offset-lg-4">
-                <div class="form-group mt-3">
-                    <label asp-for="CompensatingUnit.UnitName" class="form-label"></label>
-                    <input asp-for="CompensatingUnit.UnitName" class="form-control" readonly />
+            <div class="row mb-3">
+                <div class="col-lg-4 col-md-12 offset-lg-4">
+                    <div class="form-group mt-3">
+                        <label asp-for="MilitarySecurity.MilitarySecurityName" class="form-label"></label>
+                        <input asp-for="MilitarySecurity.MilitarySecurityName" class="form-control" readonly />
+                    </div>
                 </div>
             </div>
+
+            <div class="row mb-3">
+                <div class="col-lg-4 col-md-12 offset-lg-4">
+                    <div class="form-group mt-3">
+                        <label asp-for="CompensatingUnit.UnitName" class="form-label"></label>
+                        <input asp-for="CompensatingUnit.UnitName" class="form-control" readonly />
+                    </div>
+                </div>
+            </div>
+        }
+        <div class="d-flex justify-content-center mb-4">
+            <a asp-action="List" class="btn btn-secondary">Voltar</a>
         </div>
-    }
-    <div class="d-flex justify-content-center mb-4">
-        <a asp-action="List" class="btn btn-secondary">Voltar</a>
     </div>
 </div>
