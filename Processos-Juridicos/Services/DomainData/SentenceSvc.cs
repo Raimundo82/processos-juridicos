@@ -6,6 +6,7 @@ using Processos_Juridicos.Entities;
 using Processos_Juridicos.Exceptions;
 using Processos_Juridicos.Mappers;
 using Processos_Juridicos.Services.Interfaces.DomainData;
+using Processos_Juridicos.Utilities.TextManager;
 
 namespace Processos_Juridicos.Services.DomainData;
 
@@ -37,23 +38,26 @@ public class SentenceSvc(AppDbContext context) : ISentenceSvc
 
     public async Task<SentenceDto> EditSentence(SentenceDto sentence)
     {
-        Sentence sentenceEntity = Mapper.MapToSentence(sentence);
-        _context.Sentences.Entry(sentenceEntity).State = EntityState.Modified;
+        Sentence existing = await _context.Sentences.FindAsync(sentence.SentenceId)
+            ?? throw new EntityNotFoundException(GlobalTextManager.GetString("EntityNotFound"));
 
+        Mapper.MapToSentence(sentence, existing);
         await _context.SaveChangesAsync();
-        return Mapper.MapToSentenceDto(sentenceEntity);
+
+        return Mapper.MapToSentenceDto(existing);
     }
 
     public async Task<IEnumerable<SentenceDto>> GetAllSentences()
     {
-        List<Sentence> sentences = await _context.Sentences.ToListAsync();
+        List<Sentence> sentences = await _context.Sentences.AsNoTracking().ToListAsync();
         return Mapper.MapToToSentenceDtoEnum(sentences);
     }
 
     public async Task<SentenceDto> GetSentenceById(int? id)
     {
-        Sentence? sentence = await _context.Sentences.FindAsync(id);
+        Sentence sentence = await _context.Sentences.AsNoTracking().FirstOrDefaultAsync(a => a.SentenceId == id)
+            ?? throw new EntityNotFoundException(GlobalTextManager.GetString("EntityNotFound"));
 
-        return sentence != null ? Mapper.MapToSentenceDto(sentence) : throw new EntityNotFoundException("Sentence not found");
+        return Mapper.MapToSentenceDto(sentence);
     }
 }

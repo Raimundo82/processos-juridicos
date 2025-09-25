@@ -30,6 +30,7 @@ public static partial class Mapper
     // Sentences map
     public static partial SentenceDto MapToSentenceDto(Sentence entity);
     public static partial Sentence MapToSentence(SentenceDto dto);
+    public static partial void MapToSentence(SentenceDto dto, Sentence entity);
     public static partial IEnumerable<SentenceDto> MapToToSentenceDtoEnum(IEnumerable<Sentence> entity);
 
     // Harmed or Casualties map
