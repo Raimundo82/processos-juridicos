@@ -6,6 +6,7 @@ using Processos_Juridicos.Entities;
 using Processos_Juridicos.Exceptions;
 using Processos_Juridicos.Mappers;
 using Processos_Juridicos.Services.Interfaces.DomainData;
+using Processos_Juridicos.Utilities.TextManager;
 namespace Processos_Juridicos.Services.DomainData;
 
 public class MilitarySecuritySvc(AppDbContext context) : IMilitarySecuritySvc
@@ -38,22 +39,27 @@ public class MilitarySecuritySvc(AppDbContext context) : IMilitarySecuritySvc
 
     public async Task<MilitarySecurityDto> EditMilitarySecurity(MilitarySecurityDto militarySecurity)
     {
-        MilitarySecurity militarySecurityEntity = Mapper.MapToMilitarySecurity(militarySecurity);
-        _context.MilitarySecurities.Entry(militarySecurityEntity).State = EntityState.Modified;
+        MilitarySecurity existing = await _context.MilitarySecurities.FindAsync(militarySecurity.MilitarySecurityId)
+            ?? throw new EntityNotFoundException(GlobalTextManager.GetString("EntityNotFound"));
+
+        Mapper.MapToMilitarySecurity(militarySecurity, existing);
 
         await _context.SaveChangesAsync();
-        return Mapper.MapToMilitarySecurityDto(militarySecurityEntity);
+
+        return Mapper.MapToMilitarySecurityDto(existing);
     }
 
     public async Task<IEnumerable<MilitarySecurityDto>> GetAllMilitarySecurities()
     {
-        List<MilitarySecurity> militarySecurity = await _context.MilitarySecurities.ToListAsync();
+        List<MilitarySecurity> militarySecurity = await _context.MilitarySecurities.AsNoTracking().ToListAsync();
         return Mapper.MapToMilitarySecurityEnum(militarySecurity);
     }
 
     public async Task<MilitarySecurityDto> GetMilitarySecurityById(int? id)
     {
-        MilitarySecurity? militarySecurity = await _context.MilitarySecurities.FindAsync(id);
-        return militarySecurity != null ? Mapper.MapToMilitarySecurityDto(militarySecurity) : throw new EntityNotFoundException("Military security not found");
+        MilitarySecurity? militarySecurity = await _context.MilitarySecurities.AsNoTracking().FirstOrDefaultAsync(a => a.MilitarySecurityId == id)
+            ?? throw new EntityNotFoundException(GlobalTextManager.GetString("EntityNotFound"));
+
+        return Mapper.MapToMilitarySecurityDto(militarySecurity);
     }
 }

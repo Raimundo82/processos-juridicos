@@ -79,6 +79,7 @@ public static partial class Mapper
 
     public static partial MilitarySecurityDto MapToMilitarySecurityDto(MilitarySecurity entity);
     public static partial MilitarySecurity MapToMilitarySecurity(MilitarySecurityDto dto);
+    public static partial void MapToMilitarySecurity(MilitarySecurityDto dto, MilitarySecurity entity);
     public static partial IEnumerable<MilitarySecurityDto> MapToMilitarySecurityEnum(IEnumerable<MilitarySecurity> entity);
 
     //Process state transition map
