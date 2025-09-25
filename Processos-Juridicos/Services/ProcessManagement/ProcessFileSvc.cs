@@ -6,6 +6,7 @@ using Processos_Juridicos.Entities;
 using Processos_Juridicos.Exceptions;
 using Processos_Juridicos.Mappers;
 using Processos_Juridicos.Services.Interfaces.ProcessManagement;
+using Processos_Juridicos.Utilities.TextManager;
 
 namespace Processos_Juridicos.Services.ProcessManagement;
 
@@ -40,25 +41,12 @@ public class ProcessFileSvc(AppDbContext context) : IProcessFileSvc
         }
     }
 
-    public async Task<ProcessFileDto> EditProcessFile(ProcessFileDto file)
-    {
-        ProcessFile processFileEntity = Mapper.MapToFiles(file);
-        processFileEntity.ProcessFileName = Path.GetFileName(processFileEntity.ProcessFileName);
-        _context.ProcessFiles.Entry(processFileEntity).State = EntityState.Modified;
-        await _context.SaveChangesAsync();
-        return Mapper.MapToFilesDto(processFileEntity);
-    }
-
-    public async Task<IEnumerable<ProcessFileDto>> GetAllProcessFiles()
-    {
-        List<ProcessFile> files = await _context.ProcessFiles.ToListAsync();
-        return Mapper.MapToToFilesEnum(files);
-    }
-
     public async Task<ProcessFileDto> GetProcessFileById(int? id)
     {
-        ProcessFile? processFile = await _context.ProcessFiles.FindAsync(id);
-        return processFile != null ? Mapper.MapToFilesDto(processFile) : throw new EntityNotFoundException("Process File not found");
+        ProcessFile file = await _context.ProcessFiles.AsNoTracking().SingleOrDefaultAsync(a => a.ProcessFileId == id)
+            ?? throw new EntityNotFoundException(GlobalTextManager.GetString("EntityNotFound"));
+
+        return Mapper.MapToFilesDto(file);
     }
 
     public async Task<List<ProcessFileDto>> GetAllProcessFilesByProcessId(int? id)
