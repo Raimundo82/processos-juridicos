@@ -12,6 +12,7 @@ public static partial class Mapper
     // Units Map
     public static partial UnitDto MapToUnitDto(Unit entity);
     public static partial Unit MapToUnit(UnitDto dto);
+    public static partial void MapToUnit(UnitDto dto, Unit entity);
     public static partial IEnumerable<UnitDto> MapToToUnitDtoEnum(IEnumerable<Unit> entity);
 
     // Process States Map 

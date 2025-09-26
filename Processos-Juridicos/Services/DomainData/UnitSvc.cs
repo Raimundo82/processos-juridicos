@@ -6,6 +6,7 @@ using Processos_Juridicos.Entities;
 using Processos_Juridicos.Exceptions;
 using Processos_Juridicos.Mappers;
 using Processos_Juridicos.Services.Interfaces.DomainData;
+using Processos_Juridicos.Utilities.TextManager;
 
 namespace Processos_Juridicos.Services.DomainData;
 
@@ -15,24 +16,26 @@ public class UnitSvc(AppDbContext context) : IUnitSvc
 
     public async Task<IEnumerable<UnitDto>> GetAllUnits()
     {
-        List<Unit> units = await _context.Units.ToListAsync();
+        List<Unit> units = await _context.Units.AsNoTracking().ToListAsync();
         return Mapper.MapToToUnitDtoEnum(units);
     }
 
     public async Task<UnitDto> GetUnitById(int? id)
     {
-        Unit? unit = await _context.Units.Include(uc => uc.UnitCommanders).ThenInclude(u => u.User).FirstOrDefaultAsync(u => u.UnitId == id);
-        return unit != null ? Mapper.MapToUnitDto(unit) : throw new EntityNotFoundException("Unit not found");
+        Unit unit = await _context.Units.Include(uc => uc.UnitCommanders).ThenInclude(u => u.User).FirstOrDefaultAsync(u => u.UnitId == id)
+            ?? throw new EntityNotFoundException(GlobalTextManager.GetString("EntityNotFound"));
+
+        return Mapper.MapToUnitDto(unit);
+
     }
 
     public async Task<UnitDto> CreateUnit(UnitDto unit, List<string> responsibleUserIds)
     {
         Unit unitEntity = Mapper.MapToUnit(unit);
 
-        // Update responsible users
         unit.ResponsibleUsers.Clear();
         List<User> users = await _context.Users
-            .Where(u => responsibleUserIds.Contains(u.UserNii!)) // or UserId
+            .Where(u => responsibleUserIds.Contains(u.UserNii!))
             .ToListAsync();
 
         foreach (User? user in users)
@@ -44,30 +47,49 @@ public class UnitSvc(AppDbContext context) : IUnitSvc
         await _context.SaveChangesAsync();
         return Mapper.MapToUnitDto(unitEntity);
     }
-
-    public async Task EditUnit(UnitDto model, List<string> responsibleUserIds)
+    public async Task<UnitDto> EditUnit(UnitDto model, List<string> responsibleUserIds)
     {
-        Unit? unit = await _context.Units
-            .Include(u => u.ResponsibleUsers)
-            .FirstOrDefaultAsync(u => u.UnitId == model.UnitId) ?? throw new EntityNotFoundException("Unit not found");
+        Unit unit = await _context.Units
+            .Include(u => u.UnitCommanders)
+            .ThenInclude(uc => uc.User)
+            .FirstOrDefaultAsync(u => u.UnitId == model.UnitId)
+            ?? throw new EntityNotFoundException("Unit not found");
 
-        unit.UnitName = model.UnitName;
-        unit.UnitCode = model.UnitCode;
-        unit.UnitAcronym = model.UnitAcronym;
+        Mapper.MapToUnit(model, unit);
 
-        // Update responsible users
-        unit.ResponsibleUsers.Clear();
-        List<User> users = await _context.Users
-            .Where(u => responsibleUserIds.Contains(u.UserNii!)) // or UserId
-            .ToListAsync();
+        var newIds = (responsibleUserIds ?? [])
+            .Where(id => !string.IsNullOrWhiteSpace(id))
+            .Select(id => id.Trim().ToUpperInvariant())
+            .ToHashSet();
 
-        foreach (User? user in users)
+        var currentIds = unit.UnitCommanders
+            .Select(uc => uc.UserNii.Trim().ToUpperInvariant())
+            .ToHashSet();
+
+        var toRemove = unit.UnitCommanders
+            .Where(uc => !newIds.Contains(uc.UserNii.Trim().ToUpperInvariant()))
+            .ToList();
+        foreach (UnitCommander? uc in toRemove)
         {
-            unit.ResponsibleUsers.Add(user);
+            unit.UnitCommanders.Remove(uc);
+        }
+
+        var toAddIds = newIds.Except(currentIds).ToList();
+
+        foreach (var id in toAddIds)
+        {
+            unit.UnitCommanders.Add(new UnitCommander
+            {
+                UnitId = (int)unit.UnitId!,
+                UserNii = id
+            });
         }
 
         await _context.SaveChangesAsync();
+
+        return Mapper.MapToUnitDto(unit);
     }
+
 
     public async Task<bool> DeleteUnit(int? id)
     {
@@ -88,10 +110,8 @@ public class UnitSvc(AppDbContext context) : IUnitSvc
                .Include(u => u.ResponsibleUsers)
                .FirstOrDefaultAsync(u => u.UnitId == unitId) ?? throw new EntityNotFoundException("Unit not found");
 
-        // Clear existing assignments
         unit.ResponsibleUsers.Clear();
 
-        // Add the new ones
         List<User> users = await _context.Users
             .Where(u => userIds.Contains(u.UserNii!))
             .ToListAsync();
@@ -104,6 +124,4 @@ public class UnitSvc(AppDbContext context) : IUnitSvc
         await _context.SaveChangesAsync();
         return true;
     }
-
-
 }
