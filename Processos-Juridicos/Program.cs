@@ -143,6 +143,7 @@ GlobalTextManager.SetManager(app.Services.GetRequiredService<IJsonTextManager>()
 // Global unhandled exception logging (Production only)
 if (!app.Environment.IsDevelopment())
 {
+
     AppDomain.CurrentDomain.UnhandledException += (sender, eventArgs) =>
     {
         var ex = (Exception)eventArgs.ExceptionObject;
