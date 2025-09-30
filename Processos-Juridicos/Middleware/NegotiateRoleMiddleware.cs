@@ -17,7 +17,7 @@ public class NegotiateRoleMiddleware(IUserSvc userSvc) : IMiddleware
         {
             var fullUser = winIdentity.Name.Split('\\');
             var userName = fullUser[^1];
-            var role = await _userSvc.GetUserRoleByNii(userName);
+            var role = await _userSvc.GetUserRoleNameByNii(userName);
 
             if (!string.IsNullOrEmpty(role))
             {

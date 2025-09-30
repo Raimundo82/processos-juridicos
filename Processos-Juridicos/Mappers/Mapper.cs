@@ -102,6 +102,7 @@ public static partial class Mapper
 
     public static partial UserDto MapToUserDto(User entity);
     public static partial User MapToUser(UserDto dto);
+    public static partial void MapToUser(UserDto dto, User entity);
     public static partial IEnumerable<UserDto> MapToUserEnum(IEnumerable<User> entity);
 
     //Role transition map

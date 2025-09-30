@@ -26,37 +26,38 @@ public class UserSvc(AppDbContext context) : IUserSvc
 
     public async Task<UserDto> UpdateUser(UserDto user)
     {
-        User userEntity = Mapper.MapToUser(user);
-        _context.Users.Entry(userEntity).State = EntityState.Modified;
+        User existing = await _context.Users.FirstOrDefaultAsync(u => u.UserNii == user.UserNii)
+            ?? throw new EntityNotFoundException("User not found");
+
+        Mapper.MapToUser(user, existing); // overload that maps onto an existing entity
 
         await _context.SaveChangesAsync();
-        return Mapper.MapToUserDto(userEntity);
+        return Mapper.MapToUserDto(existing);
     }
 
 
     public async Task<IEnumerable<UserDto>> GetAllUsers()
     {
-        List<User> users = await _context.Users.Include(x => x.UserRole).ToListAsync();
+        List<User> users = await _context.Users.AsNoTracking().Include(x => x.UserRole).ToListAsync();
         return Mapper.MapToUserEnum(users);
     }
 
     public async Task<UserDto> GetUserByNii(string nii)
     {
-        User? user = await _context.Users.FirstOrDefaultAsync(u => u.UserNii == nii);
+        User? user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.UserNii == nii);
 
         return user != null
             ? Mapper.MapToUserDto(user)
             : throw new EntityNotFoundException("User not found");
     }
 
-    public async Task<string?> GetUserRoleByNii(string nii)
+    public async Task<string?> GetUserRoleNameByNii(string nii)
     {
-        var roleId = await _context.Users
+        return await _context.Users
+            .AsNoTracking()
             .Where(u => u.UserNii == nii)
             .Select(u => u.UserRole!.RoleName)
             .FirstOrDefaultAsync();
-
-        return roleId ?? null;
     }
 
     public async Task<bool> RemoveUser(string? id)

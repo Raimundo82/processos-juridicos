@@ -20,6 +20,7 @@ public class ProcessController(
     IToastNotify toastNotify) : Controller
 {
     private const string EntityName = "Processo";
+    private const string AccidentProcessTypeName = "Acidentes em serviço";
 
     private readonly IProcessManagementSvc _processManagement = processManagement;
     private readonly IProcessViewDataSvc _viewDataSvc = viewDataSvc;
@@ -89,6 +90,11 @@ public class ProcessController(
             return View(model);
         }
 
+        if (model.ProcessType?.ProcessTypeName == AccidentProcessTypeName)
+        {
+            model.ComunicatedToPjm = false;
+        }
+
         UserDataModel userData = _ldapUserSvc.GetLoggedUserData();
         model.CreatedByName = userData.DisplayName;
         model.CreatedByNii = "M" + userData.Nii;
@@ -153,6 +159,11 @@ public class ProcessController(
             ModelState.AddModelError(nameof(model.ProcessStateId), GlobalTextManager.GetString("StateTransitionInvalidMessage"));
             await _viewDataSvc.PopulateForEditAsync(ViewData, model.ProcessId);
             return View(model);
+        }
+
+        if (model.ProcessType?.ProcessTypeName == AccidentProcessTypeName)
+        {
+            model.ComunicatedToPjm = false;
         }
 
         UserDataModel userData = _ldapUserSvc.GetLoggedUserData();

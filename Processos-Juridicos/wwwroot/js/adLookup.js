@@ -23,20 +23,21 @@ export function initAdLookup({ applySelection, setupIds, debounceMs = 1000 }) {
         if (!resultsBody) return;
         resultsBody.innerHTML = '';
         if (!items?.length) {
-            resultsBody.innerHTML = '<tr><td colspan="5" class="text-muted">Sem resultados</td></tr>';
+            resultsBody.innerHTML = '<tr><td colspan="5" class="text-muted text-center">Sem resultados</td></tr>';
             return;
         }
         for (const u of items) {
             const tr = document.createElement('tr');
+            tr.style.cursor = 'pointer'; 
             tr.innerHTML = `
                 <td>${escapeHtml(u.displayName || '')}</td>
                 <td>${escapeHtml(u.samAccountName || '')}</td>
                 <td>${escapeHtml(u.email || '')}</td>
                 <td>${escapeHtml(u.department || u.company || '')}</td>
-                <td><button type="button" class="btn btn-sm btn-success">Selecionar</button></td>
+                <td><a class="btn btn-sm text-success"><i class="bi bi-check-lg"></i></a></td>
             `;
             tr.addEventListener('dblclick', () => applySelection(u, currentTarget, adModal));
-            tr.querySelector('button').addEventListener('click', () => applySelection(u, currentTarget, adModal));
+            tr.querySelector('a').addEventListener('click', () => applySelection(u, currentTarget, adModal));
             resultsBody.appendChild(tr);
         }
     };

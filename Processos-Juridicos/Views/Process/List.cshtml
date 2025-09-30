@@ -104,11 +104,14 @@
 
                                                 @if (User.IsDjAdministration())
                                                 {
-                                                    <form asp-action="Delete" method="post" data-action="delete">
-                                                        @Html.AntiForgeryToken()
-                                                        <input type="hidden" name="id" value="@item.ProcessId">
-                                                        <button type="submit" class="btn btn-sm text-danger js-delete-btn"><i class="bi bi-trash-fill"></i></button>
-                                                    </form>
+                                                    <a class="text-danger btn-delete"
+                                                            data-entity="o processo"
+                                                            data-name="@item.Nuipm"
+                                                            data-id="@item.ProcessId"
+                                                            data-controller="Process"
+                                                            data-action="Delete">
+                                                        <i class="bi bi-trash-fill"></i>
+                                                    </a>
                                                 }
                                             </div>
                                         </td>
@@ -128,6 +131,8 @@
         </div>
     </div>
 </div>
+
+@await Html.PartialAsync("ConfirmationModals/_DeleteModal")
 
 @section Scripts {
     <script>

@@ -37,7 +37,7 @@ public class AccountController(
             return View();
         }
 
-        var userRole = await _userSvc.GetUserRoleByNii(model.Username) ?? string.Empty;
+        var userRole = await _userSvc.GetUserRoleNameByNii(model.Username) ?? string.Empty;
 
         HttpContext.Session.SetString("SessionUser", model.Username);
         HttpContext.Session.SetString("SessionRole", userRole);

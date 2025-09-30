@@ -3,9 +3,9 @@
     /* colors */
     --black: #000000;
     --dark-blue: #182439;
-    --dark-blue-hover: #2c4269;
+    --dark-blue-hover: #2C4269;
     --charcoal: #444C5A;
-    --charcoal-hover: #5a6370;
+    --charcoal-hover: #5A6370;
     --dark-gray: #E9EAED;
     --gray: #DEE0E4;
     --light-gray: #F3F4F6;
@@ -15,14 +15,11 @@
     /* fonts */
     --font-title: 'Prosto One', sans-serif;
     --font-base: 'Roboto', sans-serif;
-    --font-size-sm: 14px;
-    --font-weight-regular: 400;
-    --font-weight-medium: 500;
 }
 
 body.dark-mode {
     --black: #FFFFFF;
-    --dark-blue: #2c4269;
+    --dark-blue: #F3F4F6;
     --dark-blue-hover: #182439;
     --light-gray: #1E1E1E;
     --gray: #3A3A3A;
@@ -44,25 +41,31 @@ html {
 
 body {
     background-image: url("../images/bg-image.webp");
-    background-color: #a1e4ff; /* remove after pages done */
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center center;
     margin-bottom: 60px;
+    font-family: var(--font-base);
 }
 
 h1 {
     font-family: var(--font-title);
     font-size: 24px;
-    font-weight: var(--font-weight-medium);
-    color: var(--black);
+    font-weight: 500;
+    color: var(--dark-blue);
 }
 
 h2 {
     font-size: 20px;
-    font-weight: var(--font-weight-medium);
-    color: var(--black);
+    font-weight: 500;
+    color: var(--dark-blue);
     margin-bottom: 0px;
+}
+
+p {
+    color: var(--dark-blue);
+    font-size: 15px;
+    font-weight: 400;
 }
 
 /* text */
@@ -71,20 +74,17 @@ h2 {
 }
 
 .text-primary {
-    font-family: var(--font-base);
     font-weight: 400;
     font-size: 15px;
     color: var(--dark-blue) !important;
 }
 
 .text-danger {
-    font-family: var(--font-base);
     font-weight: 400;
     font-size: 15px;
 }
 
 .text-mini {
-    font-family: var(--font-base);
     font-weight: 300;
     font-size: 14px;
     color: var(--charcoal);
@@ -130,10 +130,27 @@ h2 {
 }
 
 .nav-link {
-    font-weight: 600;
-    color: var(--black);
+    font-weight: 500;
+    color: var(--dark-blue);
     border: none;
     background: none;
+    font-size: 15px;
+}
+
+/* dropdown */
+.dropdown-menu {
+    padding: 0 0;
+}
+
+.dropdown-item {
+    font-size: 15px;
+    padding: 0.40rem 1rem;
+    color: var(--dark-blue);
+}
+
+.dropdown-item.active, .dropdown-item:active {
+    color: #fff;
+    background-color: var(--dark-blue);
 }
 
 .container,
@@ -173,6 +190,11 @@ h2 {
     font-size: 14px;
     padding: 0.5rem 1rem;
     font-weight: 500;
+    min-width: 100px;
+}
+
+.btn-auto {
+        min-width: auto !important;
 }
 
 .btn-sm {
@@ -202,6 +224,10 @@ h2 {
     background-color: var(--dark-gray);
     border: none;
     box-shadow: none;
+}
+
+.btn-delete {
+    cursor: pointer;
 }
 
 .input-group > :not(:first-child):not(.dropdown-menu):not(.valid-tooltip):not(.valid-feedback):not(.invalid-tooltip):not(.invalid-feedback) {
@@ -357,9 +383,14 @@ select .form-select option {
 }
 
 .role-title {
-    font-weight: 600;
-    font-size: 1.2rem;
-    margin-top: 1.5rem;
+    font-weight: 500;
+    font-size: 16px;
+    color: var(--dark-blue);
+}
+
+.section ul {
+    font-size: 15px;
+    color: var(--dark-blue);
 }
 
 .diagram-image {
@@ -429,7 +460,6 @@ select .form-select option {
     box-shadow: none;
 }
 
-
 /* footer */
 .footer {
     bottom: 0;
@@ -438,9 +468,14 @@ select .form-select option {
     align-items: center;
     display: flex;
     height: 40px;
-    font-family: var(--font-base);
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-medium);
-    color: var(--black);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--dark-blue);
     width: 100%;
+}
+
+/* Modal */
+.modal-header,
+.modal-footer {
+    border: none;
 }

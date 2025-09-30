@@ -344,19 +344,19 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
         IDocument listDoc = await _client.GetDocumentAsync("/Process/List");
 
         var token = listDoc
-            .QuerySelector("form[action='/Process/Delete'] input[name=__RequestVerificationToken]")!
+            .QuerySelector("#deleteForm input[name=__RequestVerificationToken]")!
             .GetAttribute("value");
 
         var fields = new Dictionary<string, string?>
         {
-            ["ProcessId"] = process.ProcessId.ToString(),
+            ["id"] = process.ProcessId.ToString(),
             ["__RequestVerificationToken"] = token
         };
 
-        //Act
-        await _client.PostAsync($"/Process/Delete/{process.ProcessId}", new FormUrlEncodedContent(fields));
+        // Act
+        await _client.PostAsync($"/Process/Delete", new FormUrlEncodedContent(fields));
 
-        // Assert 
+        // Assert
         DbSet<Process> dbItems = dbContext.Processes;
         Assert.Empty(dbItems);
     }
@@ -375,16 +375,17 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
         IDocument listDoc = await _client.GetDocumentAsync("/Process/List");
 
         var token = listDoc
-            .QuerySelector("form[action='/Process/Delete'] input[name=__RequestVerificationToken]")!
+            .QuerySelector("#deleteForm input[name=__RequestVerificationToken]")!
             .GetAttribute("value");
 
         var fields = new Dictionary<string, string?>
         {
+            ["id"] = int.MaxValue.ToString(),
             ["__RequestVerificationToken"] = token
         };
 
-        //Act
-        await _client.PostAsync($"/Process/Delete/{int.MaxValue}", new FormUrlEncodedContent(fields));
+        // Act
+        await _client.PostAsync("/Process/Delete", new FormUrlEncodedContent(fields));
 
         // Assert
         Assert.Single(dbContext.Processes);

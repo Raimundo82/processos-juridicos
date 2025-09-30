@@ -1,14 +1,13 @@
-<!-- Shared AD search modal (Bootstrap) -->
 <div class="modal fade" id="adPickerModal" tabindex="-1" aria-labelledby="adPickerLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="adPickerLabel">Procurar no AD</h5>
+                <h5 class="modal-title" id="adPickerLabel">Procurar utilizadores</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
             </div>
             <div class="modal-body">
                 <div class="input-group mb-3">
-                    <input id="adSearchBox" class="form-control" placeholder="Nome, ID (sAMAccountName) ou email" />
+                    <input id="adSearchBox" class="form-control" placeholder="Pesquisar por nome, NII, email ou unidade…" />
                     <button id="adSearchBtn" class="btn btn-primary" type="button">Pesquisar</button>
                 </div>
 
@@ -19,7 +18,7 @@
                         <thead>
                             <tr>
                                 <th>Nome</th>
-                                <th>ID</th>
+                                <th>NII</th>
                                 <th>Email</th>
                                 <th>Unidade</th>
                                 <th></th>

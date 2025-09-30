@@ -13,3 +13,18 @@ function markFileForDeletion(fileId) {
   input.value = fileId;
   container.appendChild(input);
 }
+
+function toggleReportToPjm() {
+    let typeText = $("#ProcessTypeId option:selected").text();
+    if (typeText === "Acidentes em serviço") {
+        $("#ComunicatedToPjm").prop("checked", false).prop("disabled", true);
+    } else {
+        $("#ComunicatedToPjm").prop("disabled", false);
+    }
+}
+
+$(document).ready(function () {
+    toggleReportToPjm();
+    $("#ProcessTypeId").on("change", toggleReportToPjm);
+});
+

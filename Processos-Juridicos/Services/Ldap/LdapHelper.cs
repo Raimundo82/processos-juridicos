@@ -18,6 +18,13 @@ public static partial class LdapHelper
     private const string ThumbnailPhoto = "thumbnailPhoto";
     private const string Department = "department";
     private const string DistinguishedName = "distinguishedName";
+    private const string Groups = "memberOf";
+    private const string Nii = "employeeID";
+    private const string Email = "email";
+    private const string EmailLdap = "mail";
+    private const string DisplayName = "displayName";
+    private const string UserPrincipalName = "userPrincipalName";
+    private const string AccountName = "sAMAccountName";
 
 
     [GeneratedRegex(@"CN=([^,]+)")]
@@ -47,13 +54,13 @@ public static partial class LdapHelper
         using var searcher = new DirectorySearcher(entry)
         {
             Filter = $"(&(objectClass=user)(sAMAccountName={username}))",
-            PropertiesToLoad = { "memberOf" }
+            PropertiesToLoad = { Groups }
         };
 
         SearchResult? result = searcher.FindOne();
-        if (result != null && result.Properties.Contains("memberOf"))
+        if (result != null && result.Properties.Contains(Groups))
         {
-            foreach (string dn in result.Properties["memberOf"])
+            foreach (string dn in result.Properties[Groups])
             {
                 Match match = CnRegex().Match(dn);
                 if (match.Success)
@@ -91,8 +98,8 @@ public static partial class LdapHelper
 
         using var ds = new DirectorySearcher(root, filter,
         [
-            "displayName","sAMAccountName","userPrincipalName","mail",
-            Department,"employeeID",ThumbnailPhoto,DistinguishedName
+            DisplayName,AccountName,UserPrincipalName, EmailLdap,
+            Department, Nii ,ThumbnailPhoto,DistinguishedName
         ])
         {
             PageSize = 50,
@@ -113,9 +120,9 @@ public static partial class LdapHelper
                 DisplayName = Prop("displayName"),
                 UserName = Prop("sAMAccountName"),
                 FullUser = Prop(DistinguishedName),
-                Nii = Prop("employeeID"),
+                Nii = Prop(Nii),
                 Unit = Prop(Department),
-                Email = Prop("mail")
+                Email = Prop(Email)
             });
         }
         return list;

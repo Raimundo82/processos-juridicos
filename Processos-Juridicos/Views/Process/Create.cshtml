@@ -24,7 +24,7 @@
             <div class="d-flex justify-content-center mb-4">
                 <div class="form-group mt-3 text-center">
                     <input type="submit" value="@ViewData["Title"]" class="btn btn-primary me-2" />
-                    <a asp-action="List" class="btn btn-secondary">Voltar à Lista</a>
+                    <a class="btn btn-secondary btn-reject">Voltar</a>
                 </div>
             </div>
 
@@ -32,6 +32,7 @@
     </div>
 </div>
 
+@await Html.PartialAsync("ConfirmationModals/_ConfirmRejectModal")
 
 <script src="~/js/forms.js" asp-append-version="true"></script>
 @section Scripts {
