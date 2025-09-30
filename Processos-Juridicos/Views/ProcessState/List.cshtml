@@ -1,36 +1,57 @@
 @using Processos_Juridicos.DTOs
-
+@model IEnumerable<ProcessStateDto>
 @{
     ViewData["Title"] = "Lista de Estados";
+    int count = 1;
 }
 
-@model IEnumerable<ProcessStateDto>
+<div class="container-fluid">
+    <div class="mx-lg-5 my-3">
 
-<div class="text-center">
-    <h1 class="display-4">Estados</h1>
-</div>
+        <div class="card mb-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <h2>@ViewData["Title"]</h2>
+            </div>
+        </div>
+    
+        <div class="card">
+            <div id="tableLoader" class="d-flex justify-content-center my-5">
+                <output class="spinner-border text-primary">
+                    <span class="visually-hidden">A carregar...</span>
+                </output>
+            </div>
 
-<div>
-    <table id="tableStates" class="table table-striped-columns table-hover">
-        <thead>
-            <tr>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().StateName)</th>
-            </tr>
-        </thead>
-        <tbody>
+            <div id="tableContent" class="d-none">
+                <div class="table-responsive">
+                    <table id="tableStates" class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">@Html.DisplayNameFor(m => m.First().StateName)</th>
+                            </tr>
+                        </thead>
 
-            @foreach (var item in Model.ToList())
-            {
-                <tr data-id="@item.ProcessStateId">
-                    <td data-property="name">@Html.DisplayFor(m => item.StateName)</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+                        <tbody>
+                            @foreach (var item in Model.ToList())
+                            {
+                                <tr data-id="@item.ProcessStateId">
+                                    <th scope="col">@count</th>
+                                    <td data-property="name">@Html.DisplayFor(m => item.StateName)</td>
+                                </tr>
+
+                                count++;
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
 </div>
 
 @section Scripts {
     <script>
-        let table = createDataTable("#tableStates");
+        createDataTable('#tableStates');
     </script>
-} 
+}

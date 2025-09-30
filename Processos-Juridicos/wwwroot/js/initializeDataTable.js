@@ -2,14 +2,13 @@
 function createDataTable(elementId) {
     const table = $(elementId);
     if (table.length && table.find('tbody tr').length > 0) {
-        table.DataTable({
+
+        const options = {
             "language": {
                 "sEmptyTable": "Nenhum registo disponível",
                 "sInfo": "A mostrar _START_ a _END_ de um total de _TOTAL_ registos",
                 "sInfoEmpty": "A mostrar 0 a 0 de um total de 0 registos",
                 "sInfoFiltered": "(filtrado de um total de _MAX_ registos)",
-                "sInfoPostFix": "",
-                "sInfoThousands": " ",
                 "sLengthMenu": "Mostrar _MENU_ registos",
                 "sLoadingRecords": "A carregar...",
                 "sProcessing": "A processar...",
@@ -26,13 +25,16 @@ function createDataTable(elementId) {
                     "sSortDescending": ": Ordenar colunas de forma descendente"
                 }
             },
-            "columnDefs": [
-                { "orderable": false, "targets": 11 }
-            ],
-            "infoCallback": function( settings, start, end, max, total, pre ) {
+            "infoCallback": function(settings, start, end, max, total, pre) {
                 return pre.replace(/(\d+)/g, '<strong>$1</strong>');
             }
-        });
+        };
+
+        if (elementId !== '#tableStates') {
+            options.columnDefs = [{ orderable: false, targets: -1 }];
+        }
+
+        table.DataTable(options);
     }
 }
 
