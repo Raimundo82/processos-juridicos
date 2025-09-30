@@ -39,9 +39,17 @@ const applySelectionBadge = (user, target, adModal) => {
         return;
     }
 
-    hiddenContainer.appendChild(createBadge(display, id));
-    setText(info, `✅ Added ${display} (${id})`);
-    adModal?.hide();
+
+    const input = document.querySelector(`input[value="${user.employeeId}"]`);
+
+    if (input) {
+        hiddenContainer.appendChild(createBadge(display, id));
+        setText(info, `✅ Added ${display} (${id})`);
+        adModal?.hide();
+    } else {
+        setText(info, `User ${display} (${id}) was already added `);
+    }
+
 };
 
 document.addEventListener('DOMContentLoaded', () => {

@@ -58,7 +58,7 @@ public class UserSearchController(ILdapUserSvc directory) : ControllerBase
         }
         catch (KeyNotFoundException)
         {
-            return Ok(new { found = false });
+            return NotFound(new { message = "Utilizador não encontrado" });
         }
     }
 }
