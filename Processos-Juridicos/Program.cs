@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.Negotiate;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 using NToastNotify;
 
@@ -15,6 +16,7 @@ using Processos_Juridicos.Services.Interfaces.ProcessManagement;
 using Processos_Juridicos.Services.Ldap;
 using Processos_Juridicos.Services.ProcessManagement;
 using Processos_Juridicos.Services.UiHelpers;
+using Processos_Juridicos.Settings;
 using Processos_Juridicos.Utilities;
 using Processos_Juridicos.Utilities.TextManager;
 using Processos_Juridicos.Utilities.TextManager.Interfaces;
@@ -56,6 +58,9 @@ builder.Configuration.AddUserSecrets<Program>();
 
 // Global Exception Handling
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+
+// Bind the "AppSettings" section from configuration to the AppSettingsOptions class
+builder.Services.Configure<AppSettingsOptions>(builder.Configuration.GetSection(AppSettingsOptions.AppSettings));
 
 
 // Connection string from configuration
@@ -157,7 +162,12 @@ if (!app.Environment.IsDevelopment())
     };
 }
 
+
+// Get AppSettingsOptions values from configuration via dependency injection
+AppSettingsOptions appSettings = app.Services.GetRequiredService<IOptions<AppSettingsOptions>>().Value;
+
 // HTTP Pipeline
+app.UsePathBase(appSettings.SubPath);
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseSession();
