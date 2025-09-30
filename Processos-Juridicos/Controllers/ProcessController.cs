@@ -28,7 +28,7 @@ public class ProcessController(
 
     private readonly IToastNotify _toastNotify = toastNotify;
 
-    [Authorize(Policy = "PROCESS-VIEW")]
+    [Authorize]
     [HttpGet]
     public async Task<IActionResult> List()
     {

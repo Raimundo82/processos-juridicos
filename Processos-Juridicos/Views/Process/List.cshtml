@@ -11,7 +11,7 @@
         {
             <div class="card card-action mb-3">
                 <div class="d-flex align-items-center justify-content-between">
-                    <h2>@ViewData["Title"]</h2>
+                    <h2>@(Model.Title ?? "Lista de Processos")</h2>
                     <a asp-controller="Process" asp-action="Create" class="btn btn-primary">Inserir Processo</a>
                 </div>
             </div>
@@ -84,16 +84,16 @@
                                 {
                                     <tr data-id="@item.ProcessId">
                                         <td data-property="nuipm"><strong>@Html.DisplayFor(m => item.Nuipm)</strong></td>
-                                        <td data-property="process-type">@(item.ProcessType?.ProcessTypeName ?? "-")</td>
-                                        <td data-property="unit">@(item.Unit?.UnitAcronym ?? "-")</td>
+                                        <td data-property="process-type">@(item.ProcessType?.ProcessTypeName )</td>
+                                        <td data-property="unit">@(item.Unit?.UnitAcronym )</td>
                                         <td data-property="instructing-official">@Html.DisplayFor(m => item.OficialInstName)</td>
                                         <td data-property="instructing-official-phone">@Html.DisplayFor(m => item.OficialInstTelephone)</td>
                                         <td data-property="created-at">@Html.DisplayFor(m => item.CreatedAt)</td>
                                         <td data-property="created-by">@Html.DisplayFor(m => item.CreatedByName)</td>
-                                        <td data-property="sentence"><strong>@(item.Sentence?.SentenceName ?? "-")</strong></td>
-                                        <td data-property="state"><strong>@(item.ProcessState?.StateName ?? "-")</strong></td>
-                                        <td data-property="last-modified-date">@(item.ModifiedAt?.ToString("dd-MM-yyyy") ?? "-")</td>
-                                        <td data-property="last-modified-by">@(item.ModifiedByName?.ToString() ?? "-")</td>
+                                        <td data-property="sentence"><strong>@(item.Sentence?.SentenceName )</strong></td>
+                                        <td data-property="state"><strong>@(item.ProcessState?.StateName)</strong></td>
+                                        <td data-property="last-modified-date">@(item.ModifiedAt?.ToString("dd-MM-yyyy"))</td>
+                                        <td data-property="last-modified-by">@(item.ModifiedByName?.ToString() )</td>
 
                                         <td>
                                             <div class="d-flex gap-3">
