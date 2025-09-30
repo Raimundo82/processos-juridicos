@@ -190,6 +190,11 @@ p {
     font-size: 14px;
     padding: 0.5rem 1rem;
     font-weight: 500;
+    min-width: 100px;
+}
+
+.btn-auto {
+        min-width: auto !important;
 }
 
 .btn-sm {
@@ -219,6 +224,10 @@ p {
     background-color: var(--dark-gray);
     border: none;
     box-shadow: none;
+}
+
+.btn-delete {
+    cursor: pointer;
 }
 
 .input-group > :not(:first-child):not(.dropdown-menu):not(.valid-tooltip):not(.valid-feedback):not(.invalid-tooltip):not(.invalid-feedback) {
@@ -451,7 +460,6 @@ select .form-select option {
     box-shadow: none;
 }
 
-
 /* footer */
 .footer {
     bottom: 0;
@@ -464,4 +472,10 @@ select .form-select option {
     font-weight: 500;
     color: var(--dark-blue);
     width: 100%;
+}
+
+/* Modal */
+.modal-header,
+.modal-footer {
+    border: none;
 }

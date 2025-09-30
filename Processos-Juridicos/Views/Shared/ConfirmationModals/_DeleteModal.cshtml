@@ -1,0 +1,26 @@
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+
+            <div class="modal-body d-grid text-center">
+                <span class="mb-2">Deseja eliminar <span id="deleteEntity"></span>?<br />
+                <strong><span id="deleteName"></span></strong></span>
+                <span><strong>Esta operação não pode ser revertida.</strong></span>
+            </div>
+
+            <div class="modal-footer d-flex justify-content-center">
+                <form id="deleteForm" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" id="deleteId" />
+                    <button type="submit" class="btn btn-danger">Sim</button>
+                </form>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Não</button>
+            </div>
+
+        </div>
+    </div>
+</div>

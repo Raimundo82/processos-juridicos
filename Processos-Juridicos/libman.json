@@ -80,10 +80,6 @@
             ]
         },
         {
-            "library": "sweetalert2@11.22.1",
-            "destination": "wwwroot/lib/sweetalert2/"
-        },
-        {
             "provider": "jsdelivr",
             "library": "@fontsource/prosto-one@5.2.6",
             "destination": "wwwroot/lib/fontsource/prosto-one/"
