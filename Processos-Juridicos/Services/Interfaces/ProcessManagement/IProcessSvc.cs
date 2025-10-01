@@ -7,13 +7,11 @@ namespace Processos_Juridicos.Services.Interfaces.ProcessManagement;
 
 public interface IProcessSvc
 {
-    public Task<IEnumerable<ProcessDto>> GetAllProcesses(ClaimsPrincipal User);
     public Task<ProcessDto> GetProcessById(int? id);
     public Task<ProcessDto> CreateProcess(ProcessDto process);
     public Task<ProcessDto> EditProcess(ProcessDto process);
     public Task<bool> DeleteProcess(int? id);
     public Task<bool> CanChangeStateAsync(int processId, int? newStateId);
-    public Task<object> GetPagedProcessesAsync(ClaimsPrincipal user, int draw, int start, int length, string? search);
     public Task<ProcessFilterValuesDto> GetFilterValuesAsync();
     public IQueryable<Process> BuildRestrictedQuery(ClaimsPrincipal user);
 }

@@ -255,29 +255,27 @@ public class ProcessController(
 
         return RedirectToAction(nameof(List));
     }
+
+
     [Authorize]
     [HttpPost]
-    public async Task<IActionResult> LoadProcesses(
-    int draw,
-    int start,
-    int length,
-    [FromForm(Name = "search[value]")] string? search,
-    string? unitFilter,
-    string? typeFilter,
-    string? stateFilter)
+    public async Task<IActionResult> LoadProcesses(int draw, int start, int length, [FromForm(Name = "search[value]")] string? search, string? unitFilter, string? typeFilter, string? stateFilter)
     {
+        if (!ModelState.IsValid)
+        {
+            return Json(new { });
+        }
+
         IQueryable<Entities.Process> query = _processManagement.Processes.BuildRestrictedQuery(User);
 
         var totalRecords = await query.CountAsync();
 
-        // Apply global search
         if (!string.IsNullOrWhiteSpace(search))
         {
             query = query.Where(p => p.Nuipm.Contains(search) ||
                                      p.OficialInstName.Contains(search));
         }
 
-        // Apply dropdown filters
         if (!string.IsNullOrEmpty(unitFilter))
         {
             query = query.Where(p => p.Unit.UnitAcronym == unitFilter);
@@ -293,29 +291,49 @@ public class ProcessController(
 
         var filteredRecords = await query.CountAsync();
 
-        var data = await query
+        // Materialize first
+        List<Entities.Process> page = await query
             .OrderByDescending(p => p.CreatedAt)
             .Skip(start)
             .Take(length)
-            .Select(p => new
-            {
-                processId = p.ProcessId,
-                nuipm = p.Nuipm ?? "",
-                processTypeName = p.ProcessType.ProcessTypeName ?? "",
-                unitAcronym = p.Unit.UnitAcronym ?? "",
-                oficialInstName = p.OficialInstName ?? "",
-                oficialInstTelephone = p.OficialInstTelephone ?? "",
-                createdByName = p.CreatedByName ?? "",
-                sentenceName = p.Sentence != null ? p.Sentence.SentenceName ?? "" : "",
-                createdAt = p.CreatedAt.HasValue ? p.CreatedAt.Value.ToString("dd-MM-yyyy") : "",
-                processStateName = p.ProcessState.StateName ?? "",
-                modifiedAt = p.ModifiedAt.HasValue ? p.ModifiedAt.Value.ToString("dd-MM-yyyy") : "",
-                modifiedByName = p.ModifiedByName ?? "",
-                actions = $@"
-                <a href='/Process/Details/{p.ProcessId}' class='text-primary'><i class='bi bi-search'></i></a>
-                <a href='/Process/Edit/{p.ProcessId}' class='text-primary'><i class='bi bi-pencil-square'></i></a>"
-            })
             .ToListAsync();
+
+        var isAdmin = User.IsDjAdministration();
+
+        var data = page.Select(p => new
+        {
+            processId = p.ProcessId,
+            nuipm = p.Nuipm ?? "",
+            processTypeName = p.ProcessType?.ProcessTypeName ?? "",
+            unitAcronym = p.Unit?.UnitAcronym ?? "",
+            oficialInstName = p.OficialInstName ?? "",
+            oficialInstTelephone = p.OficialInstTelephone ?? "",
+            createdByName = p.CreatedByName ?? "",
+            sentenceName = p.Sentence?.SentenceName ?? "",
+            createdAt = p.CreatedAt?.ToString("dd-MM-yyyy") ?? "",
+            processStateName = p.ProcessState?.StateName ?? "",
+            modifiedAt = p.ModifiedAt?.ToString("dd-MM-yyyy") ?? "",
+            modifiedByName = p.ModifiedByName ?? "",
+            actions =
+                $@" <div class=""d-flex gap-3"">
+                    <a href='/Process/Details/{p.ProcessId}' class='text-primary'>
+                   <i class='bi bi-search'></i>
+               </a>
+               <a href='/Process/Edit/{p.ProcessId}' class='text-primary'>
+                   <i class='bi bi-pencil-square'></i>
+               </a>"
+                + (isAdmin
+                    ? $@"<a class='text-danger btn-delete'
+                          data-entity='o processo'
+                          data-name='{p.Nuipm}'
+                          data-id='{p.ProcessId}'
+                          data-controller='Process'
+                          data-action='Delete'>
+                          <i class='bi bi-trash-fill'></i>
+                      </a>
+                      </div>"
+                    : "")
+        });
 
         return Json(new
         {
@@ -325,9 +343,6 @@ public class ProcessController(
             data
         });
     }
-
-
-
 
     private string GetProcessPageTitle()
     {
