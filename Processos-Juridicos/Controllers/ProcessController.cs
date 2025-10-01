@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 using Processos_Juridicos.DTOs;
+using Processos_Juridicos.Mappers;
 using Processos_Juridicos.Models;
 using Processos_Juridicos.Services.Interfaces;
 using Processos_Juridicos.Services.Interfaces.Ldap;
@@ -31,6 +33,9 @@ public class ProcessController(
 
     [Authorize]
     [HttpGet]
+
+    [Authorize]
+    [HttpGet]
     public async Task<IActionResult> List()
     {
         if (!User.IsInstrutor() && !User.IsComando() && !User.IsDj())
@@ -44,18 +49,29 @@ public class ProcessController(
             });
         }
 
-        IEnumerable<ProcessDto> processes = await _processManagement.Processes.GetAllProcesses(User);
+        const int defaultPageSize = 25;
+
+        IQueryable<Entities.Process> query = _processManagement.Processes.BuildRestrictedQuery(User);
+
+        List<Entities.Process> firstPageEntities = await query
+            .OrderByDescending(p => p.CreatedAt)
+            .Skip(0)
+            .Take(defaultPageSize)
+            .ToListAsync();
+
+        IEnumerable<ProcessDto> firstPageDtos = Mapper.MapToToProcessesEnum(firstPageEntities);
 
         var vm = new ProcessListViewModel
         {
             Title = GetProcessPageTitle(),
-            Processes = processes,
+            Processes = firstPageDtos,                 // only first page
             CanInsertProcess = User.IsInstrutor() || User.IsDj(),
             HasRole = true
         };
 
         return View(vm);
     }
+
 
     [Authorize(Policy = "PROCESS-VIEW")]
     [HttpGet]
@@ -79,6 +95,7 @@ public class ProcessController(
         await _viewDataSvc.PopulateForCreateAsync(ViewData);
         return View();
     }
+
 
     [Authorize(Policy = "PROCESS-MANAGEMENT")]
     [HttpPost]
@@ -238,6 +255,79 @@ public class ProcessController(
 
         return RedirectToAction(nameof(List));
     }
+    [Authorize]
+    [HttpPost]
+    public async Task<IActionResult> LoadProcesses(
+    int draw,
+    int start,
+    int length,
+    [FromForm(Name = "search[value]")] string? search,
+    string? unitFilter,
+    string? typeFilter,
+    string? stateFilter)
+    {
+        IQueryable<Entities.Process> query = _processManagement.Processes.BuildRestrictedQuery(User);
+
+        var totalRecords = await query.CountAsync();
+
+        // Apply global search
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            query = query.Where(p => p.Nuipm.Contains(search) ||
+                                     p.OficialInstName.Contains(search));
+        }
+
+        // Apply dropdown filters
+        if (!string.IsNullOrEmpty(unitFilter))
+        {
+            query = query.Where(p => p.Unit.UnitAcronym == unitFilter);
+        }
+        if (!string.IsNullOrEmpty(typeFilter))
+        {
+            query = query.Where(p => p.ProcessType.ProcessTypeName == typeFilter);
+        }
+        if (!string.IsNullOrEmpty(stateFilter))
+        {
+            query = query.Where(p => p.ProcessState.StateName == stateFilter);
+        }
+
+        var filteredRecords = await query.CountAsync();
+
+        var data = await query
+            .OrderByDescending(p => p.CreatedAt)
+            .Skip(start)
+            .Take(length)
+            .Select(p => new
+            {
+                processId = p.ProcessId,
+                nuipm = p.Nuipm ?? "",
+                processTypeName = p.ProcessType.ProcessTypeName ?? "",
+                unitAcronym = p.Unit.UnitAcronym ?? "",
+                oficialInstName = p.OficialInstName ?? "",
+                oficialInstTelephone = p.OficialInstTelephone ?? "",
+                createdByName = p.CreatedByName ?? "",
+                sentenceName = p.Sentence != null ? p.Sentence.SentenceName ?? "" : "",
+                createdAt = p.CreatedAt.HasValue ? p.CreatedAt.Value.ToString("dd-MM-yyyy") : "",
+                processStateName = p.ProcessState.StateName ?? "",
+                modifiedAt = p.ModifiedAt.HasValue ? p.ModifiedAt.Value.ToString("dd-MM-yyyy") : "",
+                modifiedByName = p.ModifiedByName ?? "",
+                actions = $@"
+                <a href='/Process/Details/{p.ProcessId}' class='text-primary'><i class='bi bi-search'></i></a>
+                <a href='/Process/Edit/{p.ProcessId}' class='text-primary'><i class='bi bi-pencil-square'></i></a>"
+            })
+            .ToListAsync();
+
+        return Json(new
+        {
+            draw,
+            recordsTotal = totalRecords,
+            recordsFiltered = filteredRecords,
+            data
+        });
+    }
+
+
+
 
     private string GetProcessPageTitle()
     {

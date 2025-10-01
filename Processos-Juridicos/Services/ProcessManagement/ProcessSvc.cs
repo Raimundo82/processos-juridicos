@@ -26,6 +26,92 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
         return Mapper.MapToProcessesDto(processEntity);
     }
 
+    public async Task<object> GetPagedProcessesAsync(
+    ClaimsPrincipal user,
+    int draw,
+    int start,
+    int length,
+    string? search)
+    {
+        IQueryable<Process> query = _context.Processes
+            .Include(p => p.Unit)
+            .Include(p => p.ProcessType)
+            .Include(p => p.ProcessState)
+            .Include(p => p.Sentence)
+            .AsNoTracking();
+
+        // Apply role filters (reuse your existing logic)
+        var nii = user.Identity?.Name;
+        if (user.IsInstrutor())
+        {
+            query = query.Where(p => p.OficialInstName != null &&
+                                     p.OficialInstName.EndsWith(" - " + nii));
+        }
+        else if (user.IsComando())
+        {
+            var unitId = _context.UnitCommanders
+                .Where(u => u.UserNii == nii)
+                .Select(u => u.UnitId)
+                .FirstOrDefault();
+            query = query.Where(p => p.UnitId == unitId);
+        }
+
+        var totalRecords = await query.CountAsync();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            query = query.Where(p => p.Nuipm.Contains(search) ||
+                                     p.OficialInstName.Contains(search));
+        }
+
+        var filteredRecords = await query.CountAsync();
+
+        List<Process> entities = await query
+    .OrderByDescending(p => p.CreatedAt)
+    .Skip(start)
+    .Take(length)
+    .ToListAsync();
+
+        var data = (await query
+       .OrderByDescending(p => p.CreatedAt)
+       .Skip(start)
+       .Take(length)
+       .ToListAsync())
+       .Select(p => new
+       {
+           processId = p.ProcessId,
+           nuipm = p.Nuipm ?? "",
+           processTypeName = p.ProcessType?.ProcessTypeName ?? "",
+           unitAcronym = p.Unit?.UnitAcronym ?? "",
+           oficialInstName = p.OficialInstName ?? "",
+           oficialInstTelephone = p.OficialInstTelephone ?? "",
+           createdByName = p.CreatedByName ?? "",
+           sentenceName = p.Sentence?.SentenceName ?? "",
+           createdAt = p.CreatedAt.HasValue ? p.CreatedAt.Value.ToString("dd-MM-yyyy") : "",
+           processStateName = p.ProcessState?.StateName ?? "",
+           modifiedAt = p.ModifiedAt.ToString() ?? "",
+           modifiedByName = p.ModifiedByName ?? "",
+           actions = $@"
+                    <a href='/Process/Details/{p.ProcessId}' class='text-primary'>
+                        <i class='bi bi-search'></i>
+                    </a>
+                    <a href='/Process/Edit/{p.ProcessId}' class='text-primary'>
+                        <i class='bi bi-pencil-square'></i>
+                    </a>"
+       });
+
+
+
+        return new
+        {
+            draw,
+            recordsTotal = totalRecords,
+            recordsFiltered = filteredRecords,
+            data
+        };
+    }
+
+
     public async Task<bool> DeleteProcess(int? id)
     {
         Process? process = await _context.Processes.FindAsync(id);
@@ -80,7 +166,13 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
         return Mapper.MapToProcessesDto(existingEntity);
     }
 
-    public async Task<IEnumerable<ProcessDto>> GetAllProcesses(ClaimsPrincipal User)
+    public async Task<IEnumerable<ProcessDto>> GetAllProcesses(ClaimsPrincipal user)
+    {
+        List<Process> processes = await BuildRestrictedQuery(user).ToListAsync();
+        return Mapper.MapToToProcessesEnum(processes);
+    }
+
+    public IQueryable<Process> BuildRestrictedQuery(ClaimsPrincipal user)
     {
         IQueryable<Process> query = _context.Processes
             .Include(x => x.Unit)
@@ -92,16 +184,17 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
             .Include(x => x.ProcessState)
             .Include(x => x.AccidentType)
             .Include(x => x.MilitarySecurity)
-            .Include(x => x.CrimeType);
+            .Include(x => x.CrimeType)
+            .AsNoTracking();
 
-        var nii = User.Identity?.Name;
+        var nii = user.Identity?.Name;
 
-        if (User.IsInstrutor())
+        if (user.IsInstrutor())
         {
             query = query.Where(p => p.OficialInstName != null &&
-                p.OficialInstName.EndsWith(" - " + nii));
+                                     p.OficialInstName.EndsWith(" - " + nii));
         }
-        else if (User.IsComando())
+        else if (user.IsComando())
         {
             var unitId = _context.UnitCommanders
                 .Where(u => u.UserNii == nii)
@@ -110,9 +203,9 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
             query = query.Where(p => p.UnitId == unitId);
         }
 
-        List<Process> processes = await query.ToListAsync();
-        return Mapper.MapToToProcessesEnum(processes);
+        return query;
     }
+
 
     public async Task<ProcessDto> GetProcessById(int? id)
     {

@@ -136,6 +136,40 @@
 
 @section Scripts {
     <script>
-        createDataTable('#processesTable');
+
+                    var table = $('#processesTable').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: '@Url.Action("LoadProcesses", "Process")',
+                type: 'POST',
+                data: function (d) {
+                    d.unitFilter = $('#unitFilter').val();
+                    d.typeFilter = $('#typeFilter').val();
+                    d.stateFilter = $('#stateFilter').val();
+                }
+            },
+            columns: [
+                { data: "nuipm" },
+                { data: "processTypeName" },
+                { data: "unitAcronym" },
+                { data: "oficialInstName" },
+                { data: "oficialInstTelephone" },
+                { data: "createdByName" },
+                { data: "sentenceName" },
+                { data: "createdAt" },
+                { data: "processStateName" },
+                { data: "modifiedAt" },
+                { data: "modifiedByName" },
+                { data: "actions", orderable: false, searchable: false }
+            ]
+        });
+
+        // Trigger reload when filters change
+        $('#unitFilter, #typeFilter, #stateFilter').on('change', function () {
+            table.ajax.reload();
+        });
+
     </script>
 }
+

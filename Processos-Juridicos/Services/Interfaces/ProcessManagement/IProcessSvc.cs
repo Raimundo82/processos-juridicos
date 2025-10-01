@@ -1,6 +1,7 @@
 using System.Security.Claims;
 
 using Processos_Juridicos.DTOs;
+using Processos_Juridicos.Entities;
 
 namespace Processos_Juridicos.Services.Interfaces.ProcessManagement;
 
@@ -12,5 +13,7 @@ public interface IProcessSvc
     public Task<ProcessDto> EditProcess(ProcessDto process);
     public Task<bool> DeleteProcess(int? id);
     public Task<bool> CanChangeStateAsync(int processId, int? newStateId);
+    public Task<object> GetPagedProcessesAsync(ClaimsPrincipal user, int draw, int start, int length, string? search);
     public Task<ProcessFilterValuesDto> GetFilterValuesAsync();
+    public IQueryable<Process> BuildRestrictedQuery(ClaimsPrincipal user);
 }

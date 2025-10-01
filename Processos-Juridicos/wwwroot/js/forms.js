@@ -16,12 +16,22 @@ function markFileForDeletion(fileId) {
 
 function toggleReportToPjm() {
     let typeText = $("#ProcessTypeId option:selected").text();
+
     if (typeText === "Acidentes em serviço") {
+        // disable and uncheck the checkbox
         $("#ComunicatedToPjm").prop("checked", false).prop("disabled", true);
+
+        // disable and clear the date input
+        $("#ComunicationDate")
+            .val("")              // clear the value
+            .prop("disabled", true);
     } else {
+        // enable both fields
         $("#ComunicatedToPjm").prop("disabled", false);
+        $("#ComunicationDate").prop("disabled", false);
     }
 }
+
 
 $(document).ready(function () {
     toggleReportToPjm();
