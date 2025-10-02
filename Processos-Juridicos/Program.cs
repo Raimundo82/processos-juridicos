@@ -64,7 +64,7 @@ builder.Services.Configure<AppSettingsOptions>(builder.Configuration.GetSection(
 
 
 // Connection string from configuration
-var processosDj = builder.Configuration.GetConnectionString("ProcessosDJ_Dev")!;
+var processosDj = builder.Configuration.GetConnectionString("DefaultConnection")!;
 
 // Register DbContext with SQL Server and detailed logging
 builder.Services.AddDbContext<AppDbContext>(opt =>
