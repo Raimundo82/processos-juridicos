@@ -1,12 +1,11 @@
 using System.DirectoryServices;
-using System.Runtime.Versioning;
 using System.Text.RegularExpressions;
 
 using Processos_Juridicos.Models;
 
 namespace Processos_Juridicos.Services.Ldap;
 
-[SupportedOSPlatform("windows")]
+#pragma warning disable CA1416 // Validate platform compatibility
 public static partial class LdapHelper
 {
     private static readonly IConfigurationRoot _config = new ConfigurationBuilder()
@@ -32,9 +31,11 @@ public static partial class LdapHelper
 
     public static string? GetPhoto(DirectoryEntry? entry)
     {
+
         return entry?.Properties[ThumbnailPhoto]?.Value is byte[] rawPhoto && rawPhoto.Length > 0
             ? $"data:image/jpeg;base64,{Convert.ToBase64String(rawPhoto)}"
             : null;
+
     }
 
     public static string EscapeLdap(string s)
@@ -275,3 +276,4 @@ public static partial class LdapHelper
 
     }
 }
+#pragma warning restore CA1416 // Validate platform compatibility

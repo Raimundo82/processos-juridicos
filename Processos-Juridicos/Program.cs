@@ -106,12 +106,11 @@ builder.Services.AddScoped<IProcessManagementSvc, ProcessManagementSvc>();
 builder.Services.AddScoped<IProcessViewDataSvc, ProcessViewDataSvc>();
 builder.Services.AddScoped<IFileValidatorSvc, FileValidatorSvc>();
 
-// Interface service only supported on windows
-if (OperatingSystem.IsWindows())
-{
-    builder.Services.AddScoped<NegotiateRoleMiddleware>();
-    builder.Services.AddScoped<ILdapUserSvc, LdapUserSvc>();
-}
+#pragma warning disable CA1416 // Validate platform compatibility
+builder.Services.AddScoped<NegotiateRoleMiddleware>();
+#pragma warning restore CA1416 // Validate platform compatibility
+
+builder.Services.AddScoped<ILdapUserSvc, LdapUserSvc>();
 
 
 // Register NToastNotify (Notifications)
@@ -173,14 +172,6 @@ app.UseStaticFiles();
 app.UseSession();
 app.UseRouting();
 app.UseAuthentication();
-
-// Middleware only supported on windows
-if (OperatingSystem.IsWindows())
-{
-    app.UseMiddleware<NegotiateRoleMiddleware>();
-}
-
-app.UseMiddleware<SessionRoleMiddleware>();
 app.UseAuthorization();
 app.UseNToastNotify();
 

@@ -1,20 +1,14 @@
 using System.DirectoryServices;
 using System.DirectoryServices.AccountManagement;
-using System.Runtime.Versioning;
-using System.Security.Authentication;
-using System.Security.Claims;
-using System.Security.Principal;
 
 using Processos_Juridicos.Models;
 using Processos_Juridicos.Services.Interfaces.Ldap;
 
 namespace Processos_Juridicos.Services.Ldap;
 
-[SupportedOSPlatform("windows")]
-public class LdapUserSvc(IHttpContextAccessor httpContextAccessor) : ILdapUserSvc
+#pragma warning disable CA1416 // Validate platform compatibility
+public class LdapUserSvc() : ILdapUserSvc
 {
-    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
-
     public bool ValidateAccount(string username, string password)
     {
         using var context = new PrincipalContext(ContextType.Domain);
@@ -23,20 +17,7 @@ public class LdapUserSvc(IHttpContextAccessor httpContextAccessor) : ILdapUserSv
 
     public UserDataModel GetLoggedUserData()
     {
-        ClaimsPrincipal? principal = _httpContextAccessor.HttpContext?.User;
-        if (principal?.Identity == null || !principal.Identity.IsAuthenticated)
-        {
-            throw new AuthenticationException();
-        }
-
-        var nii = principal.Identity switch
-        {
-            WindowsIdentity winIdentity => winIdentity.Name.Split('\\')[^1],
-            _ => principal.Identity.Name ??
-                principal.Claims.FirstOrDefault(c => c.Type == "nii")?.Value
-        };
-
-        return string.IsNullOrWhiteSpace(nii) ? throw new AuthenticationException("NII não encontrado") : GetUserDataByNii(nii);
+        return new UserDataModel { };
     }
 
     public UserDataModel GetUserDataByNii(string nii)
@@ -77,3 +58,4 @@ public class LdapUserSvc(IHttpContextAccessor httpContextAccessor) : ILdapUserSv
         return LdapHelper.GetEmployeeIdsInGroup(groupName);
     }
 }
+#pragma warning restore CA1416 // Validate platform compatibility

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using Processos_Juridicos.Services.Interfaces;
@@ -7,6 +8,7 @@ using Processos_Juridicos.ViewModels;
 
 namespace Processos_Juridicos.Controllers;
 
+[AllowAnonymous]
 public class AccountController(
     ILdapUserSvc ldapUserSvc,
     IUserSvc userSvc,
