@@ -51,6 +51,8 @@ jobs:
         env:
           GITEA_TOKEN: ${{ secrets.PACKAGE_UPLOAD_TOKEN }}
           GITEA_URL: https://devops-01.marinha.pt
+          DOCKER_REGISTRY_USER: m22600
+          DOCKER_REGISTRY_PASSWORD: ${{ secrets.PACKAGE_UPLOAD_TOKEN }}
         run: |
           export NODE_OPTIONS="--use-system-ca"
           npx semantic-release
