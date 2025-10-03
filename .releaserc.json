@@ -9,7 +9,9 @@
             {
                 "dockerRegistry": "devops-01.marinha.pt",
                 "dockerProject": "marinha-si"
-            },
+            }
+        ],
+        [
             "@saithodev/semantic-release-gitea",
             {
                 "giteaUrl": "https://devops-01.marinha.pt",
