@@ -133,15 +133,15 @@ public class UnitIntegrationTests(CustomWebApplicationFactory<Program> factory) 
         Assert.NotNull(form);
         Assert.Equal(form.GetAttribute("action"), $"/Unit/Edit/{unit.UnitId}");
 
-        IElement? nameField = form.QuerySelector("#unit-name");
+        IElement? nameField = form.QuerySelector("#UnitName");
         Assert.NotNull(nameField);
         Assert.Equal(unit.UnitName, nameField.GetAttribute("value"));
 
-        IElement? codeField = form.QuerySelector("#unit-code");
+        IElement? codeField = form.QuerySelector("#UnitCode");
         Assert.NotNull(codeField);
         Assert.Equal(unit.UnitCode, codeField.GetAttribute("value"));
 
-        IElement? acronymField = form.QuerySelector("#unit-acronym");
+        IElement? acronymField = form.QuerySelector("#UnitAcronym");
         Assert.NotNull(acronymField);
         Assert.Equal(unit.UnitAcronym, acronymField.GetAttribute("value"));
     }
@@ -242,11 +242,10 @@ public class UnitIntegrationTests(CustomWebApplicationFactory<Program> factory) 
         await dbContext.SaveChangesAsync();
 
         IDocument listDoc = await _client.GetDocumentAsync("/Unit/List");
-        IElement deleteForm = listDoc.QuerySelector("form[action='/Unit/Delete']")!;
 
-        var token = deleteForm
-            .QuerySelector("input[name=__RequestVerificationToken]")!
-            .GetAttribute("value")!;
+        var token = listDoc
+            .QuerySelector("#deleteForm input[name=__RequestVerificationToken]")!
+            .GetAttribute("value");
 
         var fields = new Dictionary<string, string?>
         {
@@ -277,13 +276,12 @@ public class UnitIntegrationTests(CustomWebApplicationFactory<Program> factory) 
         await dbContext.SaveChangesAsync();
 
         IDocument listDoc = await _client.GetDocumentAsync("/Unit/List");
-        IElement deleteForm = listDoc.QuerySelector("form[action='/Unit/Delete']")!;
 
-        var token = deleteForm
-            .QuerySelector("input[name=__RequestVerificationToken]")!
-            .GetAttribute("value")!;
+        var token = listDoc
+            .QuerySelector("#deleteForm input[name=__RequestVerificationToken]")!
+            .GetAttribute("value");
 
-        var fields = new Dictionary<string, string>
+        var fields = new Dictionary<string, string?>
         {
             ["__RequestVerificationToken"] = token
         };

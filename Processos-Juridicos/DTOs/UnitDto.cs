@@ -16,20 +16,20 @@ public class UnitDto
     [Key]
     public int? UnitId { get; set; }
 
-    [DisplayName("Código da Unidade")]
-    [EntityFieldIsRequired("Código da Unidade")]
+    [DisplayName("Código")]
+    [EntityFieldIsRequired("Código")]
     [UniqueUnitCode]
     public string UnitCode { get; set; } = null!;
 
-    [EntityFieldIsRequired("Nome da Unidade")]
-    [Attributes.MaxLength(50, "Nome da Unidade")]
+    [EntityFieldIsRequired("Nome")]
+    [Attributes.MaxLength(50, "Nome")]
     [Unicode(false)]
-    [DisplayName("Nome da unidade")]
+    [DisplayName("Nome")]
     [UniqueUnitName]
     public string UnitName { get; set; } = null!;
 
     [DisplayName("Sigla")]
-    [EntityFieldIsRequired("Sigla da Unidade")]
+    [EntityFieldIsRequired("Sigla")]
     [UniqueUnitAcronym]
     public string UnitAcronym { get; set; } = null!;
 
