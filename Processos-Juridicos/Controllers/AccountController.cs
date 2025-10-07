@@ -1,55 +1,54 @@
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
-using Processos_Juridicos.Services.Interfaces;
-using Processos_Juridicos.Services.Interfaces.Ldap;
-using Processos_Juridicos.Utilities.TextManager;
-using Processos_Juridicos.ViewModels;
 
 namespace Processos_Juridicos.Controllers;
 
 [AllowAnonymous]
-public class AccountController(
-    ILdapUserSvc ldapUserSvc,
-    IUserSvc userSvc,
-    IToastNotify toastNotify) : Controller
+[Route("account")]
+public class AccountController(ILogger<AccountController> logger) : Controller
 {
-    private readonly ILdapUserSvc _ldapUserSvc = ldapUserSvc;
-    private readonly IUserSvc _userSvc = userSvc;
-    private readonly IToastNotify _toastNotify = toastNotify;
+    private readonly ILogger<AccountController> logger = logger;
 
-    [HttpGet]
-    public IActionResult Login()
+    public IActionResult SignIn()
     {
-        return View();
+        return !User.Identity!.IsAuthenticated ? Challenge(OpenIdConnectDefaults.AuthenticationScheme) : RedirectToAction("Index", "Home");
     }
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Login(LoginViewModel model)
+    [HttpGet("signin")]
+    public async Task<IActionResult> SignOutAsync()
     {
-        if (!ModelState.IsValid)
+        if (!User.Identity!.IsAuthenticated)
         {
-            return View(model);
+            return Challenge(OpenIdConnectDefaults.AuthenticationScheme);
         }
 
-        if (!_ldapUserSvc.ValidateAccount(model.Username, model.Password))
-        {
-            _toastNotify.Error(GlobalTextManager.GetString("InvalidLoginMessage"));
-            return View();
-        }
+        var idToken = await HttpContext.GetTokenAsync("id_token");
 
-        var userRole = await _userSvc.GetUserRoleNameByNii(model.Username) ?? string.Empty;
+        AuthenticateResult? authResult = HttpContext.Features.Get<IAuthenticateResultFeature>()
+            ?.AuthenticateResult;
 
-        HttpContext.Session.SetString("SessionUser", model.Username);
-        HttpContext.Session.SetString("SessionRole", userRole);
+        IEnumerable<AuthenticationToken> tokens = authResult!.Properties!.GetTokens();
 
-        return RedirectToAction("Index", "Home");
+        var tokenNames = tokens.Select(token => token.Name).ToArray();
+
+        logger.LogInformation("Token Names: {TokenNames}", string.Join(", ", tokenNames));
+
+        return SignOut(
+            new AuthenticationProperties
+            {
+                RedirectUri = "/",
+                Items = { { "id_token_hint", idToken } }
+            },
+            CookieAuthenticationDefaults.AuthenticationScheme,
+            OpenIdConnectDefaults.AuthenticationScheme
+        );
     }
 
-    public IActionResult Logout()
+    public IActionResult AccessDenied()
     {
-        HttpContext.Session.Clear();
-        return RedirectToAction("Index", "Home");
+        return RedirectToAction("AccessDenied", "Home");
     }
 }

@@ -7,7 +7,7 @@ using Processos_Juridicos.Models;
 
 namespace Processos_Juridicos.Controllers;
 
-[AllowAnonymous]
+[Authorize]
 public class HomeController() : Controller
 {
     [HttpGet]

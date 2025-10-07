@@ -24,9 +24,9 @@ public class TestAuthHandler(IOptionsMonitor<AuthenticationSchemeOptions> option
             claims.Add(new Claim(ClaimTypes.Role, role));
         }
 
-        var identity = new ClaimsIdentity(claims, Scheme.Name);
+        var identity = new ClaimsIdentity(claims, SchemeName);
         var principal = new ClaimsPrincipal(identity);
-        var ticket = new AuthenticationTicket(principal, Scheme.Name);
+        var ticket = new AuthenticationTicket(principal, SchemeName);
 
         return Task.FromResult(AuthenticateResult.Success(ticket));
     }

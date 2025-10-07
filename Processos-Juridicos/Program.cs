@@ -1,5 +1,7 @@
-using Microsoft.AspNetCore.Authentication.Negotiate;
+using Keycloak.AuthServices.Authentication;
+
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -23,10 +25,10 @@ using Processos_Juridicos.Utilities.TextManager.Interfaces;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-// Enable Windows/Negotiate authentication (SSO)
-builder.Services
-    .AddAuthentication(NegotiateDefaults.AuthenticationScheme)
-    .AddNegotiate();
+// Keycloak
+ConfigurationManager configuration = builder.Configuration;
+builder.Services.AddKeycloakAuthentication(configuration);
+
 
 // Configure role-based authorization policies
 AuthorizationBuilder authBuilder = builder.Services.AddAuthorizationBuilder();
@@ -47,8 +49,15 @@ builder.Services.AddSession(options =>
 });
 
 
-// MVC pattern
-builder.Services.AddControllersWithViews();
+// Add services to the container - Enable login requirement functionality on all controllers
+builder.Services.AddControllersWithViews(options =>
+{
+    AuthorizationPolicy policy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
+
+    options.Filters.Add(new AuthorizeFilter(policy));
+});
 
 // Allows services to access HttpContext
 builder.Services.AddHttpContextAccessor();
@@ -98,19 +107,19 @@ builder.Services.AddScoped<ICrimeTypeSvc, CrimeTypeSvc>();
 builder.Services.AddScoped<IMilitarySecuritySvc, MilitarySecuritySvc>();
 builder.Services.AddScoped<IUserSvc, UserSvc>();
 builder.Services.AddScoped<IRoleSvc, RoleSvc>();
-builder.Services.AddScoped<RoleSyncSvc>();
-builder.Services.AddHostedService<TimedSyncSvc>();
+//builder.Services.AddScoped<RoleSyncSvc>();
+//builder.Services.AddHostedService<TimedSyncSvc>();
 builder.Services.AddScoped<ILegalReferenceSvc, LegalReferenceSvc>();
 builder.Services.AddScoped<IContextSvc, ContextSvc>();
 builder.Services.AddScoped<IProcessManagementSvc, ProcessManagementSvc>();
 builder.Services.AddScoped<IProcessViewDataSvc, ProcessViewDataSvc>();
 builder.Services.AddScoped<IFileValidatorSvc, FileValidatorSvc>();
 
-#pragma warning disable CA1416 // Validate platform compatibility
-builder.Services.AddScoped<NegotiateRoleMiddleware>();
-#pragma warning restore CA1416 // Validate platform compatibility
-
-builder.Services.AddScoped<ILdapUserSvc, LdapUserSvc>();
+// Interface service only supported on windows
+if (OperatingSystem.IsWindows())
+{
+    builder.Services.AddScoped<ILdapUserSvc, LdapUserSvc>();
+}
 
 
 // Register NToastNotify (Notifications)
@@ -172,6 +181,7 @@ app.UseStaticFiles();
 app.UseSession();
 app.UseRouting();
 app.UseAuthentication();
+app.UseMiddleware<SessionRoleMiddleware>();
 app.UseAuthorization();
 app.UseNToastNotify();
 

@@ -1,7 +1,6 @@
 using System.Data.Common;
 
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Negotiate;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -19,18 +18,18 @@ namespace Processos_Juridicos.Tests;
 
 public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProgram> where TProgram : class
 {
-    public Mock<ILdapUserSvc> WindowsAuthSvcMock { get; }
+    public Mock<ILdapUserSvc> UserSvcMock { get; }
 
     public CustomWebApplicationFactory()
     {
-        WindowsAuthSvcMock = new Mock<ILdapUserSvc>();
-        WindowsAuthSvcMock
+        UserSvcMock = new Mock<ILdapUserSvc>();
+        UserSvcMock
             .Setup(s => s.GetLoggedUserData())
             .Returns(new UserDataModel
             {
                 DisplayName = "Mock User",
             });
-        WindowsAuthSvcMock
+        UserSvcMock
             .Setup(s => s.GetUserGroups(It.IsAny<string>()))
             .Returns(["Admin", "User"]);
     }
@@ -44,15 +43,10 @@ public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProg
             services.AddDbContextFactory<AppDbContext>(options => options.UseInMemoryDatabase(Guid.NewGuid().ToString()));
 
             services.RemoveAll<ILdapUserSvc>();
-            services.AddSingleton(WindowsAuthSvcMock.Object);
-            services.PostConfigure<AuthenticationOptions>(options =>
-            {
-                if (options.SchemeMap.TryGetValue(NegotiateDefaults.AuthenticationScheme, out AuthenticationSchemeBuilder? negotiateScheme))
-                {
-                    negotiateScheme.HandlerType = typeof(TestAuthHandler);
-                }
-                options.DefaultScheme = NegotiateDefaults.AuthenticationScheme;
-            });
+            services.AddSingleton(UserSvcMock.Object);
+
+            services.AddAuthentication(defaultScheme: TestAuthHandler.SchemeName)
+                .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.SchemeName, options => { });
 
             services.AddAuthorizationBuilder()
                 .SetDefaultPolicy(new AuthorizationPolicyBuilder(TestAuthHandler.SchemeName).RequireAuthenticatedUser().Build())
