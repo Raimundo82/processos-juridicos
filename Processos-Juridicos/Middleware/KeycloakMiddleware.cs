@@ -19,10 +19,7 @@ public static class KeycloakMiddlewareExtensions
                     options.BackchannelHttpHandler = new HttpClientHandler
                     {
                         UseProxy = false,
-                        ServerCertificateCustomValidationCallback = (message, cert, chain, errors) =>
-                        {
-                            return errors == System.Net.Security.SslPolicyErrors.None;
-                        }
+                        ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
                     };
                     options.ResponseType = OpenIdConnectResponseType.Code;
                     options.Events = new OpenIdConnectEvents
