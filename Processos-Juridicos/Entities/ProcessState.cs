@@ -12,6 +12,6 @@ public partial class ProcessState
     public int? ProcessStateId { get; set; }
 
     [Column("state_name")]
-    public string StateName { get; set; }
+    public string StateName { get; set; } = string.Empty;
 
 }

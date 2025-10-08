@@ -127,7 +127,6 @@ public class UnitIntegrationTests(CustomWebApplicationFactory<Program> factory) 
         IDocument doc = await _client.GetDocumentAsync($"/Unit/Edit/{unit.UnitId}");
 
         // Assert
-        DbSet<Unit> dbItems = dbContext.Units;
 
         IElement? form = doc.QuerySelector($"main form");
         Assert.NotNull(form);
@@ -301,9 +300,9 @@ public class UnitIntegrationTests(CustomWebApplicationFactory<Program> factory) 
         return unitTest => new Unit
         {
             Enable = unitTest.IsEnabled,
-            UnitAcronym = unitTest.Acronym,
-            UnitCode = unitTest.Code,
-            UnitName = unitTest.Name
+            UnitAcronym = unitTest.Acronym!,
+            UnitCode = unitTest.Code!,
+            UnitName = unitTest.Name!
         };
     }
 

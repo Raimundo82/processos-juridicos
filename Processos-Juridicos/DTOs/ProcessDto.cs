@@ -125,7 +125,10 @@ public partial class ProcessDto
     public virtual HarmedOrCasualtyDto HarmedOrCasualties { get; set; }
 
     [DisplayName("Artigos infrigidos")]
+    [MapperIgnore]
     public List<int?> Infringements { get; set; } = [];
+
+    [MapperIgnore]
     public List<InfringementDto> InfringementDetails { get; set; } = [];
 
     [ForeignKey("ProcessTypeId")]

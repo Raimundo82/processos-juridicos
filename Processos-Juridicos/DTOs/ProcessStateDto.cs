@@ -18,5 +18,5 @@ public partial class ProcessStateDto
     [EntityFieldIsRequired("Nome do Estado")]
     [StringLength(20)]
     [Unicode(false)]
-    public required string StateName { get; set; }
+    public string StateName { get; set; } = string.Empty;
 }
