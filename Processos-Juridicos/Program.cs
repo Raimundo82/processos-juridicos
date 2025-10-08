@@ -107,20 +107,15 @@ builder.Services.AddScoped<ICrimeTypeSvc, CrimeTypeSvc>();
 builder.Services.AddScoped<IMilitarySecuritySvc, MilitarySecuritySvc>();
 builder.Services.AddScoped<IUserSvc, UserSvc>();
 builder.Services.AddScoped<IRoleSvc, RoleSvc>();
-//builder.Services.AddScoped<RoleSyncSvc>();
-//builder.Services.AddHostedService<TimedSyncSvc>();
 builder.Services.AddScoped<ILegalReferenceSvc, LegalReferenceSvc>();
 builder.Services.AddScoped<IContextSvc, ContextSvc>();
 builder.Services.AddScoped<IProcessManagementSvc, ProcessManagementSvc>();
 builder.Services.AddScoped<IProcessViewDataSvc, ProcessViewDataSvc>();
 builder.Services.AddScoped<IFileValidatorSvc, FileValidatorSvc>();
 
-// Interface service only supported on windows
-if (OperatingSystem.IsWindows())
-{
-    builder.Services.AddScoped<ILdapUserSvc, LdapUserSvc>();
-}
-
+builder.Services.AddScoped<ILdapUserSvc, LdapUserSvc>();
+//builder.Services.AddScoped<RoleSyncSvc>();
+//builder.Services.AddHostedService<TimedSyncSvc>();
 
 // Register NToastNotify (Notifications)
 builder.Services.AddMvc().AddNToastNotifyToastr(new ToastrOptions()
