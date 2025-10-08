@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 
 using NToastNotify;
 
+using Processos_Juridicos.Configuration;
 using Processos_Juridicos.Data;
 using Processos_Juridicos.Middleware;
 using Processos_Juridicos.Middleware.ExceptionHandlers;
@@ -80,6 +81,16 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseSqlServer(processosDj)
         .EnableSensitiveDataLogging()
         .LogTo(Console.WriteLine, LogLevel.Debug));
+
+
+// LDAP Configuration and Service
+builder.Services.AddScoped((options) =>
+{
+    var profile = Environment.GetEnvironmentVariable("ASPNETCORE_PROFILE") ?? "Marinha";
+    LdapConfiguration ldapConfiguration = configuration.GetSection($"Ldap:{profile}").Get<LdapConfiguration>() ?? new LdapConfiguration();
+
+    return new LdapConnService(ldapConfiguration);
+});
 
 
 // JSON text manager for system text (systemtext.json)
