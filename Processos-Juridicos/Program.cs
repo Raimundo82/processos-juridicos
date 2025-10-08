@@ -25,6 +25,12 @@ using Processos_Juridicos.Utilities.TextManager.Interfaces;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
+builder.Services.Configure<CookiePolicyOptions>(options =>
+{
+    options.CheckConsentNeeded = context => true;
+    options.MinimumSameSitePolicy = SameSiteMode.None;
+});
+
 // Keycloak
 ConfigurationManager configuration = builder.Configuration;
 builder.Services.AddKeycloakAuthentication(configuration);
@@ -45,7 +51,7 @@ builder.Services.AddSession(options =>
     options.IdleTimeout = TimeSpan.FromHours(3);
     options.Cookie.HttpOnly = true;
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-    options.Cookie.SameSite = SameSiteMode.Strict;
+    options.Cookie.SameSite = SameSiteMode.None;
 });
 
 
@@ -178,6 +184,7 @@ AppSettingsOptions appSettings = app.Services.GetRequiredService<IOptions<AppSet
 app.UsePathBase(appSettings.SubPath);
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.UseCookiePolicy();
 app.UseSession();
 app.UseRouting();
 app.UseAuthentication();
