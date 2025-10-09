@@ -121,11 +121,7 @@ builder.Services.AddScoped<IProcessManagementSvc, ProcessManagementSvc>();
 builder.Services.AddScoped<IProcessViewDataSvc, ProcessViewDataSvc>();
 builder.Services.AddScoped<IFileValidatorSvc, FileValidatorSvc>();
 
-// Interface service only supported on windows
-if (OperatingSystem.IsWindows())
-{
-    builder.Services.AddScoped<ILdapUserSvc, LdapUserSvc>();
-}
+builder.Services.AddScoped<ILdapUserSvc, LdapUserSvc>();
 
 
 // Register NToastNotify (Notifications)
