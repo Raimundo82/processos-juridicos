@@ -5,7 +5,7 @@
     var nii = User?.FindFirst("preferred_username")?.Value
         ?? "Utilizador";
 
-    var photo = Url.Content("/images/default-avatar.webp");
+    var photo = Url.Content("~/images/default-avatar.webp");
 }
 
 @if (isAuthenticated)
