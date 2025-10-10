@@ -26,7 +26,7 @@ public static class KeycloakMiddlewareExtensions
                     {
                         OnSignedOutCallbackRedirect = context =>
                         {
-                            context.Response.Redirect("/");
+                            context.Response.Redirect($"{context.Request.PathBase}/");
                             context.HandleResponse();
                             return Task.CompletedTask;
                         }

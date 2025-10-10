@@ -17,7 +17,7 @@ public class AccountController(ILogger<AccountController> logger) : Controller
         return !User.Identity!.IsAuthenticated ? Challenge(OpenIdConnectDefaults.AuthenticationScheme) : RedirectToAction("Index", "Home");
     }
 
-    [HttpGet("signin")]
+    [HttpGet("signout")]
     public async Task<IActionResult> SignOutAsync()
     {
         if (!User.Identity!.IsAuthenticated)

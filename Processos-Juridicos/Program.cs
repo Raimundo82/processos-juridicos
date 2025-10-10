@@ -135,6 +135,10 @@ builder.Services.AddMvc().AddNToastNotifyToastr(new ToastrOptions()
 
 WebApplication app = builder.Build();
 
+// Get AppSettingsOptions values from configuration via dependency injection
+AppSettingsOptions appSettings = app.Services.GetRequiredService<IOptions<AppSettingsOptions>>().Value;
+
+
 // Automatic Migrations (Development Only)
 if (app.Environment.IsDevelopment())
 {
@@ -147,9 +151,6 @@ if (app.Environment.IsDevelopment())
     }
 }
 
-
-// Error & Exception Configuration
-app.UseExceptionHandler("/Home/Error");
 
 // Set the global text manager
 GlobalTextManager.SetManager(app.Services.GetRequiredService<IJsonTextManager>());
@@ -172,10 +173,6 @@ if (!app.Environment.IsDevelopment())
     };
 }
 
-
-// Get AppSettingsOptions values from configuration via dependency injection
-AppSettingsOptions appSettings = app.Services.GetRequiredService<IOptions<AppSettingsOptions>>().Value;
-
 // HTTP Pipeline
 app.UsePathBase(appSettings.SubPath);
 app.UseHttpsRedirection();
@@ -192,6 +189,11 @@ app.UseNToastNotify();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+
+// Error & Exception Configuration
+app.UseExceptionHandler($"{appSettings.SubPath}/Error");
+
 
 await app.RunAsync();
 
