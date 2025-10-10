@@ -63,3 +63,5 @@ document.addEventListener('DOMContentLoaded', () => {
         debounceMs: 1000
     });
 });
+
+export { createBadge, applySelectionBadge };

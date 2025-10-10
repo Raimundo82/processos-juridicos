@@ -28,3 +28,4 @@ $(document).ready(function () {
     $("#ProcessTypeId").on("change", toggleReportToPjm);
 });
 
+export { markFileForDeletion, toggleReportToPjm };

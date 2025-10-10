@@ -2,10 +2,7 @@ name: PR SonarQube Analysis
 
 on:
   pull_request:
-    types:
-      - opened
-      - reopened
-      - synchronize
+    types: [opened, reopened, synchronize]
 
 env:
   RUNNER_TOOL_CACHE: /toolcache
@@ -26,8 +23,12 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: Install SonarQube scanner
-        shell: bash
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install SonarQube scanner + coverlet
         run: |
           mkdir -p .sonar/scanner
           dotnet tool update dotnet-sonarscanner --tool-path ./.sonar/scanner
@@ -36,29 +37,43 @@ jobs:
       - name: Begin SonarQube Analysis
         run: |
           ./.sonar/scanner/dotnet-sonarscanner begin \
-          /key:processos-juridicos \
-          /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
-          /d:sonar.host.url="${{ vars.SONAR_HOST_URL }}" \
-          /d:sonar.cs.opencover.reportsPaths=coverage.xml \
-          /d:sonar.pullrequest.key=${{ gitea.event.number }} \
-          /d:sonar.pullrequest.branch=${{ gitea.head_ref }} \
-          /d:sonar.pullrequest.base=${{ gitea.base_ref }} \
-          /d:sonar.exclusions="**/.devcontainer/**,**/Migrations/**,**/bin/**,**/obj/**" \
-          /d:sonar.scanner.scanAll=false
+            /k:processos-juridicos \
+            /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
+            /d:sonar.host.url="${{ vars.SONAR_HOST_URL }}" \
+            /d:sonar.cs.opencover.reportsPaths=coverage.opencover.xml \
+            /d:sonar.javascript.lcov.reportPaths=coverage/lcov.info \
+            /d:sonar.sources=Processos_Juridicos,Processos-Juridicos/wwwroot/js,Processos-Juridicos \
+            /d:sonar.pullrequest.key=${{ gitea.event.number }} \
+            /d:sonar.pullrequest.branch=${{ gitea.head_ref }} \
+            /d:sonar.pullrequest.base=${{ gitea.base_ref }} \
+            /d:sonar.exclusions="**/.devcontainer/**,**/Migrations/**,**/bin/**,**/obj/**" \
+            /d:sonar.scanner.scanAll=false
 
       - name: Build for SonarQube (no incremental)
         run: dotnet build --no-incremental
 
-      - name: Run tests with coverage for SonarQube
+      - name: Run C# tests with coverage
         run: |
+          mkdir -p coverage
           dotnet coverlet ./Processos_Juridicos.Tests/bin/Debug/net8.0/Processos_Juridicos.Tests.dll \
-          --target dotnet \
-          --targetargs "test --no-build" \
-          -f=opencover \
-          -o="coverage.xml"
+            --target dotnet \
+            --targetargs "test --no-build" \
+            -f=opencover \
+            -o="coverage.opencover.xml"
+
+      - name: Run JS tests with coverage
+        run: |
+          npm ci
+          # force vitest to write its lcov into the same coverage folder
+          npx vitest run --coverage --coverage.reportsDirectory=coverage
+
+     # - name: Normalize LCOV paths
+       # run: |
+     #     sed -i 's#SF:.*wwwroot/js/#SF:Processos-Juridicos/wwwroot/js/#' coverage/lcov.info
+
 
       - name: End SonarQube Analysis
-        run: ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{  secrets.SONAR_TOKEN }}"
+        run: ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
 
       - name: SonarQube Quality Gate check
         id: sonarqube-quality-gate-check
