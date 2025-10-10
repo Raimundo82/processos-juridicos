@@ -42,8 +42,8 @@ jobs:
             /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
             /d:sonar.host.url="${{ vars.SONAR_HOST_URL }}" \
             /d:sonar.cs.opencover.reportsPaths=coverage.opencover.xml \
-            /d:sonar.javascript.lcov.reportPaths=coverage/lcov.info \
-            /d:sonar.sources=Processos_Juridicos,Processos-Juridicos/wwwroot/js,Processos-Juridicos \
+            /d:sonar.javascript.lcov.reportPaths=$(pwd)/coverage/lcov.info \
+            /d:sonar.sources=. \
             /d:sonar.exclusions="**/.devcontainer/**,**/Migrations/**,**/bin/**,**/obj/**" \
             /d:sonar.scanner.scanAll=false
 
@@ -63,6 +63,10 @@ jobs:
         run: |
           npm ci
           npx vitest run --coverage --coverage.reportsDirectory=coverage
+
+      - name: Normalize LCOV paths
+        run: |
+           sed -i 's#^SF:Processos-Juridicos/wwwroot/#SF:wwwroot/#' coverage/lcov.info
 
       - name: End SonarQube Analysis
         run: ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"

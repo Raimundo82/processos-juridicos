@@ -41,11 +41,11 @@ jobs:
             /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
             /d:sonar.host.url="${{ vars.SONAR_HOST_URL }}" \
             /d:sonar.cs.opencover.reportsPaths=coverage.opencover.xml \
-            /d:sonar.javascript.lcov.reportPaths=coverage/lcov.info \
-            /d:sonar.sources=Processos_Juridicos,Processos-Juridicos/wwwroot/js,Processos-Juridicos \
+            /d:sonar.javascript.lcov.reportPaths=$(pwd)/coverage/lcov.info \
             /d:sonar.pullrequest.key=${{ gitea.event.number }} \
             /d:sonar.pullrequest.branch=${{ gitea.head_ref }} \
             /d:sonar.pullrequest.base=${{ gitea.base_ref }} \
+            /d:sonar.sources=. \
             /d:sonar.exclusions="**/.devcontainer/**,**/Migrations/**,**/bin/**,**/obj/**" \
             /d:sonar.scanner.scanAll=false
 
@@ -67,9 +67,9 @@ jobs:
           # force vitest to write its lcov into the same coverage folder
           npx vitest run --coverage --coverage.reportsDirectory=coverage
 
-     # - name: Normalize LCOV paths
-       # run: |
-     #     sed -i 's#SF:.*wwwroot/js/#SF:Processos-Juridicos/wwwroot/js/#' coverage/lcov.info
+      - name: Normalize LCOV paths
+        run: |
+           sed -i 's#^SF:Processos-Juridicos/wwwroot/#SF:wwwroot/#' coverage/lcov.info
 
 
       - name: End SonarQube Analysis
