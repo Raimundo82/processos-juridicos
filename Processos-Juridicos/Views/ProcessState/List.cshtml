@@ -22,28 +22,37 @@
             </div>
 
             <div id="tableContent" class="d-none">
-                <div class="table-responsive">
-                    <table id="tableStates" class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">@Html.DisplayNameFor(m => m.First().StateName)</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            @foreach (var item in Model.ToList())
-                            {
-                                <tr data-id="@item.ProcessStateId">
-                                    <th scope="col">@count</th>
-                                    <td data-property="name">@Html.DisplayFor(m => item.StateName)</td>
+                @if (Model != null && Model.Any())
+                {
+                    <div class="table-responsive">
+                        <table id="tableStates" class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">@Html.DisplayNameFor(m => m.First().StateName)</th>
                                 </tr>
+                            </thead>
 
-                                count++;
-                            }
-                        </tbody>
-                    </table>
-                </div>
+                            <tbody>
+                                @foreach (var item in Model.ToList())
+                                {
+                                    <tr data-id="@item.ProcessStateId">
+                                        <th scope="col">@count</th>
+                                        <td data-property="name">@Html.DisplayFor(m => item.StateName)</td>
+                                    </tr>
+
+                                    count++;
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center">
+                        <span>Não existem unidades.</span>
+                    </div>
+                }   
             </div>
 
         </div>
