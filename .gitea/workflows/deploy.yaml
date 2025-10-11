@@ -24,12 +24,15 @@ jobs:
         run: sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 
       - name: Extract base64 encoded config
-        run: |
-          echo "${{ secrets.KUBECONFIG_ENCODED }}" | base64 -d > /tmp/config
-          cat /tmp/config
+        run: echo "${{ secrets.KUBECONFIG_ENCODED }}" | base64 -d > /tmp/config
 
       - name: Apply deployment
         run: kubectl --kubeconfig=/tmp/config -n ${{ vars.CLUSTER_NAMESPACE }} apply -f app-deployment.yaml
 
+      - name: Extract tag version
+        run: |
+          TAG="${GITEA_REF##refs/tags/v}"
+          echo "TAG=$TAG" >> $GITHUB_ENV
+
       - name: Update deployment image
-        run: kubectl --kubeconfig=/tmp/config -n ${{ vars.CLUSTER_NAMESPACE }} set image deployment/app processos-juridcos-app=devops-01.marinha.pt/marinha-si/processos-juridicos:${{ gitea.ref }}
+        run: kubectl --kubeconfig=/tmp/config -n ${{ vars.CLUSTER_NAMESPACE }} set image deployment/app processos-juridcos-app=devops-01.marinha.pt/marinha-si/processos-juridicos:$TAG
