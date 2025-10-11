@@ -376,3 +376,7 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 "Processos-Juridicos/wwwroot/lib/select2" 
+
+kubeconfig*
+
+*secrets*
