@@ -29,10 +29,9 @@ jobs:
       - name: Apply deployment
         run: kubectl --kubeconfig=/tmp/config -n ${{ vars.CLUSTER_NAMESPACE }} apply -f app-deployment.yaml
 
-      - name: Extract tag version
-        run: |
-          TAG="${GITEA_REF##refs/tags/v}"
-          echo "TAG=$TAG" >> $GITHUB_ENV
-
       - name: Update deployment image
-        run: kubectl --kubeconfig=/tmp/config -n ${{ vars.CLUSTER_NAMESPACE }} set image deployment/app processos-juridcos-app=devops-01.marinha.pt/marinha-si/processos-juridicos:$TAG
+        env:
+          GITEA_REF: ${{ gitea.ref }}
+        run: |
+          TAG="${GITEA_REF##refs/tags/v}"    
+          kubectl --kubeconfig=/tmp/config -n ${{ vars.CLUSTER_NAMESPACE }} set image deployment/app processos-juridcos-app=devops-01.marinha.pt/marinha-si/processos-juridicos:$TAG
