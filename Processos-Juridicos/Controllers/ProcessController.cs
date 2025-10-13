@@ -37,7 +37,7 @@ public class ProcessController(
         {
             return View(new ProcessListViewModel
             {
-                Title = "Sem Permissões",
+                Title = "Gestão de Processos",
                 Processes = [],
                 CanInsertProcess = false,
                 HasRole = false
