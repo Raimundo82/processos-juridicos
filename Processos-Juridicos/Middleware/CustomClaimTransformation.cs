@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Authentication;
 
 using Processos_Juridicos.Services.Interfaces;
 
+namespace Processos_Juridicos.Middleware;
+
 public class CustomClaimsTransformer(IUserSvc userSvc) : IClaimsTransformation
 {
     private readonly IUserSvc _userSvc = userSvc;
