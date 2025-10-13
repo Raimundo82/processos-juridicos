@@ -1,5 +1,7 @@
-using Microsoft.AspNetCore.Authentication.Negotiate;
+using Keycloak.AuthServices.Authentication;
+
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -23,10 +25,16 @@ using Processos_Juridicos.Utilities.TextManager.Interfaces;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-// Enable Windows/Negotiate authentication (SSO)
-builder.Services
-    .AddAuthentication(NegotiateDefaults.AuthenticationScheme)
-    .AddNegotiate();
+builder.Services.Configure<CookiePolicyOptions>(options =>
+{
+    options.CheckConsentNeeded = context => true;
+    options.MinimumSameSitePolicy = SameSiteMode.None;
+});
+
+// Keycloak
+ConfigurationManager configuration = builder.Configuration;
+builder.Services.AddKeycloakAuthentication(configuration);
+
 
 // Configure role-based authorization policies
 AuthorizationBuilder authBuilder = builder.Services.AddAuthorizationBuilder();
@@ -43,12 +51,19 @@ builder.Services.AddSession(options =>
     options.IdleTimeout = TimeSpan.FromHours(3);
     options.Cookie.HttpOnly = true;
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-    options.Cookie.SameSite = SameSiteMode.Strict;
+    options.Cookie.SameSite = SameSiteMode.None;
 });
 
 
-// MVC pattern
-builder.Services.AddControllersWithViews();
+// Add services to the container - Enable login requirement functionality on all controllers
+builder.Services.AddControllersWithViews(options =>
+{
+    AuthorizationPolicy policy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
+
+    options.Filters.Add(new AuthorizeFilter(policy));
+});
 
 // Allows services to access HttpContext
 builder.Services.AddHttpContextAccessor();
@@ -64,7 +79,7 @@ builder.Services.Configure<AppSettingsOptions>(builder.Configuration.GetSection(
 
 
 // Connection string from configuration
-var processosDj = builder.Configuration.GetConnectionString("ProcessosDJ_Dev")!;
+var processosDj = builder.Configuration.GetConnectionString("DefaultConnection")!;
 
 // Register DbContext with SQL Server and detailed logging
 builder.Services.AddDbContext<AppDbContext>(opt =>
@@ -98,20 +113,15 @@ builder.Services.AddScoped<ICrimeTypeSvc, CrimeTypeSvc>();
 builder.Services.AddScoped<IMilitarySecuritySvc, MilitarySecuritySvc>();
 builder.Services.AddScoped<IUserSvc, UserSvc>();
 builder.Services.AddScoped<IRoleSvc, RoleSvc>();
-builder.Services.AddScoped<RoleSyncSvc>();
-builder.Services.AddHostedService<TimedSyncSvc>();
+//builder.Services.AddScoped<RoleSyncSvc>();
+//builder.Services.AddHostedService<TimedSyncSvc>();
 builder.Services.AddScoped<ILegalReferenceSvc, LegalReferenceSvc>();
 builder.Services.AddScoped<IContextSvc, ContextSvc>();
 builder.Services.AddScoped<IProcessManagementSvc, ProcessManagementSvc>();
 builder.Services.AddScoped<IProcessViewDataSvc, ProcessViewDataSvc>();
 builder.Services.AddScoped<IFileValidatorSvc, FileValidatorSvc>();
 
-// Interface service only supported on windows
-if (OperatingSystem.IsWindows())
-{
-    builder.Services.AddScoped<NegotiateRoleMiddleware>();
-    builder.Services.AddScoped<ILdapUserSvc, LdapUserSvc>();
-}
+builder.Services.AddScoped<ILdapUserSvc, LdapUserSvc>();
 
 
 // Register NToastNotify (Notifications)
@@ -125,6 +135,10 @@ builder.Services.AddMvc().AddNToastNotifyToastr(new ToastrOptions()
 
 WebApplication app = builder.Build();
 
+// Get AppSettingsOptions values from configuration via dependency injection
+AppSettingsOptions appSettings = app.Services.GetRequiredService<IOptions<AppSettingsOptions>>().Value;
+
+
 // Automatic Migrations (Development Only)
 if (app.Environment.IsDevelopment())
 {
@@ -137,9 +151,6 @@ if (app.Environment.IsDevelopment())
     }
 }
 
-
-// Error & Exception Configuration
-app.UseExceptionHandler("/Home/Error");
 
 // Set the global text manager
 GlobalTextManager.SetManager(app.Services.GetRequiredService<IJsonTextManager>());
@@ -162,24 +173,14 @@ if (!app.Environment.IsDevelopment())
     };
 }
 
-
-// Get AppSettingsOptions values from configuration via dependency injection
-AppSettingsOptions appSettings = app.Services.GetRequiredService<IOptions<AppSettingsOptions>>().Value;
-
 // HTTP Pipeline
 app.UsePathBase(appSettings.SubPath);
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.UseCookiePolicy();
 app.UseSession();
 app.UseRouting();
 app.UseAuthentication();
-
-// Middleware only supported on windows
-if (OperatingSystem.IsWindows())
-{
-    app.UseMiddleware<NegotiateRoleMiddleware>();
-}
-
 app.UseMiddleware<SessionRoleMiddleware>();
 app.UseAuthorization();
 app.UseNToastNotify();
@@ -188,6 +189,11 @@ app.UseNToastNotify();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+
+// Error & Exception Configuration
+app.UseExceptionHandler($"{appSettings.SubPath}/Error");
+
 
 await app.RunAsync();
 

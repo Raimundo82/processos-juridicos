@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: app
+  name: app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: app
+  template:
+    metadata:
+      labels:
+        io.kompose.service: app
+    spec:
+      imagePullSecrets:
+        - name: devops-01
+      containers:
+        - env:
+            - name: ASPNETCORE_FORWARDEDHEADERS_ENABLED
+              value: "true"
+            - name: ConnectionStrings__DefaultConnection
+              value: Server=10.50.1.208; Database=Processos_DJ; User Id=processosUser; Password=$(DB_PASSWORD);TrustServerCertificate=True;
+            - name: Keycloak__credentials__secret
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: keycloak-secret
+          image: devops-01.marinha.pt/marinha-si/processos-juridicos:1.20.7
+          name: processos-juridcos-app
+          ports:
+            - containerPort: 8080
+              protocol: TCP          
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    io.kompose.service: app
+  name: app
+spec:
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+  selector:
+    io.kompose.service: app
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: app-route
+  labels:
+    app: processos-juridicos
+spec:
+  host: processos-juridicos.apps.okd-01.marinha.pt
+  to:
+    kind: Service
+    name: app
+    weight: 100
+  port:
+    targetPort: http
+  tls:
+    termination: edge

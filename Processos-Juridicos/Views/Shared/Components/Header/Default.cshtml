@@ -1,32 +1,22 @@
-@model UserDataModel
+@using System.Security.Claims
 @{
-	var nii = Model.UserName ?? "Utilizador";
-	var photo = Model.PhotoBase64 ?? Url.Content("/images/default-avatar.webp");
-    var isSessionLogin = Context.Session.GetString("SessionUser") != null;
+    var isAuthenticated = User?.Identity?.IsAuthenticated ?? false;
+
+    var nii = User?.FindFirst("preferred_username")?.Value
+        ?? "Utilizador";
+
+    var photo = Url.Content("~/images/default-avatar.webp");
 }
 
-<div class="dropdown">
-    <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle"
-       id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
-        <img src="@photo" alt="Avatar de @nii"
-             class="rounded-circle" width="40" height="40" />
-    </a>
-    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
-        @if (isSessionLogin)
-        {
-            <li>
-                <a class="dropdown-item bg-danger text-white" asp-controller="Account" asp-action="Logout">
-                    @($"Terminar sessão de {nii}")
-                </a>
-            </li>
-        }
-        else
-        {
-            <li>
-                <a class="dropdown-item" asp-controller="Account" asp-action="Login">
-                    Iniciar sessão com outra conta
-                </a>
-            </li>
-        }
-    </ul>
-</div>
+@if (isAuthenticated)
+{
+    <div class="d-flex align-items-center gap-2" >
+        <span class="text-small">@nii</span>
+        <img src="@photo" alt="Avatar de @nii" class="rounded-circle mr-2" width="40" height="40" />
+
+        <a href="~/account/signout" class="btn text-danger">
+            Terminar sessão
+        </a>
+    </div>
+}
+

@@ -1,4 +1,7 @@
 // DataTable Initializer
+
+export { createDataTable, loadProcessFilters, fillSelect };
+
 function createDataTable(elementId) {
     const table = $(elementId);
     if (table.length && table.find('tbody tr').length > 0) {

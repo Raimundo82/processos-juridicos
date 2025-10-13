@@ -5,6 +5,13 @@
         "@semantic-release/release-notes-generator",
         "@semantic-release/changelog",
         [
+            "@codedependant/semantic-release-docker",
+            {
+                "dockerRegistry": "devops-01.marinha.pt",
+                "dockerProject": "marinha-si"
+            }
+        ],
+        [
             "@saithodev/semantic-release-gitea",
             {
                 "giteaUrl": "https://devops-01.marinha.pt",

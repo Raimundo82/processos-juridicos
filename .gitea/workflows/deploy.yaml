@@ -1,0 +1,37 @@
+name: Deploy with kubectl
+
+on:
+  push:
+    tags:
+      - '*'
+env:
+  RUNNER_TOOL_CACHE: /toolcache
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ssh-key: ${{ secrets.SSH_KEY }}
+          ssh-known-hosts: ${{ vars.SSH_KNOWN_HOSTS }}
+
+      - name: Download Kubectl binaries
+        run: curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+
+      - name: Install Kubectl
+        run: sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
+      - name: Extract base64 encoded config
+        run: echo "${{ secrets.KUBECONFIG_ENCODED }}" | base64 -d > /tmp/config
+
+      - name: Apply deployment
+        run: kubectl --kubeconfig=/tmp/config -n ${{ vars.CLUSTER_NAMESPACE }} apply -f app-deployment.yaml
+
+      - name: Update deployment image
+        env:
+          GITEA_REF: ${{ gitea.ref }}
+        run: |
+          TAG="${GITEA_REF##refs/tags/v}"    
+          kubectl --kubeconfig=/tmp/config -n ${{ vars.CLUSTER_NAMESPACE }} set image deployment/app processos-juridcos-app=devops-01.marinha.pt/marinha-si/processos-juridicos:$TAG

@@ -68,6 +68,10 @@ p {
     font-weight: 400;
 }
 
+.bg-primary {
+    background-color: var(--dark-blue) !important;
+}
+
 /* text */
 .text-justify {
     text-align: justify;

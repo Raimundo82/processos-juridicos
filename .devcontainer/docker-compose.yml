@@ -8,7 +8,7 @@ services:
       - ..:/workspace:cached
 
     env_file:
-      - .env
+      - ../.env
 
     working_dir: /workspace/Processos-Juridicos
     

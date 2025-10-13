@@ -1,11 +1,13 @@
 using System.Diagnostics;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using Processos_Juridicos.Models;
 
 namespace Processos_Juridicos.Controllers;
 
+[Authorize]
 public class HomeController() : Controller
 {
     [HttpGet]

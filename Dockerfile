@@ -3,7 +3,7 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 
 ENV http_proxy=http://proxy-n-wcg.marinha.pt:8080
 ENV https_proxy=http://proxy-n-wcg.marinha.pt:8080
-ENV no_proxy="devops-01.marinha.pt, marinha.pt,.marinha.pt, localhost, 10.45.7.143"
+ENV no_proxy="devops-01.marinha.pt, marinha.pt,.marinha.pt, localhost, 10.45.1.165"
 ENV HUSKY=0
 
 WORKDIR /app
@@ -15,7 +15,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 
 ENV http_proxy=http://proxy-n-wcg.marinha.pt:8080
 ENV https_proxy=http://proxy-n-wcg.marinha.pt:8080
-ENV no_proxy="devops-01.marinha.pt, marinha.pt,.marinha.pt, localhost, 10.45.7.143"
+ENV no_proxy="devops-01.marinha.pt, marinha.pt,.marinha.pt, localhost, 10.45.1.165"
 
 WORKDIR /app
 COPY --from=build /out .

@@ -2,6 +2,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
+using Riok.Mapperly.Abstractions;
+
 namespace Processos_Juridicos.Entities;
 
 public partial class Process
@@ -114,6 +116,7 @@ public partial class Process
     [ForeignKey("HarmedOrCasualtiesId")]
     public virtual HarmedOrCasualty HarmedOrCasualties { get; set; }
 
+    [MapperIgnore]
     public virtual ICollection<Infringement> Infringements { get; set; } = [];
 
     [ForeignKey("ProcessTypeId")]
