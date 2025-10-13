@@ -11,7 +11,7 @@
         {
             <div class="card card-action mb-3">
                 <div class="d-flex align-items-center justify-content-between">
-                    <h2>@ViewData["Title"]</h2>
+                    <h2>@Model.Title</h2>
                     <a asp-controller="Process" asp-action="Create" class="btn btn-primary">Inserir Processo</a>
                 </div>
             </div>
@@ -20,7 +20,7 @@
         {
             <div class="card mb-3">
                 <div class="d-flex align-items-center justify-content-between">
-                    <h2>@ViewData["Title"]</h2>
+                    <h2>@Model.Title</h2>
                 </div>
             </div>
         }
@@ -123,9 +123,16 @@
                 }
                 else
                 {
-                    <div class="text-center">
-                        <span>Não existem processos.</span>
-                    </div>
+                    @if (Model.HasRole) {
+                        <div class="text-center">
+                            <span>Não existem processos.</span>
+                        </div>
+                    }
+                    else {
+                        <div class="text-center">
+                            <span>Não tem permissão para aceder a esta página.</span>
+                        </div>
+                    }
                 }
             </div>
         </div>

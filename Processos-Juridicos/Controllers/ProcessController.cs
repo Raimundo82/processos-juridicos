@@ -29,7 +29,7 @@ public class ProcessController(
 
     private readonly IToastNotify _toastNotify = toastNotify;
 
-    [Authorize(Policy = "PROCESS-VIEW")]
+    [Authorize]
     [HttpGet]
     public async Task<IActionResult> List()
     {
@@ -37,7 +37,7 @@ public class ProcessController(
         {
             return View(new ProcessListViewModel
             {
-                Title = "Sem Permissões",
+                Title = "Gestão de Processos",
                 Processes = [],
                 CanInsertProcess = false,
                 HasRole = false
