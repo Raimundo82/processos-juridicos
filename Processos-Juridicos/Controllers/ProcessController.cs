@@ -33,9 +33,6 @@ public class ProcessController(
 
     [Authorize]
     [HttpGet]
-
-    [Authorize]
-    [HttpGet]
     public async Task<IActionResult> List()
     {
         if (!User.IsInstrutor() && !User.IsComando() && !User.IsDj())

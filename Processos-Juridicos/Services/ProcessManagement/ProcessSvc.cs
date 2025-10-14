@@ -186,7 +186,6 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
                         e.CreatedAt < startOfNextYear)
             .CountAsync();
 
-        System.Diagnostics.Debug.WriteLine($"Count = {count}");
         return count;
     }
 
