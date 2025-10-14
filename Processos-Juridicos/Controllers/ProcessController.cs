@@ -311,25 +311,26 @@ public class ProcessController(
             processStateName = p.ProcessState?.StateName ?? "",
             modifiedAt = p.ModifiedAt?.ToString("dd-MM-yyyy") ?? "",
             modifiedByName = p.ModifiedByName ?? "",
-            actions =
-                $@" <div class=""d-flex gap-3"">
-                    <a href='/Process/Details/{p.ProcessId}' class='text-primary'>
-                   <i class='bi bi-search'></i>
-               </a>
-               <a href='/Process/Edit/{p.ProcessId}' class='text-primary'>
-                   <i class='bi bi-pencil-square'></i>
-               </a>"
-                + (isAdmin
-                    ? $@"<a class='text-danger btn-delete'
-                          data-entity='o processo'
-                          data-name='{p.Nuipm}'
-                          data-id='{p.ProcessId}'
-                          data-controller='Process'
-                          data-action='Delete'>
-                          <i class='bi bi-trash-fill'></i>
-                      </a>
-                      </div>"
-                    : "")
+            isAdmin
+            //actions =
+            //    $@" <div class=""d-flex gap-3"">
+            //        <a href='/Process/Details/{p.ProcessId}' class='text-primary'>
+            //       <i class='bi bi-search'></i>
+            //   </a>
+            //   <a href='/Process/Edit/{p.ProcessId}' class='text-primary'>
+            //       <i class='bi bi-pencil-square'></i>
+            //   </a>"
+            //    + (isAdmin
+            //        ? $@"<a class='text-danger btn-delete'
+            //              data-entity='o processo'
+            //              data-name='{p.Nuipm}'
+            //              data-id='{p.ProcessId}'
+            //              data-controller='Process'
+            //              data-action='Delete'>
+            //              <i class='bi bi-trash-fill'></i>
+            //          </a>
+            //          </div>"
+            //        : "")
         });
 
         return Json(new

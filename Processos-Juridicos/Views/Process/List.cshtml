@@ -124,7 +124,33 @@
                 { data: "processStateName" },
                 { data: "modifiedAt" },
                 { data: "modifiedByName" },
-                { data: "actions", orderable: false, searchable: false }
+                { data: null,
+                    orderable: false,
+                    searchable: false,
+                    render: function (data, type, row) {
+                        let html = `
+                            <div class="d-flex gap-3">
+                                <a href='/Process/Details/${row.processId}' class='text-primary'>
+                                    <i class='bi bi-search'></i>
+                                </a>
+                                <a href='/Process/Edit/${row.processId}' class='text-primary'>
+                                    <i class='bi bi-pencil-square'></i>
+                                </a>`;
+                        if (row.isAdmin) {
+                            html += `
+                                <a class='text-danger btn-delete'
+                                   data-entity='o processo'
+                                   data-name='${row.nuipm}'
+                                   data-id='${row.processId}'
+                                   data-controller='Process'
+                                   data-action='Delete'>
+                                    <i class='bi bi-trash-fill'></i>
+                                </a>`;
+                        }
+                        html += `</div>`;
+                        return html;
+                    }
+                }
             ]
         });
 
