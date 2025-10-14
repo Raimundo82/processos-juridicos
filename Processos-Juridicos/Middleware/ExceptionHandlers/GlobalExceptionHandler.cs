@@ -7,10 +7,8 @@ namespace Processos_Juridicos.Middleware.ExceptionHandlers;
 
 public class GlobalExceptionHandler() : IExceptionHandler
 {
-
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
-
         var statusCode = exception switch
         {
             EntityNotFoundException => StatusCodes.Status404NotFound,
@@ -21,20 +19,11 @@ public class GlobalExceptionHandler() : IExceptionHandler
             _ => 0
         };
 
+        httpContext.Response.Clear();
         httpContext.Response.StatusCode = statusCode;
 
-        if (statusCode == StatusCodes.Status404NotFound)
-        {
-            httpContext.Response.Redirect($"{httpContext.Request.PathBase}/Error/404");
-        }
-        else if (statusCode == StatusCodes.Status403Forbidden)
-        {
-            httpContext.Response.Redirect($"{httpContext.Request.PathBase}/Error/403");
-        }
-        else
-        {
-            httpContext.Response.Redirect($"{httpContext.Request.PathBase}/Error");
-        }
+        var errorPath = $"{httpContext.Request.PathBase}/Error/{statusCode}";
+        httpContext.Request.Path = errorPath;
 
         await Task.CompletedTask;
         return true;
