@@ -46,9 +46,4 @@ public class AccountController(ILogger<AccountController> logger) : Controller
             OpenIdConnectDefaults.AuthenticationScheme
         );
     }
-
-    public IActionResult AccessDenied()
-    {
-        return RedirectToAction("AccessDenied", "Home");
-    }
 }
