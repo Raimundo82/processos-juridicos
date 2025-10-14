@@ -190,9 +190,9 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-
 // Error & Exception Configuration
 app.UseExceptionHandler($"{appSettings.SubPath}/Error");
+app.UseStatusCodePagesWithReExecute($"{appSettings.SubPath}/Error/{{0}}");
 
 
 await app.RunAsync();
