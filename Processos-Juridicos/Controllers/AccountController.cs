@@ -46,4 +46,10 @@ public class AccountController(ILogger<AccountController> logger) : Controller
             OpenIdConnectDefaults.AuthenticationScheme
         );
     }
+
+    [HttpGet("AccessDenied")]
+    public IActionResult AccessDenied()
+    {
+        return Redirect("/Error/403");
+    }
 }
