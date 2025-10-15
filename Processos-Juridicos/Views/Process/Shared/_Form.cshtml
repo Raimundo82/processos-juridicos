@@ -43,8 +43,8 @@
                        class="form-control"
                        placeholder="Digite o ID do oficial, ex: a1234"
                        value="@(string.Join(" - ",
-                                      new[] { Model?.OficialInstName, Model?.OficialInstNii }
-                                          .Where(s => !string.IsNullOrWhiteSpace(s))))" />
+                                 new[] { Model?.OficialInstName, Model?.OficialInstNii }
+                                 .Where(s => !string.IsNullOrWhiteSpace(s)).DefaultIfEmpty()))" />
 
                 <button type="button"
                         class="btn btn-primary btn-auto ad-lookup-btn"
