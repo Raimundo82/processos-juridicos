@@ -19,7 +19,7 @@ public partial class CrimeTypeDto
     [Unicode(false)]
     [EntityFieldIsRequired("Nome do Tipo de Crime")]
     [Attributes.MaxLength(50, "Nome do Tipo de Crime")]
-    [DisplayName(_entityName)]
+    [DisplayName("Nome do " + _entityName)]
     [UniqueCrimeTypeName]
     public string CrimeTypeName { get; set; }
 }
