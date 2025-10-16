@@ -176,6 +176,10 @@ if (!app.Environment.IsDevelopment())
     };
 }
 
+// Error & Exception Configuration
+app.UseStatusCodePagesWithReExecute("/Error/{0}");
+app.UseExceptionHandler("/Error/{0}");
+
 // HTTP Pipeline
 app.UsePathBase(appSettings.SubPath);
 app.UseHttpsRedirection();
@@ -192,10 +196,6 @@ app.UseNToastNotify();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-
-
-// Error & Exception Configuration
-app.UseExceptionHandler($"{appSettings.SubPath}/Error");
 
 
 await app.RunAsync();

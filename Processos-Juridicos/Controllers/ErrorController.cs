@@ -1,10 +1,12 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using Processos_Juridicos.Models;
 
 namespace Processos_Juridicos.Controllers;
 
-[Route("Error/{code?}")]
+[AllowAnonymous]
+[Route("Error/{code:int}")]
 public class ErrorController : Controller
 {
     public IActionResult Index(int code)

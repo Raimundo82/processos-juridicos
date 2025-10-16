@@ -47,8 +47,9 @@ public class AccountController(ILogger<AccountController> logger) : Controller
         );
     }
 
+    [HttpGet("AccessDenied")]
     public IActionResult AccessDenied()
     {
-        return RedirectToAction("AccessDenied", "Home");
+        return RedirectToAction("Index", "Error", new { code = 403 });
     }
 }
