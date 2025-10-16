@@ -222,11 +222,10 @@ public class SentenceIntegrationTests(CustomWebApplicationFactory<Program> facto
         var id = Sentence.SentenceId;
 
         IDocument listDoc = await _client.GetDocumentAsync("/Sentence/List");
-        IElement deleteForm = listDoc.QuerySelector("form[action='/Sentence/Delete']")!;
 
-        var token = deleteForm
-            .QuerySelector("input[name=__RequestVerificationToken]")!
-            .GetAttribute("value")!;
+        var token = listDoc
+            .QuerySelector("#deleteForm input[name=__RequestVerificationToken]")!
+            .GetAttribute("value");
 
         var fields = new Dictionary<string, string?>
         {
@@ -258,20 +257,18 @@ public class SentenceIntegrationTests(CustomWebApplicationFactory<Program> facto
         var id = Sentence.SentenceId;
 
         IDocument listDoc = await _client.GetDocumentAsync("/Sentence/List");
-        IElement deleteForm = listDoc.QuerySelector("form[action='/Sentence/Delete']")!;
-        var action = deleteForm.GetAttribute("action")!;
-        var token = deleteForm
-            .QuerySelector("input[name=__RequestVerificationToken]")!
-            .GetAttribute("value")!;
+        var token = listDoc
+            .QuerySelector("#deleteForm input[name=__RequestVerificationToken]")!
+            .GetAttribute("value");
 
-        var fields = new Dictionary<string, string>
+        var fields = new Dictionary<string, string?>
         {
             ["SentenceId"] = "-1",
             ["__RequestVerificationToken"] = token
         };
 
         //Act
-        HttpResponseMessage postResponse = await _client.PostAsync(action, new FormUrlEncodedContent(fields));
+        await _client.PostAsync($"/Sentence/Delete/{int.MaxValue}", new FormUrlEncodedContent(fields));
         IDocument afterDoc = await _client.GetDocumentAsync("/Sentence/List");
 
         // Assert

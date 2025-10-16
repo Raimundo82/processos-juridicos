@@ -1,51 +1,88 @@
 @using Processos_Juridicos.DTOs
-
+@using Processos_Juridicos.Utilities
+@model IEnumerable<SentenceDto>
 @{
-    ViewData["Title"] = "Sentenças";
+    ViewData["Title"] = "Lista de Sentenças";
+    int count = 1;
 }
 
-@model IEnumerable<SentenceDto>
+<div class="container-fluid">
+    <div class="mx-lg-5 my-3">
 
-<div class="text-center">
-    <h1 class="display-4">Sentenças</h1>
+        <div class="card card-action mb-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <h2>@ViewData["Title"]</h2>
+                <a asp-controller="Sentence" asp-action="Create" class="btn btn-primary">Inserir Sentença</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div id="tableLoader" class="d-flex justify-content-center my-5">
+                <output class="spinner-border text-primary">
+                    <span class="visually-hidden">A carregar...</span>
+                </output>
+            </div>
+
+            <div id="tableContent" class="d-none">
+                @if (Model != null && Model.Any())
+                {
+                    <div class="table-responsive">
+                        <table id="tableSentences" class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">@Html.DisplayNameFor(m => m.SentenceName)</th>
+                                    <th scope="col"></th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @foreach (var item in Model.ToList())
+                                {
+                                    <tr data-id="@item.SentenceId">
+                                        <th scope="col">@count</th>
+                                        <td data-property="name">@Html.DisplayFor(m => item.SentenceName)</td>
+                                        <td>
+                                            <div class="d-flex gap-3">
+                                                <a asp-controller="Sentence" asp-action="Edit" asp-route-id="@item.SentenceId"
+                                                   data-action="access-edit-form" class="text-primary"><i class="bi bi-pencil-square"></i></a>
+
+                                                @if (User.IsDjAdministration())
+                                                {
+                                                    <a class="text-danger btn-delete"
+                                                            data-entity="a sentença"
+                                                            data-name="@item.SentenceName"
+                                                            data-id="@item.SentenceId"
+                                                            data-controller="Sentence"
+                                                            data-action="Delete">
+                                                        <i class="bi bi-trash-fill"></i>
+                                                    </a>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    count++;
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else 
+                {
+                    <div class="text-center">
+                        <span>Não existem sentenças.</span>
+                    </div>
+                }
+            </div>
+        </div>
+
+    </div>
 </div>
 
-<a asp-controller="Sentence" asp-action="Create" class="btn btn-primary">Inserir tipo de acidente</a>
-
-<div>
-    <table id="tableSentences" class="table table-striped-columns table-hover">
-        <thead>
-            <tr>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().SentenceName)</th>
-                <th scope="col">Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-
-            @foreach (var item in Model.ToList())
-            {
-                <tr data-id="@item.SentenceId">
-                    <td data-property="name">@Html.DisplayFor(m => item.SentenceName)</td>
-                    <td>
-                        <div class="d-flex gap-2">
-                            <form asp-controller="Sentence" asp-action="Delete" method="post" data-action="delete">
-                                <input type="hidden" name="id" value="@item.SentenceId">
-                                <button type="submit" class="btn btn-danger js-delete-btn"></button>
-                            </form>
-                            <a asp-controller="Sentence" asp-action="Edit" asp-route-id="@item.SentenceId"
-                                data-action="access-edit-form" class="btn btn-warning">
-                                <i class="bi bi-pencil"></i>
-                            </a>
-                        </div>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-</div>
+@await Html.PartialAsync("ConfirmationModals/_DeleteModal")
 
 @section Scripts {
     <script>
-        let table = createDataTable("#tableSentences");
+        createDataTable('#tableSentences');
     </script>
 }

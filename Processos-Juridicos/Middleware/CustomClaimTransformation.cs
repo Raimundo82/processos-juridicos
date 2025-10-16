@@ -1,0 +1,32 @@
+
+using System.Security.Claims;
+
+using Microsoft.AspNetCore.Authentication;
+
+using Processos_Juridicos.Services.Interfaces;
+
+namespace Processos_Juridicos.Middleware;
+
+public class CustomClaimsTransformer(IUserSvc userSvc) : IClaimsTransformation
+{
+    private readonly IUserSvc _userSvc = userSvc;
+
+    public async Task<ClaimsPrincipal> TransformAsync(ClaimsPrincipal principal)
+    {
+        if (principal.Identity is ClaimsIdentity identity)
+        {
+            var username = identity.FindFirst("preferred_username")?.Value;
+
+            if (!string.IsNullOrEmpty(username))
+            {
+                var role = await _userSvc.GetUserRoleNameByNii(username);
+                if (!string.IsNullOrEmpty(role))
+                {
+                    identity.AddClaim(new Claim(ClaimTypes.Role, role));
+                }
+            }
+        }
+
+        return principal;
+    }
+}

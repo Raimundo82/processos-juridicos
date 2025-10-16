@@ -1,5 +1,6 @@
 using Keycloak.AuthServices.Authentication;
 
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -7,6 +8,7 @@ using Microsoft.Extensions.Options;
 
 using NToastNotify;
 
+using Processos_Juridicos.Configuration;
 using Processos_Juridicos.Data;
 using Processos_Juridicos.Middleware;
 using Processos_Juridicos.Middleware.ExceptionHandlers;
@@ -88,6 +90,16 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
         .LogTo(Console.WriteLine, LogLevel.Debug));
 
 
+// LDAP Configuration and Service
+builder.Services.AddScoped((options) =>
+{
+    var profile = Environment.GetEnvironmentVariable("ASPNETCORE_PROFILE") ?? "Marinha";
+    LdapConfiguration ldapConfiguration = configuration.GetSection($"Ldap:{profile}").Get<LdapConfiguration>() ?? new LdapConfiguration();
+
+    return new LdapConnService(ldapConfiguration);
+});
+
+
 // JSON text manager for system text (systemtext.json)
 builder.Services.AddSingleton<IJsonTextManager>(sp =>
 {
@@ -113,8 +125,6 @@ builder.Services.AddScoped<ICrimeTypeSvc, CrimeTypeSvc>();
 builder.Services.AddScoped<IMilitarySecuritySvc, MilitarySecuritySvc>();
 builder.Services.AddScoped<IUserSvc, UserSvc>();
 builder.Services.AddScoped<IRoleSvc, RoleSvc>();
-//builder.Services.AddScoped<RoleSyncSvc>();
-//builder.Services.AddHostedService<TimedSyncSvc>();
 builder.Services.AddScoped<ILegalReferenceSvc, LegalReferenceSvc>();
 builder.Services.AddScoped<IContextSvc, ContextSvc>();
 builder.Services.AddScoped<IProcessManagementSvc, ProcessManagementSvc>();
@@ -123,6 +133,7 @@ builder.Services.AddScoped<IFileValidatorSvc, FileValidatorSvc>();
 
 builder.Services.AddScoped<ILdapUserSvc, LdapUserSvc>();
 
+builder.Services.AddScoped<IClaimsTransformation, CustomClaimsTransformer>();
 
 // Register NToastNotify (Notifications)
 builder.Services.AddMvc().AddNToastNotifyToastr(new ToastrOptions()
@@ -173,6 +184,10 @@ if (!app.Environment.IsDevelopment())
     };
 }
 
+// Error & Exception Configuration
+app.UseStatusCodePagesWithReExecute("/Error/{0}");
+app.UseExceptionHandler("/Error/{0}");
+
 // HTTP Pipeline
 app.UsePathBase(appSettings.SubPath);
 app.UseHttpsRedirection();
@@ -189,10 +204,6 @@ app.UseNToastNotify();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-
-
-// Error & Exception Configuration
-app.UseExceptionHandler($"{appSettings.SubPath}/Error");
 
 
 await app.RunAsync();

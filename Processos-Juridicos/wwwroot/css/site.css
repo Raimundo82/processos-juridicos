@@ -464,6 +464,16 @@ select .form-select option {
     box-shadow: none;
 }
 
+.error-icon {
+    font-size: 40px;
+    color: var(--charcoal);
+}
+
+.error-text {
+    font-size: 14px;
+    color: var(--charcoal);
+}
+
 /* footer */
 .footer {
     bottom: 0;
