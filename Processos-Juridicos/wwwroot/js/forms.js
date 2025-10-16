@@ -4,7 +4,7 @@ function markFileForDeletion(fileId) {
   // Remove the table row so it's no longer visible
   let row = document.getElementById('file-row-' + fileId);
   if (row) {
-    row.parentNode.removeChild(row);
+    row.remove();
   }
 
   // Create a new hidden input to mark this file for deletion
@@ -25,7 +25,7 @@ function toggleReportToPjm() {
     }
 }
 
-$(document).ready(function () {
+$(function () {
     toggleReportToPjm();
     $("#ProcessTypeId").on("change", toggleReportToPjm);
 });
