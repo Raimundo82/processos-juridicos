@@ -42,8 +42,11 @@ beforeAll(async () => {
         if (selector === '#ProcessTypeId option:selected') {
             const sel = document.querySelector('#ProcessTypeId');
             return { text: () => sel?.selectedOptions[0]?.textContent || '' };
-        } else if (selector.startsWith('#')) {
+        } else if (typeof selector === 'string' && selector.startsWith('#')) {
             mock = makeElementMock(selector);
+        } else if (selector instanceof HTMLElement) {
+            // If code calls $(element), just return a minimal mock
+            mock = makeElementMock('#' + selector.id);
         } else {
             mock = {};
         }
