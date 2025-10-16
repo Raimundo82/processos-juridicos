@@ -5,7 +5,7 @@ namespace Processos_Juridicos.Tests;
 
 public static class AngleSharpHelper
 {
-    private static readonly IConfiguration _config = Configuration.Default;
+    private static readonly IConfiguration _config = AngleSharp.Configuration.Default;
 
     public static async Task<IDocument> GetDocumentAsync(
         this HttpClient client,

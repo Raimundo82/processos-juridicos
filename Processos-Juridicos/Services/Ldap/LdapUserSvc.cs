@@ -5,6 +5,7 @@ namespace Processos_Juridicos.Services.Ldap;
 
 public class LdapUserSvc() : ILdapUserSvc
 {
+
     public bool ValidateAccount(string username, string password)
     {
         return true;
