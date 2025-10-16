@@ -95,9 +95,9 @@ public class ProcessController(
             model.ComunicatedToPjm = false;
         }
 
-        UserDataModel userData = _ldapUserSvc.GetLoggedUserData();
-        model.CreatedByName = userData.DisplayName;
-        model.CreatedByNii = "M" + userData.Nii;
+
+        model.CreatedByName = User?.FindFirst("name")?.Value ?? "Utilizador";
+        model.CreatedByNii = User?.FindFirst("preferred_username")?.Value ?? "Utilizador";
 
         ProcessDto insertTarget = await _processManagement.Processes.CreateProcess(model);
 
@@ -166,9 +166,8 @@ public class ProcessController(
             model.ComunicatedToPjm = false;
         }
 
-        UserDataModel userData = _ldapUserSvc.GetLoggedUserData();
-        model.ModifiedByName = userData.DisplayName;
-        model.ModifiedByNii = "M" + userData.Nii;
+        model.ModifiedByName = User?.FindFirst("name")?.Value ?? "Utilizador";
+        model.ModifiedByNii = User?.FindFirst("preferred_username")?.Value ?? "Utilizador";
         model.ModifiedAt = DateOnly.FromDateTime(DateTime.Now);
 
         ProcessStateDto states = await _processManagement.ProcessStates.GetStateById(model.ProcessStateId);
