@@ -1,3 +1,5 @@
+using System.Security.Claims;
+
 using Keycloak.AuthServices.Authentication;
 using Keycloak.AuthServices.Authorization;
 
@@ -22,6 +24,7 @@ public static class KeycloakMiddlewareExtensions
                         ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
                     };
                     options.ResponseType = OpenIdConnectResponseType.Code;
+                    options.TokenValidationParameters.RoleClaimType = ClaimTypes.Role;
                     options.Events = new OpenIdConnectEvents
                     {
                         OnSignedOutCallbackRedirect = context =>

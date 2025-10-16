@@ -107,14 +107,14 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
     }
 
     [Fact]
-    public async Task Details_Get_WhenProcessDoesNotExist_RedirectsToList()
+    public async Task Details_Get_WhenProcessDoesNotExist_RedirectsToNotFound()
     {
         // Act
         TestAuthContext.Roles = ["DJ-AUTHORIZED"];
         HttpResponseMessage response = await _client.GetAsync($"/Process/Details/9999");
 
         // Assert
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         var content = await response.Content.ReadAsStringAsync();
         Assert.Contains("Processos", content);
     }
