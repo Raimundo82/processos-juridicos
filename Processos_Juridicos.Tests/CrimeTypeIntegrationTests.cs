@@ -222,11 +222,9 @@ public class CrimeTypeIntegrationTests(CustomWebApplicationFactory<Program> fact
         var id = CrimeType.CrimeTypeId;
 
         IDocument listDoc = await _client.GetDocumentAsync("/CrimeType/List");
-        IElement deleteForm = listDoc.QuerySelector("form[action='/CrimeType/Delete']")!;
-
-        var token = deleteForm
-            .QuerySelector("input[name=__RequestVerificationToken]")!
-            .GetAttribute("value")!;
+        var token = listDoc
+            .QuerySelector("#deleteForm input[name=__RequestVerificationToken]")!
+            .GetAttribute("value");
 
         var fields = new Dictionary<string, string?>
         {
@@ -258,20 +256,18 @@ public class CrimeTypeIntegrationTests(CustomWebApplicationFactory<Program> fact
         var id = CrimeType.CrimeTypeId;
 
         IDocument listDoc = await _client.GetDocumentAsync("/CrimeType/List");
-        IElement deleteForm = listDoc.QuerySelector("form[action='/CrimeType/Delete']")!;
-        var action = deleteForm.GetAttribute("action")!;
-        var token = deleteForm
-            .QuerySelector("input[name=__RequestVerificationToken]")!
-            .GetAttribute("value")!;
+        var token = listDoc
+            .QuerySelector("#deleteForm input[name=__RequestVerificationToken]")!
+            .GetAttribute("value");
 
-        var fields = new Dictionary<string, string>
+        var fields = new Dictionary<string, string?>
         {
             ["CrimeTypeId"] = "-1",
             ["__RequestVerificationToken"] = token
         };
 
         //Act
-        await _client.PostAsync(action, new FormUrlEncodedContent(fields));
+        await _client.PostAsync($"/CrimeType/Delete/{int.MaxValue}", new FormUrlEncodedContent(fields));
         IDocument afterDoc = await _client.GetDocumentAsync("/CrimeType/List");
 
         // Assert
