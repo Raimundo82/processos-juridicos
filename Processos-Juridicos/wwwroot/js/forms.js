@@ -1,3 +1,5 @@
+export { markFileForDeletion, toggleReportToPjm };
+
 function markFileForDeletion(fileId) {
   // Remove the table row so it's no longer visible
   let row = document.getElementById('file-row-' + fileId);
@@ -28,4 +30,3 @@ $(document).ready(function () {
     $("#ProcessTypeId").on("change", toggleReportToPjm);
 });
 
-export { markFileForDeletion, toggleReportToPjm };

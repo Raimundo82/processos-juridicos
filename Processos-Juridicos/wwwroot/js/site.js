@@ -4,11 +4,14 @@
 // Modal to delete
 document.addEventListener("DOMContentLoaded", function () {
     const deleteModalEl = document.getElementById("deleteModal");
-    const deleteModal = new bootstrap.Modal(deleteModalEl);
-    const entitySpan = document.getElementById("deleteEntity");
-    const nameSpan = document.getElementById("deleteName");
-    const idInput = document.getElementById("deleteId");
-    const deleteForm = document.getElementById("deleteForm");
+    if (deleteModalEl) {
+        const deleteModal = new bootstrap.Modal(deleteModalEl);
+
+        const entitySpan = document.getElementById("deleteEntity");
+        const nameSpan = document.getElementById("deleteName");
+        const idInput = document.getElementById("deleteId");
+        const deleteForm = document.getElementById("deleteForm");
+    }
 
     document.querySelectorAll(".btn-delete").forEach(button => {
         button.addEventListener("click", function () {
@@ -37,17 +40,22 @@ document.addEventListener("DOMContentLoaded", function () {
 // Modal to confirm reject
 document.addEventListener("DOMContentLoaded", function () {
     const rejectModalEl = document.getElementById("rejectModal");
-    const rejectModal = new bootstrap.Modal(rejectModalEl);
+    if (rejectModalEl) {
+        const rejectModal = new bootstrap.Modal(rejectModalEl);
+    } 
     const btnRejectChanges = document.querySelector(".btn-reject");
     const btnConfirmReject = document.getElementById("btnConfirmReject");
 
-    btnRejectChanges.addEventListener("click", function () {
-        rejectModal.show();
-    });
+    if (rejectModalEl) {
+        btnRejectChanges.addEventListener("click", function () {
+            rejectModal.show();
+        });
 
-    btnConfirmReject.addEventListener("click", function () {
-        window.history.back();
-    });
+        btnConfirmReject.addEventListener("click", function () {
+            globalThis.history.back();
+        });
+    }
+
 });
 
 // Select2 initializers
@@ -62,6 +70,9 @@ $(function () {
 
 // Loader
 document.addEventListener("DOMContentLoaded", function () {
-    document.getElementById("tableLoader").classList.add("d-none");
-    document.getElementById("tableContent").classList.remove("d-none");
+    const loader = document.getElementById("tableLoader");
+    const content = document.getElementById("tableContent");
+
+    if (loader) loader.classList.add("d-none");
+    if (content) content.classList.remove("d-none");
 });
