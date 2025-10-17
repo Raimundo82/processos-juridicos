@@ -14,7 +14,7 @@
 <button asp-controller="File" asp-action="CreateEdit" class="btn btn-primary">Inserir ficheiro</button>
 
 <div>
-    <table id="tableStates" class="table table-striped-columns table-hover">
+    <table id="tableFiles" class="table table-striped-columns table-hover">
         <thead>
             <tr>
                 <th scope="col">@count</th>
@@ -44,7 +44,8 @@
 </div>
 
 @section Scripts {
-    <script>
-        let table = createDataTable("#tableStates");
+    <script type="module">
+        import { createDataTable } from '/js/initializeDataTable.js';
+        createDataTable('#tableFiles');
     </script>
 } 
