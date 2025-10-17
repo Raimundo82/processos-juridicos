@@ -25,7 +25,6 @@ public static class AuthorizationConfig
             policy.RequireRole(
                 OficiaisInstrutores,
                 DjAuthorized,
-                DjUnauthorized,
                 SuperAdmin
             ));
 
