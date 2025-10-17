@@ -25,7 +25,6 @@ public class ProcessController(
     private readonly IProcessManagementSvc _processManagement = processManagement;
     private readonly IProcessViewDataSvc _viewDataSvc = viewDataSvc;
     private readonly IFileValidatorSvc _fileValidatorSvc = fileValidatorSvc;
-    private readonly ILdapUserSvc _ldapUserSvc = ldapUserSvc;
 
     private readonly IToastNotify _toastNotify = toastNotify;
 

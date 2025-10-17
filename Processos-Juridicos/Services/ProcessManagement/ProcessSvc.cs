@@ -98,8 +98,8 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
 
         if (User.IsInstrutor())
         {
-            query = query.Where(p => p.OficialInstName != null &&
-                p.OficialInstName.EndsWith(" - " + nii));
+            query = query.Where(p => (p.OficialInstName != null &&
+                p.OficialInstName.EndsWith(" - " + nii)) || p.CreatedByNii == User!.FindFirst("preferred_username")!.Value);
         }
         else if (User.IsComando())
         {
