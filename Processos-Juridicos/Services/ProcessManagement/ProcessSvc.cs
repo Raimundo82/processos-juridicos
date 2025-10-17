@@ -94,7 +94,7 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
             .Include(x => x.MilitarySecurity)
             .Include(x => x.CrimeType);
 
-        var nii = User.Identity?.Name;
+        var nii = User!.FindFirst("preferred_username")!.Value;
 
         if (User.IsInstrutor())
         {
