@@ -226,11 +226,10 @@ public class ProcessTypeIntegrationTests(CustomWebApplicationFactory<Program> fa
         await dbContext.SaveChangesAsync();
 
         IDocument listDoc = await _client.GetDocumentAsync("/ProcessType/List");
-        IElement deleteForm = listDoc.QuerySelector("form[action='/ProcessType/Delete']")!;
 
-        var token = deleteForm
+        var token = listDoc
             .QuerySelector("input[name=__RequestVerificationToken]")!
-            .GetAttribute("value")!;
+            .GetAttribute("value");
 
         var fields = new Dictionary<string, string?>
         {
@@ -262,20 +261,19 @@ public class ProcessTypeIntegrationTests(CustomWebApplicationFactory<Program> fa
         await dbContext.SaveChangesAsync();
 
         IDocument listDoc = await _client.GetDocumentAsync("/ProcessType/List");
-        IElement deleteForm = listDoc.QuerySelector("form[action='/ProcessType/Delete']")!;
-        var action = deleteForm.GetAttribute("action")!;
-        var token = deleteForm
-            .QuerySelector("input[name=__RequestVerificationToken]")!
-            .GetAttribute("value")!;
 
-        var fields = new Dictionary<string, string>
+        var token = listDoc
+            .QuerySelector("#deleteForm input[name=__RequestVerificationToken]")!
+            .GetAttribute("value");
+
+        var fields = new Dictionary<string, string?>
         {
             ["ProcessTypeId"] = "-1",
             ["__RequestVerificationToken"] = token
         };
 
         //Act
-        await _client.PostAsync(action, new FormUrlEncodedContent(fields));
+        await _client.PostAsync($"/ProcessType/Delete/{int.MaxValue}", new FormUrlEncodedContent(fields));
         IDocument afterDoc = await _client.GetDocumentAsync("/ProcessType/List");
 
         // Assert
