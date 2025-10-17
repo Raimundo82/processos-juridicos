@@ -8,7 +8,7 @@ using Processos_Juridicos.Utilities.TextManager;
 
 namespace Processos_Juridicos.Controllers;
 
-[Authorize(Policy = "SUPER-ADMIN")]
+[Authorize(Policy = "PROCESS-MANAGEMENT")]
 public class UserController(IUserSvc userSvc, IRoleSvc roleSvc, IToastNotify toastNotify) : Controller
 {
     private readonly string EntityName = "Permissão de utilizador";
