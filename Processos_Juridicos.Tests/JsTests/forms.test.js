@@ -57,7 +57,6 @@ beforeAll(async () => {
 
     global.$ = fake$;
 
-    // Import after $ is defined
     const mod = await import('../../Processos-Juridicos/wwwroot/js/forms.js');
     markFileForDeletion = mod.markFileForDeletion;
     toggleReportToPjm = mod.toggleReportToPjm;

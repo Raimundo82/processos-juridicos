@@ -1,11 +1,6 @@
-export { markFileForDeletion, toggleReportToPjm };
-
 function markFileForDeletion(fileId) {
   // Remove the table row so it's no longer visible
-  let row = document.getElementById('file-row-' + fileId);
-  if (row) {
-    row.remove();
-  }
+  let row = document.getElementById('file-row-' + fileId).remove();
 
   // Create a new hidden input to mark this file for deletion
   let container = document.getElementById('deletedFilesContainer');

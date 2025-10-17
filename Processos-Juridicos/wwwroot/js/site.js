@@ -49,15 +49,14 @@ document.addEventListener("DOMContentLoaded", function () {
     const btnRejectChanges = document.querySelector(".btn-reject");
     const btnConfirmReject = document.getElementById("btnConfirmReject");
 
-    if (rejectModalEl) {
-        btnRejectChanges.addEventListener("click", function () {
-            rejectModal.show();
-        });
 
-        btnConfirmReject.addEventListener("click", function () {
-            globalThis.history.back();
+    btnRejectChanges.addEventListener("click", function () {
+    rejectModal.show();
+
+     btnConfirmReject.addEventListener("click", function () {
+     globalThis.history.back();
         });
-    }
+    })
 
 });
 
