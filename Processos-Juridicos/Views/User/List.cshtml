@@ -51,7 +51,8 @@
 </div>
 
 @section Scripts {
-    <script>
-        let table = createDataTable("#tableUserRoles");
-    </script>
+        <script type="module">
+            import { createDataTable } from '/js/initializeDataTable.js';
+            createDataTable('#tableUserRoles');
+        </script>
 }

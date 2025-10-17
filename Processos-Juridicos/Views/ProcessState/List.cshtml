@@ -60,7 +60,8 @@
 </div>
 
 @section Scripts {
-    <script>
+    <script type="module">
+        import { createDataTable } from '/js/initializeDataTable.js';
         createDataTable('#tableStates');
     </script>
 }
