@@ -222,9 +222,8 @@ public class HarmedOrCasualtyIntegrationTests(CustomWebApplicationFactory<Progra
         var id = HarmedOrCasualty.CasualtyId;
 
         IDocument listDoc = await _client.GetDocumentAsync("/HarmedOrCasualty/List");
-        IElement deleteForm = listDoc.QuerySelector("form[action='/HarmedOrCasualty/Delete']")!;
 
-        var token = deleteForm
+        var token = listDoc
             .QuerySelector("input[name=__RequestVerificationToken]")!
             .GetAttribute("value")!;
 
@@ -258,9 +257,8 @@ public class HarmedOrCasualtyIntegrationTests(CustomWebApplicationFactory<Progra
         var id = HarmedOrCasualty.CasualtyId;
 
         IDocument listDoc = await _client.GetDocumentAsync("/HarmedOrCasualty/List");
-        IElement deleteForm = listDoc.QuerySelector("form[action='/HarmedOrCasualty/Delete']")!;
-        var action = deleteForm.GetAttribute("action")!;
-        var token = deleteForm
+
+        var token = listDoc
             .QuerySelector("input[name=__RequestVerificationToken]")!
             .GetAttribute("value")!;
 
@@ -271,7 +269,7 @@ public class HarmedOrCasualtyIntegrationTests(CustomWebApplicationFactory<Progra
         };
 
         //Act
-        await _client.PostAsync(action, new FormUrlEncodedContent(fields));
+        await _client.PostAsync($"/HarmedOrCasualty/Delete/{int.MaxValue}", new FormUrlEncodedContent(fields));
         IDocument afterDoc = await _client.GetDocumentAsync("/HarmedOrCasualty/List");
 
         // Assert
