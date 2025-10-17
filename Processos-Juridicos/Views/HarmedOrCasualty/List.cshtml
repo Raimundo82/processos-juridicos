@@ -43,7 +43,8 @@
 </div>
 
 @section Scripts {
-    <script>
-        let table = createDataTable("#tableHarmedOrCasualty");
+    <script type="module">
+        import { createDataTable } from '/js/initializeDataTable.js';
+        createDataTable('#tableHarmedOrCasualty');
     </script>
 } 

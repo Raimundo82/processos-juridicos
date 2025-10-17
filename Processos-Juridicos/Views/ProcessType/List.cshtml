@@ -52,7 +52,8 @@
 </div>
 
 @section Scripts {
-    <script>
-        let table = createDataTable("#tableProcessTypes");
+    <script type="module">
+        import { createDataTable } from '/js/initializeDataTable.js';
+        createDataTable('#tableProcessTypes');
     </script>
 } 

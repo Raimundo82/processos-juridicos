@@ -83,7 +83,8 @@
 @await Html.PartialAsync("ConfirmationModals/_DeleteModal")
 
 @section Scripts {
-    <script>
+    <script type="module">
+        import { createDataTable } from '/js/initializeDataTable.js';
         createDataTable('#tableCrimeTypes');
     </script>
 }
