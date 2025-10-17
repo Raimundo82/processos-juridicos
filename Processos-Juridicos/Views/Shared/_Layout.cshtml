@@ -15,7 +15,8 @@
 
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/lib/datatables.net-bs5/dataTables.bootstrap5.min.css" />
-    <link rel="stylesheet" href="~/lib/bootstrap/bootstrap-icons-1.13.1/font/bootstrap-icons.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap/bootstrap-icons-1.13.1/font/bootstrap-icons.min.css"
+        asp-append-version="true" />
     <link rel="stylesheet" href="~/lib/fontsource/prosto-one/latin.css" />
     <link rel="stylesheet" href="~/lib/fontsource/roboto/latin.css" />
     <link rel="stylesheet" href="~/lib/font-awesome/css/all.css" />
@@ -36,7 +37,7 @@
     }
 
     <main role="main">
-            @RenderBody()
+        @RenderBody()
     </main>
 
     <partial name="_Footer" />
@@ -51,10 +52,11 @@
     <script src="~/js/dark-mode.js" asp-append-version="true"></script>
     <script type="module" src="~/js/forms.js" asp-append-version="true"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-    <script type = "module" src="~/js/initializeDataTable.js"></script>
+    <script type="module" src="~/js/initializeDataTable.js"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
     @await Component.InvokeAsync("NToastNotify")
 
 </body>
+
 </html>
