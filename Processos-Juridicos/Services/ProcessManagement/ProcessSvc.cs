@@ -172,7 +172,7 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
         var count = await GetNumOfProcessesCurrentYear() + 1;
         Unit? associatedUnit = await _context.Units.FindAsync(process.UnitId);
 
-        return $"{count}/{DateTime.Now.Year}/{associatedUnit!.UnitCode}";
+        return $"{count:D4}/{DateTime.Now.Year}/{associatedUnit!.UnitCode}";
     }
 
     private async Task<int> GetNumOfProcessesCurrentYear()
@@ -182,7 +182,7 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
         DateOnly startOfNextYear = startOfYear.AddYears(1);
 
         var count = await _context.Processes
-            .Where(e => e.CreatedAt >= startOfYear && e.CreatedAt < startOfNextYear)
+            .Where(e => e.CreatedAt >= startOfYear && e.CreatedAt < startOfNextYear && e.Nuipm != null && e.Nuipm != "")
             .CountAsync();
 
         return count;
