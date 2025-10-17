@@ -108,8 +108,9 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
                 .Select(u => u.UnitId)
                 .FirstOrDefault();
 
-            query = query.Where(p => p.UnitId == unitId);
+            query = query.Where(p => p.UnitId == unitId || p.CreatedByNii == User!.FindFirst("preferred_username")!.Value);
         }
+
 
         List<Process> processes = await query.ToListAsync();
         return Mapper.MapToToProcessesEnum(processes);
