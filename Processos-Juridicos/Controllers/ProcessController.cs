@@ -125,6 +125,12 @@ public class ProcessController(
         }
 
         ProcessDto model = await _processManagement.Processes.GetProcessById(id);
+
+        if (!UserCanEdit(model))
+        {
+            return Forbid();
+        }
+
         model.UploadedFiles = await _processManagement.ProcessFiles.GetAllProcessFilesByProcessId(id);
 
         await _viewDataSvc.PopulateForEditAsync(ViewData, model.ProcessId);
@@ -147,6 +153,12 @@ public class ProcessController(
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(ProcessDto model)
     {
+
+        if (!UserCanEdit(model))
+        {
+            return Forbid();
+        }
+
         if (!ModelState.IsValid)
         {
             await _viewDataSvc.PopulateForEditAsync(ViewData, model.ProcessId);
@@ -245,5 +257,11 @@ public class ProcessController(
             var u when u.IsComando() => "Processos da Unidade",
             _ => "Todos os Processos"
         };
+    }
+
+    private bool UserCanEdit(ProcessDto process)
+    {
+        return (User.IsInstrutor() && (process.ProcessState.StateName == "Em Edição" || process.ProcessState.StateName == "Em Validação"))
+                    || (User.IsComando() && process.ProcessState.StateName == "Aberto") || User.IsDjAdministration();
     }
 }
