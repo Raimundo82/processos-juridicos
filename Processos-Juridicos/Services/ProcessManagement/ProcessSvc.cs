@@ -156,7 +156,6 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
             return true;
         }
 
-
         var currentStateId = process!.ProcessStateId;
         return currentStateId == newStateId || (process != null && await _context.StateTransitions.AnyAsync(t =>
             t.FromStateId == process.ProcessStateId &&

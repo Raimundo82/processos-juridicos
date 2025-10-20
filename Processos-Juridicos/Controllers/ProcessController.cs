@@ -124,7 +124,7 @@ public class ProcessController(
 
         ProcessDto model = await _processManagement.Processes.GetProcessById(id);
 
-        if (!UserCanEdit(model))
+        if (!UserCanEdit(model.ProcessState))
         {
             return Forbid();
         }
@@ -177,7 +177,9 @@ public class ProcessController(
         ProcessStateDto states = await _processManagement.ProcessStates.GetStateById(model.ProcessStateId);
         model.ProcessState = states;
 
-        if (!UserCanEdit(model))
+        ProcessDto currentProcess = await _processManagement.Processes.GetProcessById(model.ProcessId);
+
+        if (!UserCanEdit(currentProcess.ProcessState))
         {
             return Forbid();
         }
@@ -215,7 +217,7 @@ public class ProcessController(
         uploadedFiles = await _processManagement.ProcessFiles.GetAllProcessFilesByProcessId(model.ProcessId);
         model.UploadedFiles = uploadedFiles;
 
-        return RedirectToAction("Edit", new { id = model.ProcessId });
+        return RedirectToAction(nameof(List));
     }
 
 
@@ -257,9 +259,10 @@ public class ProcessController(
         };
     }
 
-    private bool UserCanEdit(ProcessDto process)
+    private bool UserCanEdit(ProcessStateDto state)
     {
-        return (User.IsInstrutor() && (process.ProcessState.StateName == "Em Edição" || process.ProcessState.StateName == "Em Validação"))
-                    || (User.IsComando() && process.ProcessState.StateName == "Aberto") || User.IsDjAdministration();
+        var allowedForInstructor = User.IsInstrutor() && (state.StateName == "Em Edição" || state.StateName == "Em Validação");
+        var allowedForCommander = User.IsComando() && state.StateName == "Aberto";
+        return allowedForInstructor || allowedForCommander || User.IsDjAdministration();
     }
 }
