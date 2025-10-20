@@ -21,6 +21,7 @@ public class ProcessController(
 {
     private const string EntityName = "Processo";
     private const string AccidentProcessTypeName = "Acidentes em serviço";
+    private const string userNameFallBack = "Utilizador";
 
     private readonly IProcessManagementSvc _processManagement = processManagement;
     private readonly IProcessViewDataSvc _viewDataSvc = viewDataSvc;
@@ -96,8 +97,8 @@ public class ProcessController(
         }
 
 
-        model.CreatedByName = User?.FindFirst("name")?.Value ?? "Utilizador";
-        model.CreatedByNii = User?.FindFirst("preferred_username")?.Value ?? "Utilizador";
+        model.CreatedByName = User?.FindFirst("name")?.Value ?? userNameFallBack;
+        model.CreatedByNii = User?.FindFirst("preferred_username")?.Value ?? userNameFallBack;
 
         ProcessDto insertTarget = await _processManagement.Processes.CreateProcess(model);
 
@@ -173,8 +174,8 @@ public class ProcessController(
             model.ComunicatedToPjm = false;
         }
 
-        model.ModifiedByName = User?.FindFirst("name")?.Value ?? "Utilizador";
-        model.ModifiedByNii = User?.FindFirst("preferred_username")?.Value ?? "Utilizador";
+        model.ModifiedByName = User?.FindFirst("name")?.Value ?? userNameFallBack;
+        model.ModifiedByNii = User?.FindFirst("preferred_username")?.Value ?? userNameFallBack;
         model.ModifiedAt = DateOnly.FromDateTime(DateTime.Now);
 
         ProcessStateDto states = await _processManagement.ProcessStates.GetStateById(model.ProcessStateId);
