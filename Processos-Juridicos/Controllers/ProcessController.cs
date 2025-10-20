@@ -264,11 +264,13 @@ public class ProcessController(
 
     private async Task<bool> UserCanEdit(ProcessDto process)
     {
-        var allowedForInstructor = User.IsInstrutor() && (process.ProcessState.StateName == "Em Edição" || process.ProcessState.StateName == "Em Validação") && process.CreatedByNii == User!.FindFirst("preferred_username")!.Value;
+        var allowedForInstructor = User.IsInstrutor() && (process.ProcessState.StateName == "Em Edição" || process.ProcessState.StateName == "Em Validação") && process.CreatedByNii == User.Identity?.Name;
 
-        var isUnitcom = await _contextSvc.Units.IsTheUnitsCommander(process.UnitId, User!.FindFirst("preferred_username")!.Value);
+        var isUnitcom = await _contextSvc.Units.IsTheUnitsCommander(process.UnitId, User!.Identity!.Name!);
         var allowedForCommander = User.IsComando() && process.ProcessState.StateName == "Aberto" && isUnitcom;
 
         return allowedForInstructor || allowedForCommander || User.IsDjAdministration();
     }
 }
+
+
