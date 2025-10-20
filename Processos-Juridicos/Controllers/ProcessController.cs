@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Processos_Juridicos.DTOs;
 using Processos_Juridicos.Models;
 using Processos_Juridicos.Services.Interfaces;
+using Processos_Juridicos.Services.Interfaces.DomainData;
 using Processos_Juridicos.Services.Interfaces.ProcessManagement;
 using Processos_Juridicos.Utilities;
 using Processos_Juridicos.Utilities.TextManager;
@@ -15,6 +16,7 @@ public class ProcessController(
     IProcessManagementSvc processManagement,
     IProcessViewDataSvc viewDataSvc,
     IFileValidatorSvc fileValidatorSvc,
+    IContextSvc contextSvc,
     IToastNotify toastNotify) : Controller
 {
     private const string EntityName = "Processo";
@@ -23,6 +25,7 @@ public class ProcessController(
     private readonly IProcessManagementSvc _processManagement = processManagement;
     private readonly IProcessViewDataSvc _viewDataSvc = viewDataSvc;
     private readonly IFileValidatorSvc _fileValidatorSvc = fileValidatorSvc;
+    private readonly IContextSvc _contextSvc = contextSvc;
 
     private readonly IToastNotify _toastNotify = toastNotify;
 
@@ -124,7 +127,7 @@ public class ProcessController(
 
         ProcessDto model = await _processManagement.Processes.GetProcessById(id);
 
-        if (!UserCanEdit(model.ProcessState))
+        if (!await UserCanEdit(model))
         {
             return Forbid();
         }
@@ -179,7 +182,7 @@ public class ProcessController(
 
         ProcessDto currentProcess = await _processManagement.Processes.GetProcessById(model.ProcessId);
 
-        if (!UserCanEdit(currentProcess.ProcessState))
+        if (!await UserCanEdit(currentProcess))
         {
             return Forbid();
         }
@@ -259,10 +262,13 @@ public class ProcessController(
         };
     }
 
-    private bool UserCanEdit(ProcessStateDto state)
+    private async Task<bool> UserCanEdit(ProcessDto process)
     {
-        var allowedForInstructor = User.IsInstrutor() && (state.StateName == "Em Edição" || state.StateName == "Em Validação");
-        var allowedForCommander = User.IsComando() && state.StateName == "Aberto";
+        var allowedForInstructor = User.IsInstrutor() && (process.ProcessState.StateName == "Em Edição" || process.ProcessState.StateName == "Em Validação") && process.CreatedByNii == User!.FindFirst("preferred_username")!.Value;
+
+        var isUnitcom = await _contextSvc.Units.IsTheUnitsCommander(process.UnitId, User!.FindFirst("preferred_username")!.Value);
+        var allowedForCommander = User.IsComando() && process.ProcessState.StateName == "Aberto" && isUnitcom;
+
         return allowedForInstructor || allowedForCommander || User.IsDjAdministration();
     }
 }

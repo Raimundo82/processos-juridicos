@@ -10,4 +10,6 @@ public interface IUnitSvc
     public Task<UnitDto> CreateUnit(UnitDto unit, List<string> responsibleUserIds);
     public Task<UnitDto> EditUnit(UnitDto model, List<string> responsibleUserIds);
     public Task<bool> DeleteUnit(int? id);
+
+    public Task<bool> IsTheUnitsCommander(int? unitid, string user);
 }
