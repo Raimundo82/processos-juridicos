@@ -94,12 +94,12 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
             .Include(x => x.MilitarySecurity)
             .Include(x => x.CrimeType);
 
-        var nii = User!.FindFirst("preferred_username")!.Value;
+        var nii = User.Identity?.Name;
 
         if (User.IsInstrutor())
         {
             query = query.Where(p => (p.OficialInstName != null &&
-                p.OficialInstName.EndsWith(" - " + nii)) || p.CreatedByNii == User!.FindFirst("preferred_username")!.Value);
+                p.OficialInstName.EndsWith(" - " + nii)) || p.CreatedByNii == nii);
         }
         else if (User.IsComando())
         {
@@ -108,7 +108,7 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
                 .Select(u => u.UnitId)
                 .FirstOrDefault();
 
-            query = query.Where(p => p.UnitId == unitId || p.CreatedByNii == User!.FindFirst("preferred_username")!.Value);
+            query = query.Where(p => p.UnitId == unitId || p.CreatedByNii == nii);
         }
 
 
