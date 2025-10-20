@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Processos_Juridicos.DTOs;
 using Processos_Juridicos.Models;
 using Processos_Juridicos.Services.Interfaces;
-using Processos_Juridicos.Services.Interfaces.Ldap;
 using Processos_Juridicos.Services.Interfaces.ProcessManagement;
 using Processos_Juridicos.Utilities;
 using Processos_Juridicos.Utilities.TextManager;
@@ -16,7 +15,6 @@ public class ProcessController(
     IProcessManagementSvc processManagement,
     IProcessViewDataSvc viewDataSvc,
     IFileValidatorSvc fileValidatorSvc,
-    ILdapUserSvc ldapUserSvc,
     IToastNotify toastNotify) : Controller
 {
     private const string EntityName = "Processo";
@@ -154,11 +152,6 @@ public class ProcessController(
     public async Task<IActionResult> Edit(ProcessDto model)
     {
 
-        if (!UserCanEdit(model))
-        {
-            return Forbid();
-        }
-
         if (!ModelState.IsValid)
         {
             await _viewDataSvc.PopulateForEditAsync(ViewData, model.ProcessId);
@@ -183,6 +176,11 @@ public class ProcessController(
 
         ProcessStateDto states = await _processManagement.ProcessStates.GetStateById(model.ProcessStateId);
         model.ProcessState = states;
+
+        if (!UserCanEdit(model))
+        {
+            return Forbid();
+        }
 
         await _processManagement.Processes.EditProcess(model);
 
