@@ -1,0 +1,33 @@
+@model Processos_Juridicos.DTOs.UserDto;
+
+<div class="row mb-3">
+    <div class="col-md-12">
+        <div class="form-group mt-3">
+            <input type="hidden" asp-for="UserNii" />
+
+            <label asp-for="UserNii" class="form-label"></label>
+            <div class="input-group">
+                <input id="investigated-lookup" class="form-control" />
+                <button type="button"
+                        class="btn btn-primary btn-auto ad-lookup-btn"
+                        data-target-visible="nii-lookup"
+                        data-target-hidden="UserNii"
+                        data-target-info="UserInfo">
+                    <i class="bi bi-search"></i>
+                </button>
+            </div>
+            <span id="InvestigatedInfo" class="form-text"></span>
+            <span asp-validation-for="UserNii" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="col-md-12">
+        <div class="form-group mt-3">
+            <label asp-for="RoleId" class="form-label"></label>
+            <select asp-for="RoleId" asp-items="ViewBag.Roles" class="form-select">
+                <option value=""></option>
+            </select>
+            <span asp-validation-for="RoleId" class="text-danger"></span>
+        </div>
+    </div>
+</div>

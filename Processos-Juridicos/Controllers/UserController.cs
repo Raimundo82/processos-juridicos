@@ -38,6 +38,7 @@ public class UserController(IUserSvc userSvc, IRoleSvc roleSvc, IToastNotify toa
             return RedirectToAction(nameof(List));
         }
 
+        await PopulateRolesForViewBag();
         return View(model);
     }
 
