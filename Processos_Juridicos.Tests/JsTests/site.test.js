@@ -68,6 +68,7 @@ describe('delete/reject modals and loader script', () => {
     });
 
     test('clicking #btnConfirmReject calls history.back', () => {
+        document.querySelector('.btn-reject').click();
         document.getElementById('btnConfirmReject').click();
         expect(window.history.back).toHaveBeenCalled();
     });

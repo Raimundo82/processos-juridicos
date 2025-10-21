@@ -104,6 +104,13 @@ public class UnitSvc(AppDbContext context) : IUnitSvc
         return true;
     }
 
+    public async Task<bool> IsTheUnitsCommander(int? unitid, string user)
+    {
+        var isCommander = await _context.UnitCommanders.AnyAsync(cr => cr.UnitId == unitid && cr.UserNii == user);
+        return isCommander;
+    }
+
+
     public async Task<bool> AssignResponsibleUsers(int unitId, List<string> userIds)
     {
         Unit? unit = await _context.Units

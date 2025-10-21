@@ -2,6 +2,7 @@
 @model ProcessListViewModel
 @{
     ViewData["Title"] = "Lista de Processos";
+
 }
 
 <div class="container-fluid">
@@ -82,6 +83,12 @@
 
                                 @foreach (var item in Model.Processes.ToList())
                                 {
+                                    bool canEdit =
+                                    (User.IsInstrutor() && (item.ProcessState?.StateName == "Em Edição" || item.ProcessState?.StateName == "Em Validação"))
+                                    || (User.IsComando() && item.ProcessState?.StateName == "Aberto")
+                                    || User.IsDjAdministration();
+                                    
+
                                     <tr data-id="@item.ProcessId">
                                         <td data-property="nuipm"><strong>@Html.DisplayFor(m => item.Nuipm)</strong></td>
                                         <td data-property="process-type">@(item.ProcessType?.ProcessTypeName ?? "-")</td>
@@ -99,8 +106,11 @@
                                             <div class="d-flex gap-3">
                                                 <a asp-controller="Process" asp-action="Details" asp-route-id="@item.ProcessId"
                                                    data-action="access-edit-form" class="text-primary"><i class="bi bi-search"></i></a>
-                                                <a asp-controller="Process" asp-action="Edit" asp-route-id="@item.ProcessId"
-                                                   data-action="access-edit-form" class="text-primary"><i class="bi bi-pencil-square"></i></a>
+
+                                                @if (canEdit)
+                                                {    
+                                                    <a asp-controller="Process" asp-action="Edit" asp-route-id="@item.ProcessId" data-action="access-edit-form" class="text-primary"><i class="bi bi-pencil-square"></i></a>
+                                                }
 
                                                 @if (User.IsDjAdministration())
                                                 {
@@ -142,7 +152,8 @@
 @await Html.PartialAsync("ConfirmationModals/_DeleteModal")
 
 @section Scripts {
-    <script>
+    <script type="module">
+        import { createDataTable } from '/js/initializeDataTable.js';
         createDataTable('#processesTable');
     </script>
 }

@@ -1,7 +1,7 @@
 // adLookup.js
 import { clearValidity, shouldResolve, searchUsers, resolveId, markInvalid } from './lookup-utils.js';
 
-export const escapeHtml = (s) => {
+export function escapeHtml(s) {
     const str = s == null ? '' : String(s);
     return str.replace(/[&<>"']/g, c => (
         { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
@@ -28,7 +28,7 @@ export function initAdLookup({ applySelection, setupIds, debounceMs = 1000 }) {
         }
         for (const u of items) {
             const tr = document.createElement('tr');
-            tr.style.cursor = 'pointer'; 
+            tr.style.cursor = 'pointer';
             tr.innerHTML = `
                 <td>${escapeHtml(u.displayName || '')}</td>
                 <td>${escapeHtml(u.samAccountName || '')}</td>

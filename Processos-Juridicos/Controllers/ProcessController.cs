@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Processos_Juridicos.DTOs;
 using Processos_Juridicos.Models;
 using Processos_Juridicos.Services.Interfaces;
-using Processos_Juridicos.Services.Interfaces.Ldap;
+using Processos_Juridicos.Services.Interfaces.DomainData;
 using Processos_Juridicos.Services.Interfaces.ProcessManagement;
 using Processos_Juridicos.Utilities;
 using Processos_Juridicos.Utilities.TextManager;
@@ -16,16 +16,16 @@ public class ProcessController(
     IProcessManagementSvc processManagement,
     IProcessViewDataSvc viewDataSvc,
     IFileValidatorSvc fileValidatorSvc,
-    ILdapUserSvc ldapUserSvc,
+    IContextSvc contextSvc,
     IToastNotify toastNotify) : Controller
 {
     private const string EntityName = "Processo";
     private const string AccidentProcessTypeName = "Acidentes em serviço";
-
+    private const string UserNameFallBack = "Utilizador";
     private readonly IProcessManagementSvc _processManagement = processManagement;
     private readonly IProcessViewDataSvc _viewDataSvc = viewDataSvc;
     private readonly IFileValidatorSvc _fileValidatorSvc = fileValidatorSvc;
-    private readonly ILdapUserSvc _ldapUserSvc = ldapUserSvc;
+    private readonly IContextSvc _contextSvc = contextSvc;
 
     private readonly IToastNotify _toastNotify = toastNotify;
 
@@ -95,9 +95,9 @@ public class ProcessController(
             model.ComunicatedToPjm = false;
         }
 
-        UserDataModel userData = _ldapUserSvc.GetLoggedUserData();
-        model.CreatedByName = userData.DisplayName;
-        model.CreatedByNii = "M" + userData.Nii;
+
+        model.CreatedByName = User?.FindFirst("name")?.Value ?? UserNameFallBack;
+        model.CreatedByNii = User?.FindFirst("preferred_username")?.Value ?? UserNameFallBack;
 
         ProcessDto insertTarget = await _processManagement.Processes.CreateProcess(model);
 
@@ -126,6 +126,12 @@ public class ProcessController(
         }
 
         ProcessDto model = await _processManagement.Processes.GetProcessById(id);
+
+        if (!await UserCanEdit(model))
+        {
+            return Forbid();
+        }
+
         model.UploadedFiles = await _processManagement.ProcessFiles.GetAllProcessFilesByProcessId(id);
 
         await _viewDataSvc.PopulateForEditAsync(ViewData, model.ProcessId);
@@ -148,6 +154,7 @@ public class ProcessController(
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(ProcessDto model)
     {
+
         if (!ModelState.IsValid)
         {
             await _viewDataSvc.PopulateForEditAsync(ViewData, model.ProcessId);
@@ -166,13 +173,19 @@ public class ProcessController(
             model.ComunicatedToPjm = false;
         }
 
-        UserDataModel userData = _ldapUserSvc.GetLoggedUserData();
-        model.ModifiedByName = userData.DisplayName;
-        model.ModifiedByNii = "M" + userData.Nii;
+        model.ModifiedByName = User?.FindFirst("name")?.Value ?? UserNameFallBack;
+        model.ModifiedByNii = User?.FindFirst("preferred_username")?.Value ?? UserNameFallBack;
         model.ModifiedAt = DateOnly.FromDateTime(DateTime.Now);
 
         ProcessStateDto states = await _processManagement.ProcessStates.GetStateById(model.ProcessStateId);
         model.ProcessState = states;
+
+        ProcessDto currentProcess = await _processManagement.Processes.GetProcessById(model.ProcessId);
+
+        if (!await UserCanEdit(currentProcess))
+        {
+            return Forbid();
+        }
 
         await _processManagement.Processes.EditProcess(model);
 
@@ -207,7 +220,7 @@ public class ProcessController(
         uploadedFiles = await _processManagement.ProcessFiles.GetAllProcessFilesByProcessId(model.ProcessId);
         model.UploadedFiles = uploadedFiles;
 
-        return RedirectToAction("Edit", new { id = model.ProcessId });
+        return RedirectToAction(nameof(List));
     }
 
 
@@ -248,4 +261,16 @@ public class ProcessController(
             _ => "Todos os Processos"
         };
     }
+
+    private async Task<bool> UserCanEdit(ProcessDto process)
+    {
+        var allowedForInstructor = User.IsInstrutor() && (process.ProcessState.StateName == "Em Edição" || process.ProcessState.StateName == "Em Validação") && process.CreatedByNii == User.Identity?.Name;
+
+        var isUnitcom = await _contextSvc.Units.IsTheUnitsCommander(process.UnitId, User!.Identity!.Name!);
+        var allowedForCommander = User.IsComando() && process.ProcessState.StateName == "Aberto" && isUnitcom;
+
+        return allowedForInstructor || allowedForCommander || User.IsDjAdministration();
+    }
 }
+
+

@@ -24,8 +24,8 @@ public static class AuthorizationConfig
         builder.AddPolicy("PROCESS-MANAGEMENT", policy =>
             policy.RequireRole(
                 OficiaisInstrutores,
+                ComandoUnidade,
                 DjAuthorized,
-                DjUnauthorized,
                 SuperAdmin
             ));
 

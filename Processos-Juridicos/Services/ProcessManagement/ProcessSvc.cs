@@ -98,8 +98,8 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
 
         if (User.IsInstrutor())
         {
-            query = query.Where(p => p.OficialInstName != null &&
-                p.OficialInstName.EndsWith(" - " + nii));
+            query = query.Where(p => (p.OficialInstName != null &&
+                p.OficialInstName.EndsWith(" - " + nii)) || p.CreatedByNii == nii);
         }
         else if (User.IsComando())
         {
@@ -110,6 +110,7 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
 
             query = query.Where(p => p.UnitId == unitId);
         }
+
 
         List<Process> processes = await query.ToListAsync();
         return Mapper.MapToToProcessesEnum(processes);
@@ -155,7 +156,6 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
             return true;
         }
 
-
         var currentStateId = process!.ProcessStateId;
         return currentStateId == newStateId || (process != null && await _context.StateTransitions.AnyAsync(t =>
             t.FromStateId == process.ProcessStateId &&
@@ -172,7 +172,7 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
         var count = await GetNumOfProcessesCurrentYear() + 1;
         Unit? associatedUnit = await _context.Units.FindAsync(process.UnitId);
 
-        return $"{count}/{DateTime.Now.Year}/{associatedUnit!.UnitCode}";
+        return $"{count:D4}/{DateTime.Now.Year}/{associatedUnit!.UnitCode}";
     }
 
     private async Task<int> GetNumOfProcessesCurrentYear()
@@ -182,7 +182,7 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
         DateOnly startOfNextYear = startOfYear.AddYears(1);
 
         var count = await _context.Processes
-            .Where(e => e.CreatedAt >= startOfYear && e.CreatedAt < startOfNextYear)
+            .Where(e => e.CreatedAt >= startOfYear && e.CreatedAt < startOfNextYear && e.Nuipm != null && e.Nuipm != "")
             .CountAsync();
 
         return count;

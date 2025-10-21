@@ -79,7 +79,6 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 // Bind the "AppSettings" section from configuration to the AppSettingsOptions class
 builder.Services.Configure<AppSettingsOptions>(builder.Configuration.GetSection(AppSettingsOptions.AppSettings));
 
-
 // Connection string from configuration
 var processosDj = builder.Configuration.GetConnectionString("DefaultConnection")!;
 
