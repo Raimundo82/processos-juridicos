@@ -194,7 +194,7 @@ public class AccidentTypeIntegrationTests(CustomWebApplicationFactory<Program> f
         };
 
         //Act
-        await _client.PostAsync(action, new FormUrlEncodedContent(fields));
+        await _client.PostAsync($"/Unit/Delete/{id}", new FormUrlEncodedContent(fields));
         IDocument doc = await _client.GetDocumentAsync("/AccidentType/List");
 
         // Assert
@@ -222,9 +222,8 @@ public class AccidentTypeIntegrationTests(CustomWebApplicationFactory<Program> f
         var id = AccidentType.AccidentTypeId;
 
         IDocument listDoc = await _client.GetDocumentAsync("/AccidentType/List");
-        IElement deleteForm = listDoc.QuerySelector("form[action='/AccidentType/Delete']")!;
 
-        var token = deleteForm
+        var token = listDoc
             .QuerySelector("input[name=__RequestVerificationToken]")!
             .GetAttribute("value")!;
 
@@ -258,9 +257,8 @@ public class AccidentTypeIntegrationTests(CustomWebApplicationFactory<Program> f
         var id = AccidentType.AccidentTypeId;
 
         IDocument listDoc = await _client.GetDocumentAsync("/AccidentType/List");
-        IElement deleteForm = listDoc.QuerySelector("form[action='/AccidentType/Delete']")!;
-        var action = deleteForm.GetAttribute("action")!;
-        var token = deleteForm
+
+        var token = listDoc
             .QuerySelector("input[name=__RequestVerificationToken]")!
             .GetAttribute("value")!;
 
@@ -271,7 +269,7 @@ public class AccidentTypeIntegrationTests(CustomWebApplicationFactory<Program> f
         };
 
         //Act
-        await _client.PostAsync(action, new FormUrlEncodedContent(fields));
+        await _client.PostAsync($"/AccidentType/Delete/{int.MaxValue}", new FormUrlEncodedContent(fields));
         IDocument afterDoc = await _client.GetDocumentAsync("/AccidentType/List");
 
         // Assert
