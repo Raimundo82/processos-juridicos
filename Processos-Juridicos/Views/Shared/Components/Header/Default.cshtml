@@ -2,6 +2,8 @@
 @{
     var isAuthenticated = User?.Identity?.IsAuthenticated ?? false;
 
+    var name = User?.FindFirst("name")?.Value
+        ?? "Utilizador";
     var nii = User?.FindFirst("preferred_username")?.Value
         ?? "Utilizador";
 
@@ -11,12 +13,17 @@
 @if (isAuthenticated)
 {
     <div class="d-flex align-items-center gap-2" >
-        <span class="text-small">@nii</span>
-        <img src="@photo" alt="Avatar de @nii" class="rounded-circle mr-2" width="40" height="40" />
-
-        <a href="~/account/signout" class="btn text-danger">
-            Terminar sessão
+        <div class="d-grid text-end">
+            <span class="text-small d-none d-md-block">@name</span>
+            <span class="text-small d-none d-md-block">@nii</span>
+        </div>
+        
+        <a href="~/account/signout" class="avatar-wrapper">
+            <img src="@photo" alt="Avatar de @nii" 
+                 class="rounded-circle avatar-img" width="40" height="40" />
+            <div class="avatar-overlay">
+                <i class="bi bi-box-arrow-right text-danger fs-5"></i>
+            </div>
         </a>
     </div>
 }
-
