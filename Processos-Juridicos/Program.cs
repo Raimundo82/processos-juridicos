@@ -195,7 +195,6 @@ app.UseCookiePolicy();
 app.UseSession();
 app.UseRouting();
 app.UseAuthentication();
-app.UseMiddleware<SessionRoleMiddleware>();
 app.UseAuthorization();
 app.UseNToastNotify();
 

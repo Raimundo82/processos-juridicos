@@ -17,7 +17,6 @@
     "FileExtensionNotAllowedMessage": "Pelo menos um ficheiro dos ficheiros fornecidos tem uma extensão não permitida.",
     "FileSizeTooLargeMessage": "Pelo menos um ficheiro dos ficheiros fornecidos é demasiado grande.",
     "StateTransitionInvalidMessage": "Transição de estado Inválida.",
-    "InvalidLoginMessage": "As suas credenciais não correspondem. Tente de novo.",
     "UserDoesNotExistMessage": "Pelo menos um dos utilizadores que tentou adicionar não pode ser adicionado.",
     "UserCannotBeOfInst":  "O utilizador selectionado não pode ser oficial instrutor."
 }
