@@ -1,24 +1,33 @@
-﻿@model Processos_Juridicos.DTOs.HarmedOrCasualtyDto;
+@model Processos_Juridicos.DTOs.HarmedOrCasualtyDto;
 @using Processos_Juridicos.DTOs;
 
 @{
-    ViewData["Title"] = "Editar Categoria de Ferido";
+    ViewData["Title"] = "Editar Categoria";
 }
 
-<h1>@ViewData["Title"]</h1>
-
-<form asp-action="Edit">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-    <input type="hidden" asp-for="CasualtyId" />
-
-    <partial name="Shared/_Form" />
-
-    <div class="form-group mt-3">
-        <input type="submit" value="Guardar" class="btn btn-primary" />
-        <a asp-action="List">Voltar à Lista</a>
+<div class="container-lg my-3">
+    <div class="card mb-3">
+        <h2>@ViewData["Title"]</h2>
     </div>
-</form>
+
+    <div class="card">
+        <form asp-action="Edit" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <input type="hidden" asp-for="CasualtyId" />
+
+            <partial name="Shared/_Form" />
+
+            <div class="d-flex justify-content-center mb-4">
+                <div class="form-group mt-3 text-center">
+                    <a asp-action="List" class="btn btn-secondary">Voltar</a>
+                    <input type="submit" value="Guardar" class="btn btn-primary" />
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
 
 @section Scripts {
     @{

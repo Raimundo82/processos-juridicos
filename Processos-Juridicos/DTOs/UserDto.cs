@@ -15,6 +15,7 @@ public class UserDto
     [Key]
     [UniqueUser]
     [DisplayName("Utilizador")]
+    [EntityFieldIsRequired("Utilizador")]
     public string? UserNii { get; set; }
 
     [ScaffoldColumn(false)]
@@ -22,10 +23,11 @@ public class UserDto
     [MapperIgnore]
     public string? OriginalUserNii { get; set; }
 
-    [DisplayName("Tipo de Permissão")]
+    [DisplayName("Permissão")]
+    [EntityFieldIsRequired("Permissão")]
     public int? RoleId { get; set; }
 
-    [DisplayName("Nome do utilizador")]
+    [DisplayName("Nome")]
     public string? UserName { get; set; }
 
     [ForeignKey("RoleId")]

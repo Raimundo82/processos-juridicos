@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 
 using NToastNotify;
 
+using Processos_Juridicos.Configuration;
 using Processos_Juridicos.Data;
 using Processos_Juridicos.Middleware;
 using Processos_Juridicos.Middleware.ExceptionHandlers;
@@ -78,7 +79,6 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 // Bind the "AppSettings" section from configuration to the AppSettingsOptions class
 builder.Services.Configure<AppSettingsOptions>(builder.Configuration.GetSection(AppSettingsOptions.AppSettings));
 
-
 // Connection string from configuration
 var processosDj = builder.Configuration.GetConnectionString("DefaultConnection")!;
 
@@ -87,6 +87,16 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseSqlServer(processosDj)
         .EnableSensitiveDataLogging()
         .LogTo(Console.WriteLine, LogLevel.Debug));
+
+
+// LDAP Configuration and Service
+builder.Services.AddScoped((options) =>
+{
+    var profile = Environment.GetEnvironmentVariable("ASPNETCORE_PROFILE") ?? "Marinha";
+    LdapConfiguration ldapConfiguration = configuration.GetSection($"Ldap:{profile}").Get<LdapConfiguration>() ?? new LdapConfiguration();
+
+    return new LdapConnService(ldapConfiguration);
+});
 
 
 // JSON text manager for system text (systemtext.json)
@@ -114,8 +124,6 @@ builder.Services.AddScoped<ICrimeTypeSvc, CrimeTypeSvc>();
 builder.Services.AddScoped<IMilitarySecuritySvc, MilitarySecuritySvc>();
 builder.Services.AddScoped<IUserSvc, UserSvc>();
 builder.Services.AddScoped<IRoleSvc, RoleSvc>();
-//builder.Services.AddScoped<RoleSyncSvc>();
-//builder.Services.AddHostedService<TimedSyncSvc>();
 builder.Services.AddScoped<ILegalReferenceSvc, LegalReferenceSvc>();
 builder.Services.AddScoped<IContextSvc, ContextSvc>();
 builder.Services.AddScoped<IProcessManagementSvc, ProcessManagementSvc>();
@@ -123,7 +131,6 @@ builder.Services.AddScoped<IProcessViewDataSvc, ProcessViewDataSvc>();
 builder.Services.AddScoped<IFileValidatorSvc, FileValidatorSvc>();
 
 builder.Services.AddScoped<ILdapUserSvc, LdapUserSvc>();
-
 
 builder.Services.AddScoped<IClaimsTransformation, CustomClaimsTransformer>();
 

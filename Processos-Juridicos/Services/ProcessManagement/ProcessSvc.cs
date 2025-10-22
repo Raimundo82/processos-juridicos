@@ -99,8 +99,8 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
 
         if (user.IsInstrutor())
         {
-            query = query.Where(p => p.OficialInstName != null &&
-                                     p.OficialInstName.EndsWith(" - " + nii));
+            query = query.Where(p => (p.OficialInstName != null &&
+                p.OficialInstName.EndsWith(" - " + nii)) || p.CreatedByNii == nii);
         }
         else if (user.IsComando())
         {
@@ -113,7 +113,6 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
 
         return query;
     }
-
 
     public async Task<ProcessDto> GetProcessById(int? id)
     {
@@ -154,7 +153,6 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
         {
             return true;
         }
-
 
         var currentStateId = process!.ProcessStateId;
         return currentStateId == newStateId || (process != null && await _context.StateTransitions.AnyAsync(t =>

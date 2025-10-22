@@ -1,49 +1,90 @@
 @using Processos_Juridicos.DTOs
-
+@using Processos_Juridicos.Utilities
+@model IEnumerable<HarmedOrCasualtyDto>
 @{
     ViewData["Title"] = "Lista de Categorias de Mortos/Feridos";
+    int count = 1;
 }
 
-@model IEnumerable<HarmedOrCasualtyDto>
+<div class="container-fluid">
+    <div class="mx-lg-5 my-3">
 
-<div class="text-center">
-    <h1 class="display-4">Categorias de Mortos/Feridos</h1>
+        <div class="card card-action mb-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <h2>@ViewData["Title"]</h2>
+                <a asp-controller="HarmedOrCasualty" asp-action="Create" class="btn btn-primary">Inserir Categoria</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div id="tableLoader" class="d-flex justify-content-center my-5">
+                <output class="spinner-border text-primary">
+                    <span class="visually-hidden">A carregar...</span>
+                </output>
+            </div>
+
+            <div id="tableContent" class="d-none">
+                @if (Model != null && Model.Any())
+                {
+                    <div class="table-responsive">
+                        <table id="tableHarmedOrCasualty" class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">@Html.DisplayNameFor(m => m.CasualtyName)</th>
+                                    <th scope="col"></th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @foreach (var item in Model.ToList())
+                                {
+                                    <tr data-id="@item.CasualtyId">
+                                        <th scope="col">@count</th>
+                                        <td data-property="name">@Html.DisplayFor(m => item.CasualtyName)</td>
+
+                                        <td>
+                                            <div class="d-flex gap-3">
+                                                <a asp-controller="HarmedOrCasualty" asp-action="Edit" asp-route-id="@item.CasualtyId"
+                                                   data-action="access-edit-form" class="text-primary"><i class="bi bi-pencil-square"></i></a>
+
+                                                @if (User.IsDjAdministration())
+                                                {
+                                                    <a class="text-danger btn-delete"
+                                                       data-entity="a categoria"
+                                                       data-name="@item.CasualtyName"
+                                                       data-id="@item.CasualtyId"
+                                                       data-controller="HarmedOrCasualty"
+                                                       data-action="Delete">
+                                                        <i class="bi bi-trash-fill"></i>
+                                                    </a>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    count++;
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center">
+                        <span>Não existem categorias.</span>
+                    </div>
+                }
+            </div>
+        </div>
+
+    </div>
 </div>
 
-<a asp-controller="HarmedOrCasualty" asp-action="Create" class="btn btn-primary">Inserir categoria de Morto/Ferido</a>
-
-<div>
-    <table id="tableHarmedOrCasualty" class="table table-striped-columns table-hover">
-        <thead>
-            <tr>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().CasualtyName)</th>
-                <th scope="col">Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-
-            @foreach (var item in Model.ToList())
-            {
-                <tr data-id="@item.CasualtyId">
-                    <td data-property="name">@Html.DisplayFor(m => item.CasualtyName)</td>
-                    <td>
-                        <div class="d-flex gap-2">
-                            <form asp-controller="HarmedOrCasualty" asp-action="Delete" method="post" data-action="delete">
-                                <input type="hidden" name="id" value="@item.CasualtyId">
-                                <button type="submit" class="btn btn-danger js-delete-btn"></button>
-                            </form>
-                            <a asp-controller="HarmedOrCasualty" data-action="access-edit-form" asp-action="Edit" asp-route-id="@item.CasualtyId"
-                               class="btn btn-warning"><i class="bi bi-pencil"></i></a>
-                        </div>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-</div>
+@await Html.PartialAsync("ConfirmationModals/_DeleteModal")
 
 @section Scripts {
-    <script>
-        let table = createDataTable("#tableHarmedOrCasualty");
+    <script type="module">
+        import { createDataTable } from '/js/initializeDataTable.js';
+        createDataTable('#tableHarmedOrCasualty');
     </script>
-} 
+}

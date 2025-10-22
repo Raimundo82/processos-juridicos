@@ -20,6 +20,11 @@ spec:
         - env:
             - name: ASPNETCORE_FORWARDEDHEADERS_ENABLED
               value: "true"
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: db-password
             - name: ConnectionStrings__DefaultConnection
               value: Server=10.50.1.208; Database=Processos_DJ; User Id=processosUser; Password=$(DB_PASSWORD);TrustServerCertificate=True;
             - name: Keycloak__credentials__secret
@@ -27,7 +32,7 @@ spec:
                 secretKeyRef:
                   name: app-secrets
                   key: keycloak-secret
-          image: devops-01.marinha.pt/marinha-si/processos-juridicos:1.20.7
+          image: devops-01.marinha.pt/marinha-si/processos-juridicos:1.21.2
           name: processos-juridcos-app
           ports:
             - containerPort: 8080

@@ -1,49 +1,90 @@
 @using Processos_Juridicos.DTOs
-
+@using Processos_Juridicos.Utilities
+@model IEnumerable<InfringementDto>
 @{
     ViewData["Title"] = "Lista de Infrações";
+    int count = 1;
 }
 
-@model IEnumerable<InfringementDto>
+<div class="container-fluid">
+    <div class="mx-lg-5 my-3">
 
-<div class="text-center">
-    <h1 class="display-4">Infrações</h1>
+        <div class="card card-action mb-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <h2>@ViewData["Title"]</h2>
+                <a asp-controller="Infringement" asp-action="Create" class="btn btn-primary">Inserir Infração</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div id="tableLoader" class="d-flex justify-content-center my-5">
+                <output class="spinner-border text-primary">
+                    <span class="visually-hidden">A carregar...</span>
+                </output>
+            </div>
+
+            <div id="tableContent" class="d-none">
+                @if (Model != null && Model.Any())
+                {
+                    <div class="table-responsive">
+                        <table id="tableInfringements" class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">@Html.DisplayNameFor(m => m.InfringementName)</th>
+                                    <th scope="col"></th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @foreach (var item in Model.ToList())
+                                {
+                                    <tr data-id="@item.InfringementId">
+                                        <th scope="col">@count</th>
+                                        <td data-property="name">@Html.DisplayFor(m => item.InfringementName)</td>
+
+                                        <td>
+                                            <div class="d-flex gap-3">
+                                                <a asp-controller="Infringement" asp-action="Edit" asp-route-id="@item.InfringementId"
+                                                   data-action="access-edit-form" class="text-primary"><i class="bi bi-pencil-square"></i></a>
+
+                                                @if (User.IsDjAdministration())
+                                                {
+                                                    <a class="text-danger btn-delete"
+                                                       data-entity="a infração"
+                                                       data-name="@item.InfringementName"
+                                                       data-id="@item.InfringementId"
+                                                       data-controller="Infringement"
+                                                       data-action="Delete">
+                                                        <i class="bi bi-trash-fill"></i>
+                                                    </a>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    count++;
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center">
+                        <span>Não existem infrações.</span>
+                    </div>
+                }
+            </div>
+        </div>
+
+    </div>
 </div>
 
-<a asp-controller="Infringement" asp-action="Create" class="btn btn-primary">Inserir Acidente em Serviço</a>
-
-<div>
-    <table id="tableInfringements" class="table table-striped-columns table-hover">
-        <thead>
-            <tr>
-                <th scope="col">@Html.DisplayNameFor(m => m.First().InfringementName)</th>
-                <th scope="col">Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-
-            @foreach (var item in Model.ToList())
-            {
-                <tr data-id="@item.InfringementId">
-                    <td data-property="name"=>@Html.DisplayFor(m => item.InfringementName)</td>
-                    <td>
-                        <div class="d-flex gap-2">
-                            <form asp-controller="Infringement" asp-action="Delete" method="post" data-action="delete">
-                                <input type="hidden" name="id" value="@item.InfringementId">
-                                <button type="submit" class="btn btn-danger js-delete-btn"></button>
-                            </form>
-                            <a asp-controller="Infringement" asp-action="Edit" asp-route-id="@item.InfringementId"
-                               data-action="access-edit-form" class="btn btn-warning"><i class="bi bi-pencil"></i></a>
-                        </div>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-</div>
+@await Html.PartialAsync("ConfirmationModals/_DeleteModal")
 
 @section Scripts {
-    <script>
-        let table = createDataTable("#tableInfringements");
+    <script type="module">
+        import { createDataTable } from '/js/initializeDataTable.js';
+        createDataTable('#tableInfringements');
     </script>
-} 
+}

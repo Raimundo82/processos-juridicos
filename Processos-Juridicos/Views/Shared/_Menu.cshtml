@@ -39,7 +39,7 @@
                                 <li><a class="dropdown-item" asp-controller="MilitarySecurity" asp-action="List">Segurança militar</a></li>
                                 <li><a class="dropdown-item" asp-controller="CrimeType" asp-action="List">Tipos de Crime</a></li>
                                 
-                                @if (User.IsSuperAdmin())
+                                @if (User.IsDjAdministration())
                                 {
                                     <li><a class="dropdown-item" asp-controller="User" asp-action="List">Permissões dos Utilizadores</a></li>
                                 }
