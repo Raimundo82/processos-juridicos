@@ -17,9 +17,11 @@ using Processos_Juridicos.Services.Interfaces;
 using Processos_Juridicos.Services.Interfaces.DomainData;
 using Processos_Juridicos.Services.Interfaces.Ldap;
 using Processos_Juridicos.Services.Interfaces.ProcessManagement;
+using Processos_Juridicos.Services.Interfaces.UserData;
 using Processos_Juridicos.Services.Ldap;
 using Processos_Juridicos.Services.ProcessManagement;
 using Processos_Juridicos.Services.UiHelpers;
+using Processos_Juridicos.Services.UserData;
 using Processos_Juridicos.Settings;
 using Processos_Juridicos.Utilities;
 using Processos_Juridicos.Utilities.TextManager;
@@ -95,7 +97,7 @@ builder.Services.AddScoped((options) =>
     var profile = Environment.GetEnvironmentVariable("ASPNETCORE_PROFILE") ?? "Marinha";
     LdapConfiguration ldapConfiguration = configuration.GetSection($"Ldap:{profile}").Get<LdapConfiguration>() ?? new LdapConfiguration();
 
-    return new LdapConnService(ldapConfiguration);
+    return new LdapConnSvc(ldapConfiguration);
 });
 
 
@@ -131,6 +133,7 @@ builder.Services.AddScoped<IProcessViewDataSvc, ProcessViewDataSvc>();
 builder.Services.AddScoped<IFileValidatorSvc, FileValidatorSvc>();
 
 builder.Services.AddScoped<ILdapUserSvc, LdapUserSvc>();
+builder.Services.AddScoped<IUserDataSvc, UserDataSvc>();
 
 builder.Services.AddScoped<IClaimsTransformation, CustomClaimsTransformer>();
 

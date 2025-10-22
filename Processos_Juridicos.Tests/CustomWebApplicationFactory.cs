@@ -8,32 +8,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-using Moq;
-
 using Processos_Juridicos.Data;
-using Processos_Juridicos.Models;
-using Processos_Juridicos.Services.Interfaces.Ldap;
 
 namespace Processos_Juridicos.Tests;
 
 public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProgram> where TProgram : class
 {
-    public Mock<ILdapUserSvc> UserSvcMock { get; }
-
-    public CustomWebApplicationFactory()
-    {
-        UserSvcMock = new Mock<ILdapUserSvc>();
-        UserSvcMock
-            .Setup(s => s.GetLoggedUserData())
-            .Returns(new UserDataModel
-            {
-                DisplayName = "Mock User",
-            });
-        UserSvcMock
-            .Setup(s => s.GetUserGroups(It.IsAny<string>()))
-            .Returns(["Admin", "User"]);
-    }
-
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.ConfigureServices(services =>
@@ -41,9 +21,6 @@ public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProg
             services.RemoveAll<DbContextOptions<AppDbContext>>();
             services.RemoveAll<DbConnection>();
             services.AddDbContextFactory<AppDbContext>(options => options.UseInMemoryDatabase(Guid.NewGuid().ToString()));
-
-            services.RemoveAll<ILdapUserSvc>();
-            services.AddSingleton(UserSvcMock.Object);
 
             services.AddAuthentication(defaultScheme: TestAuthHandler.SchemeName)
                 .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.SchemeName, options => { });
