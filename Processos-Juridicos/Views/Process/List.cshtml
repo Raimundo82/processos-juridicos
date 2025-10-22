@@ -152,7 +152,21 @@
                         return html;
                     }
                 }
-            ]
+            ],
+                createdRow: function (row, data, dataIndex) {
+
+
+                $(row).attr("data-id", data.processId);
+
+               // Loop through each cell in the row
+                $('td', row).each(function (colIndex) {
+                    var colDef = table.settings()[0].aoColumns[colIndex];
+                    if (colDef && colDef.data && typeof colDef.data === "string") {
+                        $(this).attr("data-property", colDef.data);
+                    }
+                });
+
+            }
         });
 
         // Trigger reload when filters change

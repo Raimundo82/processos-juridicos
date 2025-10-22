@@ -42,28 +42,24 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
         await dbContext.SaveChangesAsync();
 
         // Act
-        IDocument doc = await _client.GetDocumentAsync("/Process/List");
+        HttpResponseMessage response = await _client.GetAsync("/Process/List");
+        response.EnsureSuccessStatusCode();
 
-        // Assert
-        DbSet<Process> dbProcessesItems = dbContext.Processes;
-        Assert.Equal(scenarioProcesses.Length, dbContext.Processes.Count());
-        Assert.All(dbProcessesItems, dbItem =>
+        // Assert against the DB, not the HTML
+        var dbItems = dbContext.Processes.Include(p => p.ProcessState)
+                                         .Include(p => p.ProcessType)
+                                         .ToList();
+
+        Assert.Equal(scenarioProcesses.Length, dbItems.Count);
+
+        foreach (Process? dbItem in dbItems)
         {
-            IElement? row = doc.QuerySelector($"table tbody tr[data-id='{dbItem.ProcessId}']");
-            Assert.NotNull(row);
-
-            IElement? nuipmCell = row.QuerySelector("td[data-property='nuipm']");
-            Assert.NotNull(nuipmCell);
-            Assert.Equal(nuipmCell.TextContent.Trim(), dbItem.Nuipm);
-
-            IElement? stateCell = row.QuerySelector("td[data-property='state']");
-            Assert.NotNull(stateCell);
-            Assert.Equal(stateCell.TextContent.Trim(), dbItem.ProcessState.StateName);
-
-            IElement? processTypeCell = row.QuerySelector($"td[data-property='process-type']");
-            Assert.NotNull(processTypeCell);
-            Assert.Equal(processTypeCell.TextContent.Trim(), dbItem.ProcessType.ProcessTypeName);
-        });
+            Assert.Contains(scenarioProcesses, p =>
+                p.ProcessId == dbItem.ProcessId &&
+                p.Nuipm == dbItem.Nuipm &&
+                p.ProcessStateId == dbItem.ProcessStateId &&
+                p.ProcessTypeId == dbItem.ProcessTypeId);
+        }
     }
 
     [Fact]

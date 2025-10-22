@@ -46,6 +46,7 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
     public async Task<ProcessDto> EditProcess(ProcessDto process)
     {
         Process existingEntity = await _context.Processes
+            .AsNoTracking()
             .Include(p => p.Infringements)
             .FirstOrDefaultAsync(p => p.ProcessId == process.ProcessId)
             ?? throw new EntityNotFoundException("Process not found");
@@ -74,7 +75,7 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
         }
 
         Mapper.MapToProcesses(process, existingEntity);
-
+        _context.Processes.Update(Mapper.MapToProcesses(process));
         await _context.SaveChangesAsync();
 
         return Mapper.MapToProcessesDto(existingEntity);
