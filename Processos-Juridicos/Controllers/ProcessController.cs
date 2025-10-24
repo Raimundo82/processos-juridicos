@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 using Processos_Juridicos.DTOs;
 using Processos_Juridicos.Models;
-using Processos_Juridicos.Services.Interfaces;
 using Processos_Juridicos.Services.Interfaces.DomainData;
 using Processos_Juridicos.Services.Interfaces.ProcessManagement;
+using Processos_Juridicos.Services.Interfaces.UIHelpers;
 using Processos_Juridicos.Utilities;
 using Processos_Juridicos.Utilities.TextManager;
 

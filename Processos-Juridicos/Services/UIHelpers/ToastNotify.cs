@@ -1,6 +1,6 @@
 using NToastNotify;
 
-using Processos_Juridicos.Services.Interfaces;
+using Processos_Juridicos.Services.Interfaces.UIHelpers;
 
 namespace Processos_Juridicos.Services.UiHelpers;
 

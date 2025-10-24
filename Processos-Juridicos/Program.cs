@@ -17,6 +17,7 @@ using Processos_Juridicos.Services.Interfaces;
 using Processos_Juridicos.Services.Interfaces.DomainData;
 using Processos_Juridicos.Services.Interfaces.Ldap;
 using Processos_Juridicos.Services.Interfaces.ProcessManagement;
+using Processos_Juridicos.Services.Interfaces.UIHelpers;
 using Processos_Juridicos.Services.Interfaces.UserData;
 using Processos_Juridicos.Services.Ldap;
 using Processos_Juridicos.Services.ProcessManagement;
@@ -29,6 +30,7 @@ using Processos_Juridicos.Utilities.TextManager.Interfaces;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
+// Cookie Policy configuration
 builder.Services.Configure<CookiePolicyOptions>(options =>
 {
     options.CheckConsentNeeded = context => true;
@@ -56,6 +58,7 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
     options.Cookie.SameSite = SameSiteMode.None;
+    options.Cookie.IsEssential = true;
 });
 
 
@@ -67,7 +70,9 @@ builder.Services.AddControllersWithViews(options =>
         .Build();
 
     options.Filters.Add(new AuthorizeFilter(policy));
-});
+})
+.AddSessionStateTempDataProvider();
+
 
 // Allows services to access HttpContext
 builder.Services.AddHttpContextAccessor();
@@ -82,7 +87,7 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.Configure<AppSettingsOptions>(builder.Configuration.GetSection(AppSettingsOptions.AppSettings));
 
 // Connection string from configuration
-var processosDj = builder.Configuration.GetConnectionString("DefaultConnection")!;
+var processosDj = builder.Configuration.GetConnectionString("DefaultConnection_Dev")!;
 
 // Register DbContext with SQL Server and detailed logging
 builder.Services.AddDbContext<AppDbContext>(opt =>
@@ -131,10 +136,8 @@ builder.Services.AddScoped<IContextSvc, ContextSvc>();
 builder.Services.AddScoped<IProcessManagementSvc, ProcessManagementSvc>();
 builder.Services.AddScoped<IProcessViewDataSvc, ProcessViewDataSvc>();
 builder.Services.AddScoped<IFileValidatorSvc, FileValidatorSvc>();
-
 builder.Services.AddScoped<ILdapUserSvc, LdapUserSvc>();
 builder.Services.AddScoped<IUserDataSvc, UserDataSvc>();
-
 builder.Services.AddScoped<IClaimsTransformation, CustomClaimsTransformer>();
 
 // Register NToastNotify (Notifications)
@@ -144,7 +147,6 @@ builder.Services.AddMvc().AddNToastNotifyToastr(new ToastrOptions()
     PositionClass = ToastPositions.TopCenter,
     TimeOut = 5000
 });
-
 
 WebApplication app = builder.Build();
 
