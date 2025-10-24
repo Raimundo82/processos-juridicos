@@ -4,38 +4,28 @@
 // Modal to delete
 document.addEventListener("DOMContentLoaded", function () {
     const deleteModalEl = document.getElementById("deleteModal");
-
-    if (!deleteModalEl) {
-        return;
-    }
-
     const deleteModal = new bootstrap.Modal(deleteModalEl);
     const entitySpan = document.getElementById("deleteEntity");
     const nameSpan = document.getElementById("deleteName");
     const idInput = document.getElementById("deleteId");
     const deleteForm = document.getElementById("deleteForm");
 
-    document.querySelectorAll(".btn-delete").forEach(button => {
-        button.addEventListener("click", function () {
-            const entity = this.dataset.entity;
-            const name = this.dataset.name?.trim();
-            const id = this.dataset.id;
-            const controller = this.dataset.controller;
-            const action = this.dataset.action;
+    document.addEventListener("click", function (e) {
+        const button = e.target.closest(".btn-delete");
+        if (!button) return;
 
-            idInput.value = id;
-            deleteForm.action = `/${controller}/${action}`;
+        const entity = button.dataset.entity;
+        const name = button.dataset.name?.trim();
+        const id = button.dataset.id;
+        const controller = button.dataset.controller;
+        const action = button.dataset.action;
 
-            entitySpan.textContent = entity;
+        idInput.value = id;
+        deleteForm.action = `/${controller}/${action}`;
+        entitySpan.textContent = entity;
+        nameSpan.textContent = name ? " " + name : "";
 
-            if (name) {
-                nameSpan.textContent = " " + name;
-            } else {
-                nameSpan.textContent = "";
-            }
-
-            deleteModal.show();
-        });
+        deleteModal.show();
     });
 });
 
