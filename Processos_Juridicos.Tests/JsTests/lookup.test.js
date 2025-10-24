@@ -44,7 +44,7 @@ describe('lookup.js', () => {
         const info = document.getElementById('info');
         const adModal = { hide: vi.fn() };
 
-        const user = { displayName: 'Alice', employeeId: '123' };
+        const user = { displayName: 'Alice', nii: 'M123' };
         const target = { visibleId: 'visible', hiddenId: 'hidden1', hiddenId2: 'hidden2', infoId: 'info' };
 
         applySelection(user, target, adModal);
@@ -52,7 +52,7 @@ describe('lookup.js', () => {
         expect(visible.value).toBe('Alice - M123');
         expect(hidden1.value).toBe('Alice');
         expect(hidden2.value).toBe('M123');
-        expect(info.textContent).toBe('✅ Alice (123)');
+        expect(info.textContent).toBe('✅ Alice (M123)');
         expect(markValid).toHaveBeenCalledWith(visible);
         expect(adModal.hide).toHaveBeenCalled();
     });
@@ -67,7 +67,7 @@ describe('lookup.js', () => {
 
         applySelection(user, target, null);
 
-        expect(visible.value).toBe('Bob - M');
+        expect(visible.value).toBe('Bob - ');
         expect(hidden1.value).toBe('Bob');
         expect(info.textContent).toBe('✅ Bob');
     });

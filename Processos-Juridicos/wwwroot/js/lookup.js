@@ -10,13 +10,12 @@ const applySelectionSingle = (user, target, adModal) => {
     const info = document.getElementById(target.infoId);
 
     const display = user.displayName || user.cn || user.name || '';
-    const empId = user.employeeId || user.samAccountName || user.userPrincipalName || '';
-
-    if (visible) visible.value = `${display} - M${empId}`;
+    const empId = user.nii || user.samAccountName || user.userPrincipalName || '';
+    if (visible) visible.value = `${display} - ${empId}`;
     hidden1.value = `${display}`;
 
     if (hidden2) {
-        hidden2.value = `M${empId}`;   // second hidden gets the employee ID
+        hidden2.value = `${empId}`;   // second hidden gets the employee ID
     }
 
     if (visible) markValid(visible);

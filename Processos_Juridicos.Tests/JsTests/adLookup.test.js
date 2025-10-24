@@ -97,7 +97,7 @@ describe('initAdLookup', () => {
     });
 
     test('blur on visible input calls resolveId and marks valid', async () => {
-        utils.resolveId.mockResolvedValueOnce({ found: true, displayName: 'Jane', username: 'jjane' });
+        utils.resolveId.mockResolvedValueOnce({ displayName: 'Jane', nii: 'jjane' });
 
         initAdLookup({ applySelection, setupIds: [['visible', 'hidden', 'info']], debounceMs: 0 });
 
@@ -112,8 +112,6 @@ describe('initAdLookup', () => {
     });
 
     test('blur on visible input marks invalid when not found', async () => {
-        utils.resolveId.mockResolvedValueOnce({ found: false });
-
         initAdLookup({ applySelection, setupIds: [['visible', 'hidden', 'info']], debounceMs: 0 });
 
         const visible = document.getElementById('visible');
