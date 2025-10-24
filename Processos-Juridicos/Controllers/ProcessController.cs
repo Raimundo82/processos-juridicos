@@ -1,7 +1,11 @@
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
+using Processos_Juridicos.Attributes;
 using Processos_Juridicos.DTOs;
 using Processos_Juridicos.Models;
 using Processos_Juridicos.Services.Interfaces.DomainData;
@@ -185,6 +189,44 @@ public class ProcessController(
         if (!await UserCanEdit(currentProcess))
         {
             return Forbid();
+        }
+
+        if (states.StateName == "Aberto")
+        {
+            var missing = model.GetType().GetProperties()
+               .Where(p => p.Name != nameof(model.ProcessState))
+               .Where(p => !Attribute.IsDefined(p, typeof(ExcludedFromValidationAttribute)))
+               .Where(p => p.GetValue(model) == null
+                        || (p.GetValue(model) is string s && string.IsNullOrWhiteSpace(s)))
+               .Select(p =>
+               {
+                   DisplayAttribute? displayAttr = p.GetCustomAttributes(typeof(DisplayAttribute), false)
+                                      .Cast<DisplayAttribute>()
+                                      .FirstOrDefault();
+
+                   if (displayAttr != null && !string.IsNullOrWhiteSpace(displayAttr.Name))
+                   {
+                       return displayAttr.Name;
+                   }
+
+                   DisplayNameAttribute? displayNameAttr = p.GetCustomAttributes(typeof(DisplayNameAttribute), false)
+                                          .Cast<DisplayNameAttribute>()
+                                          .FirstOrDefault();
+
+                   return displayNameAttr != null && !string.IsNullOrWhiteSpace(displayNameAttr.DisplayName) ? displayNameAttr.DisplayName : p.Name;
+               })
+               .ToList();
+
+            if (missing.Count > 0)
+            {
+                var message = "É necessário preencher os seguintes campos para passar o estado para Aberto: "
+                              + string.Join(", ", missing);
+
+                ModelState.AddModelError(string.Empty, message);
+
+                await _viewDataSvc.PopulateForEditAsync(ViewData, model.ProcessId);
+                return View(model);
+            }
         }
 
         await _processManagement.Processes.EditProcess(model);
