@@ -87,7 +87,7 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.Configure<AppSettingsOptions>(builder.Configuration.GetSection(AppSettingsOptions.AppSettings));
 
 // Connection string from configuration
-var processosDj = builder.Configuration.GetConnectionString("DefaultConnection_Dev")!;
+var processosDj = builder.Configuration.GetConnectionString("DefaultConnection")!;
 
 // Register DbContext with SQL Server and detailed logging
 builder.Services.AddDbContext<AppDbContext>(opt =>
