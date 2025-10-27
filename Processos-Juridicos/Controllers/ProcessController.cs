@@ -100,7 +100,7 @@ public class ProcessController(
         }
 
 
-        model.CreatedByName = User?.FindFirst("name")?.Value ?? UserNameFallBack;
+        model.CreatedByName = User?.FindFirst("display_name")?.Value ?? UserNameFallBack;
         model.CreatedByNii = User?.FindFirst("preferred_username")?.Value ?? UserNameFallBack;
 
         ProcessDto insertTarget = await _processManagement.Processes.CreateProcess(model);
@@ -177,7 +177,7 @@ public class ProcessController(
             model.ComunicatedToPjm = false;
         }
 
-        model.ModifiedByName = User?.FindFirst("name")?.Value ?? UserNameFallBack;
+        model.ModifiedByName = User?.FindFirst("display_name")?.Value ?? UserNameFallBack;
         model.ModifiedByNii = User?.FindFirst("preferred_username")?.Value ?? UserNameFallBack;
         model.ModifiedAt = DateOnly.FromDateTime(DateTime.Now);
 

@@ -2,7 +2,7 @@
 @{
     var isAuthenticated = User?.Identity?.IsAuthenticated ?? false;
 
-    var name = User?.FindFirst("name")?.Value
+    var name = User?.FindFirst("display_name")?.Value
         ?? "Utilizador";
     var nii = User?.FindFirst("preferred_username")?.Value
         ?? "Utilizador";
