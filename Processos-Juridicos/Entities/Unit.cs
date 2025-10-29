@@ -21,6 +21,9 @@ public class Unit
     [Column("enable")]
     public bool Enable { get; set; } = true;
 
+    [Column("can_compensate")]
+    public bool CanCompensate { get; set; } = false;
+
     public virtual ICollection<User> ResponsibleUsers { get; set; } = [];
 
     public ICollection<UnitCommander> UnitCommanders { get; set; } = [];

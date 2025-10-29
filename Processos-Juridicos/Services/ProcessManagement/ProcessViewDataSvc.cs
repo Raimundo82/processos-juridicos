@@ -46,6 +46,11 @@ public class ProcessViewDataSvc(
             u => u.UnitName,
             u => u.UnitId ?? 0);
 
+        viewData["compensatingUnits"] = await GetSelectListAsync(
+            await _context.Units.GetAllCompensatingUnits(),
+            u => u.UnitName,
+            u => u.UnitId ?? 0);
+
         viewData["casualties"] = await GetSelectListAsync(
             await _context.Casualties.GetAllCasualties(),
             c => c.CasualtyName,

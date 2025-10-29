@@ -12,4 +12,6 @@ public interface IUnitSvc
     public Task<bool> DeleteUnit(int? id);
 
     public Task<bool> IsTheUnitsCommander(int? unitid, string user);
+
+    public Task<IEnumerable<UnitDto>> GetAllCompensatingUnits();
 }

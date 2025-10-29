@@ -35,6 +35,9 @@ public class UnitDto
 
     public bool Enable { get; set; } = default;
 
+    [DisplayName("Pode ser unidade responsável por pagamento?")]
+    public bool CanCompensate { get; set; } = false;
+
     [UserMustExistInDatabase]
     [NotMapped]
     [MapperIgnore]

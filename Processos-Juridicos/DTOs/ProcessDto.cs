@@ -28,7 +28,7 @@ public partial class ProcessDto
     [DisplayName("Unidade")]
     public int? UnitId { get; set; }
 
-    [DisplayName("Unidade compensadora")]
+    [DisplayName("Unidade responsável pela indeminização")]
     [ExcludedFromValidation]
     public int? CompensatingUnitId { get; set; }
 
