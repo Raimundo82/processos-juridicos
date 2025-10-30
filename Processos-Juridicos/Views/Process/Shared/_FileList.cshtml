@@ -8,7 +8,7 @@
     {
         var extension = System.IO.Path.GetExtension(file.ProcessFileTrustedName)?.ToLower();
         string iconClass = "bi-file-earmark";
-
+        
         if (extension == ".pdf")
         {
             iconClass = "bi-file-earmark-pdf text-danger";
@@ -30,14 +30,17 @@
                     @file.ProcessFileTrustedName
                 </p>
 
-                <div class="d-flex gap-2 ms-auto align-items-center">
+                <div class="d-flex gap-2 ms-auto align-items-end">
                     <a asp-controller="ProcessFile" asp-action="DownloadFile" asp-route-id="@file.ProcessFileId" class="text-decoration-none text-primary" id="download-file" title="Descarregar">
                         <i class="bi bi-download"></i>
                     </a>
 
                     @if (allowDelete)
                     {
-                        <button type="button" onclick="markFileForDeletion('@file.ProcessFileId')" class="btn btn-link text-danger p-0" title="Eliminar">
+                        <button type="button"
+                            class="btn btn-auto btn-link text-danger p-0 js-mark-for-deletion"
+                            title="Eliminar"
+                            data-file-id="@file.ProcessFileId">
                             <i class="bi bi-trash-fill"></i>
                         </button>
                     }

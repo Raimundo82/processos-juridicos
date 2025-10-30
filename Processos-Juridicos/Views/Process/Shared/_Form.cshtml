@@ -77,7 +77,10 @@
 
             <label asp-for="InvestigatedName" class="form-label"></label>
             <div class="input-group">
-                <input id="investigated-lookup" class="form-control" />
+                <input id="investigated-lookup"
+                       class="form-control"
+                       value="@($"{Model?.InvestigatedName}")" />
+
                 <button type="button"
                         class="btn btn-primary btn-auto ad-lookup-btn"
                         data-target-visible="investigated-lookup"
@@ -164,11 +167,13 @@
 <div class="row mb-3">
     <div class="col-lg-4">
         <div class="form-group mt-3">
-            <label asp-for="SentenceId" class="form-label"></label>
-            <select asp-for="SentenceId" asp-items="ViewBag.sentences" class="form-select">
-                <option value="">Selecione uma sentença</option>
-            </select>
-            <span asp-validation-for="SentenceId" class="text-danger"></span>
+            <div class="form-check mt-2">
+                <input asp-for="ComunicatedToPjm" type="checkbox" class="form-check-input" />
+                <label asp-for ="ComunicatedToPjm" class="form-check-label"></label>
+            </div>
+            <label asp-for="ComunicationDate" class="form-label"></label>
+            <input asp-for="ComunicationDate" type="date" class="form-control" />
+            <span asp-validation-for="ComunicationDate" class="text-danger"></span>
         </div>
     </div>
 </div>

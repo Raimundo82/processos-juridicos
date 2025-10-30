@@ -105,19 +105,13 @@
                     <input asp-for="DeadlineDate" type="date" class="form-control" readonly />
                 </div>
             </div>
-            <div class="col-lg-4">
-                <div class="form-group mt-3">
-                    <label asp-for="FinalDispatchDate" class="form-label"></label>
-                    <input asp-for="FinalDispatchDate" type="date" class="form-control" readonly />
-                </div>
-            </div>
         </div>
 
         <div class="row mb-3">
             <div class="col-lg-4">
                 <div class="form-group mt-3">
-                    <label asp-for="Sentence.SentenceName" class="form-label">Pena aplicada</label>
-                    <input asp-for="Sentence.SentenceName" class="form-control" readonly />
+                    <label asp-for="ComunicationDate" class="form-label mt-3"></label>
+                    <input asp-for="ComunicationDate" class="form-control" readonly />
                 </div>
             </div>
         </div>
@@ -184,7 +178,7 @@
             </div>
 
             <div class="row mb-3">
-                <div class="col-lg-8 col-md-12 offset-lg-2">
+                <div class="col-lg-4 col-md-12 offset-lg-2">
                     <div class="form-group mt-3">
                         <label asp-for="Infringements" class="form-label"></label>
                         <textarea class="form-control" rows="2" readonly>
@@ -192,18 +186,11 @@
                 </textarea>
                     </div>
                 </div>
-            </div>
 
-            <div class="row mb-3">
-                <div class="col-lg-4 col-md-12 offset-lg-4">
+                <div class="col-lg-4 col-md-12">
                     <div class="form-group mt-3">
-                        <div class="form-check mt-2">
-                            <input asp-for="ComunicatedToPjm" type="checkbox" class="form-check-input" disabled />
-                            <label asp-for="ComunicatedToPjm" class="form-check-label"></label>
-                        </div>
-
-                        <label asp-for="ComunicationDate" class="form-label mt-3"></label>
-                        <input asp-for="ComunicationDate" class="form-control" readonly />
+                        <label asp-for="Sentence.SentenceName" class="form-label">Pena aplicada</label>
+                        <input asp-for="Sentence.SentenceName" class="form-control" readonly />
                     </div>
                 </div>
             </div>
@@ -211,7 +198,7 @@
             <div class="row mb-3">
                 <div class="col-lg-4 col-md-12 offset-lg-4">
                     <div class="form-group mt-3">
-                        <label asp-for="CrimeType.CrimeTypeName" class="form-label"></label>
+                        <label asp-for="CrimeType.CrimeTypeName" class="form-label">Tipo de Crime</label>
                         <input asp-for="CrimeType.CrimeTypeName" class="form-control" readonly />
                     </div>
                 </div>
@@ -229,8 +216,17 @@
             <div class="row mb-3">
                 <div class="col-lg-4 col-md-12 offset-lg-4">
                     <div class="form-group mt-3">
-                        <label asp-for="CompensatingUnit.UnitName" class="form-label"></label>
+                        <label asp-for="CompensatingUnit.UnitName" class="form-label">Unidade Compensadora</label>
                         <input asp-for="CompensatingUnit.UnitName" class="form-control" readonly />
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-lg-4 col-md-12 offset-lg-4">
+                    <div class="form-group mt-3">
+                        <label asp-for="FinalDispatchDate" class="form-label"></label>
+                        <input asp-for="FinalDispatchDate" type="date" class="form-control" readonly />
                     </div>
                 </div>
             </div>
