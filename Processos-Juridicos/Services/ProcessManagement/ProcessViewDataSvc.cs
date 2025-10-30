@@ -113,8 +113,8 @@ public class ProcessViewDataSvc(
             }
         }
 
-        viewData["DisableStateSelection"] = true;
         viewData["states"] = statesList;
+        viewData["CurrentState"] = initialState?.StateName;
     }
 
     private async Task PopulateStatesForEditAsync(ViewDataDictionary viewData, int? processId)
@@ -137,8 +137,8 @@ public class ProcessViewDataSvc(
                 Value = s.ProcessStateId.ToString()
             }).ToList();
 
-        viewData["DisableStateSelection"] = false;
         viewData["states"] = listStates;
+        viewData["CurrentState"] = process.ProcessState.StateName;
     }
 
     private static Task<List<SelectListItem>> GetSelectListAsync<T>(
