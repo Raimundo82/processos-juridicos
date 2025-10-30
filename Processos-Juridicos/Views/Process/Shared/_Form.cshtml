@@ -1,3 +1,5 @@
+@using Processos_Juridicos.DTOs
+@using Processos_Juridicos.Entities
 @model Processos_Juridicos.DTOs.ProcessDto
 
 <div class="row mb-3">
@@ -13,8 +15,14 @@
     <div class="col-lg-4 col-md-6">
         <div class="form-group mt-3">
             <label asp-for="ProcessTypeId" class="form-label"></label>
-            <select asp-for="ProcessTypeId" asp-items="ViewBag.processTypes" class="form-select">
+            <select asp-for="ProcessTypeId" class="form-select" id="ProcessTypeId">
                 <option value="">Selecione um tipo</option>
+                @foreach (var pt in (ViewData["processTypes"] as IEnumerable<ProcessTypeDto>) ?? Enumerable.Empty<ProcessTypeDto>())
+                {
+                    <option value="@pt.ProcessTypeId" data-deadline="@pt.Deadline">
+                        @pt.ProcessTypeName
+                    </option>
+                }
             </select>
             <span asp-validation-for="ProcessTypeId" class="text-danger"></span>
         </div>
@@ -150,7 +158,7 @@
     <div class="col-lg-4">
         <div class="form-group mt-3">
             <label asp-for="DeadlineDate" class="form-label"></label>
-            <input asp-for="DeadlineDate" type="date" class="form-control" />
+            <input asp-for="DeadlineDate" type="date" class="form-control" disabled />
             <span asp-validation-for="DeadlineDate" class="text-danger"></span>
         </div>
     </div>
@@ -217,6 +225,36 @@
 <div id="deletedFilesContainer"></div>
 
 <partial name="~/Views/Shared/Components/ModalUserSearch/_UserSearchModal.cshtml" />
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const processTypeSelect = document.getElementById("ProcessTypeId");
+        const createdAtInput = document.getElementById("CreatedAt");
+        const deadlineInput = document.getElementById("DeadlineDate");
+
+        function recalcDeadline() {
+            const selectedOption = processTypeSelect.options[processTypeSelect.selectedIndex];
+            const deadlineDays = selectedOption ? selectedOption.getAttribute("data-deadline") : null;
+            const createdAtValue = createdAtInput.value;
+
+            if (deadlineDays && createdAtValue) {
+                const baseDate = new Date(createdAtValue);
+                baseDate.setDate(baseDate.getDate() + parseInt(deadlineDays));
+
+                const formatted = baseDate.toISOString().split('T')[0];
+
+                deadlineInput.value = formatted;
+                deadlineInput.removeAttribute("disabled");
+            } else {
+                deadlineInput.value = "";
+                deadlineInput.setAttribute("disabled", "disabled");
+            }
+        }
+
+        processTypeSelect.addEventListener("change", recalcDeadline);
+        createdAtInput.addEventListener("change", recalcDeadline);
+    });
+</script>
 
 <script type="module" src="~/js/lookup.js"></script>
 

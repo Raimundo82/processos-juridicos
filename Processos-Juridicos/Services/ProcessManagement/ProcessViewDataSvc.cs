@@ -61,10 +61,7 @@ public class ProcessViewDataSvc(
             i => i.InfringementName,
             i => i.InfringementId ?? 0);
 
-        viewData["processTypes"] = await GetSelectListAsync(
-            await _legalRefs.ProcessTypes.GetAllProcessTypes(),
-            p => p.ProcessTypeName,
-            p => p.ProcessTypeId ?? 0);
+        viewData["processTypes"] = await _legalRefs.ProcessTypes.GetAllProcessTypes();
 
         viewData["sentences"] = await GetSelectListAsync(
             await _legalRefs.Sentences.GetAllSentences(),
