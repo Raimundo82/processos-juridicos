@@ -9,7 +9,12 @@
     <div class="card card-action mb-3">
         <div class="d-flex align-items-center justify-content-between">
             <h2>@ViewData["Title"]</h2>
-            <a asp-action="Edit" asp-route-id="@Model.ProcessId" class="btn btn-primary">Editar Processo</a>
+             <div class="d-flex gap-2">
+                <a asp-controller="Documents" asp-action="GeneratePDF" asp-route-id="@Model.ProcessId" class="btn btn-danger" target="_blank">
+                    <i class="bi bi-file-earmark-pdf"></i> Gerar PDF
+                </a>
+                <a asp-action="Edit" asp-route-id="@Model.ProcessId" class="btn btn-primary">Editar Processo</a>
+            </div>
         </div>
     </div>
 

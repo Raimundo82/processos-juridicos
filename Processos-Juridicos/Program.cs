@@ -12,8 +12,10 @@ using Processos_Juridicos.Configuration;
 using Processos_Juridicos.Data;
 using Processos_Juridicos.Middleware;
 using Processos_Juridicos.Middleware.ExceptionHandlers;
+using Processos_Juridicos.Services.Document;
 using Processos_Juridicos.Services.DomainData;
 using Processos_Juridicos.Services.Interfaces;
+using Processos_Juridicos.Services.Interfaces.Document;
 using Processos_Juridicos.Services.Interfaces.DomainData;
 using Processos_Juridicos.Services.Interfaces.Ldap;
 using Processos_Juridicos.Services.Interfaces.ProcessManagement;
@@ -139,6 +141,7 @@ builder.Services.AddScoped<IFileValidatorSvc, FileValidatorSvc>();
 builder.Services.AddScoped<ILdapUserSvc, LdapUserSvc>();
 builder.Services.AddScoped<IUserDataSvc, UserDataSvc>();
 builder.Services.AddScoped<IClaimsTransformation, CustomClaimsTransformer>();
+builder.Services.AddScoped<IViewRenderSvc, ViewRenderSvc>();
 
 // Register NToastNotify (Notifications)
 builder.Services.AddMvc().AddNToastNotifyToastr(new ToastrOptions()
