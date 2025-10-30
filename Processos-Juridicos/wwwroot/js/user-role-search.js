@@ -11,11 +11,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultsBody = document.getElementById('adResultsBody');
     const statusEl = document.getElementById('adSearchStatus');
     const clearBtn = document.getElementById('adClearBtn');
-
-    const niiInputEl = document.getElementById('nii-lookup');
+    const inputEl = document.getElementById('user-lookup');
     const hiddenNiiEl = document.getElementById('UserNii');
-    const nameDisplayEl = document.getElementById('user-name');
     const infoEl = document.getElementById('UserInfo');
+    const hiddenNameEl = document.getElementById('UserName');
 
     const setStatus = (msg) => { if (statusEl) statusEl.textContent = msg || ''; };
 
@@ -49,11 +48,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // Only add "m" if it doesn't already start with it (case-insensitive)
         const prefixedNii = /^m/i.test(niiValue) ? niiValue : `m${niiValue}`;
 
-        if (nameDisplayEl) nameDisplayEl.textContent = display;
+    
         if (hiddenNiiEl) hiddenNiiEl.value = prefixedNii;
-        if (niiInputEl) {
-            niiInputEl.value = prefixedNii;
-            markValid(niiInputEl);
+        if (hiddenNameEl) hiddenNameEl.value = display;
+        if (inputEl) {
+            inputEl.value = display + ' - ' +prefixedNii;
+            markValid(inputEl);
         }
         if (infoEl) infoEl.textContent = `✅ ${display} (${prefixedNii})`;
 
@@ -102,9 +102,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Inline resolve for manual NII typing
     const resetState = () => {
-        clearValidity(niiInputEl);
+        clearValidity(inputEl);
         if (hiddenNiiEl) hiddenNiiEl.value = '';
-        if (nameDisplayEl) nameDisplayEl.textContent = 'Nenhum utilizador selecionado';
+        if (hiddenNameEl) hiddenNameEl.value = '';
         if (infoEl) infoEl.textContent = '';
     };
 
@@ -112,44 +112,48 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const data = await resolveId(raw);
 
-            if (data?.found) {
-                const prefixedNii = raw.startsWith('m') ? raw : `m${raw}`;
+
+            if (data?.userName) {
+
+                const prefixedNii = raw.startsWith('M') ? raw : `M${raw}`;
+                if (hiddenNameEl) hiddenNameEl.value = data.displayName;
                 if (hiddenNiiEl) hiddenNiiEl.value = prefixedNii;
-                if (niiInputEl) {
-                    niiInputEl.value = prefixedNii;
-                    markValid(niiInputEl);
+
+                if (inputEl) {
+                    inputEl.value = prefixedNii;
+                    markValid(inputEl);
                 }
-                if (nameDisplayEl) nameDisplayEl.textContent = data.displayName || raw;
+
                 if (infoEl) infoEl.textContent = `✅ ${data.displayName || ''} (${prefixedNii})`;
                 return;
             }
 
             // Not found
-            markInvalid(niiInputEl);
+            markInvalid(inputEl);
             resetState();
             if (infoEl) infoEl.textContent = `❌ Não encontrado: ${raw}`;
 
         } catch {
-            markInvalid(niiInputEl);
+            markInvalid(inputEl);
             if (infoEl) infoEl.textContent = '⚠️ Erro ao validar ID';
         }
     };
 
     let t = null;
-    if (niiInputEl) {
-        niiInputEl.addEventListener('input', () => {
-            const raw = (niiInputEl.value || '').trim();
+    if (inputEl) {
+        inputEl.addEventListener('input', () => {
+            const raw = (inputEl.value || '').trim();
             if (!raw) { resetState(); return; }
             if (!shouldResolve(raw)) {
-                clearValidity(niiInputEl);
+                clearValidity(inputEl);
                 if (infoEl) infoEl.textContent = '';
                 return;
             }
             clearTimeout(t);
             t = setTimeout(() => resolveAndReplace(raw), DEBOUNCE_MS);
         });
-        niiInputEl.addEventListener('blur', () => {
-            const raw = (niiInputEl.value || '').trim();
+        inputEl.addEventListener('blur', () => {
+            const raw = (inputEl.value || '').trim();
             if (shouldResolve(raw)) {
                 clearTimeout(t);
                 resolveAndReplace(raw);
