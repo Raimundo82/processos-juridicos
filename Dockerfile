@@ -1,13 +1,11 @@
 # Build stage
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 
-ENV http_proxy=http://proxy-n-wcg.marinha.pt:8080
-ENV https_proxy=http://proxy-n-wcg.marinha.pt:8080
-ENV no_proxy="devops-01.marinha.pt, marinha.pt,.marinha.pt, localhost, 10.45.1.165"
 ENV HUSKY=0
 
 WORKDIR /app
 COPY ./Processos-Juridicos ./
+
 RUN dotnet publish -c Release -o /out
 
 # Runtime stage
@@ -15,7 +13,11 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 
 ENV http_proxy=http://proxy-n-wcg.marinha.pt:8080
 ENV https_proxy=http://proxy-n-wcg.marinha.pt:8080
-ENV no_proxy="devops-01.marinha.pt, marinha.pt,.marinha.pt, localhost, 10.45.1.165"
+ENV no_proxy="marinha.pt,.marinha.pt,localhost"
+
+RUN apt-get update \
+    && apt-get install -y \
+    libldap-2.5-0 && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 COPY --from=build /out .
