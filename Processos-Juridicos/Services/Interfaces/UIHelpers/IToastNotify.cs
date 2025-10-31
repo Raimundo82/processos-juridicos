@@ -1,4 +1,4 @@
-namespace Processos_Juridicos.Services.Interfaces;
+namespace Processos_Juridicos.Services.Interfaces.UIHelpers;
 
 public interface IToastNotify
 {

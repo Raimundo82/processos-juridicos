@@ -46,6 +46,11 @@ public class ProcessViewDataSvc(
             u => u.UnitName,
             u => u.UnitId ?? 0);
 
+        viewData["compensatingUnits"] = await GetSelectListAsync(
+            await _context.Units.GetAllCompensatingUnits(),
+            u => u.UnitName,
+            u => u.UnitId ?? 0);
+
         viewData["casualties"] = await GetSelectListAsync(
             await _context.Casualties.GetAllCasualties(),
             c => c.CasualtyName,
@@ -56,10 +61,7 @@ public class ProcessViewDataSvc(
             i => i.InfringementName,
             i => i.InfringementId ?? 0);
 
-        viewData["processTypes"] = await GetSelectListAsync(
-            await _legalRefs.ProcessTypes.GetAllProcessTypes(),
-            p => p.ProcessTypeName,
-            p => p.ProcessTypeId ?? 0);
+        viewData["processTypes"] = await _legalRefs.ProcessTypes.GetAllProcessTypes();
 
         viewData["sentences"] = await GetSelectListAsync(
             await _legalRefs.Sentences.GetAllSentences(),
@@ -111,8 +113,8 @@ public class ProcessViewDataSvc(
             }
         }
 
-        viewData["DisableStateSelection"] = true;
         viewData["states"] = statesList;
+        viewData["CurrentState"] = initialState?.StateName;
     }
 
     private async Task PopulateStatesForEditAsync(ViewDataDictionary viewData, int? processId)
@@ -135,8 +137,8 @@ public class ProcessViewDataSvc(
                 Value = s.ProcessStateId.ToString()
             }).ToList();
 
-        viewData["DisableStateSelection"] = false;
         viewData["states"] = listStates;
+        viewData["CurrentState"] = process.ProcessState.StateName;
     }
 
     private static Task<List<SelectListItem>> GetSelectListAsync<T>(

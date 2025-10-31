@@ -1,6 +1,4 @@
-/**
- * @vitest-environment jsdom
- */
+// @vitest-environment jsdom
 import { describe, test, expect, vi, beforeEach } from 'vitest';
 
 // --- Mock lookup-utils functions ---
@@ -25,9 +23,9 @@ describe('user-role-search.js', () => {
       <div id="adSearchStatus"></div>
       <button id="adClearBtn"></button>
 
-      <input id="nii-lookup" />
-      <input id="UserNii" />
-      <div id="user-name"></div>
+      <input type="hidden" id="UserNii" />
+      <input type="hidden" id="UserName" />
+      <input id="user-lookup" />
       <div id="UserInfo"></div>
 
       <button class="ad-lookup-btn"></button>
@@ -78,30 +76,37 @@ describe('user-role-search.js', () => {
         expect(statusEl.textContent).toBe('');
     });
 
-    test('blur on nii-lookup calls resolveId and marks valid when found', async () => {
-        utils.resolveId.mockResolvedValueOnce({ found: true, displayName: 'Jane' });
+    test('blur on user-lookup calls resolveId and marks valid when found', async () => {
+        utils.resolveId.mockResolvedValueOnce({
+            userName: 'jjane',          // must include userName for branch to run
+            displayName: 'Jane'
+        });
 
-        const niiInput = document.getElementById('nii-lookup');
-        niiInput.value = 'jjane';
-        niiInput.dispatchEvent(new Event('blur'));
+        const visibleInput = document.getElementById('user-lookup');
+        visibleInput.value = 'jjane';
+        visibleInput.dispatchEvent(new Event('blur'));
 
         await Promise.resolve();
+        await new Promise(setImmediate);
 
-        expect(utils.resolveId).toHaveBeenCalledWith('jjane');
-        expect(utils.markValid).toHaveBeenCalledWith(niiInput);
+        expect(utils.resolveId).toHaveBeenCalledWith('jjane');       // string
+        expect(utils.markValid).toHaveBeenCalledWith(visibleInput);  // element
         expect(document.getElementById('UserInfo').textContent).toContain('✅ Jane');
+        expect(document.getElementById('UserNii').value).toBe('Mjjane'); // note M prefix
     });
 
-    test('blur on nii-lookup marks invalid when not found', async () => {
-        utils.resolveId.mockResolvedValueOnce({ found: false });
+    test('blur on user-lookup marks invalid when not found', async () => {
+        utils.resolveId.mockResolvedValueOnce({}); // no userName property
 
-        const niiInput = document.getElementById('nii-lookup');
-        niiInput.value = 'unknown';
-        niiInput.dispatchEvent(new Event('blur'));
+        const visibleInput = document.getElementById('user-lookup');
+        visibleInput.value = 'unknown';
+        visibleInput.dispatchEvent(new Event('blur'));
 
         await Promise.resolve();
+        await new Promise(setImmediate);
 
-        expect(utils.markInvalid).toHaveBeenCalledWith(niiInput);
+        expect(utils.markInvalid).toHaveBeenCalledWith(visibleInput); // element
         expect(document.getElementById('UserInfo').textContent).toContain('❌ Não encontrado');
+        expect(document.getElementById('UserNii').value).toBe(''); // reset hidden
     });
 });

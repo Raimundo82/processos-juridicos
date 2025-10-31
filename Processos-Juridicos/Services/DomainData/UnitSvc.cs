@@ -20,6 +20,17 @@ public class UnitSvc(AppDbContext context) : IUnitSvc
         return Mapper.MapToToUnitDtoEnum(units);
     }
 
+    public async Task<IEnumerable<UnitDto>> GetAllCompensatingUnits()
+    {
+        List<Unit> units = await _context.Units
+            .AsNoTracking()
+            .Where(u => u.CanCompensate)   // only rows where CanCompensate = true
+            .ToListAsync();
+
+        return Mapper.MapToToUnitDtoEnum(units);
+    }
+
+
     public async Task<UnitDto> GetUnitById(int? id)
     {
         Unit unit = await _context.Units.Include(uc => uc.UnitCommanders).ThenInclude(u => u.User).FirstOrDefaultAsync(u => u.UnitId == id)

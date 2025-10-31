@@ -5,11 +5,12 @@ import { describe, test, expect, vi, beforeEach } from 'vitest';
 
 describe('user-name-finder.js', () => {
     beforeEach(() => {
-        // Reset DOM
+        // Reset DOM with the correct elements
         document.body.innerHTML = `
-      <div id="user-nii"></div>
-      <div id="user-name"></div>
-    `;
+          <input id="UserNii" />
+          <input id="user-lookup" />
+          <button class="ad-lookup-btn"></button>
+        `;
 
         // Reset fetch mock
         global.fetch = vi.fn();
@@ -20,55 +21,59 @@ describe('user-name-finder.js', () => {
         await import('../../Processos-Juridicos/wwwroot/js/user-name-finder.js');
         // Fire DOMContentLoaded so the code runs
         document.dispatchEvent(new Event('DOMContentLoaded'));
-
         await Promise.resolve();
     }
 
     test('shows "Nenhum NII encontrado" when no NII text', async () => {
-        document.getElementById('user-nii').textContent = '';
+        document.getElementById('UserNii').value = '';
 
         await loadModuleAndTrigger();
 
-        expect(document.getElementById('user-name').textContent).toBe('Nenhum NII encontrado');
+        expect(document.getElementById('user-lookup').value)
+            .toBe('Nenhum NII encontrado');
     });
 
     test('shows user display and id when resolveId returns found', async () => {
-        document.getElementById('user-nii').textContent = 'abc-123';
+        document.getElementById('UserNii').value = 'abc-123';
 
-        const jsonPromise = Promise.resolve({ found: true, displayName: 'Jane Doe', username: 'jdoe' });
-        global.fetch.mockResolvedValueOnce({ ok: true, json: () => jsonPromise });
-
-        await loadModuleAndTrigger();
-        await jsonPromise; 
-        await new Promise(setImmediate);
-
-        expect(global.fetch).toHaveBeenCalledWith('/api/directory/resolve/123');
-        expect(document.getElementById('user-name').textContent).toBe('Jane Doe (jdoe)');
-    });
-
-    test('shows not found message when resolveId returns not found', async () => {
-        document.getElementById('user-nii').textContent = 'abc-999';
-
-        const jsonPromise = Promise.resolve({ found: false });
+        const jsonPromise = Promise.resolve({
+            userName: true,
+            displayName: 'Jane Doe',
+            username: 'jdoe'
+        });
         global.fetch.mockResolvedValueOnce({ ok: true, json: () => jsonPromise });
 
         await loadModuleAndTrigger();
         await jsonPromise;
         await new Promise(setImmediate);
 
-        expect(document.getElementById('user-name').textContent)
+        expect(global.fetch).toHaveBeenCalledWith('/api/directory/resolve/123');
+        expect(document.getElementById('user-lookup').value)
+            .toBe('Jane Doe (jdoe)');
+    });
+
+    test('shows not found message when resolveId returns not found', async () => {
+        document.getElementById('UserNii').value = 'abc-999';
+
+        const jsonPromise = Promise.resolve({ userName: false });
+        global.fetch.mockResolvedValueOnce({ ok: true, json: () => jsonPromise });
+
+        await loadModuleAndTrigger();
+        await jsonPromise;
+        await new Promise(setImmediate);
+
+        expect(document.getElementById('user-lookup').value)
             .toContain('❌ Utilizador não encontrado: 999');
     });
 
-
     test('shows error message when fetch fails', async () => {
-        document.getElementById('user-nii').textContent = 'abc-err';
+        document.getElementById('UserNii').value = 'abc-err';
 
         global.fetch.mockResolvedValueOnce({ ok: false, status: 500 });
 
         await loadModuleAndTrigger();
 
-        expect(document.getElementById('user-name').textContent)
+        expect(document.getElementById('user-lookup').value)
             .toBe('⚠️ Erro ao obter o nome do utilizador');
     });
 });

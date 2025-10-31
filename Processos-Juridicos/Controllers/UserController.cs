@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 using Processos_Juridicos.DTOs;
 using Processos_Juridicos.Services.Interfaces;
+using Processos_Juridicos.Services.Interfaces.UIHelpers;
 using Processos_Juridicos.Utilities.TextManager;
 
 namespace Processos_Juridicos.Controllers;

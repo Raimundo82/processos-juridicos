@@ -4,10 +4,10 @@
     <div class="col-md-12">
         <div class="form-group mt-3">
             <input type="hidden" asp-for="UserNii" />
-
+            <input type="hidden" asp-for="UserName" />
             <label asp-for="UserNii" class="form-label"></label>
             <div class="input-group">
-                <input id="investigated-lookup" class="form-control" />
+                <input id="user-lookup" class="form-control" />
                 <button type="button"
                         class="btn btn-primary btn-auto ad-lookup-btn"
                         data-target-visible="nii-lookup"
@@ -16,7 +16,7 @@
                     <i class="bi bi-search"></i>
                 </button>
             </div>
-            <span id="InvestigatedInfo" class="form-text"></span>
+            <small id="UserInfo" class="form-text text-muted"></small>
             <span asp-validation-for="UserNii" class="text-danger"></span>
         </div>
     </div>

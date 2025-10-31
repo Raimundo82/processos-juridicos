@@ -34,9 +34,10 @@
 
 @await Html.PartialAsync("ConfirmationModals/_ConfirmRejectModal")
 
-<script src="~/js/forms.js" asp-append-version="true"></script>
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script src="~/js/forms.js" type="module"></script>
 }

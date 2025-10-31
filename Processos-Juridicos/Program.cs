@@ -12,14 +12,19 @@ using Processos_Juridicos.Configuration;
 using Processos_Juridicos.Data;
 using Processos_Juridicos.Middleware;
 using Processos_Juridicos.Middleware.ExceptionHandlers;
+using Processos_Juridicos.Services.Document;
 using Processos_Juridicos.Services.DomainData;
 using Processos_Juridicos.Services.Interfaces;
+using Processos_Juridicos.Services.Interfaces.Document;
 using Processos_Juridicos.Services.Interfaces.DomainData;
 using Processos_Juridicos.Services.Interfaces.Ldap;
 using Processos_Juridicos.Services.Interfaces.ProcessManagement;
+using Processos_Juridicos.Services.Interfaces.UIHelpers;
+using Processos_Juridicos.Services.Interfaces.UserData;
 using Processos_Juridicos.Services.Ldap;
 using Processos_Juridicos.Services.ProcessManagement;
 using Processos_Juridicos.Services.UiHelpers;
+using Processos_Juridicos.Services.UserData;
 using Processos_Juridicos.Settings;
 using Processos_Juridicos.Utilities;
 using Processos_Juridicos.Utilities.TextManager;
@@ -27,6 +32,7 @@ using Processos_Juridicos.Utilities.TextManager.Interfaces;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
+// Cookie Policy configuration
 builder.Services.Configure<CookiePolicyOptions>(options =>
 {
     options.CheckConsentNeeded = context => true;
@@ -54,6 +60,7 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
     options.Cookie.SameSite = SameSiteMode.None;
+    options.Cookie.IsEssential = true;
 });
 
 
@@ -65,7 +72,9 @@ builder.Services.AddControllersWithViews(options =>
         .Build();
 
     options.Filters.Add(new AuthorizeFilter(policy));
-});
+})
+.AddSessionStateTempDataProvider();
+
 
 // Allows services to access HttpContext
 builder.Services.AddHttpContextAccessor();
@@ -95,7 +104,7 @@ builder.Services.AddScoped((options) =>
     var profile = Environment.GetEnvironmentVariable("ASPNETCORE_PROFILE") ?? "Marinha";
     LdapConfiguration ldapConfiguration = configuration.GetSection($"Ldap:{profile}").Get<LdapConfiguration>() ?? new LdapConfiguration();
 
-    return new LdapConnService(ldapConfiguration);
+    return new LdapConnSvc(ldapConfiguration);
 });
 
 
@@ -129,10 +138,10 @@ builder.Services.AddScoped<IContextSvc, ContextSvc>();
 builder.Services.AddScoped<IProcessManagementSvc, ProcessManagementSvc>();
 builder.Services.AddScoped<IProcessViewDataSvc, ProcessViewDataSvc>();
 builder.Services.AddScoped<IFileValidatorSvc, FileValidatorSvc>();
-
 builder.Services.AddScoped<ILdapUserSvc, LdapUserSvc>();
-
+builder.Services.AddScoped<IUserDataSvc, UserDataSvc>();
 builder.Services.AddScoped<IClaimsTransformation, CustomClaimsTransformer>();
+builder.Services.AddScoped<IViewRenderSvc, ViewRenderSvc>();
 
 // Register NToastNotify (Notifications)
 builder.Services.AddMvc().AddNToastNotifyToastr(new ToastrOptions()
@@ -141,7 +150,6 @@ builder.Services.AddMvc().AddNToastNotifyToastr(new ToastrOptions()
     PositionClass = ToastPositions.TopCenter,
     TimeOut = 5000
 });
-
 
 WebApplication app = builder.Build();
 
@@ -195,7 +203,6 @@ app.UseCookiePolicy();
 app.UseSession();
 app.UseRouting();
 app.UseAuthentication();
-app.UseMiddleware<SessionRoleMiddleware>();
 app.UseAuthorization();
 app.UseNToastNotify();
 

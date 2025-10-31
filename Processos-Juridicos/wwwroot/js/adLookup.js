@@ -31,9 +31,9 @@ export function initAdLookup({ applySelection, setupIds, debounceMs = 1000 }) {
             tr.style.cursor = 'pointer';
             tr.innerHTML = `
                 <td>${escapeHtml(u.displayName || '')}</td>
-                <td>${escapeHtml(u.samAccountName || '')}</td>
+                <td>${escapeHtml(u.userName || '')}</td>
                 <td>${escapeHtml(u.email || '')}</td>
-                <td>${escapeHtml(u.department || u.company || '')}</td>
+                <td>${escapeHtml(u.unit || u.company || '')}</td>
                 <td><a class="btn btn-sm text-success"><i class="bi bi-check-lg"></i></a></td>
             `;
             tr.addEventListener('dblclick', () => applySelection(u, currentTarget, adModal));
@@ -107,10 +107,10 @@ export function initAdLookup({ applySelection, setupIds, debounceMs = 1000 }) {
         const resolveAndReplace = async (raw) => {
             try {
                 const data = await resolveId(raw);
-                if (data?.found) {
+                if (data?.nii) {
                     const user = {
                         displayName: data.displayName || raw,
-                        samAccountName: data.username || data.fullUser || raw
+                        samAccountName: data.nii || data.fullUser || raw
                     };
                     currentTarget = { visibleId, hiddenId, infoId };
                     applySelection(user, currentTarget, adModal);

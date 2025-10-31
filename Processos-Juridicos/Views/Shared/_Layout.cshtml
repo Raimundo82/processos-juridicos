@@ -31,10 +31,7 @@
         <partial name="_Header" />
     </header>
 
-    @if (ViewData["LoginView"] as bool? != true)
-    {
-        <partial name="_Menu" />
-    }
+    <partial name="_Menu" />
 
     <main role="main">
         @RenderBody()
@@ -54,8 +51,9 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script type="module" src="~/js/initializeDataTable.js"></script>
 
-    @await RenderSectionAsync("Scripts", required: false)
     @await Component.InvokeAsync("NToastNotify")
+    @await RenderSectionAsync("Scripts", required: false)
+   
 
 </body>
 
