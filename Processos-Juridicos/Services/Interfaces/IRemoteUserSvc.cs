@@ -1,8 +1,8 @@
 using Processos_Juridicos.Models;
 
-namespace Processos_Juridicos.Services.Interfaces.Ldap;
+namespace Processos_Juridicos.Services.Interfaces;
 
-public interface ILdapUserSvc
+public interface IRemoteUserSvc
 {
     public Task<UserDataModel?> FindUserByNiiAsync(string nii);
 

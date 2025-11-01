@@ -17,7 +17,6 @@ using Processos_Juridicos.Services.DomainData;
 using Processos_Juridicos.Services.Interfaces;
 using Processos_Juridicos.Services.Interfaces.Document;
 using Processos_Juridicos.Services.Interfaces.DomainData;
-using Processos_Juridicos.Services.Interfaces.Ldap;
 using Processos_Juridicos.Services.Interfaces.ProcessManagement;
 using Processos_Juridicos.Services.Interfaces.UIHelpers;
 using Processos_Juridicos.Services.Interfaces.UserData;
@@ -99,14 +98,7 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
 
 
 // LDAP Configuration and Service
-builder.Services.AddScoped((options) =>
-{
-    var profile = Environment.GetEnvironmentVariable("ASPNETCORE_PROFILE") ?? "Marinha";
-    LdapConfiguration ldapConfiguration = configuration.GetSection($"Ldap:{profile}").Get<LdapConfiguration>() ?? new LdapConfiguration();
-
-    return new LdapConnSvc(ldapConfiguration);
-});
-
+builder.Services.AddScoped(sp => configuration.GetSection($"Ldap:Marinha").Get<LdapConfiguration>() ?? new LdapConfiguration());
 
 // JSON text manager for system text (systemtext.json)
 builder.Services.AddSingleton<IJsonTextManager>(sp =>
@@ -138,7 +130,8 @@ builder.Services.AddScoped<IContextSvc, ContextSvc>();
 builder.Services.AddScoped<IProcessManagementSvc, ProcessManagementSvc>();
 builder.Services.AddScoped<IProcessViewDataSvc, ProcessViewDataSvc>();
 builder.Services.AddScoped<IFileValidatorSvc, FileValidatorSvc>();
-builder.Services.AddScoped<ILdapUserSvc, LdapUserSvc>();
+builder.Services.AddScoped<ILdapConnSvc, LdapConnSvc>();
+builder.Services.AddScoped<IRemoteUserSvc, LdapUserSvc>();
 builder.Services.AddScoped<IUserDataSvc, UserDataSvc>();
 builder.Services.AddScoped<IClaimsTransformation, CustomClaimsTransformer>();
 builder.Services.AddScoped<IViewRenderSvc, ViewRenderSvc>();

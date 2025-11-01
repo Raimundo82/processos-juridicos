@@ -19,6 +19,9 @@ RUN apt-get update \
     && apt-get install -y \
     libldap-2.5-0 && rm -rf /var/lib/apt/lists/*
 
+COPY certs/marinha-root-ca.crt /usr/local/share/ca-certificates/
+RUN update-ca-certificates
+
 WORKDIR /app
 COPY --from=build /out .
 EXPOSE 8080

@@ -1,13 +1,15 @@
 using System.DirectoryServices.Protocols;
 
+using Processos_Juridicos.Configuration;
 using Processos_Juridicos.Models;
-using Processos_Juridicos.Services.Interfaces.Ldap;
+using Processos_Juridicos.Services.Interfaces;
 
 namespace Processos_Juridicos.Services.Ldap;
 
-public class LdapUserSvc(LdapConnSvc ldapConnSvc) : ILdapUserSvc
+public class LdapUserSvc(ILdapConnSvc ldapConnSvc, LdapConfiguration configuration) : IRemoteUserSvc
 {
-    private readonly LdapConnSvc _ldapConnSvc = ldapConnSvc;
+    private readonly LdapConfiguration _configuration = configuration;
+    private readonly ILdapConnSvc _ldapConnSvc = ldapConnSvc;
 
     public async Task<UserDataModel?> FindUserByNiiAsync(string nii)
     {
@@ -40,7 +42,7 @@ public class LdapUserSvc(LdapConnSvc ldapConnSvc) : ILdapUserSvc
             LdapConnection conn = _ldapConnSvc.GetConnection();
 
             var request = new SearchRequest(
-                _ldapConnSvc.GetLdapConfiguration()?.BaseDN,
+                _configuration?.BaseDN,
                 $"(cn={nii})",
                 SearchScope.Subtree
             );
@@ -58,7 +60,7 @@ public class LdapUserSvc(LdapConnSvc ldapConnSvc) : ILdapUserSvc
             var filter = $"(|(displayName=*{term}*)(sAMAccountName=*{term}*)(mail=*{term}*))";
 
             var request = new SearchRequest(
-                _ldapConnSvc.GetLdapConfiguration()?.BaseDN,
+                _configuration?.BaseDN,
                 filter,
                 SearchScope.Subtree
             );

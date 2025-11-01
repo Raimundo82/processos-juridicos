@@ -2,26 +2,65 @@ using System.DirectoryServices.Protocols;
 using System.Net;
 
 using Processos_Juridicos.Configuration;
+using Processos_Juridicos.Services.Interfaces;
 
 namespace Processos_Juridicos.Services.Ldap;
 
-public class LdapConnSvc(LdapConfiguration configuration)
+public class LdapConnSvc(LdapConfiguration configuration) : ILdapConnSvc
 {
-    private readonly LdapConfiguration _ldapConfiguration = configuration;
-    private readonly LdapDirectoryIdentifier _ldapDirectoryIdentifier = new(string.Format("{0}:{1}", configuration?.Url, configuration?.Port));
+    private readonly LdapConfiguration _configuration = configuration;
+    private LdapConnection? _ldapConnection;
+    private bool _disposed = false;
+
 
     public LdapConnection GetConnection()
     {
-        return GetConnection(_ldapConfiguration?.Username, _ldapConfiguration?.Password);
+        ObjectDisposedException.ThrowIf(_disposed, this);
+
+        if (_ldapConnection != null)
+        {
+            return _ldapConnection;
+
+        }
+
+        LdapDirectoryIdentifier ldapDirectoryIdentifier = new(
+            _configuration.Url,
+            int.Parse(_configuration.Port),
+            fullyQualifiedDnsHostName: false,
+            connectionless: false);
+
+        NetworkCredential networkCredential = new(_configuration.Username, _configuration.Password);
+
+        _ldapConnection = new LdapConnection(ldapDirectoryIdentifier, networkCredential, AuthType.Basic)
+        {
+            Timeout = TimeSpan.FromSeconds(10),
+        };
+        _ldapConnection.SessionOptions.ProtocolVersion = 3;
+        _ldapConnection.SessionOptions.SecureSocketLayer = true;
+
+        try
+        {
+            _ldapConnection.Bind();
+            return _ldapConnection;
+        }
+        catch (LdapException ex)
+        {
+            _ldapConnection?.Dispose();
+            _ldapConnection = null;
+            throw new InvalidOperationException($"Failed to connect to LDAP server at {_configuration.Url}:{_configuration.Port}", ex);
+        }
     }
 
-    public LdapConnection GetConnection(string? username, string? password)
+    public void Dispose()
     {
-        return new LdapConnection(_ldapDirectoryIdentifier, new NetworkCredential(username, password));
+        if (_disposed)
+        {
+            return;
+        }
+        _ldapConnection?.Dispose();
+        _ldapConnection = null;
+        _disposed = true;
+        GC.SuppressFinalize(this);
     }
 
-    public LdapConfiguration GetLdapConfiguration()
-    {
-        return _ldapConfiguration;
-    }
 }
