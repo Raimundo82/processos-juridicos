@@ -32,6 +32,11 @@ spec:
                 secretKeyRef:
                   name: app-secrets
                   key: keycloak-secret
+            - name: Ldap__Marinha__Password
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: ldap-password
           image: devops-01.marinha.pt/marinha-si/processos-juridicos:1.21.2
           name: processos-juridcos-app
           ports:

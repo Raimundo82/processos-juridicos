@@ -10,10 +10,10 @@
     <Content Remove="Views\Home\Privacy.cshtml" />
   </ItemGroup>
   <ItemGroup>
-      <PackageReference Include="itext" Version="9.3.0" />
-      <PackageReference Include="itext.bouncy-castle-adapter" Version="9.3.0" />
-      <PackageReference Include="itext.pdfhtml" Version="6.2.1" />
-      <PackageReference Include="Keycloak.AuthServices.Authentication" Version="2.7.0" />
+    <PackageReference Include="itext" Version="9.3.0" />
+    <PackageReference Include="itext.bouncy-castle-adapter" Version="9.3.0" />
+    <PackageReference Include="itext.pdfhtml" Version="6.2.1" />
+    <PackageReference Include="Keycloak.AuthServices.Authentication" Version="2.7.0" />
     <PackageReference Include="Keycloak.AuthServices.Authorization" Version="2.7.0" />
     <PackageReference Include="Keycloak.AuthServices.Common" Version="2.7.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.21" />
@@ -29,7 +29,7 @@
     <PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="3.0.71" />
     <PackageReference Include="NToastNotify" Version="8.0.0" />
     <PackageReference Include="Riok.Mapperly" Version="4.3.0" />
-    <PackageReference Include="System.DirectoryServices.AccountManagement" Version="8.0.1" />
+    <PackageReference Include="System.DirectoryServices.Protocols" Version="8.0.2" />
   </ItemGroup>
   <ItemGroup>
     <None Include="efpt.config.json.user" />
@@ -38,7 +38,9 @@
     <Folder Include="Views\User\Shared\" />
   </ItemGroup>
   <Target Name="Husky" BeforeTargets="Restore;CollectPackageReferences" Condition="'$(HUSKY)' != 0">
-    <Exec Command="dotnet tool restore" StandardOutputImportance="Low" StandardErrorImportance="High" />
-    <Exec Command="dotnet husky install" StandardOutputImportance="Low" StandardErrorImportance="High" WorkingDirectory=".." />
+    <Exec Command="dotnet tool restore" StandardOutputImportance="Low"
+      StandardErrorImportance="High" />
+    <Exec Command="dotnet husky install" StandardOutputImportance="Low"
+      StandardErrorImportance="High" WorkingDirectory=".." />
   </Target>
 </Project>
