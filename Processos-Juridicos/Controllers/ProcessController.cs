@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Reflection;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,6 +17,7 @@ using Processos_Juridicos.Utilities.TextManager;
 
 namespace Processos_Juridicos.Controllers;
 
+[Authorize]
 public class ProcessController(
     IProcessManagementSvc processManagement,
     IProcessViewDataSvc viewDataSvc,
@@ -25,15 +27,13 @@ public class ProcessController(
 {
     private const string EntityName = "Processo";
     private const string AccidentProcessTypeName = "Acidentes em serviço";
-    private const string UserNameFallBack = "Utilizador";
+
     private readonly IProcessManagementSvc _processManagement = processManagement;
     private readonly IProcessViewDataSvc _viewDataSvc = viewDataSvc;
     private readonly IFileValidatorSvc _fileValidatorSvc = fileValidatorSvc;
     private readonly IContextSvc _contextSvc = contextSvc;
-
     private readonly IToastNotify _toastNotify = toastNotify;
 
-    [Authorize]
     [HttpGet]
     public async Task<IActionResult> List()
     {
@@ -94,26 +94,14 @@ public class ProcessController(
             return View(model);
         }
 
-        if (model.ProcessType?.ProcessTypeName == AccidentProcessTypeName)
-        {
-            model.ComunicatedToPjm = false;
-        }
-
-
-        model.CreatedByName = User?.FindFirst("display_name")?.Value ?? UserNameFallBack;
-        model.CreatedByNii = User?.FindFirst("preferred_username")?.Value ?? UserNameFallBack;
+        ApplyCommunicatedPJMRules(model);
+        SetAuditFields(model, isNew: true, null);
 
         ProcessDto insertTarget = await _processManagement.Processes.CreateProcess(model);
 
-        if (model.ProcessFiles != null && model.ProcessFiles.Length > 0)
+        if (!await ValidateAndSaveFiles(insertTarget.ProcessId, model.ProcessFiles))
         {
-            foreach (IFormFile? file in model.ProcessFiles)
-            {
-                if (!await _fileValidatorSvc.ValidateAndSaveFileAsync(insertTarget.ProcessId, file))
-                {
-                    return View(model);
-                }
-            }
+            return View(model);
         }
 
         _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("CreateSuccessMessage"), "O", EntityName, "o"));
@@ -137,14 +125,11 @@ public class ProcessController(
         }
 
         model.UploadedFiles = await _processManagement.ProcessFiles.GetAllProcessFilesByProcessId(id);
-
         await _viewDataSvc.PopulateForEditAsync(ViewData, model.ProcessId);
 
         if (ViewData["infringements"] is List<SelectListItem> infrList)
         {
-            foreach (SelectListItem? item in from SelectListItem item in infrList
-                                             where model.Infringements.Contains(int.Parse(item.Value))
-                                             select item)
+            foreach (SelectListItem? item in infrList.Where(i => model.Infringements.Contains(int.Parse(i.Value))))
             {
                 item.Selected = true;
             }
@@ -158,7 +143,6 @@ public class ProcessController(
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(ProcessDto model)
     {
-
         if (!ModelState.IsValid)
         {
             await _viewDataSvc.PopulateForEditAsync(ViewData, model.ProcessId);
@@ -177,91 +161,38 @@ public class ProcessController(
             model.ComunicatedToPjm = false;
         }
 
-        model.ModifiedByName = User?.FindFirst("display_name")?.Value ?? UserNameFallBack;
-        model.ModifiedByNii = User?.FindFirst("preferred_username")?.Value ?? UserNameFallBack;
-        model.ModifiedAt = DateOnly.FromDateTime(DateTime.Now);
 
-        ProcessStateDto states = await _processManagement.ProcessStates.GetStateById(model.ProcessStateId);
-        model.ProcessState = states;
+
+        model.ProcessState = await _processManagement.ProcessStates.GetStateById(model.ProcessStateId);
 
         ProcessDto currentProcess = await _processManagement.Processes.GetProcessById(model.ProcessId);
-
         if (!await UserCanEdit(currentProcess))
         {
             return Forbid();
         }
 
-        if (states.StateName == "Aberto")
+        if (!ValidateRequiredFieldsForOpenState(model))
         {
-            var missing = model.GetType().GetProperties()
-               .Where(p => p.Name != nameof(model.ProcessState))
-               .Where(p => !Attribute.IsDefined(p, typeof(ExcludedFromValidationAttribute)))
-               .Where(p => p.GetValue(model) == null
-                        || (p.GetValue(model) is string s && string.IsNullOrWhiteSpace(s)))
-               .Select(p =>
-               {
-                   DisplayAttribute? displayAttr = p.GetCustomAttributes(typeof(DisplayAttribute), false)
-                                      .Cast<DisplayAttribute>()
-                                      .FirstOrDefault();
-
-                   if (displayAttr != null && !string.IsNullOrWhiteSpace(displayAttr.Name))
-                   {
-                       return displayAttr.Name;
-                   }
-
-                   DisplayNameAttribute? displayNameAttr = p.GetCustomAttributes(typeof(DisplayNameAttribute), false)
-                                          .Cast<DisplayNameAttribute>()
-                                          .FirstOrDefault();
-
-                   return displayNameAttr != null && !string.IsNullOrWhiteSpace(displayNameAttr.DisplayName) ? displayNameAttr.DisplayName : p.Name;
-               })
-               .ToList();
-
-            if (missing.Count > 0)
-            {
-                var message = "É necessário preencher os seguintes campos para passar o estado para Aberto: "
-                              + string.Join(", ", missing);
-
-                ModelState.AddModelError(string.Empty, message);
-
-                await _viewDataSvc.PopulateForEditAsync(ViewData, model.ProcessId);
-                return View(model);
-            }
+            return await ReturnToEditView(model);
         }
+
+
+        ApplyCommunicatedPJMRules(model);
+        SetAuditFields(model, isNew: false, currentProcess);
 
         await _processManagement.Processes.EditProcess(model);
 
-        List<ProcessFileDto> uploadedFiles = await _processManagement.ProcessFiles.GetAllProcessFilesByProcessId(model.ProcessId);
-
-        if (model.ProcessFiles?.Length > 0)
+        if (!await ValidateAndSaveFiles(model.ProcessId, model.ProcessFiles))
         {
-            foreach (IFormFile file in model.ProcessFiles)
-            {
-
-                if (!await _fileValidatorSvc.ValidateAndSaveFileAsync(model.ProcessId, file))
-                {
-                    model = await _processManagement.Processes.GetProcessById(model.ProcessId);
-                    model.UploadedFiles = uploadedFiles;
-                    await _viewDataSvc.PopulateForEditAsync(ViewData, model.ProcessId);
-                    return View(model);
-                }
-            }
+            return await ReturnToEditViewWithFiles(model);
         }
 
-        if (model.FilesToRemove?.Count > 0)
+        if (model.FilesToRemove?.Any() == true)
         {
-            foreach (var fileId in model.FilesToRemove)
-            {
-                await _processManagement.ProcessFiles.DeleteProcessFile(fileId);
-            }
+            await RemoveFiles(model.FilesToRemove);
         }
 
         _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("EditSuccessMessage"), "O", EntityName, "o"));
-        await _viewDataSvc.PopulateForEditAsync(ViewData, model.ProcessId);
-        model = await _processManagement.Processes.GetProcessById(model.ProcessId);
-        uploadedFiles = await _processManagement.ProcessFiles.GetAllProcessFilesByProcessId(model.ProcessId);
-        model.UploadedFiles = uploadedFiles;
-
         return RedirectToAction(nameof(List));
     }
 
@@ -294,6 +225,8 @@ public class ProcessController(
         return RedirectToAction(nameof(List));
     }
 
+    #region Helpers
+
     private string GetProcessPageTitle()
     {
         return User switch
@@ -306,13 +239,136 @@ public class ProcessController(
 
     private async Task<bool> UserCanEdit(ProcessDto process)
     {
-        var allowedForInstructor = User.IsInstrutor() && (process.ProcessState.StateName == "Em Edição" || process.ProcessState.StateName == "Em Validação") && process.CreatedByNii == User.Identity?.Name;
+        var allowedForInstructor = User.IsInstrutor() && (process.ProcessState.StateName == "Em Edição"
+            || process.ProcessState.StateName == "Em Validação") && process.CreatedByNii == User.Identity?.Name;
 
         var isUnitcom = await _contextSvc.Units.IsTheUnitsCommander(process.UnitId, User!.Identity!.Name!);
         var allowedForCommander = User.IsComando() && process.ProcessState.StateName == "Aberto" && isUnitcom;
 
         return allowedForInstructor || allowedForCommander || User.IsDjAdministration();
     }
+
+    private void ApplyCommunicatedPJMRules(ProcessDto model)
+    {
+        if (model.ProcessType?.ProcessTypeName == AccidentProcessTypeName)
+        {
+            model.ComunicatedToPjm = false;
+        }
+    }
+
+    private void SetAuditFields(ProcessDto model, bool isNew, ProcessDto? process)
+    {
+        var UserNameFallBack = "Utilizador";
+
+        var displayName = User?.FindFirst("display_name")?.Value ?? UserNameFallBack;
+        var nii = User?.FindFirst("preferred_username")?.Value ?? UserNameFallBack;
+
+        if (isNew)
+        {
+            model.CreatedByName = displayName;
+            model.CreatedByNii = nii;
+            model.CreatedAt = DateOnly.FromDateTime(DateTime.Now);
+        }
+        else
+        {
+            if (process != null)
+            {
+                model.CreatedBy = process!.CreatedBy;
+                model.CreatedByName = process!.CreatedByName;
+                model.CreatedByNii = process!.CreatedByNii;
+            }
+
+            model.ModifiedByName = displayName;
+            model.ModifiedByNii = nii;
+            model.ModifiedAt = DateOnly.FromDateTime(DateTime.Now);
+        }
+    }
+
+    private async Task<bool> ValidateAndSaveFiles(int? processId, IFormFile[]? files)
+    {
+        if (files == null)
+        {
+            return true;
+        }
+
+        foreach (IFormFile file in files)
+        {
+            if (!await _fileValidatorSvc.ValidateAndSaveFileAsync(processId, file))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private async Task RemoveFiles(IEnumerable<int> fileIds)
+    {
+        foreach (var fileId in fileIds)
+        {
+            await _processManagement.ProcessFiles.DeleteProcessFile(fileId);
+        }
+    }
+
+    private bool ValidateRequiredFieldsForOpenState(ProcessDto model)
+    {
+        if (model.ProcessState.StateName != "Aberto")
+        {
+            return true;
+        }
+
+        var missing = model.GetType().GetProperties()
+            .Where(p => p.Name != nameof(model.ProcessState))
+            .Where(p => !Attribute.IsDefined(p, typeof(ExcludedFromValidationAttribute)))
+            .Where(p => p.GetValue(model) == null
+                     || (p.GetValue(model) is string s && string.IsNullOrWhiteSpace(s)))
+            .Select(GetDisplayName)
+            .ToList();
+
+        if (missing.Count == 0)
+        {
+            return true;
+        }
+
+        var message = "É necessário preencher os seguintes campos para passar o estado para Aberto: "
+            + string.Join(", ", missing);
+
+        ModelState.AddModelError(string.Empty, message);
+        return false;
+    }
+
+    private static string GetDisplayName(PropertyInfo property)
+    {
+        DisplayAttribute? displayAttr = property.GetCustomAttributes(typeof(DisplayAttribute), false)
+            .Cast<DisplayAttribute>()
+            .FirstOrDefault();
+
+        if (!string.IsNullOrWhiteSpace(displayAttr?.Name))
+        {
+            return displayAttr.Name;
+        }
+
+        DisplayNameAttribute? displayNameAttr = property.GetCustomAttributes(typeof(DisplayNameAttribute), false)
+            .Cast<DisplayNameAttribute>()
+            .FirstOrDefault();
+
+        return !string.IsNullOrWhiteSpace(displayNameAttr?.DisplayName)
+            ? displayNameAttr.DisplayName
+            : property.Name;
+    }
+
+    private async Task<IActionResult> ReturnToEditView(ProcessDto model)
+    {
+        await _viewDataSvc.PopulateForEditAsync(ViewData, model.ProcessId);
+        return View(model);
+    }
+
+    private async Task<IActionResult> ReturnToEditViewWithFiles(ProcessDto model)
+    {
+        model = await _processManagement.Processes.GetProcessById(model.ProcessId);
+        model.UploadedFiles = await _processManagement.ProcessFiles.GetAllProcessFilesByProcessId(model.ProcessId);
+        await _viewDataSvc.PopulateForEditAsync(ViewData, model.ProcessId);
+        return View(model);
+    }
 }
 
-
+#endregion Helpers
