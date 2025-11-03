@@ -5,4 +5,6 @@ namespace Processos_Juridicos.Services.Interfaces;
 public interface ILdapConnSvc : IDisposable
 {
     public LdapConnection GetConnection();
+
+    public LdapConnection CreateConnection();
 }

@@ -17,4 +17,10 @@ public class UserDataSvc(IRemoteUserSvc remoteUserService) : IUserDataSvc
     {
         return await _remoteUserService.SearchUsersByTermAsync(term);
     }
+
+    public List<string> GetUsersInGroup(string groupName)
+    {
+        return _remoteUserService.GetUsersInGroup(groupName);
+    }
+
 }

@@ -7,4 +7,6 @@ public interface IUserDataSvc
     public Task<UserDataModel?> GetUserByNiiAsync(string nii);
 
     public Task<IReadOnlyList<UserDataModel>?> SearchUsersAsync(string term);
+
+    public List<string> GetUsersInGroup(string groupName);
 }

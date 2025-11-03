@@ -7,4 +7,6 @@ public interface IRemoteUserSvc
     public Task<UserDataModel?> FindUserByNiiAsync(string nii);
 
     public Task<IReadOnlyList<UserDataModel>?> SearchUsersByTermAsync(string term);
+
+    public List<string> GetUsersInGroup(string groupName);
 }

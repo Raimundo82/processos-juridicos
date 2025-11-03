@@ -19,8 +19,15 @@ public class LdapConnSvc(LdapConfiguration configuration) : ILdapConnSvc
 
         if (_ldapConnection != null)
         {
-            return _ldapConnection;
-
+            try
+            {
+                TimeSpan _ = _ldapConnection.Timeout;
+                return _ldapConnection;
+            }
+            catch (ObjectDisposedException)
+            {
+                _ldapConnection = null;
+            }
         }
 
         LdapDirectoryIdentifier ldapDirectoryIdentifier = new(
@@ -50,6 +57,29 @@ public class LdapConnSvc(LdapConfiguration configuration) : ILdapConnSvc
             throw new InvalidOperationException($"Failed to connect to LDAP server at {_configuration.Url}:{_configuration.Port}", ex);
         }
     }
+
+    public LdapConnection CreateConnection()
+    {
+        var ldapDirectoryIdentifier = new LdapDirectoryIdentifier(
+            _configuration.Url,
+            int.Parse(_configuration.Port),
+            fullyQualifiedDnsHostName: false,
+            connectionless: false);
+
+        var networkCredential = new NetworkCredential(_configuration.Username, _configuration.Password);
+
+        var conn = new LdapConnection(ldapDirectoryIdentifier, networkCredential, AuthType.Basic)
+        {
+            Timeout = TimeSpan.FromSeconds(10),
+        };
+
+        conn.SessionOptions.ProtocolVersion = 3;
+        conn.SessionOptions.SecureSocketLayer = true;
+        conn.Bind();
+
+        return conn;
+    }
+
 
     public void Dispose()
     {
