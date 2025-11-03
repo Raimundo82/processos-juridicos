@@ -89,10 +89,10 @@ describe('user-role-search.js', () => {
         await Promise.resolve();
         await new Promise(setImmediate);
 
-        expect(utils.resolveId).toHaveBeenCalledWith('jjane');       // string
-        expect(utils.markValid).toHaveBeenCalledWith(visibleInput);  // element
+        expect(utils.resolveId).toHaveBeenCalledWith('jjane');
+        expect(utils.markValid).toHaveBeenCalledWith(visibleInput);
         expect(document.getElementById('UserInfo').textContent).toContain('✅ Jane');
-        expect(document.getElementById('UserNii').value).toBe('Mjjane'); // note M prefix
+        expect(document.getElementById('UserNii').value).toBe('JJANE');
     });
 
     test('blur on user-lookup marks invalid when not found', async () => {

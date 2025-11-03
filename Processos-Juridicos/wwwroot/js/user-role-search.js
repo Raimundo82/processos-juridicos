@@ -29,9 +29,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td>${u.displayName || ''}</td>
-                <td>${u.samAccountName || ''}</td>
+                <td>${u.userName || ''}</td>
                 <td>${u.email || ''}</td>
-                <td>${u.department || u.company || ''}</td>
+                <td>${u.unit || ''}</td>
                 <td><button type="button" class="btn btn-sm btn-success">Selecionar</button></td>
             `;
             tr.addEventListener('dblclick', () => applySelection(u));
@@ -115,12 +115,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (data?.userName) {
 
-                const prefixedNii = raw.startsWith('M') ? raw : `M${raw}`;
+                const prefixedNii = raw.toUpperCase();
                 if (hiddenNameEl) hiddenNameEl.value = data.displayName;
                 if (hiddenNiiEl) hiddenNiiEl.value = prefixedNii;
 
                 if (inputEl) {
-                    inputEl.value = prefixedNii;
+                     inputEl.value = data.displayName + ' - ' +prefixedNii;
                     markValid(inputEl);
                 }
 
