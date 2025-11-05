@@ -5,9 +5,11 @@ using System.Reflection;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 using Processos_Juridicos.Attributes;
 using Processos_Juridicos.DTOs;
+using Processos_Juridicos.Mappers;
 using Processos_Juridicos.Models;
 using Processos_Juridicos.Services.Interfaces.DomainData;
 using Processos_Juridicos.Services.Interfaces.ProcessManagement;
@@ -35,8 +37,10 @@ public class ProcessController(
     private readonly IToastNotify _toastNotify = toastNotify;
 
     [HttpGet]
-    public async Task<IActionResult> List()
+    public async Task<IActionResult> List() // default to 10
     {
+        var length = 10;
+
         if (!User.IsInstrutor() && !User.IsComando() && !User.IsDj())
         {
             return View(new ProcessListViewModel
@@ -48,7 +52,10 @@ public class ProcessController(
             });
         }
 
-        IEnumerable<ProcessDto> processes = await _processManagement.Processes.GetAllProcesses(User);
+        // Fetch only the first `length` processes user can see
+        IEnumerable<ProcessDto> allProcesses = await _processManagement.Processes.GetAllProcesses(User);
+
+        IEnumerable<ProcessDto> processes = allProcesses.Take(length);
 
         var vm = new ProcessListViewModel
         {
@@ -60,6 +67,7 @@ public class ProcessController(
 
         return View(vm);
     }
+
 
     [Authorize(Policy = "PROCESS-VIEW")]
     [HttpGet]
@@ -196,7 +204,6 @@ public class ProcessController(
         return RedirectToAction(nameof(List));
     }
 
-
     [HttpGet]
     public async Task<IActionResult> GetFilterValues()
     {
@@ -225,6 +232,74 @@ public class ProcessController(
         return RedirectToAction(nameof(List));
     }
 
+    [Authorize]
+    [HttpPost]
+    public async Task<IActionResult> LoadProcesses(int draw, int start, int length, [FromForm(Name = "search[value]")] string? search, string? unitFilter, string? typeFilter, string? stateFilter)
+    {
+        if (!ModelState.IsValid)
+        {
+            return Json(new { });
+        }
+
+        IQueryable<Entities.Process> query = _processManagement.Processes.BuildRestrictedQuery(User);
+
+        var totalRecords = await query.CountAsync();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            query = query.Where(p => p.Nuipm.Contains(search) ||
+                p.OficialInstName.Contains(search));
+        }
+
+        if (!string.IsNullOrEmpty(unitFilter))
+        {
+            query = query.Where(p => p.Unit.UnitAcronym == unitFilter);
+        }
+        if (!string.IsNullOrEmpty(typeFilter))
+        {
+            query = query.Where(p => p.ProcessType.ProcessTypeName == typeFilter);
+        }
+        if (!string.IsNullOrEmpty(stateFilter))
+        {
+            query = query.Where(p => p.ProcessState.StateName == stateFilter);
+        }
+
+        var filteredRecords = await query.CountAsync();
+
+        // Materialize first
+        List<Entities.Process> page = await query
+            .OrderByDescending(p => p.CreatedAt)
+            .Skip(start)
+            .Take(length)
+            .ToListAsync();
+
+        var data = page.Select(p => new
+        {
+            processId = p.ProcessId,
+            nuipm = p.Nuipm ?? "",
+            processTypeName = p.ProcessType?.ProcessTypeName ?? "",
+            unitAcronym = p.Unit?.UnitAcronym ?? "",
+            oficialInstName = p.OficialInstName ?? "",
+            oficialInstTelephone = p.OficialInstTelephone ?? "",
+            createdByName = p.CreatedByName ?? "",
+            sentenceName = p.Sentence?.SentenceName ?? "",
+            createdAt = p.CreatedAt?.ToString("dd-MM-yyyy") ?? "",
+            processStateName = p.ProcessState?.StateName ?? "",
+            modifiedAt = p.ModifiedAt?.ToString("dd-MM-yyyy") ?? "",
+            modifiedByName = p.ModifiedByName ?? "",
+            canEdit = UserCanEdit(Mapper.MapToProcessesDto(p)),
+            canDelete = UserCanDelete(Mapper.MapToProcessesDto(p))
+        });
+
+        return Json(new
+        {
+            draw,
+            recordsTotal = totalRecords,
+            recordsFiltered = filteredRecords,
+            data
+        });
+    }
+
     #region Helpers
 
     private string GetProcessPageTitle()
@@ -246,6 +321,14 @@ public class ProcessController(
         var allowedForCommander = User.IsComando() && process.ProcessState.StateName == "Aberto" && isUnitcom;
 
         return allowedForInstructor || allowedForCommander || User.IsDjAdministration();
+    }
+
+    private bool UserCanDelete(ProcessDto process)
+    {
+        var allowedForDelete = (User.IsDjAdministration() || process.CreatedByNii == User.Identity?.Name)
+            && (process.ProcessState.StateName == "Em Edição" || process.ProcessState.StateName == "Em Validação");
+
+        return allowedForDelete;
     }
 
     private void ApplyCommunicatedPJMRules(ProcessDto model)

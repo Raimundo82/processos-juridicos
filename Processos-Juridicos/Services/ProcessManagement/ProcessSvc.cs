@@ -188,6 +188,42 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
         return count;
     }
 
+
+    public IQueryable<Process> BuildRestrictedQuery(ClaimsPrincipal user)
+    {
+        IQueryable<Process> query = _context.Processes
+            .Include(x => x.Unit)
+            .Include(x => x.CompensatingUnit)
+            .Include(x => x.HarmedOrCasualties)
+            .Include(x => x.Infringements)
+            .Include(x => x.ProcessType)
+            .Include(x => x.Sentence)
+            .Include(x => x.ProcessState)
+            .Include(x => x.AccidentType)
+            .Include(x => x.MilitarySecurity)
+            .Include(x => x.CrimeType)
+            .AsNoTracking();
+
+        var nii = user.Identity?.Name;
+
+        if (user.IsInstrutor())
+        {
+            query = query.Where(p => (p.OficialInstName != null &&
+                p.OficialInstName.EndsWith(" - " + nii)) || p.CreatedByNii == nii);
+        }
+        else if (user.IsComando())
+        {
+            var unitId = _context.UnitCommanders
+                .Where(u => u.UserNii == nii)
+                .Select(u => u.UnitId)
+                .FirstOrDefault();
+            query = query.Where(p => p.UnitId == unitId);
+        }
+
+        return query;
+    }
+
+
     public async Task<ProcessFilterValuesDto> GetFilterValuesAsync()
     {
         List<string> units = await _context.Processes
