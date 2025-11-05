@@ -50,7 +50,9 @@
                 <input id="instructor-lookup"
                        class="form-control"
                        placeholder="Digite o ID do oficial, ex: a1234"
-                       value="@($"{Model?.OficialInstName} - {Model?.OficialInstNii}")" />
+                       value="@(string.Join(" - ",
+                            new[] { Model?.OficialInstName, Model?.OficialInstNii }
+                            .Where(s => !string.IsNullOrWhiteSpace(s)).DefaultIfEmpty()))" />
 
                 <button type="button"
                         class="btn btn-primary btn-auto ad-lookup-btn"
