@@ -103,8 +103,8 @@
             <span asp-validation-for="InvestigatedName" class="text-danger"></span>
 
             <div class="form-check mt-2">
-                <input type="checkbox" id="uncertainInvestigated" class="form-check-input" />
-                <label for="uncertainInvestigated" class="form-check-label">Averiguado incerto</label>
+                <input asp-for="InvestigatedUncertain" class="form-check-input" />
+                <label asp-for="InvestigatedUncertain" class="form-check-label"></label>
             </div>
         </div>
     </div>

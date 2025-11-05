@@ -102,6 +102,7 @@ public class ProcessController(
             return View(model);
         }
 
+        ApplyInvestigatedUncertainRules(model);
         ApplyCommunicatedPJMRules(model);
         SetAuditFields(model, isNew: true, null);
 
@@ -169,8 +170,6 @@ public class ProcessController(
             model.ComunicatedToPjm = false;
         }
 
-
-
         model.ProcessState = await _processManagement.ProcessStates.GetStateById(model.ProcessStateId);
 
         ProcessDto currentProcess = await _processManagement.Processes.GetProcessById(model.ProcessId);
@@ -184,7 +183,7 @@ public class ProcessController(
             return await ReturnToEditView(model);
         }
 
-
+        ApplyInvestigatedUncertainRules(model);
         ApplyCommunicatedPJMRules(model);
         SetAuditFields(model, isNew: false, currentProcess);
 
@@ -329,6 +328,15 @@ public class ProcessController(
             && (process.ProcessState.StateName == "Em Edição" || process.ProcessState.StateName == "Em Validação");
 
         return allowedForDelete;
+    }
+
+    private static void ApplyInvestigatedUncertainRules(ProcessDto model)
+    {
+        if (model.InvestigatedUncertain)
+        {
+            model.InvestigatedName = null;
+            model.InvestigatedGender = "Incerto";
+        }
     }
 
     private void ApplyCommunicatedPJMRules(ProcessDto model)

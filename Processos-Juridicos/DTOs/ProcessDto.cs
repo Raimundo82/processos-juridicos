@@ -44,6 +44,9 @@ public partial class ProcessDto
     [Phone(ErrorMessage = "Invalid phone number")]
     public string OficialInstTelephone { get; set; }
 
+    [DisplayName("Averiguado Incerto")]
+    public required bool InvestigatedUncertain { get; set; } = false;
+
     [DisplayName("Averiguado")]
     [ExcludedFromValidation]
     public string InvestigatedName { get; set; }

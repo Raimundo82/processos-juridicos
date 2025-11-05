@@ -33,10 +33,11 @@ public partial class Process
     [Column("compensating_unit_id")]
     public int? CompensatingUnitId { get; set; }
 
+    [Column("investigated_uncertain")]
+    public bool InvestigatedUncertain { get; set; } = false;
+
     [Column("investigated_name")]
     public string InvestigatedName { get; set; }
-
-
 
     [Column("investigated_gender")]
     public string InvestigatedGender { get; set; }
