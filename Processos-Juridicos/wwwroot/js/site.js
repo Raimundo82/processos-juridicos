@@ -41,14 +41,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     btnRejectChanges.addEventListener("click", function () {
-    rejectModal.show();
+        rejectModal.show();
+    });
 
-     btnConfirmReject.addEventListener("click", function () {
-     globalThis.history.back();
-        });
-    })
-
+    btnConfirmReject.addEventListener("click", function () {
+        globalThis.history.back();
+    });
 });
+
+
 
 // Select2 initializers
 $(function () {
