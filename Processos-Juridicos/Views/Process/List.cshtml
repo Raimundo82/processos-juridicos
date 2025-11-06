@@ -160,6 +160,10 @@
         var table = $('#processesTable').DataTable({
             processing: true,
             serverSide: true,
+            columnDefs: [
+                { targets: '_all', orderSequence: ['asc', 'desc'] }
+            ],
+            order: [[5, 'desc']],
             ajax: {
                 url: '@Url.Action("LoadProcesses", "Process")',
                 type: 'POST',

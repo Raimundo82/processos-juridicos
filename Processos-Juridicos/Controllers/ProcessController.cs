@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Linq.Expressions;
 using System.Reflection;
 
 using Microsoft.AspNetCore.Authorization;
@@ -35,6 +36,21 @@ public class ProcessController(
     private readonly IFileValidatorSvc _fileValidatorSvc = fileValidatorSvc;
     private readonly IContextSvc _contextSvc = contextSvc;
     private readonly IToastNotify _toastNotify = toastNotify;
+
+    private readonly Dictionary<int, Expression<Func<Entities.Process, object>>> sortMap = new()
+    {
+    { 0, p => p.Nuipm },
+    { 1, p => p.ProcessType.ProcessTypeName },
+    { 2, p => p.Unit.UnitAcronym },
+    { 3, p => p.OficialInstName },
+    { 4, p => p.OficialInstTelephone },
+    { 5, p => p.CreatedByName },
+    { 6, p => p.Sentence.SentenceName },
+    { 7, p => p.CreatedAt! },
+    { 8, p => p.ProcessState.StateName },
+    { 9, p => p.ModifiedAt! },
+    { 10, p => p.ModifiedByName }
+};
 
     [HttpGet]
     public async Task<IActionResult> List() // default to 10
@@ -233,7 +249,7 @@ public class ProcessController(
 
     [Authorize]
     [HttpPost]
-    public async Task<IActionResult> LoadProcesses(int draw, int start, int length, [FromForm(Name = "search[value]")] string? search, string? unitFilter, string? typeFilter, string? stateFilter)
+    public async Task<IActionResult> LoadProcesses([FromForm] DataTablesRequest request)
     {
         if (!ModelState.IsValid)
         {
@@ -244,34 +260,47 @@ public class ProcessController(
 
         var totalRecords = await query.CountAsync();
 
-        if (!string.IsNullOrWhiteSpace(search))
+        // Filtering
+        if (!string.IsNullOrWhiteSpace(request.Search))
         {
-            query = query.Where(p => p.Nuipm.Contains(search) ||
-                p.OficialInstName.Contains(search));
+            query = query.Where(p => p.Nuipm.Contains(request.Search) ||
+                                     p.OficialInstName.Contains(request.Search));
         }
 
-        if (!string.IsNullOrEmpty(unitFilter))
+        if (!string.IsNullOrEmpty(request.UnitFilter))
         {
-            query = query.Where(p => p.Unit.UnitAcronym == unitFilter);
+            query = query.Where(p => p.Unit.UnitAcronym == request.UnitFilter);
         }
-        if (!string.IsNullOrEmpty(typeFilter))
+
+        if (!string.IsNullOrEmpty(request.TypeFilter))
         {
-            query = query.Where(p => p.ProcessType.ProcessTypeName == typeFilter);
+            query = query.Where(p => p.ProcessType.ProcessTypeName == request.TypeFilter);
         }
-        if (!string.IsNullOrEmpty(stateFilter))
+
+        if (!string.IsNullOrEmpty(request.StateFilter))
         {
-            query = query.Where(p => p.ProcessState.StateName == stateFilter);
+            query = query.Where(p => p.ProcessState.StateName == request.StateFilter);
         }
 
         var filteredRecords = await query.CountAsync();
 
-        // Materialize first
+        if (sortMap.TryGetValue(request.OrderColumn, out Expression<Func<Entities.Process, object>>? sortExpr))
+        {
+            query = request.OrderDir == "asc" ? query.OrderBy(sortExpr) : query.OrderByDescending(sortExpr);
+        }
+        else
+        {
+            // fallback if no mapping found
+            query = query.OrderByDescending(p => p.CreatedAt);
+        }
+
+        // Paging
         List<Entities.Process> page = await query
-            .OrderByDescending(p => p.CreatedAt)
-            .Skip(start)
-            .Take(length)
+            .Skip(request.Start)
+            .Take(request.Length)
             .ToListAsync();
 
+        // Projection
         var data = page.Select(p => new
         {
             processId = p.ProcessId,
@@ -292,7 +321,7 @@ public class ProcessController(
 
         return Json(new
         {
-            draw,
+            request.Draw,
             recordsTotal = totalRecords,
             recordsFiltered = filteredRecords,
             data
