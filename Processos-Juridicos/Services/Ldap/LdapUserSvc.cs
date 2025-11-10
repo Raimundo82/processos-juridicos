@@ -18,6 +18,12 @@ public class LdapUserSvc(ILdapConnSvc ldapConnSvc, LdapConfiguration configurati
         return response.Entries.Count > 0 ? MapToUser(response.Entries[0]) : null;
     }
 
+    public async Task<UserDataModel?> FetchUserPhotoByNiiAsync(string nii)
+    {
+        SearchResponse response = await ExecuteSearchByNiiAsync(nii);
+        return response.Entries.Count > 0 ? GetUserPhoto(response.Entries[0]) : null;
+    }
+
     public async Task<IReadOnlyList<UserDataModel>?> SearchUsersByTermAsync(string term)
     {
         SearchResponse response = await ExecuteSearchByTermAsync(term);
@@ -35,7 +41,6 @@ public class LdapUserSvc(ILdapConnSvc ldapConnSvc, LdapConfiguration configurati
         return users;
     }
 
-
     private Task<SearchResponse> ExecuteSearchByNiiAsync(string nii)
     {
         using LdapConnection conn = _ldapConnSvc.CreateConnection();
@@ -48,8 +53,6 @@ public class LdapUserSvc(ILdapConnSvc ldapConnSvc, LdapConfiguration configurati
         var response = (SearchResponse)conn.SendRequest(request);
         return Task.FromResult(response);
     }
-
-
 
     private Task<SearchResponse> ExecuteSearchByTermAsync(string term)
     {
@@ -145,6 +148,17 @@ public class LdapUserSvc(ILdapConnSvc ldapConnSvc, LdapConfiguration configurati
 
         var raw = response.Entries[0].Attributes["sAMAccountName"]?[0];
         return raw is byte[] b ? Encoding.UTF8.GetString(b) : raw?.ToString();
+    }
+
+
+    private static UserDataModel GetUserPhoto(SearchResultEntry entry)
+    {
+        return new UserDataModel
+        {
+            UserPhoto = entry.Attributes.Contains("thumbnailPhoto")
+            ? (byte[])entry.Attributes["thumbnailPhoto"][0]
+            : null
+        };
     }
 
 

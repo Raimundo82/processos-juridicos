@@ -23,4 +23,9 @@ public class UserDataSvc(IRemoteUserSvc remoteUserService) : IUserDataSvc
         return _remoteUserService.GetUsersInGroup(groupName);
     }
 
+    public Task<UserDataModel?> FetchUserPhoto(string nii)
+    {
+        return _remoteUserService.FetchUserPhotoByNiiAsync(nii);
+    }
+
 }

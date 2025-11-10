@@ -8,6 +8,8 @@
         ?? "Utilizador";
 
     var photo = Url.Content("~/images/default-avatar.webp");
+
+    var base64 = User?.FindFirst("PhotoBase64")?.Value;
 }
 
 @if (isAuthenticated)
@@ -19,8 +21,14 @@
         </div>
         
         <a href="~/account/signout" class="avatar-wrapper">
-            <img src="@photo" alt="Avatar de @nii" 
-                 class="rounded-circle avatar-img" width="40" height="40" />
+            @if (!string.IsNullOrEmpty(base64))
+            {
+                <img src="data:image/png;base64,@base64" alt="Fotografia de @nii" class="rounded-circle avatar-img" width="40" height="40" />
+            } else
+            {
+                <img src="@photo" alt="Fotografia de @nii"
+                     class="rounded-circle avatar-img" width="40" height="40" />
+            }
             <div class="avatar-overlay">
                 <i class="bi bi-box-arrow-right text-danger fs-5"></i>
             </div>

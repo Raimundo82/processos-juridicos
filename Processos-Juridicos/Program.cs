@@ -1,6 +1,5 @@
 using Keycloak.AuthServices.Authentication;
 
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -133,11 +132,8 @@ builder.Services.AddScoped<IFileValidatorSvc, FileValidatorSvc>();
 builder.Services.AddScoped<ILdapConnSvc, LdapConnSvc>();
 builder.Services.AddScoped<IRemoteUserSvc, LdapUserSvc>();
 builder.Services.AddScoped<IUserDataSvc, UserDataSvc>();
-
 builder.Services.AddTransient<RoleSyncSvc>();
 builder.Services.AddHostedService<TimedSyncSvc>();
-
-builder.Services.AddScoped<IClaimsTransformation, CustomClaimsTransformer>();
 builder.Services.AddScoped<IViewRenderSvc, ViewRenderSvc>();
 
 // Register NToastNotify (Notifications)

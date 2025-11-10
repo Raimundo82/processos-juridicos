@@ -10,4 +10,5 @@ public interface IUserSvc
     public Task<UserDto> CreateUser(UserDto user);
     public Task<UserDto> UpdateUser(UserDto user);
     public Task<bool> RemoveUser(string? id);
+
 }

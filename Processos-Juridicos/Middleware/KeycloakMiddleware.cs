@@ -27,6 +27,12 @@ public static class KeycloakMiddlewareExtensions
                     options.TokenValidationParameters.RoleClaimType = ClaimTypes.Role;
                     options.Events = new OpenIdConnectEvents
                     {
+                        OnTokenValidated = async context =>
+                        {
+                            var identity = (ClaimsIdentity?)context!.Principal!.Identity;
+                            await ClaimsHelper.AddCustomClaimsAsync(identity!, context!.HttpContext.RequestServices);
+                        },
+
                         OnSignedOutCallbackRedirect = context =>
                         {
                             context.Response.Redirect($"{context.Request.PathBase}/");

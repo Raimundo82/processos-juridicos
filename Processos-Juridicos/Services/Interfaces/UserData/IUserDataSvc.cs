@@ -9,4 +9,6 @@ public interface IUserDataSvc
     public Task<IReadOnlyList<UserDataModel>?> SearchUsersAsync(string term);
 
     public List<string> GetUsersInGroup(string groupName);
+
+    public Task<UserDataModel?> FetchUserPhoto(string nii);
 }
