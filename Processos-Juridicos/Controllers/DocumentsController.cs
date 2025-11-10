@@ -39,6 +39,9 @@ public class DocumentsController(
             return HandleInvalidProcess();
         }
 
+        process.OficialInstName = FormatDisplay(process.OficialInstName, process.OficialInstNii);
+        process.CreatedByName = FormatDisplay(process.CreatedByName, process.CreatedByNii);
+
         var htmlContent = await _viewRenderSvc.RenderViewToStringAsync(ControllerContext, "PdfTemplate", process);
 
         using var memoryStream = new MemoryStream();
@@ -65,5 +68,15 @@ public class DocumentsController(
     {
         _toastNotify.Error("Ocorreu um erro a gerar o pdf");
         return RedirectToAction("List", "Process");
+    }
+
+    private static string FormatDisplay(string? name, string? nii)
+    {
+        if (string.IsNullOrEmpty(name))
+        {
+            return "N/A";
+        }
+
+        return string.IsNullOrEmpty(nii) ? name : $"{name} ({nii})";
     }
 }

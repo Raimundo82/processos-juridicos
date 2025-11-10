@@ -1,5 +1,6 @@
 @model Processos_Juridicos.DTOs.ProcessDto
 @using System.IO
+
 @{
     Layout = null;
     ViewData["Title"] = "Relatório do Processo " + (Model?.Nuipm ?? "N/A");
@@ -65,11 +66,9 @@
     <div class="data-grid">
         <div class="data-row">
             <div class="data-label">Oficial Instrutor:</div>
-            <div class="data-value">@(Model?.OficialInstName ?? "N/A")</div>
-        </div>
-        <div class="data-row">
-            <div class="data-label">Oficial Instrutor Nii:</div>
-            <div class="data-value">@(Model?.OficialInstNii ?? "N/A")</div>
+            <div class="data-value">
+                @(Model?.OficialInstName)
+            </div>
         </div>
         <div class="data-row">
             <div class="data-label">Telefone do Oficial Instrutor:</div>
@@ -127,6 +126,26 @@
         }
     </div>
 
+    <h2 class="doc-subtitle">Ocorrência</h2>
+    <div class="data-grid">
+        <div class="data-row">
+            <div class="data-label">Tipo de Crime:</div>
+            <div class="data-value">@(Model?.CrimeType?.CrimeTypeName ?? "N/A")</div>
+        </div>
+        <div class="data-row">
+            <div class="data-label">Segurança Militar:</div>
+            <div class="data-value">@(Model?.MilitarySecurity?.MilitarySecurityName ?? "N/A")</div>
+        </div>
+        <div class="data-row">
+            <div class="data-label">Acidente em Serviço:</div>
+            <div class="data-value">@(Model?.AccidentType?.AccidentTypeName ?? "N/A")</div>
+        </div>
+        <div class="data-row">
+            <div class="data-label">Morto/Ferido:</div>
+            <div class="data-value">@(Model?.HarmedOrCasualties?.CasualtyName ?? "N/A")</div>
+        </div>
+    </div>
+
     <h2 class="doc-subtitle">Valores e Compensação</h2>
     <div class="data-grid">
         <div class="data-row">
@@ -156,27 +175,7 @@
         </div>
     </div>
 
-    <h2 class="doc-subtitle">Ocorrência e Descrição</h2>
-    <div class="data-grid">
-        <div class="data-row">
-            <div class="data-label">Tipo de Crime:</div>
-            <div class="data-value">@(Model?.CrimeType?.CrimeTypeName ?? "N/A")</div>
-        </div>
-        <div class="data-row">
-            <div class="data-label">Segurança Militar:</div>
-            <div class="data-value">@(Model?.MilitarySecurity?.MilitarySecurityName ?? "N/A")</div>
-        </div>
-        <div class="data-row">
-            <div class="data-label">Acidente em Serviço:</div>
-            <div class="data-value">@(Model?.AccidentType?.AccidentTypeName ?? "N/A")</div>
-        </div>
-        <div class="data-row">
-            <div class="data-label">Morto/Ferido:</div>
-            <div class="data-value">@(Model?.HarmedOrCasualties?.CasualtyName ?? "N/A")</div>
-        </div>
-    </div>
-
-    <h2 class="doc-subtitle">Comunicação e Auditoria</h2>
+    <h2 class="doc-subtitle">Comunicação</h2>
     <div class="data-grid">
         <div class="data-row">
             <div class="data-label">Comunicado à PJM:</div>
@@ -186,13 +185,19 @@
             <div class="data-label">Data da Comunicação à PJM:</div>
             <div class="data-value">@(Model?.ComunicationDate?.ToString("dd/MM/yyyy") ?? "N/A")</div>
         </div>
+    </div>
+
+    <h2 class="doc-subtitle">Autoria</h2>
+    <div class="data-grid">
         <div class="data-row">
             <div class="data-label">Data de Criação:</div>
             <div class="data-value">@(Model?.CreatedAt?.ToString("dd/MM/yyyy") ?? "N/A")</div>
         </div>
         <div class="data-row">
             <div class="data-label">Criado por:</div>
-            <div class="data-value">@Model?.CreatedByName (@Model?.CreatedByNii)</div>
+            <div class="data-value">
+                @(Model?.CreatedByName)
+            </div>
         </div>
     </div>
 
