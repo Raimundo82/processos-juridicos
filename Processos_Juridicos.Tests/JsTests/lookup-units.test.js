@@ -31,7 +31,7 @@ describe('createBadge', () => {
 
         // label is the first child span inside wrapper
         const spans = badge.querySelectorAll('span');
-        expect(spans[0].textContent).toBe('Alice');
+        expect(spans[0].textContent).toBe('Alice (123)');
 
         // remove button
         const btn = badge.querySelector('button');
@@ -54,36 +54,32 @@ describe('applySelectionBadge', () => {
         adModal = { hide: vi.fn() };
     });
 
-    test('adds a new badge when employeeId input exists', () => {
-        // Reset DOM
+    test('adds a new badge when no employeeId input exists', () => {
         document.body.innerHTML = `
-    <div id="hidden"></div>
-    <div id="info"></div>
-  `;
+      <div id="hidden"></div>
+      <div id="info"></div>
+    `;
         const hiddenContainer = document.getElementById('hidden');
         const info = document.getElementById('info');
         const adModal = { hide: vi.fn() };
 
-        // Append the input with the employeeId value AFTER reset
-        const existing = document.createElement('input');
-        existing.setAttribute('value', 'emp123'); // set attribute so querySelector matches
-        document.body.appendChild(existing);
-
-        const user = { displayName: 'Bob', employeeId: 'emp123', samAccountName: 'bob' };
+        // Do NOT append an input with emp123
+        const user = { displayName: 'Bob', employeeId: 'emp123', nii: 'bob' };
         const target = { hiddenId: 'hidden', infoId: 'info' };
 
         applySelectionBadge(user, target, adModal);
 
         const badge = hiddenContainer.querySelector('.badge');
         expect(badge).not.toBeNull();
-        expect(info.textContent).toContain('✅ Added Bob (bob)');
+        expect(info.textContent).toContain('✅ Adicionado Bob (bob)');
         expect(adModal.hide).toHaveBeenCalled();
     });
+
 
     test('does not add duplicate badge if one with same id already exists', () => {
         hiddenContainer.innerHTML = `<input type="hidden" value="bob" />`;
 
-        const user = { displayName: 'Bob', samAccountName: 'bob' };
+        const user = { displayName: 'Bob', nii: 'bob' };
         const target = { hiddenId: 'hidden', infoId: 'info' };
 
         applySelectionBadge(user, target, adModal);
@@ -93,12 +89,15 @@ describe('applySelectionBadge', () => {
     });
 
     test('sets info text when user already added (no matching employeeId input)', () => {
-        const user = { displayName: 'Carol', employeeId: 'emp999', samAccountName: 'carol' };
+        hiddenContainer.innerHTML = `<input type="hidden" value="emp999" />`;
+
+        const user = { displayName: 'Carol', employeeId: 'emp999', nii: 'carol' };
         const target = { hiddenId: 'hidden', infoId: 'info' };
 
         applySelectionBadge(user, target, adModal);
 
-        expect(info.textContent).toContain('User Carol (carol) was already added');
+        expect(info.textContent).toContain('Utilizador Carol (carol) já é comando da unidade ou já foi adicionado');
+
     });
 });
 

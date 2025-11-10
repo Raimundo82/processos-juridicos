@@ -14,7 +14,7 @@ const createBadge = (display, id) => {
     });
 
     const label = document.createElement('span');
-    label.textContent = display;
+    label.textContent = display + " (" + id +")";
 
     const removeBtn = Object.assign(document.createElement('button'), {
         type: 'button',
@@ -30,9 +30,8 @@ const createBadge = (display, id) => {
 const applySelectionBadge = (user, target, adModal) => {
     const hiddenContainer = $(target.hiddenId);
     const info = $(target.infoId);
-
-    const display = user.displayName || user.cn || user.name || '';
-    const id = user.samAccountName || user.userPrincipalName || user.employeeId || '';
+    const display = user.displayName || '';
+    const id = user.nii || '';
 
     if (hiddenContainer.querySelector(`input[value="${id}"]`)) {
         adModal?.hide();
@@ -42,12 +41,12 @@ const applySelectionBadge = (user, target, adModal) => {
 
     const input = document.querySelector(`input[value="${user.employeeId}"]`);
 
-    if (input) {
+    if (!input) {
         hiddenContainer.appendChild(createBadge(display, id));
-        setText(info, `✅ Added ${display} (${id})`);
+        setText(info, `✅ Adicionado ${display} (${id})`);
         adModal?.hide();
     } else {
-        setText(info, `User ${display} (${id}) was already added `);
+        setText(info, `Utilizador ${display} (${id}) já é comando da unidade ou já foi adicionado `);
     }
 
 };
