@@ -47,12 +47,21 @@ jobs:
           tar -czf processos-juridicos.tar.gz -C ./Release .
         shell: bash
 
+      - name: Prepare CA certificate
+        run: |
+          mkdir -p certs
+          printf "%s\n" "${{ vars.MARINHA_ROOT_CA }}" > ${{ github.workspace }}/certs/marinha-root-ca.crt
+          echo "🔍 Certificate starts with:"
+          head -n 5 "${{ github.workspace }}/certs/marinha-root-ca.crt"
+          echo "✅ Certificate information:"
+          openssl x509 -in "${{ github.workspace }}/certs/marinha-root-ca.crt" -text -noout
+
       - name: Release
         env:
           GITEA_TOKEN: ${{ secrets.PACKAGE_UPLOAD_TOKEN }}
           GITEA_URL: https://devops-01.marinha.pt
+          NODE_EXTRA_CA_CERTS: '${{ github.workspace }}/certs/marinha-root-ca.crt'
           DOCKER_REGISTRY_USER: m22600
           DOCKER_REGISTRY_PASSWORD: ${{ secrets.PACKAGE_UPLOAD_TOKEN }}
         run: |
-          export NODE_OPTIONS="--use-system-ca"
           npx semantic-release
