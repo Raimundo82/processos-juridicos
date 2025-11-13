@@ -42,11 +42,12 @@ function createDataTable(elementId) {
 }
 
 // Filters to Process Table 
-function loadProcessFilters(apiUrl, unitSelector, typeSelector, stateSelector) {
-        $.getJSON(apiUrl, function (data) {
+function loadProcessFilters(apiUrl, unitSelector, typeSelector, stateSelector, yearSelector) {
+        $.getJSON(apiUrl, function (data) {    
             fillSelect(unitSelector, data.units);
             fillSelect(typeSelector, data.types);
             fillSelect(stateSelector, data.states);
+            fillSelect(yearSelector, data.years);
         });
     }
 
@@ -62,8 +63,7 @@ function fillSelect(selector, values) {
 
 $(document).ready(function () {
     const table = $('#processesTable').DataTable();
-
-    loadProcessFilters('/Process/GetFilterValues', '#unitFilter', '#typeFilter', '#stateFilter');
+    loadProcessFilters('/Process/GetFilterValues', '#unitFilter', '#typeFilter', '#stateFilter', '#yearFilter');
 
     $('#unitFilter').on('change', function () {
         table.column(2).search(this.value).draw();
@@ -73,6 +73,9 @@ $(document).ready(function () {
     });
     $('#stateFilter').on('change', function () {
         table.column(8).search(this.value).draw();
+    });
+     $('#yearFilter').on('change', function () {
+        table.column(5).search(this.value).draw();
     });
 });
 
@@ -91,6 +94,12 @@ $('#typeFilter').select2({
 });
 $('#stateFilter').select2({
     placeholder: "Todas os estados",
+    allowClear: true,
+    theme: 'bootstrap-5',
+    width: 'resolve'
+});
+$('#yearFilter').select2({
+    placeholder: "Todos os anos",
     allowClear: true,
     theme: 'bootstrap-5',
     width: 'resolve'

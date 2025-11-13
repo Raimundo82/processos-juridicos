@@ -14,6 +14,7 @@ public class DataTablesRequest
     public string? UnitFilter { get; set; }
     public string? TypeFilter { get; set; }
     public string? StateFilter { get; set; }
+    public string? YearFilter { get; set; }
 
     [FromForm(Name = "order[0][column]")]
     public required int OrderColumn { get; set; }

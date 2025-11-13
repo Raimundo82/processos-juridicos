@@ -38,24 +38,31 @@
                 {
                 
                     <div class="row mb-2">
-                        <div class="col-lg-4 col-md-12">
+                        <div class="col-lg-3 col-md-6">
                             <div class="form-group mt-3">
                                 <select class="form-select" id="unitFilter">
                                     <option value="">Todas as unidades</option>
                                 </select>
                             </div>
                         </div>
-                        <div class="col-lg-4 col-md-6">
+                        <div class="col-lg-3 col-md-6">
                             <div class="form-group mt-3">
                                 <select class="form-select" id="typeFilter">
                                     <option value="">Todos os tipos</option>
                                 </select>
                             </div>
                         </div>
-                        <div class="col-lg-4 col-md-6">
+                        <div class="col-lg-3 col-md-6">
                             <div class="form-group mt-3">
                                 <select class="form-select" id="stateFilter">
                                     <option value="">Todos os estados</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <div class="form-group mt-3">
+                                <select class="form-select" id="yearFilter">
+                                    <option value="">Todos os anos</option>
                                 </select>
                             </div>
                         </div>
@@ -171,6 +178,7 @@
                     d.unitFilter = $('#unitFilter').val();
                     d.typeFilter = $('#typeFilter').val();
                     d.stateFilter = $('#stateFilter').val();
+                    d.yearFilter = $('#yearFilter').val();
                 }
             },
             columns: [
@@ -233,7 +241,7 @@
         });
 
         // Trigger reload when filters change
-        $('#unitFilter, #typeFilter, #stateFilter').on('change', function () {
+        $('#unitFilter, #typeFilter, #stateFilter, #yearFilter').on('change', function () {
             table.ajax.reload();
         });
 

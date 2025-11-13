@@ -282,6 +282,11 @@ public class ProcessController(
             query = query.Where(p => p.ProcessState.StateName == request.StateFilter);
         }
 
+        if (int.TryParse(request.YearFilter, out var yearFilter))
+        {
+            query = query.Where(p => p.CreatedAt.HasValue && p.CreatedAt.Value.Year == yearFilter);
+        }
+
         var filteredRecords = await query.CountAsync();
 
         if (sortMap.TryGetValue(request.OrderColumn, out Expression<Func<Entities.Process, object>>? sortExpr))
@@ -368,7 +373,7 @@ public class ProcessController(
         }
     }
 
-    private void ApplyCommunicatedPJMRules(ProcessDto model)
+    private static void ApplyCommunicatedPJMRules(ProcessDto model)
     {
         if (model.ProcessType?.ProcessTypeName == AccidentProcessTypeName)
         {

@@ -105,6 +105,7 @@ describe('initializeDataTable.js', () => {
       <select id="unitFilter"></select>
       <select id="typeFilter"></select>
       <select id="stateFilter"></select>
+      <select id="yearFilter"></select>
     `;
         vi.clearAllMocks();
     });
@@ -150,24 +151,27 @@ describe('initializeDataTable.js', () => {
     });
 
     test('loadProcessFilters calls getJSON and fills selects', () => {
-        const data = { units: ['U'], types: ['T'], states: ['S'] };
+        const data = { units: ['U'], types: ['T'], states: ['S'], years: ['Y'] };
         global.$.getJSON.mockImplementation((url, cb) => cb(data));
 
-        loadProcessFilters('/Process/GetFilterValues', '#unit', '#type', '#state');
+        loadProcessFilters('/Process/GetFilterValues', '#unit', '#type', '#state', '#year');
 
         expect(global.$.getJSON).toHaveBeenCalledWith('/Process/GetFilterValues', expect.any(Function));
 
         const unitMock = global.$('#unit');   // same cached instance used internally
         const typeMock = global.$('#type');
         const stateMock = global.$('#state');
+        const yearMock = global.$('#year');
 
         // Default option + each value should be appended
         expect(unitMock.append).toHaveBeenCalledWith('<option value="">Todos</option>');
         expect(typeMock.append).toHaveBeenCalledWith('<option value="">Todos</option>');
         expect(stateMock.append).toHaveBeenCalledWith('<option value="">Todos</option>');
+        expect(yearMock.append).toHaveBeenCalledWith('<option value="">Todos</option>');
 
         expect(unitMock.append).toHaveBeenCalledWith('<option value="U">U</option>');
         expect(typeMock.append).toHaveBeenCalledWith('<option value="T">T</option>');
         expect(stateMock.append).toHaveBeenCalledWith('<option value="S">S</option>');
+        expect(yearMock.append).toHaveBeenCalledWith('<option value="Y">Y</option>');
     });
 });

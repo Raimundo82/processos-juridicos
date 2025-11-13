@@ -247,11 +247,19 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
             .OrderBy(x => x)
             .ToListAsync();
 
+        List<int> years = await _context.Processes
+            .Where(p => p.CreatedAt.HasValue)
+            .Select(p => p.CreatedAt!.Value.Year)
+            .Distinct()
+            .OrderBy(x => x)
+            .ToListAsync();
+
         return new ProcessFilterValuesDto
         {
             Units = units,
             Types = types,
-            States = states
+            States = states,
+            Years = years
         };
     }
 }
