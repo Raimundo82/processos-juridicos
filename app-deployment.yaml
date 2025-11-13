@@ -20,13 +20,30 @@ spec:
         - env:
             - name: ASPNETCORE_FORWARDEDHEADERS_ENABLED
               value: "true"
-            - name: DB_PASSWORD
+            - name: DB_HOST_PROD
+              value: SH13INTRA-DB1.marinha.pt
+            - name: DB_HOST_STAGGING
+              value: DEV-SH19-DB1.marinha.pt
+            - name: DB_USER_PROD
+              value: Processos
+            - name: DB_USER_STAGGING
+              value: processosUser            
+            - name: DB_NAME_STAGGING
+              value: Processos_DJ
+            - name: DB_NAME_PROD
+              value: ProcessosJustica 
+            - name: DB_PASSWORD            
               valueFrom:
                 secretKeyRef:
                   name: app-secrets
                   key: db-password
+            - name: DB_PASSWORD_PROD
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: db-password-prod
             - name: ConnectionStrings__DefaultConnection
-              value: Server=10.50.1.208; Database=Processos_DJ; User Id=processosUser; Password=$(DB_PASSWORD);TrustServerCertificate=True;
+              value: Server=$(DB_HOST_PROD); Database=$(DB_NAME_PROD); User Id=$(DB_USER_PROD); Password=$(DB_PASSWORD_PROD);TrustServerCertificate=True;
             - name: Keycloak__credentials__secret
               valueFrom:
                 secretKeyRef:
