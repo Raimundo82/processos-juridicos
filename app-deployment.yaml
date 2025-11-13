@@ -1,93 +1,107 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  name: processos-juridicos
+  namespace: dsi-paas
   labels:
-    io.kompose.service: app
-  name: app
+    app: processos-juridicos
 spec:
   replicas: 1
   selector:
     matchLabels:
-      io.kompose.service: app
+      app: processos-juridicos
   template:
     metadata:
       labels:
-        io.kompose.service: app
+        app: processos-juridicos
     spec:
       imagePullSecrets:
-        - name: devops-01
+      - name: devops-01
       containers:
-        - env:
-            - name: ASPNETCORE_FORWARDEDHEADERS_ENABLED
-              value: "true"
-            - name: DB_HOST_PROD
-              value: SH13INTRA-DB1.marinha.pt
-            - name: DB_HOST_STAGGING
-              value: DEV-SH19-DB1.marinha.pt
-            - name: DB_USER_PROD
-              value: Processos
-            - name: DB_USER_STAGGING
-              value: processosUser            
-            - name: DB_NAME_STAGGING
-              value: Processos_DJ
-            - name: DB_NAME_PROD
-              value: ProcessosJustica 
-            - name: DB_PASSWORD            
-              valueFrom:
-                secretKeyRef:
-                  name: app-secrets
-                  key: db-password
-            - name: DB_PASSWORD_PROD
-              valueFrom:
-                secretKeyRef:
-                  name: app-secrets
-                  key: db-password-prod
-            - name: ConnectionStrings__DefaultConnection
-              value: Server=$(DB_HOST_PROD); Database=$(DB_NAME_PROD); User Id=$(DB_USER_PROD); Password=$(DB_PASSWORD_PROD);TrustServerCertificate=True;
-            - name: Keycloak__credentials__secret
-              valueFrom:
-                secretKeyRef:
-                  name: app-secrets
-                  key: keycloak-secret
-            - name: Ldap__Marinha__Password
-              valueFrom:
-                secretKeyRef:
-                  name: app-secrets
-                  key: ldap-password
-          image: devops-01.marinha.pt/marinha-si/processos-juridicos:1.21.2
-          name: processos-juridcos-app
-          ports:
-            - containerPort: 8080
-              protocol: TCP          
+      - name: processos-juridicos
+        image: devops-01.marinha.pt/marinha-si/processos-juridicos:1.22.6
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP 
+        env:
+        - name: ASPNETCORE_FORWARDEDHEADERS_ENABLED
+          value: "true"
+        - name: ConnectionStrings__DefaultConnection
+          valueFrom:
+            secretKeyRef:
+              name: processos-juridicos-secrets
+              key: db-connection-stagging
+        - name: Keycloak__credentials__secret
+          valueFrom:
+            secretKeyRef:
+              name: processos-juridicos-secrets
+              key: keycloak-secret
+        - name: Ldap__Marinha__Password
+          valueFrom:
+            secretKeyRef:
+              name: processos-juridicos-secrets
+              key: ldap-password
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        livenessProbe:
+          httpGet:
+            path: /alive
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        
+        readinessProbe:
+          httpGet:
+            path: /alive
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
       restartPolicy: Always
 ---
 apiVersion: v1
 kind: Service
 metadata:
+  name: processos-juridicos
+  namespace: dsi-paas
   labels:
-    io.kompose.service: app
-  name: app
+    app: processos-juridicos
 spec:
   ports:
     - name: http
       port: 8080
       targetPort: 8080
+      protocol: TCP
   selector:
-    io.kompose.service: app
+    app: processos-juridicos
+  type: ClusterIP
 ---
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
-  name: app-route
+  name: processos-juridicos
+  namespace: dsi-paas
   labels:
     app: processos-juridicos
 spec:
   host: processos-juridicos.apps.okd-01.marinha.pt
   to:
     kind: Service
-    name: app
+    name: processos-juridicos
     weight: 100
   port:
     targetPort: http
   tls:
     termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None
