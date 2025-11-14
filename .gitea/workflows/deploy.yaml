@@ -36,4 +36,4 @@ jobs:
 
         run: |
           TAG="${GITEA_REF##refs/tags/v}"    
-          kubectl --kubeconfig=/tmp/config -n ${{ vars.DSI_PAAS_NS }} set image deployment/processos-juridicos processos-juridcos=devops-01.marinha.pt/marinha-si/processos-juridicos:$TAG
+          kubectl --kubeconfig=/tmp/config -n ${{ vars.DSI_PAAS_NS }} set image deployment/processos-juridicos processos-juridicos=devops-01.marinha.pt/marinha-si/processos-juridicos:$TAG
