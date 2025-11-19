@@ -92,15 +92,17 @@ export function initAdLookup({ applySelection, setupIds, debounceMs = 1000 }) {
         });
     });
 
-    const setupLookup = (visibleId, hiddenId, infoId) => {
+    const setupLookup = (visibleId, hiddenId, infoId, hiddenId2) => {
         const visibleEl = document.getElementById(visibleId);
         const hiddenEl = document.getElementById(hiddenId);
+        const hiddenEl2 = hiddenId2 ? document.getElementById(hiddenId2) : null;
         const infoEl = infoId ? document.getElementById(infoId) : null;
         if (!visibleEl || !hiddenEl) return;
 
         const resetState = () => {
             clearValidity(visibleEl);
             hiddenEl.value = '';
+            if (hiddenEl2) hiddenEl2.value = '';
             if (infoEl) infoEl.textContent = '';
         };
 
@@ -112,7 +114,7 @@ export function initAdLookup({ applySelection, setupIds, debounceMs = 1000 }) {
                         displayName: data.displayName || raw,
                         samAccountName: data.nii || data.fullUser || raw
                     };
-                    currentTarget = { visibleId, hiddenId, infoId };
+                    currentTarget = { visibleId, hiddenId, infoId, hiddenId2 };
                     applySelection(user, currentTarget, adModal);
                     visibleEl.value = user.displayName + ' - ' + user.samAccountName;
                     clearValidity(visibleEl);

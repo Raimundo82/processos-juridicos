@@ -5,10 +5,11 @@ import { initAdLookup } from './adLookup.js';
 // Fills one visible + one hidden input, and sets info text
 const applySelectionSingle = (user, target, adModal) => {
     const visible = document.getElementById(target.visibleId);
+
     const hidden1 = document.getElementById(target.hiddenId);   // always present
     const hidden2 = target.hiddenId2 ? document.getElementById(target.hiddenId2) : null;
-    const info = document.getElementById(target.infoId);
 
+    const info = document.getElementById(target.infoId);
     const display = user.displayName || user.cn || user.name || '';
     const empId = user.nii || user.samAccountName || user.userPrincipalName || '';
     if (visible) visible.value = `${display} - ${empId}`;
@@ -28,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initAdLookup({
         applySelection: applySelectionSingle,
         setupIds: [
-            ['instructor-lookup', 'OficialInstName', 'OficialInstInfo'],
+            ['instructor-lookup', 'OficialInstName', 'OficialInstInfo', 'OficialInstNii'],
             ['investigated-lookup', 'InvestigatedName', 'InvestigatedInfo']
         ],
         debounceMs: 1000

@@ -43,8 +43,12 @@
         <div class="row mb-3">
             <div class="col-lg-8">
                 <div class="form-group mt-3">
+                    <input type="hidden" asp-for="OficialInstName" />
+                    <input type="hidden" asp-for="OficialInstNii" />
+
                     <label asp-for="OficialInstName" class="form-label"></label>
-                    <input asp-for="OficialInstName" class="form-control" readonly />
+                    <input type="text" class="form-control"
+                           value="@($"{Model.OficialInstName} ({Model.OficialInstNii})")" readonly />
                 </div>
             </div>
             <div class="col-lg-4">
@@ -241,3 +245,4 @@
         </div>
     </div>
 </div>
+

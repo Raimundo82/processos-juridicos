@@ -77,7 +77,7 @@ describe('lookup.js', () => {
             expect.objectContaining({
                 applySelection: expect.any(Function),
                 setupIds: [
-                    ['instructor-lookup', 'OficialInstName', 'OficialInstInfo'],
+                    ['instructor-lookup', 'OficialInstName', 'OficialInstInfo', "OficialInstNii"],
                     ['investigated-lookup', 'InvestigatedName', 'InvestigatedInfo'],
                 ],
                 debounceMs: 1000,

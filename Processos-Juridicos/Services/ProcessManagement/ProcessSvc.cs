@@ -18,6 +18,17 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
 
     public async Task<ProcessDto> CreateProcess(ProcessDto process)
     {
+        if (process.OficialInstNii == null)
+        {
+            User? user = await _context.Users
+             .FirstOrDefaultAsync(u => u.UserName == process.OficialInstName);
+
+            if (user != null)
+            {
+                process.OficialInstNii = user.UserNii;
+            }
+        }
+
         Process processEntity = Mapper.MapToProcesses(process);
 
         _context.Processes.Add(processEntity);
@@ -99,7 +110,7 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
         if (User.IsInstrutor())
         {
             query = query.Where(p => (p.OficialInstName != null &&
-                p.OficialInstName.EndsWith(" - " + nii)) || p.CreatedByNii == nii);
+                p.OficialInstNii == nii) || p.CreatedByNii == nii);
         }
         else if (User.IsComando())
         {
