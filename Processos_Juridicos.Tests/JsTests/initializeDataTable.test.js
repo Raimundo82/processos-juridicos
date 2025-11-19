@@ -90,6 +90,14 @@ beforeAll(async () => {
     );
     fake$.fn = { select2: vi.fn() };
 
+    fake$.extend = (deep, target, ...sources) => {
+        if (typeof deep !== 'boolean') {
+            sources.unshift(target);
+            target = deep;
+        }
+        return Object.assign(target, ...sources);
+    };
+
     global.$ = fake$;
 
     // Dynamically import AFTER stubbing $

@@ -1,31 +1,30 @@
-// DataTable Initializer
-
 export { createDataTable, loadProcessFilters, fillSelect };
 
-function createDataTable(elementId) {
+// DataTable Initializer
+function createDataTable(elementId, extraOptions = {}) {
     const table = $(elementId);
-    if (table.length && table.find('tbody tr').length > 0) {
+    if (table.length) {
 
-        const options = {
-            "language": {
-                "sEmptyTable": "Nenhum registo disponível",
-                "sInfo": "A mostrar _START_ a _END_ de um total de _TOTAL_ registos",
-                "sInfoEmpty": "A mostrar 0 a 0 de um total de 0 registos",
-                "sInfoFiltered": "(filtrado de um total de _MAX_ registos)",
-                "sLengthMenu": "Mostrar _MENU_ registos",
-                "sLoadingRecords": "A carregar...",
-                "sProcessing": "A processar...",
-                "sZeroRecords": "Não foram encontrados resultados",
-                "sSearch": "Procurar:",
-                "oPaginate": {
-                    "sFirst": "Primeiro",
-                    "sPrevious": "Anterior",
-                    "sNext": "Seguinte",
-                    "sLast": "Último"
+        const baseOptions = {
+            language: {
+                sEmptyTable: "Nenhum registo disponível",
+                sInfo: "A mostrar _START_ a _END_ de um total de _TOTAL_ registos",
+                sInfoEmpty: "A mostrar 0 a 0 de um total de 0 registos",
+                sInfoFiltered: "(filtrado de um total de _MAX_ registos)",
+                sLengthMenu: "Mostrar _MENU_ registos",
+                sLoadingRecords: "A carregar...",
+                sProcessing: "A processar...",
+                sZeroRecords: "Não foram encontrados resultados",
+                sSearch: "Procurar:",
+                oPaginate: {
+                    sFirst: "Primeiro",
+                    sPrevious: "Anterior",
+                    sNext: "Seguinte",
+                    sLast: "Último"
                 },
-                "oAria": {
-                    "sSortAscending": ": Ordenar colunas de forma ascendente",
-                    "sSortDescending": ": Ordenar colunas de forma descendente"
+                oAria: {
+                    sSortAscending: ": Ordenar colunas de forma ascendente",
+                    sSortDescending: ": Ordenar colunas de forma descendente"
                 }
             },
             "infoCallback": function (settings, start, end, max, total, pre) {
@@ -34,11 +33,14 @@ function createDataTable(elementId) {
         };
 
         if (elementId !== '#tableStates') {
-            options.columnDefs = [{ orderable: false, targets: -1 }];
+            baseOptions.columnDefs = [{ orderable: false, targets: -1 }];
         }
 
-        table.DataTable(options);
+        const options = $.extend(true, {}, baseOptions, extraOptions);
+
+        return table.DataTable(options);
     }
+    return null;
 }
 
 function loadProcessFilters(apiUrl, unitSelector, typeSelector, stateSelector, yearSelector) {

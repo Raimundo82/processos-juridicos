@@ -162,14 +162,12 @@
 @await Html.PartialAsync("ConfirmationModals/_DeleteModal")
 
 @section Scripts {
-    <script>
+    <script type="module">
+        import { createDataTable } from '/js/initializeDataTable.js';
 
-        var table = $('#processesTable').DataTable({
+        const table = createDataTable('#processesTable', {
             processing: true,
             serverSide: true,
-            columnDefs: [
-                { targets: '_all', orderSequence: ['asc', 'desc'] }
-            ],
             order: [[5, 'desc']],
             ajax: {
                 url: '@Url.Action("LoadProcesses", "Process")',
@@ -182,18 +180,19 @@
                 }
             },
             columns: [
-                { data: "nuipm", render: function (data) { return `<strong>${data}</strong>`; } },
+                { data: "nuipm", render: data => `<strong>${data}</strong>` },
                 { data: "processTypeName" },
                 { data: "unitAcronym" },
                 { data: "oficialInstName" },
                 { data: "oficialInstTelephone" },
                 { data: "createdAt" },
                 { data: "createdByName" },
-                { data: "sentenceName", render: function (data) { return `<strong>${data}</strong>`; } },
-                { data: "processStateName", render: function (data) { return `<strong>${data}</strong>`; } },
+                { data: "sentenceName", render: data => `<strong>${data}</strong>` },
+                { data: "processStateName", render: data => `<strong>${data}</strong>` },
                 { data: "modifiedAt" },
                 { data: "modifiedByName" },
-                { data: null,
+                {
+                    data: null,
                     orderable: false,
                     searchable: false,
                     render: function (data, type, row) {
@@ -201,14 +200,13 @@
                             <div class="d-flex gap-3">
                                 <a href='/Process/Details/${row.processId}' class='text-primary'>
                                     <i class='bi bi-search'></i>
-                                </a>`
-                        if(row.canEdit)  {
+                                </a>`;
+                        if (row.canEdit) {
                             html += `
-                            <a href='/Process/Edit/${row.processId}' class='text-primary'>
+                                <a href='/Process/Edit/${row.processId}' class='text-primary'>
                                     <i class='bi bi-pencil-square'></i>
-                                </a>`
-                         };
-                                
+                                </a>`;
+                        }
                         if (row.canDelete) {
                             html += `
                                 <a class='text-danger btn-delete'
@@ -225,12 +223,8 @@
                     }
                 }
             ],
-                createdRow: function (row, data, dataIndex) {
-
-
+            createdRow: function (row, data) {
                 $(row).attr("data-id", data.processId);
-
-               // Loop through each cell in the row
                 $('td', row).each(function (colIndex) {
                     var colDef = table.settings()[0].aoColumns[colIndex];
                     if (colDef && colDef.data && typeof colDef.data === "string") {
@@ -244,6 +238,5 @@
         $('#unitFilter, #typeFilter, #stateFilter, #yearFilter').on('change', function () {
             table.ajax.reload();
         });
-
     </script>
 }
