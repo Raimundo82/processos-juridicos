@@ -3,9 +3,12 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
-#enviorment variables
+# Enviorment variables
 .env
 .devcontainer/.env
+
+# Vitest coverage output
+coverage/
 
 # User-specific files
 *.rsuser

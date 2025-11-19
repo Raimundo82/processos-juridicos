@@ -80,7 +80,14 @@ beforeAll(async () => {
     };
 
     // Plugin stubs
-    fake$.getJSON = vi.fn();
+    fake$.getJSON = vi.fn(() =>
+        Promise.resolve({
+            units: ['U'],
+            types: ['T'],
+            states: ['S'],
+            years: ['Y'],
+        })
+    );
     fake$.fn = { select2: vi.fn() };
 
     global.$ = fake$;
@@ -150,20 +157,20 @@ describe('initializeDataTable.js', () => {
         expect(selectMock.append).toHaveBeenCalledWith('<option value="B">B</option>');
     });
 
-    test('loadProcessFilters calls getJSON and fills selects', () => {
+    test('loadProcessFilters calls getJSON and fills selects', async () => {
         const data = { units: ['U'], types: ['T'], states: ['S'], years: ['Y'] };
-        global.$.getJSON.mockImplementation((url, cb) => cb(data));
 
-        loadProcessFilters('/Process/GetFilterValues', '#unit', '#type', '#state', '#year');
+        global.$.getJSON.mockImplementation(() => Promise.resolve(data));
 
-        expect(global.$.getJSON).toHaveBeenCalledWith('/Process/GetFilterValues', expect.any(Function));
+        await loadProcessFilters('/Process/GetFilterValues', '#unit', '#type', '#state', '#year');
 
-        const unitMock = global.$('#unit');   // same cached instance used internally
+        expect(global.$.getJSON).toHaveBeenCalledWith('/Process/GetFilterValues');
+
+        const unitMock = global.$('#unit');
         const typeMock = global.$('#type');
         const stateMock = global.$('#state');
         const yearMock = global.$('#year');
 
-        // Default option + each value should be appended
         expect(unitMock.append).toHaveBeenCalledWith('<option value="">Todos</option>');
         expect(typeMock.append).toHaveBeenCalledWith('<option value="">Todos</option>');
         expect(stateMock.append).toHaveBeenCalledWith('<option value="">Todos</option>');

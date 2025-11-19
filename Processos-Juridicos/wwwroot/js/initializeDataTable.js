@@ -28,7 +28,7 @@ function createDataTable(elementId) {
                     "sSortDescending": ": Ordenar colunas de forma descendente"
                 }
             },
-            "infoCallback": function(settings, start, end, max, total, pre) {
+            "infoCallback": function (settings, start, end, max, total, pre) {
                 return pre.replace(/(\d+)/g, '<strong>$1</strong>');
             }
         };
@@ -41,15 +41,14 @@ function createDataTable(elementId) {
     }
 }
 
-// Filters to Process Table 
 function loadProcessFilters(apiUrl, unitSelector, typeSelector, stateSelector, yearSelector) {
-        $.getJSON(apiUrl, function (data) {    
-            fillSelect(unitSelector, data.units);
-            fillSelect(typeSelector, data.types);
-            fillSelect(stateSelector, data.states);
-            fillSelect(yearSelector, data.years);
-        });
-    }
+    return $.getJSON(apiUrl).then(function (data) {
+        fillSelect(unitSelector, data.units);
+        fillSelect(typeSelector, data.types);
+        fillSelect(stateSelector, data.states);
+        fillSelect(yearSelector, data.years);
+    });
+}
 
 function fillSelect(selector, values) {
     const $select = $(selector);
@@ -63,43 +62,82 @@ function fillSelect(selector, values) {
 
 $(document).ready(function () {
     const table = $('#processesTable').DataTable();
-    loadProcessFilters('/Process/GetFilterValues', '#unitFilter', '#typeFilter', '#stateFilter', '#yearFilter');
+    let restoringFilters = false;
+
+    function saveFilters() {
+        if (restoringFilters) return;
+        const filters = {
+            unit: $('#unitFilter').val() ?? '',
+            type: $('#typeFilter').val() ?? '',
+            state: $('#stateFilter').val() ?? '',
+            year: $('#yearFilter').val() ?? ''
+        };
+        localStorage.setItem('processFilters', JSON.stringify(filters));
+    }
+
+    function restoreFilters() {
+        const saved = localStorage.getItem('processFilters');
+        if (!saved) return;
+
+        const filters = JSON.parse(saved);
+        restoringFilters = true;
+
+        $('#unitFilter').val(filters.unit).trigger('change.select2');
+        table.column(2).search(filters.unit || '').draw();
+
+        $('#typeFilter').val(filters.type).trigger('change.select2');
+        table.column(1).search(filters.type || '').draw();
+
+        $('#stateFilter').val(filters.state).trigger('change.select2');
+        table.column(8).search(filters.state || '').draw();
+
+        $('#yearFilter').val(filters.year).trigger('change.select2');
+        table.column(5).search(filters.year || '').draw();
+
+        restoringFilters = false;
+    }
+
+    loadProcessFilters('/Process/GetFilterValues', '#unitFilter', '#typeFilter', '#stateFilter', '#yearFilter')
+        .then(() => restoreFilters());
 
     $('#unitFilter').on('change', function () {
-        table.column(2).search(this.value).draw();
+        table.column(2).search(this.value || '').draw();
+        saveFilters();
     });
     $('#typeFilter').on('change', function () {
-        table.column(1).search(this.value).draw();
+        table.column(1).search(this.value || '').draw();
+        saveFilters();
     });
     $('#stateFilter').on('change', function () {
-        table.column(8).search(this.value).draw();
+        table.column(8).search(this.value || '').draw();
+        saveFilters();
     });
-     $('#yearFilter').on('change', function () {
-        table.column(5).search(this.value).draw();
+    $('#yearFilter').on('change', function () {
+        table.column(5).search(this.value || '').draw();
+        saveFilters();
     });
 });
 
-// Select2 Input Filters to Process Table
 $('#unitFilter').select2({
-    placeholder: "Todas as unidades",
+    placeholder: "Todas as Unidades",
     allowClear: true,
     theme: 'bootstrap-5',
     width: 'resolve'
 });
 $('#typeFilter').select2({
-    placeholder: "Todas os tipos",
+    placeholder: "Todos os Tipos",
     allowClear: true,
     theme: 'bootstrap-5',
     width: 'resolve'
 });
 $('#stateFilter').select2({
-    placeholder: "Todas os estados",
+    placeholder: "Todas os Estados",
     allowClear: true,
     theme: 'bootstrap-5',
     width: 'resolve'
 });
 $('#yearFilter').select2({
-    placeholder: "Todos os anos",
+    placeholder: "Todos os Anos",
     allowClear: true,
     theme: 'bootstrap-5',
     width: 'resolve'
