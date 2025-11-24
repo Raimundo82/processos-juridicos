@@ -73,7 +73,6 @@ public partial class ProcessDto
 
     [DisplayName("Data de Despacho Final")]
     [ExcludedFromValidation]
-    [FutureDate]
     public DateOnly? FinalDispatchDate { get; set; }
 
     [DisplayName("Pena aplicada")]
