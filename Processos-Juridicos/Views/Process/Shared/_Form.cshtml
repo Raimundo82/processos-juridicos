@@ -83,19 +83,19 @@
 <div class="row mb-3">
     <div class="col-lg-8 col-md-12">
         <div class="form-group mt-3">
-            <input type="hidden" asp-for="InvestigatedName" />
+     
 
             <label asp-for="InvestigatedName" class="form-label"></label>
             <div class="input-group">
                 <input id="investigated-lookup"
-                       class="form-control"
+                       class="form-control" asp-for="InvestigatedName"
                        value="@($"{Model?.InvestigatedName}")" />
 
                 <button type="button"
                         class="btn btn-primary btn-auto ad-lookup-btn"
                         data-target-visible="investigated-lookup"
                         data-target-hidden="InvestigatedName"
-                        data-target-info="InvestigatedInfo">
+                        data-target-info="InvestigatedInfo" >
                     <i class="bi bi-search"></i>
                 </button>
             </div>
