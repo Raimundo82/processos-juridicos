@@ -22,7 +22,7 @@ public partial class ProcessDto
     [ExcludedFromValidation]
     public string Nuipm { get; set; }
 
-    [DisplayName("Tipo de processo")]
+    [DisplayName("Tipo de Processo")]
     public int? ProcessTypeId { get; set; }
 
     [DisplayName("Unidade")]
@@ -51,7 +51,7 @@ public partial class ProcessDto
     [ExcludedFromValidation]
     public string InvestigatedName { get; set; }
 
-    [DisplayName("Sexo do averiguado")]
+    [DisplayName("Sexo do Averiguado")]
     public string InvestigatedGender { get; set; }
 
     [DisplayName("Data da Ocorrência")]
@@ -75,14 +75,14 @@ public partial class ProcessDto
     [ExcludedFromValidation]
     public DateOnly? FinalDispatchDate { get; set; }
 
-    [DisplayName("Pena aplicada")]
+    [DisplayName("Pena Aplicada")]
     [ExcludedFromValidation]
     public int? SentenceId { get; set; }
 
     [DisplayName("Estado")]
     public required int ProcessStateId { get; set; }
 
-    [DisplayName("Data de criação")]
+    [DisplayName("Data de Criação")]
     public DateOnly? CreatedAt { get; set; }
 
     [DisplayName("Criado por")]
@@ -103,7 +103,7 @@ public partial class ProcessDto
     [ExcludedFromValidation]
     public string ModifiedByNii { get; set; }
 
-    [DisplayName("Acident em serviço")]
+    [DisplayName("Acidente em Serviço")]
     [ExcludedFromValidation]
     public int? ServiceAccidentId { get; set; }
 
@@ -121,7 +121,7 @@ public partial class ProcessDto
     [ExcludedFromValidation]
     public double? Reimbursement { get; set; }
 
-    [EntityFieldIsRequired("Compensação paga?")]
+    [EntityFieldIsRequired("Compensação Paga?")]
     [DisplayName("Compensação Paga")]
     [ExcludedFromValidation]
     public required bool CompensationPaid { get; set; } = false;
@@ -131,11 +131,11 @@ public partial class ProcessDto
     [ExcludedFromValidation]
     public required bool ComunicatedToPjm { get; set; } = false;
 
-    [DisplayName("Tipo de crime")]
+    [DisplayName("Tipo de Crime")]
     [ExcludedFromValidation]
     public int? CrimeTypeId { get; set; }
 
-    [DisplayName("Segurança militar")]
+    [DisplayName("Segurança Militar")]
     [ExcludedFromValidation]
     public int? MilitarySecurityId { get; set; }
 
@@ -151,7 +151,7 @@ public partial class ProcessDto
     [ExcludedFromValidation]
     public virtual HarmedOrCasualtyDto HarmedOrCasualties { get; set; }
 
-    [DisplayName("Artigos infrigidos")]
+    [DisplayName("Artigos Infrigidos")]
     [MapperIgnore]
     public List<int?> Infringements { get; set; } = [];
 
@@ -162,12 +162,12 @@ public partial class ProcessDto
     [ExcludedFromValidation]
     public virtual ProcessTypeDto ProcessType { get; set; }
 
-    [DisplayName("Pena aplicada")]
+    [DisplayName("Pena Aplicada")]
     [ForeignKey("SentenceId")]
     [ExcludedFromValidation]
     public virtual SentenceDto Sentence { get; set; }
 
-    [DisplayName("Estado do processo")]
+    [DisplayName("Estado")]
     [ExcludedFromValidation]
     [ForeignKey("ProcessStateId")]
     public virtual ProcessStateDto ProcessState { get; set; }

@@ -467,6 +467,41 @@ select .form-select option {
     font-size: 18px;
 }
 
+/* datatable */
+table.dataTable td.dt-type-numeric {
+  text-align: left !important;
+}
+
+table.dataTable th.dt-type-numeric div.dt-column-header, 
+table.dataTable th.dt-type-numeric div.dt-column-footer, 
+table.dataTable th.dt-type-date div.dt-column-header, 
+table.dataTable th.dt-type-date div.dt-column-footer, 
+table.dataTable td.dt-type-numeric div.dt-column-header, 
+table.dataTable td.dt-type-numeric div.dt-column-footer, 
+table.dataTable td.dt-type-date div.dt-column-header, 
+table.dataTable td.dt-type-date div.dt-column-footer {
+    flex-direction: row;
+}
+
+table.dataTable th.dt-type-numeric, 
+table.dataTable th.dt-type-date, 
+table.dataTable td.dt-type-numeric, 
+table.dataTable td.dt-type-date {
+    text-align: left;
+}
+
+table.dataTable tbody tr:nth-child(odd) {
+  background-color: #f9f9f9;
+}
+
+table.dataTable tbody tr:nth-child(even) {
+  background-color: #ffffff;
+}
+
+table.dataTable tbody tr:hover {
+  background-color: #e6f2ff;
+}
+
 /* pagination */
 .page-item:first-child .page-link {
     border-top-left-radius: 8px;
