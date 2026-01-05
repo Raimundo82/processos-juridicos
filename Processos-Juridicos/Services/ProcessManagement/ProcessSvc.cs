@@ -194,7 +194,7 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
         var startOfYear = new DateOnly(year, 1, 1);
         DateOnly startOfNextYear = startOfYear.AddYears(1);
 
-        var max = await _context.Processes.Where(e => e.CreatedAt >= startOfYear && e.CreatedAt < startOfNextYear && !string.IsNullOrWhiteSpace(e.Nuipm)).MaxAsync(e => (int?)Convert.ToInt32(e.Nuipm.Substring(0, 4))) ?? 0;
+        var max = await _context.Processes.Where(e => e.CreatedAt >= startOfYear && e.CreatedAt < startOfNextYear && !string.IsNullOrWhiteSpace(e.Nuipm)).MinAsync(e => (int?)Convert.ToInt32(e.Nuipm.Substring(0, 4))) ?? 0;
 
         return max;
     }
