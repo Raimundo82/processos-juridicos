@@ -87,14 +87,16 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.Configure<AppSettingsOptions>(builder.Configuration.GetSection(AppSettingsOptions.AppSettings));
 
 // Connection string from configuration
-var processosDj = builder.Configuration.GetConnectionString("DefaultConnection")!;
+IWebHostEnvironment env = builder.Environment;
 
-// Register DbContext with SQL Server and detailed logging
-builder.Services.AddDbContext<AppDbContext>(opt =>
-    opt.UseSqlServer(processosDj)
-        .EnableSensitiveDataLogging()
-        .LogTo(Console.WriteLine, LogLevel.Debug));
-
+if (!env.IsEnvironment("Testing"))
+{
+    var processosDj = builder.Configuration.GetConnectionString("DefaultConnection")!;
+    builder.Services.AddDbContext<AppDbContext>(opt =>
+        opt.UseSqlServer(processosDj)
+            .EnableSensitiveDataLogging()
+            .LogTo(Console.WriteLine, LogLevel.Debug));
+}
 
 // LDAP Configuration and Service
 builder.Services.AddScoped(sp => configuration.GetSection($"Ldap:Marinha").Get<LdapConfiguration>() ?? new LdapConfiguration());
