@@ -1,5 +1,5 @@
 # Build stage
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 
 ENV http_proxy=http://proxy-n-wcg.marinha.pt:8080
 ENV https_proxy=http://proxy-n-wcg.marinha.pt:8080
@@ -12,7 +12,7 @@ COPY ./Processos-Juridicos ./
 RUN dotnet publish -c Release -o /out
 
 # Runtime stage
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 
 ENV http_proxy=http://proxy-n-wcg.marinha.pt:8080
 ENV https_proxy=http://proxy-n-wcg.marinha.pt:8080
