@@ -10,9 +10,9 @@
     <Content Remove="Views\Home\Privacy.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="itext" Version="9.4.0" />
-    <PackageReference Include="itext.bouncy-castle-adapter" Version="9.4.0" />
-    <PackageReference Include="itext.pdfhtml" Version="6.3.0" />
+    <PackageReference Include="itext" Version="9.5.0" />
+    <PackageReference Include="itext.bouncy-castle-adapter" Version="9.5.0" />
+    <PackageReference Include="itext.pdfhtml" Version="6.3.1" />
     <PackageReference Include="Keycloak.AuthServices.Authentication" Version="2.8.0" />
     <PackageReference Include="Keycloak.AuthServices.Authorization" Version="2.8.0" />
     <PackageReference Include="Keycloak.AuthServices.Common" Version="2.8.0" />    
