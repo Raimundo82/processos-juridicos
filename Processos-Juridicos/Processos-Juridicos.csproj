@@ -16,13 +16,13 @@
     <PackageReference Include="Keycloak.AuthServices.Authentication" Version="2.8.0" />
     <PackageReference Include="Keycloak.AuthServices.Authorization" Version="2.8.0" />
     <PackageReference Include="Keycloak.AuthServices.Common" Version="2.8.0" />    
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.1">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.1">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -30,7 +30,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="NToastNotify" Version="8.0.0" />
     <PackageReference Include="Riok.Mapperly" Version="4.3.1" />
-    <PackageReference Include="System.DirectoryServices.Protocols" Version="10.0.1" />
+    <PackageReference Include="System.DirectoryServices.Protocols" Version="10.0.2" />
   </ItemGroup>
   <ItemGroup>
     <None Include="efpt.config.json.user" />
