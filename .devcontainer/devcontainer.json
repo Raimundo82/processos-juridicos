@@ -2,7 +2,8 @@
   "name": "ASP.NET Core DevContainer",
   "dockerComposeFile": "docker-compose.yml",
   "service": "app",
-  "workspaceFolder": "/workspace/${localWorkspaceFolderBasename}",
+  "workspaceFolder": "/workspace",
+  "remoteUser": "vscode",
   "customizations": {
     "vscode": {
       "extensions": [
@@ -11,7 +12,6 @@
         "esbenp.prettier-vscode",
         "mtxr.sqltools",
         "mtxr.sqltools-driver-pg",
-        "SonarSource.sonarlint-vscode",
         "fernandoescolar.vscode-solution-explorer",
         "me-dutour-mathieu.vscode-github-actions",
         "EditorConfig.EditorConfig"
@@ -21,6 +21,15 @@
       }
     }
   },
-  "postCreateCommand": "bash .devcontainer/post-script.sh",
-  "forwardPorts": [5000]
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "20.8.1",
+      "pnpmVersion": "8.8.0",
+      "nvmVersion": "0.39.7",
+      "installYarnUsingApt": true,
+      "nodeGypDependencies": true
+    }
+  },
+  "forwardPorts": [8080, 5175, 7028],
+  "postCreateCommand": "bash .devcontainer/post-script.sh"
 }

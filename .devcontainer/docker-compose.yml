@@ -1,21 +1,30 @@
+version: '3.9'
+
 services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    environment:
+      - SA_PASSWORD=P@ssw0rd1234
+      - ACCEPT_EULA=Y
+    ports:
+      - "1433:1433"
+    volumes:
+      - sql_data:/var/opt/mssql        
+
   app:
     build:
       context: ..
       dockerfile: .devcontainer/Dockerfile
-    
     volumes:
       - ..:/workspace:cached
-
     env_file:
-      - ../.env
-
-    working_dir: /workspace/Processos-Juridicos
-    
+      - .env
     command: sleep infinity
-    
-    environment:
-      ConnectionStrings__processosDj: "Server=${DB_HOST};Database=${DB_NAME};User Id=${DB_USER};Password=${DB_PASSWORD};TrustServerCertificate=True;"
-
     ports:
-      - "5000:80" 
+      - "80:80"
+    depends_on:
+      - db
+
+volumes:
+  sql_data:
