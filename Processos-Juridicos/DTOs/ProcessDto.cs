@@ -139,6 +139,10 @@ public partial class ProcessDto
     [ExcludedFromValidation]
     public int? MilitarySecurityId { get; set; }
 
+    [DisplayName("Jurista")]
+    [ExcludedFromValidation]
+    public string JuristName { get; set; }
+
     [DisplayName("Data da comunicação à PJM")]
     [ExcludedFromValidation]
     public DateOnly? ComunicationDate { get; set; }

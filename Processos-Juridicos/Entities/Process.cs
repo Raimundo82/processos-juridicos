@@ -108,6 +108,9 @@ public partial class Process
     [Column("military_security_id")]
     public int? MilitarySecurityId { get; set; }
 
+    [Column("jurist_name")]
+    public string JuristName { get; set; }
+
     [ForeignKey("UnitId")]
     public virtual Unit Unit { get; set; }
 
