@@ -19,11 +19,12 @@
 
     <style>
         @@page {
-        margin-top: 60pt;
-        margin-right: 36pt;
-        margin-bottom: 50pt;
-        margin-left: 36pt;
+            margin-top: 60pt;
+            margin-right: 36pt;
+            margin-bottom: 50pt;
+            margin-left: 36pt;
         }
+
         body {
             margin: 0;
         }
@@ -51,6 +52,10 @@
         <div class="data-row">
             <div class="data-label">Unidade:</div>
             <div class="data-value">@(Model?.Unit?.UnitName ?? "N/A")</div>
+        </div>
+        <div class="data-row">
+            <div class="data-label">Data de Criação:</div>
+            <div class="data-value">@(Model?.CreatedAt?.ToString("dd/MM/yyyy") ?? "N/A")</div>
         </div>
         <div class="data-row">
             <div class="data-label">Data da Ocorrência:</div>
@@ -92,107 +97,106 @@
         </div>
     </div>
 
-    <h2 class ="doc-subtitle">Descrição da Ocorrência</h2>
+    <h2 class="doc-subtitle">Descrição da Ocorrência</h2>
     <div class="description-box">
         @Model?.Description
     </div>
 
-    <h2 class="doc-subtitle">Encerramento e Penalidades</h2>
-    <div class="data-grid">
-        <div class="data-row">
-            <div class="data-label">Data de Despacho Final:</div>
-            <div class="data-value">@(Model?.FinalDispatchDate?.ToString("dd/MM/yyyy") ?? "N/A")</div>
-        </div>
-        <div class="data-row">
-            <div class="data-label">Pena Aplicada:</div>
-            <div class="data-value">@(Model?.Sentence?.SentenceName ?? "N/A")</div>
+    @if (Model?.ProcessState.StateName == "Fechado")
+    {
+        <h2 class="doc-subtitle">Encerramento e Penalidades</h2>
+        <div class="data-grid">
+            <div class="data-row">
+                <div class="data-label">Data de Despacho Final:</div>
+                <div class="data-value">@(Model?.FinalDispatchDate?.ToString("dd/MM/yyyy") ?? "N/A")</div>
+            </div>
+            <div class="data-row">
+                <div class="data-label">Pena Aplicada:</div>
+                <div class="data-value">@(Model?.Sentence?.SentenceName ?? "N/A")</div>
+            </div>
+
+            @if (Model?.InfringementDetails?.Count > 0)
+            {
+                <div class="data-row">
+                    <div class="data-label">Artigos Infringidos:</div>
+                    <div class="data-value">
+                        @string.Join(", ", Model.InfringementDetails.Select(i => i.InfringementName))
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="data-row">
+                    <div class="data-label">Artigos Infringidos:</div>
+                    <div class="data-value">N/A</div>
+                </div>
+            }
         </div>
 
-        @if (Model?.InfringementDetails?.Count > 0)
-        {
+        <h2 class="doc-subtitle">Ocorrência</h2>
+        <div class="data-grid">
             <div class="data-row">
-                <div class="data-label">Artigos Infringidos:</div>
+                <div class="data-label">Tipo de Crime:</div>
+                <div class="data-value">@(Model?.CrimeType?.CrimeTypeName ?? "N/A")</div>
+            </div>
+            <div class="data-row">
+                <div class="data-label">Segurança Militar:</div>
+                <div class="data-value">@(Model?.MilitarySecurity?.MilitarySecurityName ?? "N/A")</div>
+            </div>
+            <div class="data-row">
+                <div class="data-label">Acidente em Serviço:</div>
+                <div class="data-value">@(Model?.AccidentType?.AccidentTypeName ?? "N/A")</div>
+            </div>
+            <div class="data-row">
+                <div class="data-label">Morto/Ferido:</div>
+                <div class="data-value">@(Model?.HarmedOrCasualties?.CasualtyName ?? "N/A")</div>
+            </div>
+        </div>
+
+        <h2 class="doc-subtitle">Valores e Compensação</h2>
+        <div class="data-grid">
+            <div class="data-row">
+                <div class="data-label">Valor Indemnizado a Terceiros:</div>
                 <div class="data-value">
-                    @string.Join(", ", Model.InfringementDetails.Select(i => i.InfringementName))
+                    @(Model?.ThirdPartyCompensation.HasValue == true
+                                    ? $"{Model.ThirdPartyCompensation.Value.ToString("N2")} €"
+                                    : "N/A")
+                </div>
+
+            </div>
+            <div class="data-row">
+                <div class="data-label">Valor Ressarcido à Marinha:</div>
+                <div class="data-value">
+                    @(Model?.Reimbursement != null && Model.Reimbursement.ToString() != "N/A"
+                                    ? $"{Model.Reimbursement.Value.ToString("N2")} €"
+                                    : "N/A")
                 </div>
             </div>
-        }
-        else
-        {
             <div class="data-row">
-                <div class="data-label">Artigos Infringidos:</div>
-                <div class="data-value">N/A</div>
+                <div class="data-label">Compensação Paga:</div>
+                <div class="data-value">@(Model?.CompensationPaid == true ? "Sim" : "Não")</div>
             </div>
-        }
-    </div>
-
-    <h2 class="doc-subtitle">Ocorrência</h2>
-    <div class="data-grid">
-        <div class="data-row">
-            <div class="data-label">Tipo de Crime:</div>
-            <div class="data-value">@(Model?.CrimeType?.CrimeTypeName ?? "N/A")</div>
-        </div>
-        <div class="data-row">
-            <div class="data-label">Segurança Militar:</div>
-            <div class="data-value">@(Model?.MilitarySecurity?.MilitarySecurityName ?? "N/A")</div>
-        </div>
-        <div class="data-row">
-            <div class="data-label">Acidente em Serviço:</div>
-            <div class="data-value">@(Model?.AccidentType?.AccidentTypeName ?? "N/A")</div>
-        </div>
-        <div class="data-row">
-            <div class="data-label">Morto/Ferido:</div>
-            <div class="data-value">@(Model?.HarmedOrCasualties?.CasualtyName ?? "N/A")</div>
-        </div>
-    </div>
-
-    <h2 class="doc-subtitle">Valores e Compensação</h2>
-    <div class="data-grid">
-        <div class="data-row">
-            <div class="data-label">Valor Indemnizado a Terceiros:</div>
-            <div class="data-value">
-                @(Model?.ThirdPartyCompensation.HasValue == true
-                    ? $"{Model.ThirdPartyCompensation.Value.ToString("N2")} €"
-                    : "N/A")
-            </div>
-
-        </div>
-        <div class="data-row">
-            <div class="data-label">Valor Ressarcido à Marinha:</div>
-            <div class="data-value">
-                @(Model?.Reimbursement != null && Model.Reimbursement.ToString() != "N/A"
-                    ? $"{Model.Reimbursement.Value.ToString("N2")} €"
-                    : "N/A")
+            <div class="data-row">
+                <div class="data-label">Unidade Compensadora:</div>
+                <div class="data-value">@(Model?.CompensatingUnit?.UnitName ?? "N/A")</div>
             </div>
         </div>
-        <div class="data-row">
-            <div class="data-label">Compensação Paga:</div>
-            <div class="data-value">@(Model?.CompensationPaid == true ? "Sim" : "Não")</div>
-        </div>
-        <div class="data-row">
-            <div class="data-label">Unidade Compensadora:</div>
-            <div class="data-value">@(Model?.CompensatingUnit?.UnitName ?? "N/A")</div>
-        </div>
-    </div>
 
-    <h2 class="doc-subtitle">Comunicação</h2>
-    <div class="data-grid">
-        <div class="data-row">
-            <div class="data-label">Comunicado à PJM:</div>
-            <div class="data-value">@(Model?.ComunicatedToPjm == true ? "Sim" : "Não")</div>
+        <h2 class="doc-subtitle">Comunicação</h2>
+        <div class="data-grid">
+            <div class="data-row">
+                <div class="data-label">Comunicado à PJM:</div>
+                <div class="data-value">@(Model?.ComunicatedToPjm == true ? "Sim" : "Não")</div>
+            </div>
+            <div class="data-row">
+                <div class="data-label">Data da Comunicação à PJM:</div>
+                <div class="data-value">@(Model?.ComunicationDate?.ToString("dd/MM/yyyy") ?? "N/A")</div>
+            </div>
         </div>
-        <div class="data-row">
-            <div class="data-label">Data da Comunicação à PJM:</div>
-            <div class="data-value">@(Model?.ComunicationDate?.ToString("dd/MM/yyyy") ?? "N/A")</div>
-        </div>
-    </div>
+    }
 
     <h2 class="doc-subtitle">Autoria</h2>
     <div class="data-grid">
-        <div class="data-row">
-            <div class="data-label">Data de Criação:</div>
-            <div class="data-value">@(Model?.CreatedAt?.ToString("dd/MM/yyyy") ?? "N/A")</div>
-        </div>
         <div class="data-row">
             <div class="data-label">Criado por:</div>
             <div class="data-value">
@@ -200,6 +204,18 @@
             </div>
         </div>
     </div>
+
+    @if(Model?.ProcessState.StateName == "Fechado")
+    {
+        <div class="data-grid mt-4">
+            <div class="data-row">
+                <div class="data-label">Jurista:</div>
+                <div class="data-value">
+                    @(Model?.JuristName ?? "N/A")
+                </div>
+            </div>
+        </div>
+    }
 
 </body>
 
