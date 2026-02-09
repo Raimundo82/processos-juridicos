@@ -8,36 +8,45 @@ namespace Processos_Juridicos.Services.Ldap;
 public class TimedSyncSvc(IServiceProvider services, ILogger<TimedSyncSvc> logger) : BackgroundService
 {
     private readonly IServiceProvider _services = services;
-    private readonly TimeSpan _interval = TimeSpan.FromHours(24);
     private readonly ILogger<TimedSyncSvc> _logger = logger;
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("Starting sync process");
+        _logger.LogInformation("Daily sync service started");
+
         while (!stoppingToken.IsCancellationRequested)
         {
-            try
+            DateTime nextRun = DateTime.Today.AddHours(3);
+            if (DateTime.Now > nextRun)
             {
-                await RunRoleSyncTickAsync(stoppingToken);
-            }
-            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
-            {
-                break;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Timed role sync run failed at {Time}. Context: {ContextInfo}",
-                    DateTimeOffset.Now, "Daily role sync");
+                nextRun = nextRun.AddDays(1);
             }
 
-            try
+            TimeSpan delay = nextRun - DateTime.Now;
+
+            if (_logger.IsEnabled(LogLevel.Information))
             {
-                await Task.Delay(_interval, stoppingToken);
+                _logger.LogInformation("Next sync at {NextRun}", nextRun);
             }
-            catch (OperationCanceledException)
-            {
-                break;
-            }
+
+            await Task.Delay(delay, stoppingToken);
+            await ExecuteSyncSafely(stoppingToken);
+        }
+    }
+
+    private async Task ExecuteSyncSafely(CancellationToken ct)
+    {
+        try
+        {
+            await RunRoleSyncTickAsync(ct);
+        }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested)
+        {
+            // Graceful shutdown, no logging needed
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Weekly sync failed at {Time}", DateTimeOffset.Now);
         }
     }
 
