@@ -205,17 +205,16 @@
         </div>
     </div>
 
-    @if(Model?.ProcessState.StateName == "Fechado")
-    {
-        <div class="data-grid mt-4">
-            <div class="data-row">
-                <div class="data-label">Jurista:</div>
-                <div class="data-value">
-                    @(Model?.JuristName ?? "N/A")
-                </div>
+
+    <div class="data-grid mt-4">
+        <div class="data-row">
+            <div class="data-label">Jurista:</div>
+            <div class="data-value">
+                @(Model?.JuristName ?? "N/A")
             </div>
         </div>
-    }
+    </div>
+
 
 </body>
 
