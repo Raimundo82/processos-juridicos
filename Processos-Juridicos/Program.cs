@@ -146,6 +146,9 @@ builder.Services.AddMvc().AddNToastNotifyToastr(new ToastrOptions()
     TimeOut = 5000
 });
 
+// Create a health check endpoint (can be expanded with custom checks as needed)
+builder.Services.AddHealthChecks();
+
 WebApplication app = builder.Build();
 
 // Get AppSettingsOptions values from configuration via dependency injection
@@ -200,6 +203,9 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseNToastNotify();
+
+// Health check endpoint
+app.MapHealthChecks("/healthz");
 
 // Default route mapping
 app.MapControllerRoute(
