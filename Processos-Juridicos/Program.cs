@@ -205,7 +205,7 @@ app.UseAuthorization();
 app.UseNToastNotify();
 
 // Health check endpoint
-app.MapHealthChecks("/healthz");
+app.MapHealthChecks("/healthz").AllowAnonymous();
 
 // Default route mapping
 app.MapControllerRoute(
