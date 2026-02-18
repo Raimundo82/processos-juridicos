@@ -183,23 +183,52 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
 
         var year = process.CreatedAt?.Year ?? DateTime.Now.Year;
 
-        var count = await GetMaxNuipmNumberByYear(year) + 1;
+        var count = await GetNuipmNumberByYear(year) + 1;
         Unit? associatedUnit = await _context.Units.FindAsync(process.UnitId);
 
         return $"{count:D4}/{year}/{associatedUnit!.UnitCode}";
     }
 
-    private async Task<int> GetMaxNuipmNumberByYear(int year)
+    private async Task<int> GetNuipmNumberByYear(int year)
     {
         var startOfYear = new DateOnly(year, 1, 1);
         DateOnly startOfNextYear = startOfYear.AddYears(1);
 
-        var max = await _context.Processes.Where(e =>
-            e.CreatedAt >= startOfYear &&
-            e.CreatedAt < startOfNextYear &&
-            !string.IsNullOrWhiteSpace(e.Nuipm)).MaxAsync(e =>
-                (int?)Convert.ToInt32(e.Nuipm.Substring(0, 4))) ?? 0;
+        IQueryable<int> numbers = _context.Processes
+            .Where(e =>
+                e.CreatedAt >= startOfYear &&
+                e.CreatedAt < startOfNextYear &&
+                !string.IsNullOrWhiteSpace(e.Nuipm))
+            .Select(e => Convert.ToInt32(e.Nuipm.Substring(0, 4)))
+            .Distinct();
 
+        // If 1 is missing, return 1 immediately
+        var hasOne = await numbers.AnyAsync(n => n == 1);
+        if (!hasOne)
+        {
+            return 0;
+        }
+
+        // Find first gap: n where n+1 does not exist
+        var firstMissing = await numbers
+            .GroupJoin(
+                numbers,
+                n => n + 1,
+                n => n,
+                (n, matches) => new { n, matches }
+            )
+            .Where(x => !x.matches.Any())
+            .Select(x => x.n + 1)
+            .OrderBy(n => n)
+            .FirstOrDefaultAsync();
+
+        if (firstMissing != 0)
+        {
+            return firstMissing - 1;
+        }
+
+        // No gap found, return max + 1
+        var max = await numbers.MaxAsync(n => (int?)n) ?? 0;
         return max;
     }
 
