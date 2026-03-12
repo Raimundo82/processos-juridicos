@@ -138,6 +138,12 @@ builder.Services.AddTransient<RoleSyncSvc>();
 builder.Services.AddHostedService<TimedSyncSvc>();
 builder.Services.AddScoped<IViewRenderSvc, ViewRenderSvc>();
 
+
+// Estatistica Configuration (page estatistica)
+builder.Services.Configure<EstatisticaOptions>(
+    builder.Configuration.GetSection("Estatistica"));
+
+
 // Register NToastNotify (Notifications)
 builder.Services.AddMvc().AddNToastNotifyToastr(new ToastrOptions()
 {

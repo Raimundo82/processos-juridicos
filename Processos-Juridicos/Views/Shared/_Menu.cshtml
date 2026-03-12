@@ -1,4 +1,6 @@
+@using Processos_Juridicos.Settings
 @using Processos_Juridicos.Utilities
+@inject Microsoft.Extensions.Options.IOptions<EstatisticaOptions> EstatisticaOptions
 
 <nav class="navbar navbar-expand-sm menu-bar">
     <div class="container-fluid mx-lg-5 mx-0">
@@ -42,6 +44,14 @@
                                     <li><a class="dropdown-item" asp-controller="User" asp-action="List">Permissões dos Utilizadores</a></li>
                                 }
                             </ul>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link"
+                               href="@EstatisticaOptions.Value.BaseUrl"
+                               target="_blank">
+                                Estatística
+                            </a>
                         </li>
                     }
                     
