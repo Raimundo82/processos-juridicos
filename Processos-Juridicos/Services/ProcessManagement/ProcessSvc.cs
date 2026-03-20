@@ -252,7 +252,7 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
         if (user.IsInstrutor())
         {
             query = query.Where(p => (p.OficialInstName != null &&
-                p.OficialInstName.EndsWith(" - " + nii)) || p.CreatedByNii == nii);
+                p.OficialInstNii == nii) || p.CreatedByNii == nii);
         }
         else if (user.IsComando())
         {
