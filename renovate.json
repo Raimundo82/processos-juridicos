@@ -17,6 +17,30 @@
         "digest"
       ],
       "automerge": true
+    },
+    {
+      "groupName": "keycloak authservices monorepo",
+      "matchPackageNames": [
+        "/^Keycloak\\.AuthServices\\./"
+      ],
+      "matchUpdateTypes": [
+        "digest",
+        "patch",
+        "minor",
+        "major"
+      ]
+    },
+    {
+      "extends": [
+        "monorepo:dotnet"
+      ],
+      "groupName": "dotnet monorepo",
+      "matchUpdateTypes": [
+        "digest",
+        "patch",
+        "minor",
+        "major"
+      ]
     }
   ]
 }
