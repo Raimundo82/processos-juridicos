@@ -14,8 +14,8 @@
     <PackageReference Include="itext.bouncy-castle-adapter" Version="9.5.0" />
     <PackageReference Include="itext.pdfhtml" Version="6.3.1" />
     <PackageReference Include="Keycloak.AuthServices.Authentication" Version="2.8.1" />
-    <PackageReference Include="Keycloak.AuthServices.Authorization" Version="2.8.0" />
-    <PackageReference Include="Keycloak.AuthServices.Common" Version="2.8.0" />    
+    <PackageReference Include="Keycloak.AuthServices.Authorization" Version="2.8.1" />
+    <PackageReference Include="Keycloak.AuthServices.Common" Version="2.8.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.5">
       <PrivateAssets>all</PrivateAssets>
@@ -36,7 +36,9 @@
     <None Include="efpt.config.json.user" />
   </ItemGroup>
   <Target Name="Husky" BeforeTargets="Restore;CollectPackageReferences" Condition="'$(HUSKY)' != 0">
-    <Exec Command="dotnet tool restore" StandardOutputImportance="Low" StandardErrorImportance="High" />
-    <Exec Command="dotnet husky install" StandardOutputImportance="Low" StandardErrorImportance="High" WorkingDirectory=".." />
+    <Exec Command="dotnet tool restore" StandardOutputImportance="Low"
+      StandardErrorImportance="High" />
+    <Exec Command="dotnet husky install" StandardOutputImportance="Low"
+      StandardErrorImportance="High" WorkingDirectory=".." />
   </Target>
 </Project>
