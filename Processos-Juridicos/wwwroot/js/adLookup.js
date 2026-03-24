@@ -3,7 +3,7 @@ import { clearValidity, shouldResolve, searchUsers, resolveId, markInvalid } fro
 
 export function escapeHtml(s) {
     const str = s == null ? '' : String(s);
-    return str.replace(/[&<>"']/g, c => (
+    return str.replaceAll(/[&<>"']/g, c => (
         { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
     ));
 };
@@ -87,7 +87,7 @@ export function initAdLookup({ applySelection, setupIds, debounceMs = 1000 }) {
             renderResults([]);
             setStatus('');
             adModal.show();
-            setTimeout(() => searchBox && searchBox.focus(), 150);
+            setTimeout(() => searchBox?.focus(), 150);
             if (currentVal) doSearch();
         });
     });

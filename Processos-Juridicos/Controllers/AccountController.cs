@@ -8,10 +8,8 @@ namespace Processos_Juridicos.Controllers;
 
 [AllowAnonymous]
 [Route("account")]
-public class AccountController(ILogger<AccountController> logger) : Controller
+public class AccountController() : Controller
 {
-    private readonly ILogger<AccountController> logger = logger;
-
     public IActionResult SignIn()
     {
         return !User.Identity!.IsAuthenticated ? Challenge(OpenIdConnectDefaults.AuthenticationScheme) : RedirectToAction("Index", "Home");
@@ -26,15 +24,6 @@ public class AccountController(ILogger<AccountController> logger) : Controller
         }
 
         var idToken = await HttpContext.GetTokenAsync("id_token");
-
-        AuthenticateResult? authResult = HttpContext.Features.Get<IAuthenticateResultFeature>()
-            ?.AuthenticateResult;
-
-        IEnumerable<AuthenticationToken> tokens = authResult!.Properties!.GetTokens();
-
-        var tokenNames = tokens.Select(token => token.Name).ToArray();
-
-        logger.LogInformation("Token Names: {TokenNames}", string.Join(", ", tokenNames));
 
         return SignOut(
             new AuthenticationProperties

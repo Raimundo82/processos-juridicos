@@ -28,7 +28,7 @@ function createDataTable(elementId, extraOptions = {}) {
                 }
             },
             "infoCallback": function (settings, start, end, max, total, pre) {
-                return pre.replace(/(\d+)/g, '<strong>$1</strong>');
+                return pre.replaceAll(/(\d+)/g, '<strong>$1</strong>');
             }
         };
 

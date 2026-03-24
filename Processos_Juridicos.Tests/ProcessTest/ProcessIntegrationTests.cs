@@ -142,9 +142,8 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
             IDocument doc = await _client.GetDocumentAsync("/Process/Create");
 
             var processStateId = doc.QuerySelector("select[name=ProcessStateId]")?
-                .QuerySelectorAll("option")
-                .FirstOrDefault()?
-                .GetAttribute("value");
+                .QuerySelectorAll("option")?[0]
+                ?.GetAttribute("value");
 
             var unitId = doc.QuerySelector("select[name=UnitId]")?
                 .QuerySelectorAll("option")
@@ -174,7 +173,7 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
         Assert.All(scenarioProcesses, scenarioProcess =>
         {
             Process? expected = dbItems.FirstOrDefault(dbItem =>
-                dbItem.ProcessType.ProcessTypeName == scenarioProcess.ProcessType!.ProcessTypeName &&
+                dbItem.ProcessType.ProcessTypeName == scenarioProcess.ProcessType.ProcessTypeName &&
                 dbItem.Unit.UnitName == scenarioProcess.Unit.UnitName);
 
             Assert.NotNull(expected);
@@ -831,7 +830,7 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
         IElement? row = doc.QuerySelector(rowSelector);
         Assert.NotNull(row);
 
-        row = doc.QuerySelectorAll("div[id^='file-row-']").First();
+        row = doc.QuerySelectorAll("div[id^='file-row-']")?[0];
 
         IElement container = doc.QuerySelector("#deletedFilesContainer")!;
         var deleteId = row.Id!;

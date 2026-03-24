@@ -111,18 +111,43 @@ public class RoleSyncSvc
 
         if (currentRoles.Any(_nonManagedRoles.Contains) || isOverride)
         {
-            _logger.LogInformation("User {UserNii} has Super/Authorized or is a manual override; skipping sync.", userNii);
+            if (_logger.IsEnabled(LogLevel.Information))
+            {
+                _logger.LogInformation("User {UserNii} has Super/Authorized or is a manual override; skipping sync.", userNii);
+            }
+
             return;
         }
 
         List<int> desiredRoles = CalculateSyncDesiredRoles(groupSet);
 
-        _logger.LogInformation("User {UserNii} desired roles: {DesiredRoles}",
-            userNii, string.Join(",", desiredRoles));
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation("User {UserNii} desired roles: {DesiredRoles}",
+                userNii, string.Join(",", desiredRoles));
+        }
 
         (List<int> toAdd, List<int> toRemove) = DiffSyncRoles(currentRoles, desiredRoles);
 
         await ApplySyncRoleChangesAsync(userNii, searchedUser.DisplayName!, toAdd, toRemove, ct);
+    }
+
+    private static string ExtractCn(string distinguishedName)
+    {
+        if (string.IsNullOrWhiteSpace(distinguishedName))
+        {
+            return distinguishedName;
+        }
+
+        if (distinguishedName.StartsWith("CN=", StringComparison.OrdinalIgnoreCase))
+        {
+            var commaIndex = distinguishedName.IndexOf(',');
+            return commaIndex > 3
+                ? distinguishedName[3..commaIndex]
+                : distinguishedName[3..];
+        }
+
+        return distinguishedName;
     }
 
     private List<int> CalculateSyncDesiredRoles(HashSet<string> groupSet)
@@ -134,7 +159,10 @@ public class RoleSyncSvc
             .Distinct()
             .ToList();
 
-        _logger.LogInformation("User has groups: {Groups}", string.Join(", ", groupSet));
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation("User has groups: {Groups}", string.Join(", ", groupSet));
+        }
 
         // Apply priority: keep only the top‑priority role(s)
         if (desiredRoles.Count > 1)
@@ -156,8 +184,6 @@ public class RoleSyncSvc
         return (toAdd, toRemove);
     }
 
-
-
     private async Task ApplySyncRoleChangesAsync(
         string userNii,
         string userName,
@@ -168,87 +194,123 @@ public class RoleSyncSvc
         User? user = await _db.Users
             .FirstOrDefaultAsync(u => u.UserNii == userNii, ct);
 
-
-        if (toAdd.Count == 0 && toRemove.Count == 0)
+        if (NoChanges(toAdd, toRemove))
         {
             return;
         }
 
-        if (toAdd.Count == 1 && user != null)
+        if (IsSingleAdd(toAdd))
         {
-            var newRoleId = toAdd[0];
-
-            var oldRoleId = user.RoleId;
-
-            if (oldRoleId != newRoleId)
-            {
-                user.RoleId = newRoleId;
-                user.UserName = userName;
-                _db.Users.Update(user);
-
-                _logger.LogInformation("Updated role for {UserNii}: {OldRole} -> {NewRole}",
-                    userNii, oldRoleId?.ToString() ?? "none", newRoleId);
-            }
-            else
-            {
-                _logger.LogInformation("User {UserNii} already has role {RoleId}; no update", userNii, newRoleId);
-            }
-
-            await _db.SaveChangesAsync(ct);
+            await HandleSingleAddAsync(user, userNii, userName, toAdd[0], ct);
             return;
         }
 
-        if (toAdd.Count == 1 && user == null)
+        if (IsSingleRemove(toAdd, toRemove) && user != null)
         {
-            var newRoleId = toAdd[0];
-
-            var newUser = new User
-            {
-                UserNii = userNii,
-                UserName = userName,
-                RoleId = newRoleId
-            };
-
-            _db.Users.Add(newUser);
-            _logger.LogInformation("Added new user {UserNii} with role {RoleId}", userNii, newRoleId);
-
-            await _db.SaveChangesAsync(ct);
+            await HandleSingleRemoveAsync(user, userNii, ct);
             return;
         }
 
-        if (toAdd.Count == 0 && toRemove.Count == 1 && user != null)
-        {
-            _db.Users.Remove(user);
-            _logger.LogInformation("Removed user {UserNii} because it has no roles", userNii);
+        LogUnexpectedDiff(userNii, toAdd, toRemove);
+    }
 
-            await _db.SaveChangesAsync(ct);
+    private static bool NoChanges(List<int> toAdd, List<int> toRemove)
+    {
+        return toAdd.Count == 0 && toRemove.Count == 0;
+    }
+
+    private static bool IsSingleAdd(List<int> toAdd)
+    {
+        return toAdd.Count == 1;
+    }
+
+    private static bool IsSingleRemove(List<int> toAdd, List<int> toRemove)
+    {
+        return toAdd.Count == 0 && toRemove.Count == 1;
+    }
+
+    private async Task HandleSingleAddAsync(
+    User? user,
+    string userNii,
+    string userName,
+    int newRoleId,
+    CancellationToken ct)
+    {
+        if (user != null)
+        {
+            await UpdateExistingUserRoleAsync(user, userNii, userName, newRoleId, ct);
+        }
+        else
+        {
+            await AddNewUserAsync(userNii, userName, newRoleId, ct);
+        }
+    }
+
+    private async Task UpdateExistingUserRoleAsync(
+        User user,
+        string userNii,
+        string userName,
+        int newRoleId,
+        CancellationToken ct)
+    {
+        var oldRoleId = user.RoleId;
+
+        if (oldRoleId == newRoleId)
+        {
+            LogInfo($"User {userNii} already has role {newRoleId}; no update");
             return;
         }
 
+        user.RoleId = newRoleId;
+        user.UserName = userName;
+        _db.Users.Update(user);
+
+        LogInfo($"Updated role for {userNii}: {oldRoleId?.ToString() ?? "none"} -> {newRoleId}");
+
+        await _db.SaveChangesAsync(ct);
+    }
+
+    private async Task AddNewUserAsync(
+        string userNii,
+        string userName,
+        int newRoleId,
+        CancellationToken ct)
+    {
+        var newUser = new User
+        {
+            UserNii = userNii,
+            UserName = userName,
+            RoleId = newRoleId
+        };
+
+        _db.Users.Add(newUser);
+
+        LogInfo($"Added new user {userNii} with role {newRoleId}");
+
+        await _db.SaveChangesAsync(ct);
+    }
+
+    private async Task HandleSingleRemoveAsync(User user, string userNii, CancellationToken ct)
+    {
+        _db.Users.Remove(user);
+
+        LogInfo($"Removed user {userNii} because it has no roles");
+
+        await _db.SaveChangesAsync(ct);
+    }
+
+    private void LogUnexpectedDiff(string userNii, List<int> toAdd, List<int> toRemove)
+    {
         _logger.LogWarning(
             "Unexpected diff for {UserNii}: toAdd=[{Add}] toRemove=[{Remove}]; no changes applied",
             userNii, string.Join(",", toAdd), string.Join(",", toRemove));
     }
 
-
-
-    private static string ExtractCn(string distinguishedName)
+    private void LogInfo(string message)
     {
-        if (string.IsNullOrWhiteSpace(distinguishedName))
+        if (_logger.IsEnabled(LogLevel.Information))
         {
-            return distinguishedName;
+            _logger.LogInformation("{Message}", message);
         }
-
-        if (distinguishedName.StartsWith("CN=", StringComparison.OrdinalIgnoreCase))
-        {
-            var commaIndex = distinguishedName.IndexOf(',');
-            return commaIndex > 3
-                ? distinguishedName[3..commaIndex]
-                : distinguishedName[3..];
-        }
-
-        return distinguishedName;
     }
-
-
 }

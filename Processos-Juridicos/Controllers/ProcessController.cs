@@ -210,7 +210,7 @@ public class ProcessController(
             return await ReturnToEditViewWithFiles(model);
         }
 
-        if (model.FilesToRemove?.Any() == true)
+        if (model.FilesToRemove?.Count > 0)
         {
             await RemoveFiles(model.FilesToRemove);
         }
@@ -398,9 +398,9 @@ public class ProcessController(
         {
             if (process != null)
             {
-                model.CreatedBy = process!.CreatedBy;
-                model.CreatedByName = process!.CreatedByName;
-                model.CreatedByNii = process!.CreatedByNii;
+                model.CreatedBy = process.CreatedBy;
+                model.CreatedByName = process.CreatedByName;
+                model.CreatedByNii = process.CreatedByNii;
             }
 
             model.ModifiedByName = displayName;

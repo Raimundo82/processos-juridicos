@@ -12,7 +12,10 @@ public class TimedSyncSvc(IServiceProvider services, ILogger<TimedSyncSvc> logge
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("Daily sync service started");
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation("Daily sync service started");
+        }
 
         while (!stoppingToken.IsCancellationRequested)
         {
@@ -69,8 +72,12 @@ public class TimedSyncSvc(IServiceProvider services, ILogger<TimedSyncSvc> logge
      .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
         var allNiis = dbNiis.Union(ldapNiis, StringComparer.OrdinalIgnoreCase).ToList();
-        _logger.LogInformation("Role sync tick: DB={DbCount}, LDAP={LdapCount}, Total={Total}",
-            dbNiis.Count, ldapNiis.Count, allNiis.Count);
+
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation("Role sync tick: DB={DbCount}, LDAP={LdapCount}, Total={Total}",
+                dbNiis.Count, ldapNiis.Count, allNiis.Count);
+        }
 
         foreach (var nii in allNiis)
         {
@@ -82,6 +89,9 @@ public class TimedSyncSvc(IServiceProvider services, ILogger<TimedSyncSvc> logge
             await roleSync.SyncUserRolesAsync(nii, ct);
         }
 
-        _logger.LogInformation("Role sync tick completed at {Time}", DateTimeOffset.Now);
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            _logger.LogInformation("Role sync tick completed at {Time}", DateTimeOffset.Now);
+        }
     }
 }

@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
             renderResults([]);
             setStatus('');
             adModal.show();
-            setTimeout(() => searchBox && searchBox.focus(), 150);
+            setTimeout(() => searchBox?.focus(), 150);
         });
     });
 

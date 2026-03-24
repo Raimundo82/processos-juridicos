@@ -10,8 +10,7 @@ public class LdapConnSvc(LdapConfiguration configuration) : ILdapConnSvc
 {
     private readonly LdapConfiguration _configuration = configuration;
     private LdapConnection? _ldapConnection;
-    private bool _disposed = false;
-
+    private bool _disposed;
 
     public LdapConnection GetConnection()
     {
@@ -21,7 +20,7 @@ public class LdapConnSvc(LdapConfiguration configuration) : ILdapConnSvc
         {
             try
             {
-                TimeSpan _ = _ldapConnection.Timeout;
+                _ = _ldapConnection.Timeout;
                 return _ldapConnection;
             }
             catch (ObjectDisposedException)
@@ -30,18 +29,19 @@ public class LdapConnSvc(LdapConfiguration configuration) : ILdapConnSvc
             }
         }
 
-        LdapDirectoryIdentifier ldapDirectoryIdentifier = new(
+        var ldapDirectoryIdentifier = new LdapDirectoryIdentifier(
             _configuration.Url,
             int.Parse(_configuration.Port),
             fullyQualifiedDnsHostName: false,
             connectionless: false);
 
-        NetworkCredential networkCredential = new(_configuration.Username, _configuration.Password);
+        var networkCredential = new NetworkCredential(_configuration.Username, _configuration.Password);
 
         _ldapConnection = new LdapConnection(ldapDirectoryIdentifier, networkCredential, AuthType.Basic)
         {
             Timeout = TimeSpan.FromSeconds(10),
         };
+
         _ldapConnection.SessionOptions.ProtocolVersion = 3;
         _ldapConnection.SessionOptions.SecureSocketLayer = true;
 
@@ -80,17 +80,25 @@ public class LdapConnSvc(LdapConfiguration configuration) : ILdapConnSvc
         return conn;
     }
 
-
-    public void Dispose()
+    protected virtual void Dispose(bool disposing)
     {
         if (_disposed)
         {
             return;
         }
-        _ldapConnection?.Dispose();
-        _ldapConnection = null;
+
+        if (disposing)
+        {
+            _ldapConnection?.Dispose();
+            _ldapConnection = null;
+        }
+
         _disposed = true;
-        GC.SuppressFinalize(this);
     }
 
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
 }

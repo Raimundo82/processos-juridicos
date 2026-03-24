@@ -41,14 +41,13 @@ const applySelectionBadge = (user, target, adModal) => {
 
     const input = document.querySelector(`input[value="${user.employeeId}"]`);
 
-    if (!input) {
+    if (input) {
+        setText(info, `Utilizador ${display} (${id}) já é comando da unidade ou já foi adicionado `);
+    } else {
         hiddenContainer.appendChild(createBadge(display, id));
         setText(info, `✅ Adicionado ${display} (${id})`);
         adModal?.hide();
-    } else {
-        setText(info, `Utilizador ${display} (${id}) já é comando da unidade ou já foi adicionado `);
     }
-
 };
 
 document.addEventListener('DOMContentLoaded', () => {
