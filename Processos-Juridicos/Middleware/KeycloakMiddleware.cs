@@ -17,7 +17,7 @@ public static class KeycloakMiddlewareExtensions
             .AddKeycloakWebApp(configuration.GetSection(KeycloakAuthenticationOptions.Section),
                 configureOpenIdConnectOptions: options =>
                 {
-                    options.SaveTokens = false;
+                    options.SaveTokens = true;
                     options.BackchannelHttpHandler = new HttpClientHandler
                     {
                         UseProxy = false,
