@@ -29,6 +29,10 @@
     <PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="3.0.71" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="NToastNotify" Version="8.0.0" />
+    <PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.15.1-beta.1" />
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.15.1" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.15.1" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.15.0" />
     <PackageReference Include="Riok.Mapperly" Version="4.3.1" />
     <PackageReference Include="System.DirectoryServices.Protocols" Version="10.0.5" />
   </ItemGroup>
@@ -36,9 +40,7 @@
     <None Include="efpt.config.json.user" />
   </ItemGroup>
   <Target Name="Husky" BeforeTargets="Restore;CollectPackageReferences" Condition="'$(HUSKY)' != 0">
-    <Exec Command="dotnet tool restore" StandardOutputImportance="Low"
-      StandardErrorImportance="High" />
-    <Exec Command="dotnet husky install" StandardOutputImportance="Low"
-      StandardErrorImportance="High" WorkingDirectory=".." />
+    <Exec Command="dotnet tool restore" StandardOutputImportance="Low" StandardErrorImportance="High" />
+    <Exec Command="dotnet husky install" StandardOutputImportance="Low" StandardErrorImportance="High" WorkingDirectory=".." />
   </Target>
 </Project>

@@ -91,7 +91,7 @@ IWebHostEnvironment env = builder.Environment;
 
 if (!env.IsEnvironment("Testing"))
 {
-    var processosDj = builder.Configuration.GetConnectionString("DefaultConnection")!;
+    var processosDj = builder.Configuration.GetConnectionString("DefaultConnection");
     builder.Services.AddDbContext<AppDbContext>(opt =>
         opt.UseSqlServer(processosDj)
             .EnableSensitiveDataLogging()
@@ -142,6 +142,8 @@ builder.Services.AddScoped<IViewRenderSvc, ViewRenderSvc>();
 // Estatistica Configuration (page estatistica)
 builder.Services.Configure<EstatisticaOptions>(
     builder.Configuration.GetSection("Estatistica"));
+
+builder.ConfigureOpenTelemetry();
 
 
 // Register NToastNotify (Notifications)
@@ -212,6 +214,9 @@ app.UseNToastNotify();
 
 // Health check endpoint
 app.MapHealthChecks("/healthz").AllowAnonymous();
+
+// Metrics endpoint 
+app.MapPrometheusScrapingEndpoint().AllowAnonymous();
 
 // Default route mapping
 app.MapControllerRoute(
