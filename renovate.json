@@ -31,6 +31,18 @@
       ]
     },
     {
+      "groupName": "itext monorepo",
+      "matchPackageNames": [
+        "/^itext(\\.|$)/"
+      ],
+      "matchUpdateTypes": [
+        "digest",
+        "patch",
+        "minor",
+        "major"
+      ]
+    },
+    {
       "extends": [
         "monorepo:dotnet"
       ],
