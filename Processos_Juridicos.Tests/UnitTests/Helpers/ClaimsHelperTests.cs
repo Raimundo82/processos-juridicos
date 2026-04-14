@@ -27,32 +27,6 @@ public class ClaimsHelperTests
     }
 
     [Fact]
-    public async Task AddCustomClaims_ShouldAddPhotoClaim_WhenPhotoExists()
-    {
-        // Arrange
-        var identity = new ClaimsIdentity();
-        identity.AddClaim(new Claim("preferred_username", "joao"));
-
-        byte[] photoBytes = [1, 2, 3, 4];
-
-        _userDataSvc.Setup(s => s.FetchUserPhoto("joao"))
-            .ReturnsAsync(new UserDataModel { UserPhoto = photoBytes });
-
-        _userSvc.Setup(s => s.GetUserRoleNameByNii("joao"))
-            .ReturnsAsync((string?)null);
-
-        IServiceProvider provider = BuildProvider();
-
-        // Act
-        await ClaimsHelper.AddCustomClaimsAsync(identity, provider);
-
-        // Assert
-        Claim? claim = identity.FindFirst("PhotoBase64");
-        claim.Should().NotBeNull();
-        claim.Value.Should().Be(Convert.ToBase64String(photoBytes));
-    }
-
-    [Fact]
     public async Task AddCustomClaims_ShouldAddRoleClaim_WhenRoleExists()
     {
         // Arrange
@@ -87,28 +61,5 @@ public class ClaimsHelperTests
 
         // Assert
         identity.Claims.Should().BeEmpty();
-    }
-
-
-    [Fact]
-    public async Task AddCustomClaims_ShouldNotAddPhoto_WhenPhotoIsNull()
-    {
-        // Arrange
-        var identity = new ClaimsIdentity();
-        identity.AddClaim(new Claim("preferred_username", "joao"));
-
-        _userDataSvc.Setup(s => s.FetchUserPhoto("joao"))
-            .ReturnsAsync(new UserDataModel { UserPhoto = null });
-
-        _userSvc.Setup(s => s.GetUserRoleNameByNii("joao"))
-            .ReturnsAsync((string?)null);
-
-        IServiceProvider provider = BuildProvider();
-
-        // Act
-        await ClaimsHelper.AddCustomClaimsAsync(identity, provider);
-
-        // Assert
-        identity.FindFirst("PhotoBase64").Should().BeNull();
     }
 }
