@@ -7,7 +7,7 @@ using Processos_Juridicos.Data;
 using Processos_Juridicos.Entities;
 using Processos_Juridicos.Tests.TestHelpers;
 
-namespace Processos_Juridicos.Tests.UnitTest;
+namespace Processos_Juridicos.Tests.IntegrationTests.UnitTest;
 
 public class UnitIntegrationTests(CustomWebApplicationFactory<Program> factory) :
     IClassFixture<CustomWebApplicationFactory<Program>>,

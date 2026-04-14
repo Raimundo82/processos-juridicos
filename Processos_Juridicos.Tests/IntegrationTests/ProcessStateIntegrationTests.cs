@@ -7,7 +7,8 @@ using Processos_Juridicos.Data;
 using Processos_Juridicos.Entities;
 using Processos_Juridicos.Tests.TestHelpers;
 
-namespace Processos_Juridicos.Tests;
+namespace Processos_Juridicos.Tests.IntegrationTests;
+
 public class ProcessStateIntegrationTests(CustomWebApplicationFactory<Program> factory) :
     IClassFixture<CustomWebApplicationFactory<Program>>,
     IAsyncLifetime

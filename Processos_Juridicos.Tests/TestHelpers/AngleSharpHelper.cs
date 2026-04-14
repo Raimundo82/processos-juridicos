@@ -1,7 +1,7 @@
 using AngleSharp;
 using AngleSharp.Dom;
 
-namespace Processos_Juridicos.Tests;
+namespace Processos_Juridicos.Tests.TestHelpers;
 
 public static class AngleSharpHelper
 {

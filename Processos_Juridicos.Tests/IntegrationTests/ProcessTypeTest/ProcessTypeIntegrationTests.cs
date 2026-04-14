@@ -7,7 +7,7 @@ using Processos_Juridicos.Data;
 using Processos_Juridicos.Entities;
 using Processos_Juridicos.Tests.TestHelpers;
 
-namespace Processos_Juridicos.Tests.ProcessTypeTest;
+namespace Processos_Juridicos.Tests.IntegrationTests.ProcessTypeTest;
 
 public class ProcessTypeIntegrationTests(CustomWebApplicationFactory<Program> factory) :
     IClassFixture<CustomWebApplicationFactory<Program>>,

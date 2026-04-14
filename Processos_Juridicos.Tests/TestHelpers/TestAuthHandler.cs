@@ -4,9 +4,7 @@ using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-
-using Processos_Juridicos.Tests.TestHelpers;
-namespace Processos_Juridicos.Tests;
+namespace Processos_Juridicos.Tests.TestHelpers;
 
 public class TestAuthHandler(IOptionsMonitor<AuthenticationSchemeOptions> options, ILoggerFactory logger, UrlEncoder encoder)
 : AuthenticationHandler<AuthenticationSchemeOptions>(options, logger, encoder)

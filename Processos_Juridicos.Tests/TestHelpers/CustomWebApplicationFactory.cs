@@ -10,7 +10,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 using Processos_Juridicos.Data;
 
-namespace Processos_Juridicos.Tests;
+namespace Processos_Juridicos.Tests.TestHelpers;
 
 public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProgram> where TProgram : class
 {

@@ -7,23 +7,23 @@ using Processos_Juridicos.Data;
 using Processos_Juridicos.Entities;
 using Processos_Juridicos.Tests.TestHelpers;
 
-namespace Processos_Juridicos.Tests;
+namespace Processos_Juridicos.Tests.IntegrationTests;
 
-public class MilitarySecurityIntegrationTests(CustomWebApplicationFactory<Program> factory) :
+public class SentenceIntegrationTests(CustomWebApplicationFactory<Program> factory) :
     IClassFixture<CustomWebApplicationFactory<Program>>,
     IAsyncLifetime
 {
     private readonly CustomWebApplicationFactory<Program> _factory = factory;
     private readonly HttpClient _client = factory.CreateClient();
 
-    private static MilitarySecurity CreateMilitarySecurity(string name)
+    private static Sentence CreateSentence(string name)
     {
-        return new MilitarySecurity { MilitarySecurityName = name };
+        return new Sentence { SentenceName = name };
     }
 
     [Theory]
     [InlineData()]
-    [InlineData("Incidentes entre militares", "Outros")]
+    [InlineData("Viação", "Serviço")]
     public async Task List_ReturnsExpectedItems(params string[] namesInput)
     {
         // Arrange
@@ -31,35 +31,35 @@ public class MilitarySecurityIntegrationTests(CustomWebApplicationFactory<Progra
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        dbContext.MilitarySecurities.AddRange(namesInput.Select(CreateMilitarySecurity));
+        dbContext.Sentences.AddRange(namesInput.Select(CreateSentence));
         await dbContext.SaveChangesAsync();
 
         // Act
-        IDocument doc = await _client.GetDocumentAsync("/MilitarySecurity/List");
+        IDocument doc = await _client.GetDocumentAsync("/Sentence/List");
 
         // Assert
-        Assert.Equal(namesInput.Length, await dbContext.MilitarySecurities.CountAsync());
+        Assert.Equal(namesInput.Length, await dbContext.Sentences.CountAsync());
 
         var rows = doc.QuerySelectorAll("table tbody tr").ToList();
         Assert.Equal(namesInput.Length, rows.Count);
 
-        foreach (MilitarySecurity militarySecurity in dbContext.MilitarySecurities)
+        foreach (Sentence Sentence in dbContext.Sentences)
         {
-            Assert.Contains(militarySecurity.MilitarySecurityName, namesInput);
+            Assert.Contains(Sentence.SentenceName, namesInput);
 
-            IElement? row = doc.QuerySelector($"table>tbody>tr[data-id='{militarySecurity.MilitarySecurityId}']");
+            IElement? row = doc.QuerySelector($"table>tbody>tr[data-id='{Sentence.SentenceId}']");
             Assert.NotNull(row);
 
             IElement? cell = row.QuerySelector($"td[data-property='name']");
             Assert.NotNull(cell);
-            Assert.Equal(militarySecurity.MilitarySecurityName, cell.TextContent.Trim());
+            Assert.Equal(Sentence.SentenceName, cell.TextContent.Trim());
         }
     }
 
     [Theory]
     [InlineData()]
-    [InlineData("Incidentes entre militares")]
-    [InlineData("Incidentes entre militares", "Outros")]
+    [InlineData("Viação")]
+    [InlineData("Viação", "Serviço")]
     public async Task Create_Post_CreatesExpectedItems(params string[] namesInput)
     {
         // Arrange
@@ -72,34 +72,35 @@ public class MilitarySecurityIntegrationTests(CustomWebApplicationFactory<Progra
         {
             var formData = new Dictionary<string, string>
             {
-                ["MilitarySecurityName"] = name
+                ["SentenceName"] = name
             };
 
-            await _client.PostAsync("/MilitarySecurity/Create", new FormUrlEncodedContent(formData));
+            await _client.PostAsync("/Sentence/Create", new FormUrlEncodedContent(formData));
         }
 
         // Assert
-        DbSet<MilitarySecurity> dbItems = dbContext.MilitarySecurities;
+        DbSet<Sentence> dbItems = dbContext.Sentences;
 
         Assert.Equal(namesInput.Length, dbItems.Count());
 
-        IDocument listDoc = await _client.GetDocumentAsync("/MilitarySecurity/List");
+        IDocument listDoc = await _client.GetDocumentAsync("/Sentence/List");
         var rows = listDoc.QuerySelectorAll("table tbody tr").ToList();
         Assert.Equal(namesInput.Length, rows.Count);
 
-        foreach (MilitarySecurity at in dbItems)
+        foreach (Sentence at in dbItems)
         {
-            Assert.Contains(at.MilitarySecurityName, namesInput);
+            Assert.Contains(at.SentenceName, namesInput);
 
             IElement? row = listDoc
-                .QuerySelector($"table > tbody > tr[data-id='{at.MilitarySecurityId}']");
+                .QuerySelector($"table > tbody > tr[data-id='{at.SentenceId}']");
             Assert.NotNull(row);
 
             IElement? cell = row.QuerySelector("td[data-property='name']");
             Assert.NotNull(cell);
-            Assert.Equal(at.MilitarySecurityName, cell.TextContent.Trim());
+            Assert.Equal(at.SentenceName, cell.TextContent.Trim());
         }
     }
+
 
     [Fact]
     public async Task Edit_Get_WhenModelExists_ShowsFormAndFields()
@@ -109,27 +110,27 @@ public class MilitarySecurityIntegrationTests(CustomWebApplicationFactory<Progra
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        MilitarySecurity militarySecurity = CreateMilitarySecurity("Incidentes entre militares");
+        Sentence Sentence = CreateSentence("Viação");
 
-        dbContext.MilitarySecurities.Add(militarySecurity);
+        dbContext.Sentences.Add(Sentence);
 
         await dbContext.SaveChangesAsync();
 
-        var id = militarySecurity.MilitarySecurityId;
+        var id = Sentence.SentenceId;
 
         // Act
-        IDocument doc = await _client.GetDocumentAsync($"/MilitarySecurity/Edit/{id}");
+        IDocument doc = await _client.GetDocumentAsync($"/Sentence/Edit/{id}");
 
         // Assert
-        Assert.Single(dbContext.MilitarySecurities);
-        IElement? form = doc.QuerySelector("form[action^='/MilitarySecurity/Edit']");
+        Assert.Single(dbContext.Sentences);
+        IElement? form = doc.QuerySelector("form[action^='/Sentence/Edit']");
         Assert.NotNull(form);
 
-        IElement idInput = form.QuerySelector("input[name=MilitarySecurityId]")!;
+        IElement idInput = form.QuerySelector("input[name=SentenceId]")!;
         Assert.Equal(id.ToString(), idInput.GetAttribute("value"));
 
-        IElement nameInput = form.QuerySelector("input[name=MilitarySecurityName]")!;
-        Assert.Equal("Incidentes entre militares", nameInput.GetAttribute("value"));
+        IElement nameInput = form.QuerySelector("input[name=SentenceName]")!;
+        Assert.Equal("Viação", nameInput.GetAttribute("value"));
     }
 
     [Fact]
@@ -139,31 +140,31 @@ public class MilitarySecurityIntegrationTests(CustomWebApplicationFactory<Progra
         TestAuthContext.Roles = ["DJ-AUTHORIZED"];
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        MilitarySecurity MilitarySecurity = CreateMilitarySecurity("Incidentes entre militares");
+        Sentence Sentence = CreateSentence("Viação");
 
-        dbContext.MilitarySecurities.Add(MilitarySecurity);
+        dbContext.Sentences.Add(Sentence);
 
         await dbContext.SaveChangesAsync();
 
-        var id = MilitarySecurity.MilitarySecurityId;
+        var id = Sentence.SentenceId;
 
-        IDocument editDoc = await _client.GetDocumentAsync($"/MilitarySecurity/Edit/{id}");
-        IElement form = editDoc.QuerySelector("form[action^='/MilitarySecurity/Edit']")!;
+        IDocument editDoc = await _client.GetDocumentAsync($"/Sentence/Edit/{id}");
+        IElement form = editDoc.QuerySelector("form[action^='/Sentence/Edit']")!;
         var action = form.GetAttribute("action")!;
 
         var fields = new Dictionary<string, string?>
         {
-            ["MilitarySecurityId"] = id.ToString(),
-            ["MilitarySecurityName"] = "Atualizado",
+            ["SentenceId"] = id.ToString(),
+            ["SentenceName"] = "Atualizado",
         };
         var content = new FormUrlEncodedContent(fields);
 
         //Act
         await _client.PostAsync(action, content);
-        IDocument listDoc = await _client.GetDocumentAsync("/MilitarySecurity/List");
+        IDocument listDoc = await _client.GetDocumentAsync("/Sentence/List");
 
         //Assert
-        Assert.Single(dbContext.MilitarySecurities);
+        Assert.Single(dbContext.Sentences);
         IElement? cell = listDoc.QuerySelector("table tbody td[data-property='name']");
         Assert.NotNull(cell);
         Assert.Equal("Atualizado", cell.TextContent.Trim());
@@ -178,27 +179,27 @@ public class MilitarySecurityIntegrationTests(CustomWebApplicationFactory<Progra
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
         var sentenceName = "prisão";
-        MilitarySecurity sentence = CreateMilitarySecurity(sentenceName);
-        dbContext.MilitarySecurities.Add(sentence);
-        var id = sentence.MilitarySecurityId;
+        Sentence sentence = CreateSentence(sentenceName);
+        dbContext.Sentences.Add(sentence);
+        var id = sentence.SentenceId;
         await dbContext.SaveChangesAsync();
 
-        IDocument editDoc = await _client.GetDocumentAsync($"/MilitarySecurity/Edit/{id}");
-        IElement form = editDoc.QuerySelector("form[action^='/MilitarySecurity/Edit']")!;
+        IDocument editDoc = await _client.GetDocumentAsync($"/Sentence/Edit/{id}");
+        IElement form = editDoc.QuerySelector("form[action^='/Sentence/Edit']")!;
         var action = form.GetAttribute("action")!;
 
         var fields = new Dictionary<string, string?>
         {
-            ["MilitarySecurityId"] = id.ToString(),
-            ["MilitarySecurityName"] = string.Empty
+            ["SentenceId"] = id.ToString(),
+            ["SentenceName"] = string.Empty
         };
 
         //Act
         await _client.PostAsync(action, new FormUrlEncodedContent(fields));
-        IDocument doc = await _client.GetDocumentAsync("/MilitarySecurity/List");
+        IDocument doc = await _client.GetDocumentAsync("/Sentence/List");
 
         // Assert
-        Assert.Single(dbContext.MilitarySecurities);
+        Assert.Single(dbContext.Sentences);
 
         IElement? row = doc.QuerySelector($"table tbody tr[data-id='{id}']");
         Assert.NotNull(row);
@@ -215,29 +216,29 @@ public class MilitarySecurityIntegrationTests(CustomWebApplicationFactory<Progra
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        MilitarySecurity MilitarySecurity = CreateMilitarySecurity("Incidentes entre militares");
-        dbContext.MilitarySecurities.Add(MilitarySecurity);
+        Sentence Sentence = CreateSentence("Viação");
+        dbContext.Sentences.Add(Sentence);
         await dbContext.SaveChangesAsync();
-        var id = MilitarySecurity.MilitarySecurityId;
+        var id = Sentence.SentenceId;
 
-        IDocument listDoc = await _client.GetDocumentAsync("/MilitarySecurity/List");
+        IDocument listDoc = await _client.GetDocumentAsync("/Sentence/List");
 
         var token = listDoc
-            .QuerySelector("input[name=__RequestVerificationToken]")!
-            .GetAttribute("value")!;
+            .QuerySelector("#deleteForm input[name=__RequestVerificationToken]")!
+            .GetAttribute("value");
 
         var fields = new Dictionary<string, string?>
         {
-            ["MilitarySecurityId"] = id.ToString(),
+            ["SentenceId"] = id.ToString(),
             ["__RequestVerificationToken"] = token
         };
 
         //Act
-        await _client.PostAsync($"/MilitarySecurity/Delete/{id}", new FormUrlEncodedContent(fields));
-        IDocument afterDoc = await _client.GetDocumentAsync("/MilitarySecurity/List");
+        await _client.PostAsync($"/Sentence/Delete/{id}", new FormUrlEncodedContent(fields));
+        IDocument afterDoc = await _client.GetDocumentAsync("/Sentence/List");
 
         // Assert 
-        Assert.Empty(dbContext.MilitarySecurities);
+        Assert.Empty(dbContext.Sentences);
         IHtmlCollection<IElement> rows = afterDoc.QuerySelectorAll("table tbody tr");
         Assert.Empty(rows);
     }
@@ -250,34 +251,33 @@ public class MilitarySecurityIntegrationTests(CustomWebApplicationFactory<Progra
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        MilitarySecurity MilitarySecurity = CreateMilitarySecurity("Incidentes entre militares");
-        dbContext.MilitarySecurities.Add(MilitarySecurity);
+        Sentence Sentence = CreateSentence("Viação");
+        dbContext.Sentences.Add(Sentence);
         await dbContext.SaveChangesAsync();
-        var id = MilitarySecurity.MilitarySecurityId;
+        var id = Sentence.SentenceId;
 
-        IDocument listDoc = await _client.GetDocumentAsync("/MilitarySecurity/List");
-
+        IDocument listDoc = await _client.GetDocumentAsync("/Sentence/List");
         var token = listDoc
-            .QuerySelector("input[name=__RequestVerificationToken]")!
-            .GetAttribute("value")!;
+            .QuerySelector("#deleteForm input[name=__RequestVerificationToken]")!
+            .GetAttribute("value");
 
-        var fields = new Dictionary<string, string>
+        var fields = new Dictionary<string, string?>
         {
-            ["MilitarySecurityId"] = "-1",
+            ["SentenceId"] = "-1",
             ["__RequestVerificationToken"] = token
         };
 
         //Act
-        await _client.PostAsync($"/MilitarySecurity/Delete/{int.MaxValue}", new FormUrlEncodedContent(fields));
-        IDocument afterDoc = await _client.GetDocumentAsync("/MilitarySecurity/List");
+        await _client.PostAsync($"/Sentence/Delete/{int.MaxValue}", new FormUrlEncodedContent(fields));
+        IDocument afterDoc = await _client.GetDocumentAsync("/Sentence/List");
 
         // Assert
-        Assert.Single(dbContext.MilitarySecurities);
+        Assert.Single(dbContext.Sentences);
         IElement? row = afterDoc.QuerySelector($"table tbody tr[data-id='{id}']");
         Assert.NotNull(row);
         IElement? cell = row.QuerySelector("td[data-property='name']");
         Assert.NotNull(cell);
-        Assert.Equal("Incidentes entre militares", cell.TextContent.Trim());
+        Assert.Equal("Viação", cell.TextContent.Trim());
     }
 
 
@@ -285,7 +285,7 @@ public class MilitarySecurityIntegrationTests(CustomWebApplicationFactory<Progra
     {
         await using AsyncServiceScope scope = _factory.Services.CreateAsyncScope();
         AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        dbContext.RemoveRange(dbContext.MilitarySecurities);
+        dbContext.RemoveRange(dbContext.Sentences);
         await dbContext.SaveChangesAsync();
     }
 

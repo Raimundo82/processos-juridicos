@@ -1,4 +1,4 @@
-namespace Processos_Juridicos.Tests.UnitTest;
+namespace Processos_Juridicos.Tests.IntegrationTests.UnitTest;
 
 public class UnitTest
 {

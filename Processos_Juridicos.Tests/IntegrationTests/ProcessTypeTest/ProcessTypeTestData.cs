@@ -1,6 +1,6 @@
 using Processos_Juridicos.Entities;
 
-namespace Processos_Juridicos.Tests.ProcessTypeTest;
+namespace Processos_Juridicos.Tests.IntegrationTests.ProcessTypeTest;
 
 public static class ProcessTypeTestData
 {

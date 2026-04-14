@@ -11,9 +11,7 @@ using Processos_Juridicos.Data;
 using Processos_Juridicos.Entities;
 using Processos_Juridicos.Tests.TestHelpers;
 
-using Process = Processos_Juridicos.Entities.Process;
-
-namespace Processos_Juridicos.Tests.ProcessTest;
+namespace Processos_Juridicos.Tests.IntegrationTests.ProcessTest;
 
 
 //TODO: authentication related tests
