@@ -58,4 +58,4 @@ Below is a description of all the main tables and their purpose:
 
 ---
 
-![Database ERD](Database-diagram.png)
+![Database Diagram](../images/Database-diagram.png)
