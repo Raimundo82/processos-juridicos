@@ -18,5 +18,6 @@
     "FileSizeTooLargeMessage": "Pelo menos um ficheiro dos ficheiros fornecidos é demasiado grande.",
     "StateTransitionInvalidMessage": "Transição de estado Inválida.",
     "UserDoesNotExistMessage": "Pelo menos um dos utilizadores que tentou adicionar não pode ser adicionado.",
-    "UserCannotBeOfInst":  "O utilizador selectionado não pode ser oficial instrutor."
+    "UserCannotBeOfInst": "O utilizador selectionado não pode ser oficial instrutor.",
+    "UserMustInsertDeclarationConflicts": "Para criar um processo é necessário submeter o formulário de declaração de conflitos."
 }

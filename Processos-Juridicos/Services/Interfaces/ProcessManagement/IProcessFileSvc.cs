@@ -9,4 +9,5 @@ public interface IProcessFileSvc
     public Task<ProcessFileDto> CreateProcessFile(ProcessFileDto file);
     public Task<bool> DeleteProcessFile(int? id);
     public Task<List<ProcessFileDto>> GetAllProcessFilesByProcessId(int? id);
+    public Task<ProcessFileDto?> GetDeclarationFileByProcessId(int? processId);
 }

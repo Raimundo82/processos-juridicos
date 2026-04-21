@@ -25,6 +25,8 @@ public class ProcessFileSvc(AppDbContext context) : IProcessFileSvc
         return Mapper.MapToFilesDto(processFileEntity);
     }
 
+
+
     public async Task<bool> DeleteProcessFile(int? id)
     {
         ProcessFile? processFile = await _context.ProcessFiles.FindAsync(id);
@@ -55,5 +57,26 @@ public class ProcessFileSvc(AppDbContext context) : IProcessFileSvc
 
         return await uploadedFiles.ToListAsync();
     }
+
+    public async Task<ProcessFileDto?> GetDeclarationFileByProcessId(int? processId)
+    {
+        // Get the process to read the FK
+        Process? process = await _context.Processes
+            .AsNoTracking()
+            .FirstOrDefaultAsync(p => p.ProcessId == processId);
+
+        if (process?.InterestConflictDeclarationId == null)
+        {
+            return null;
+        }
+
+        ProcessFile? file = await _context.ProcessFiles
+            .AsNoTracking()
+            .FirstOrDefaultAsync(f => f.ProcessFileId == process.InterestConflictDeclarationId);
+
+        return file == null ? null : Mapper.MapToFilesDto(file);
+    }
+
+
 }
 

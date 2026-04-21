@@ -207,6 +207,39 @@
     </div>
 </div>
 
+<div class="row mb-3">
+    <div class="col-lg-6">
+        <div class="form-group mt-3">
+            <label class="form-label">
+                Declaração de Conflito de Interesses (Obrigatória)
+            </label>
+
+            @if (Model != null && Model.InterestConflictDeclaration != null)
+            {
+                <div class="mb-2">
+                    <p>Ficheiro atual:</p>
+                    <a href="@Url.Action("DownloadFile", "Process", new { id = Model.InterestConflictDeclaration.ProcessFileId })"
+                       target="_blank">
+                        @Model.InterestConflictDeclaration.ProcessFileName
+                    </a>
+                </div>
+
+                <p>Substituir ficheiro:</p>
+                <input type="file" name="InterestConflictDeclarationUpload" class="form-control" />
+            }
+            else
+            {
+                <input type="file" name="InterestConflictDeclarationUpload" class="form-control" />
+            }
+
+            <span asp-validation-for="InterestConflictDeclarationUploadId" class="text-danger"></span>
+        </div>
+    </div>
+</div>
+
+
+
+
 @if (Model?.UploadedFiles?.Any() == true)
 {
     <div class="row mb-3">

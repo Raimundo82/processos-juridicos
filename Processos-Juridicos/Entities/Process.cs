@@ -108,6 +108,9 @@ public partial class Process
     [Column("military_security_id")]
     public int? MilitarySecurityId { get; set; }
 
+    [Column("interest_conflict_declaration_id")]
+    public int? InterestConflictDeclarationId { get; set; }
+
     [Column("jurist_name")]
     public string JuristName { get; set; }
 
@@ -149,5 +152,8 @@ public partial class Process
 
     [ForeignKey("OficialInstNii")]
     public virtual User OficialInstrutor { get; set; }
+
+    [ForeignKey("InterestConflictDeclarationId")]
+    public virtual ProcessFile InterestConflictDeclaration { get; set; }
 
 }

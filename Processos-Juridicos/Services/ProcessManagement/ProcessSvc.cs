@@ -85,7 +85,15 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
             }
         }
 
+        // Preserve the existing declaration FK before overwriting values
+        var existingDeclarationId = existingEntity.InterestConflictDeclarationId;
+
+        // Apply DTO values to the tracked entity
         _context.Entry(existingEntity).CurrentValues.SetValues(process);
+
+        // Restore the FK in case the DTO did not include it
+        existingEntity.InterestConflictDeclarationId = existingDeclarationId;
+
 
         await _context.SaveChangesAsync();
 
@@ -264,6 +272,17 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
         }
 
         return query;
+    }
+
+
+    public async Task SetDeclarationFileAsync(int processId, int fileId)
+    {
+        Process process = await _context.Processes
+            .SingleAsync(p => p.ProcessId == processId);
+
+        process.InterestConflictDeclarationId = fileId;
+
+        await _context.SaveChangesAsync();
     }
 
 

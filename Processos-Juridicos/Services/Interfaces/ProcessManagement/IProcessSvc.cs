@@ -15,4 +15,6 @@ public interface IProcessSvc
     public Task<bool> CanChangeStateAsync(int processId, int? newStateId);
     public Task<ProcessFilterValuesDto> GetFilterValuesAsync();
     public IQueryable<Process> BuildRestrictedQuery(ClaimsPrincipal user);
+    public Task SetDeclarationFileAsync(int processId, int fileId);
+
 }

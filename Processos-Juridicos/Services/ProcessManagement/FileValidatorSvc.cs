@@ -34,7 +34,7 @@ public class FileValidatorSvc(IProcessManagementSvc processManagement, IToastNot
         }
     };
 
-    public async Task<bool> ValidateAndSaveFileAsync(int? processId, IFormFile file)
+    public async Task<bool> ValidateAndSaveFiles(int? processId, IFormFile file)
     {
         if (processId == null)
         {

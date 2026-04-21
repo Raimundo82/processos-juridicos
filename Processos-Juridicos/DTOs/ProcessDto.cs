@@ -44,6 +44,11 @@ public partial class ProcessDto
     [Phone(ErrorMessage = "Invalid phone number")]
     public string OficialInstTelephone { get; set; }
 
+    [ExcludedFromValidation]
+    [MapperIgnore]
+    [NotMapped]
+    public int? InterestConflictDeclarationId { get; set; }
+
     [DisplayName("Averiguado Incerto")]
     public required bool InvestigatedUncertain { get; set; } = false;
 
@@ -143,6 +148,12 @@ public partial class ProcessDto
     [ExcludedFromValidation]
     public string JuristName { get; set; }
 
+    [MapperIgnore]
+    [ExcludedFromValidation]
+    [NotMapped]
+    [DisplayName("Declaração de conflito de interesses")]
+    public IFormFile InterestConflictDeclarationUploadId { get; set; }
+
     [DisplayName("Data da comunicação à PJM")]
     [ExcludedFromValidation]
     public DateOnly? ComunicationDate { get; set; }
@@ -216,4 +227,13 @@ public partial class ProcessDto
     [ExcludedFromValidation]
     [MapperIgnore]
     public List<int> FilesToRemove { get; set; } = [];
+
+    [MapperIgnore]
+    [ExcludedFromValidation]
+    [NotMapped]
+    public IFormFile InterestConflictDeclarationUpload { get; set; }
+
+    [ExcludedFromValidation]
+    [MapperIgnore]
+    public virtual ProcessFile InterestConflictDeclaration { get; set; }
 }
