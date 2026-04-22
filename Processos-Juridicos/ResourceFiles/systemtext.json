@@ -19,5 +19,6 @@
     "StateTransitionInvalidMessage": "Transição de estado Inválida.",
     "UserDoesNotExistMessage": "Pelo menos um dos utilizadores que tentou adicionar não pode ser adicionado.",
     "UserCannotBeOfInst": "O utilizador selectionado não pode ser oficial instrutor.",
-    "UserMustInsertDeclarationConflicts": "Para criar um processo é necessário submeter o formulário de declaração de conflitos."
+    "UserMustInsertDeclarationConflicts": "Para criar um processo é necessário submeter o formulário de declaração de conflitos.",
+    "FileSaveFailedMessage":  "Ocorreu um erro ao tentar salvar um dos ficheiros."
 }

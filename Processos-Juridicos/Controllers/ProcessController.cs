@@ -1,7 +1,6 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq.Expressions;
-using System.Net;
 using System.Reflection;
 
 using Microsoft.AspNetCore.Authorization;
@@ -235,26 +234,37 @@ public class ProcessController(
 
             IFormFile file = model.InterestConflictDeclarationUpload;
 
-            using var ms = new MemoryStream();
-            await file.CopyToAsync(ms);
-
-            var fileDto = new ProcessFileDto
+            if (!await _fileValidatorSvc.ValidateAndSaveFiles(model.ProcessId, file))
             {
-                ProcessFileName = file.FileName,
-                ProcessFileType = file.ContentType,
-                ProcessFileContent = ms.ToArray(),
-                ProcessFileTrustedName = WebUtility.HtmlEncode(file.FileName),
-                ProcessId = model.ProcessId.Value
-            };
-            ProcessFileDto savedDeclaration = await _processManagement.ProcessFiles.CreateProcessFile(fileDto);
+                return await ReturnToEditViewWithFiles(model);
+            }
 
-            if (savedDeclaration.ProcessFileId != null)
+            ProcessFileDto? savedDeclaration = null;
+            List<ProcessFileDto> uploadedFiles = await _processManagement.ProcessFiles.GetAllProcessFilesByProcessId(model.ProcessId);
+
+            if (uploadedFiles != null && uploadedFiles.Any())
             {
-                await _processManagement.Processes.SetDeclarationFileAsync(
+                savedDeclaration = uploadedFiles
+                    .FirstOrDefault(f => string.Equals(f.ProcessFileName, file.FileName, StringComparison.OrdinalIgnoreCase)
+                                      && string.Equals(f.ProcessFileType, file.ContentType, StringComparison.OrdinalIgnoreCase));
+
+                savedDeclaration ??= uploadedFiles
+                        .OrderByDescending(f => f.ProcessFileId)
+                        .FirstOrDefault();
+            }
+
+            if (savedDeclaration == null || savedDeclaration.ProcessFileId == null)
+            {
+                _toastNotify.Error(GlobalTextManager.GetString("FileSaveFailedMessage") ?? "Failed to save declaration file");
+                return await ReturnToEditViewWithFiles(model);
+            }
+
+            // Persist the declaration FK on the process
+            await _processManagement.Processes.SetDeclarationFileAsync(
                 model.ProcessId.Value,
                 savedDeclaration.ProcessFileId.Value
             );
-            }
+
         }
 
         // Handle anex files
