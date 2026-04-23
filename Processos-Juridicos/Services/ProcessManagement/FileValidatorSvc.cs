@@ -34,17 +34,17 @@ public class FileValidatorSvc(IProcessManagementSvc processManagement, IToastNot
         }
     };
 
-    public async Task<bool> ValidateAndSaveFiles(int? processId, IFormFile file)
+    public async Task<int?> ValidateAndSaveFiles(int? processId, IFormFile file)
     {
         if (processId == null)
         {
-            return false;
+            return null;
         }
 
         if (file == null || file.Length == 0)
         {
             _toastNotify.Error(GlobalTextManager.GetString("EmptyFileMessage"));
-            return false;
+            return null;
         }
 
         var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
@@ -55,7 +55,7 @@ public class FileValidatorSvc(IProcessManagementSvc processManagement, IToastNot
         if (!ValidateFile(ext, ms, out var errorMessage))
         {
             _toastNotify.Error(errorMessage);
-            return false;
+            return null;
         }
 
         var trustedName = WebUtility.HtmlEncode(file.FileName);
@@ -69,8 +69,8 @@ public class FileValidatorSvc(IProcessManagementSvc processManagement, IToastNot
             ProcessId = processId.Value
         });
 
-        await _processManagement.ProcessFiles.CreateProcessFile(fileDto);
-        return true;
+        ProcessFileDto created = await _processManagement.ProcessFiles.CreateProcessFile(fileDto);
+        return created.ProcessFileId;
     }
 
     private bool ValidateFile(string ext, MemoryStream ms, out string errorMessage)

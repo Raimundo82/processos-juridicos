@@ -137,7 +137,7 @@ public class ProcessController(
         }
 
         // Save mandatory file
-        if (!await _fileValidatorSvc.ValidateAndSaveFiles(insertTarget.ProcessId, model.InterestConflictDeclarationUpload))
+        if (await _fileValidatorSvc.ValidateAndSaveFiles(insertTarget.ProcessId, model.InterestConflictDeclarationUpload) != null)
         {
             return View(model);
         }
@@ -269,7 +269,7 @@ public class ProcessController(
             await _processManagement.ProcessFiles.DeleteProcessFile(existing.ProcessFileId);
         }
 
-        if (!await _fileValidatorSvc.ValidateAndSaveFiles(model.ProcessId, model.InterestConflictDeclarationUpload))
+        if (await _fileValidatorSvc.ValidateAndSaveFiles(model.ProcessId, model.InterestConflictDeclarationUpload) != null)
         {
             return false;
         }
@@ -301,7 +301,7 @@ public class ProcessController(
 
         foreach (IFormFile? file in normalFiles)
         {
-            if (!await _fileValidatorSvc.ValidateAndSaveFiles(model.ProcessId, file))
+            if (await _fileValidatorSvc.ValidateAndSaveFiles(model.ProcessId, file) != null)
             {
                 return false;
             }
@@ -556,7 +556,7 @@ public class ProcessController(
 
         foreach (IFormFile file in files)
         {
-            if (!await _fileValidatorSvc.ValidateAndSaveFiles(processId, file))
+            if (await _fileValidatorSvc.ValidateAndSaveFiles(processId, file) != null)
             {
                 return false;
             }
