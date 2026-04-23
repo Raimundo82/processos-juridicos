@@ -171,7 +171,7 @@ if (app.Environment.IsDevelopment())
 
     if (db.Database.IsRelational())
     {
-        db.Database.Migrate();
+        // db.Database.Migrate();
     }
 }
 
