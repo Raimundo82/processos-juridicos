@@ -183,25 +183,10 @@ public class ProcessController(
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(ProcessDto model)
     {
-        if (!ModelState.IsValid)
+        if (!await ValidateModelAsync(model))
         {
-            await _viewDataSvc.PopulateForEditAsync(ViewData, model.ProcessId);
-            return View(model);
+            return await ReturnToEditView(model);
         }
-
-        if (!await _processManagement.Processes.CanChangeStateAsync((int)model.ProcessId!, model.ProcessStateId))
-        {
-            ModelState.AddModelError(nameof(model.ProcessStateId), GlobalTextManager.GetString("StateTransitionInvalidMessage"));
-            await _viewDataSvc.PopulateForEditAsync(ViewData, model.ProcessId);
-            return View(model);
-        }
-
-        if (model.ProcessType?.ProcessTypeName == AccidentProcessTypeName)
-        {
-            model.ComunicatedToPjm = false;
-        }
-
-        model.ProcessState = await _processManagement.ProcessStates.GetStateById(model.ProcessStateId);
 
         ProcessDto currentProcess = await _processManagement.Processes.GetProcessById(model.ProcessId);
         if (!await UserCanEdit(currentProcess))
@@ -218,109 +203,158 @@ public class ProcessController(
         ApplyCommunicatedPJMRules(model);
         SetAuditFields(model, isNew: false, currentProcess);
 
-        // Save process changes
         await _processManagement.Processes.EditProcess(model);
 
-        // Handle declaration file
-        if (model.InterestConflictDeclarationUpload != null)
+        if (!await HandleDeclarationFileAsync(model))
         {
-            ProcessFileDto? existingDeclaration = await _processManagement.ProcessFiles
-                .GetDeclarationFileByProcessId(model.ProcessId);
-
-            if (existingDeclaration != null)
-            {
-                await _processManagement.ProcessFiles.DeleteProcessFile(existingDeclaration.ProcessFileId);
-            }
-
-            IFormFile file = model.InterestConflictDeclarationUpload;
-
-            if (!await _fileValidatorSvc.ValidateAndSaveFiles(model.ProcessId, file))
-            {
-                return await ReturnToEditViewWithFiles(model);
-            }
-
-            ProcessFileDto? savedDeclaration = null;
-            List<ProcessFileDto> uploadedFiles = await _processManagement.ProcessFiles.GetAllProcessFilesByProcessId(model.ProcessId);
-
-            if (uploadedFiles != null && uploadedFiles.Any())
-            {
-                savedDeclaration = uploadedFiles
-                    .FirstOrDefault(f => string.Equals(f.ProcessFileName, file.FileName, StringComparison.OrdinalIgnoreCase)
-                                      && string.Equals(f.ProcessFileType, file.ContentType, StringComparison.OrdinalIgnoreCase));
-
-                savedDeclaration ??= uploadedFiles
-                        .OrderByDescending(f => f.ProcessFileId)
-                        .FirstOrDefault();
-            }
-
-            if (savedDeclaration == null || savedDeclaration.ProcessFileId == null)
-            {
-                _toastNotify.Error(GlobalTextManager.GetString("FileSaveFailedMessage") ?? "Failed to save declaration file");
-                return await ReturnToEditViewWithFiles(model);
-            }
-
-            // Persist the declaration FK on the process
-            await _processManagement.Processes.SetDeclarationFileAsync(
-                model.ProcessId.Value,
-                savedDeclaration.ProcessFileId.Value
-            );
-
-        }
-
-        // Handle anex files
-        var normalFiles = model.ProcessFiles?
-            .Where(f => f != model.InterestConflictDeclarationUpload)
-            .ToList();
-
-        if (normalFiles != null)
-        {
-            foreach (IFormFile? file in normalFiles)
-            {
-                if (!await _fileValidatorSvc.ValidateAndSaveFiles(model.ProcessId, file))
-                {
-                    return await ReturnToEditViewWithFiles(model);
-                }
-            }
-        }
-
-        // --- DETECTION: user removed the declaration and did not upload a replacement ---
-        // Determine current declaration id (prefer DTO field if present, otherwise ask service)
-        var currentDeclarationId = model.InterestConflictDeclarationId;
-        if (currentDeclarationId == null)
-        {
-            ProcessFileDto? existingDecl = await _processManagement.ProcessFiles.GetDeclarationFileByProcessId(model.ProcessId);
-            currentDeclarationId = existingDecl?.ProcessFileId;
-        }
-
-        // If the user marked the declaration for removal and did NOT upload a replacement, block the save
-        if (model.FilesToRemove != null
-            && currentDeclarationId != null
-            && model.FilesToRemove.Contains(currentDeclarationId.Value)
-            && model.InterestConflictDeclarationUpload == null)
-        {
-            ModelState.AddModelError(nameof(model.InterestConflictDeclarationUploadId),
-                GlobalTextManager.GetString("UserMustInsertDeclarationConflicts"));
-
-            // Ensure the view has the latest uploaded files and viewdata
             return await ReturnToEditViewWithFiles(model);
         }
 
-
-        //
-        // 3. HANDLE FILES MARKED FOR REMOVAL
-        //
-        if (model.FilesToRemove?.Count > 0)
+        if (!await HandleNormalFilesAsync(model))
         {
-            await RemoveFiles(model.FilesToRemove);
+            return await ReturnToEditViewWithFiles(model);
         }
+
+        if (!await ValidateDeclarationRemovalAsync(model))
+        {
+            return await ReturnToEditViewWithFiles(model);
+        }
+
+        await RemoveFilesIfNeeded(model);
 
         _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("EditSuccessMessage"), "O", EntityName, "o"));
         return RedirectToAction(nameof(List));
     }
 
+    private async Task<bool> ValidateModelAsync(ProcessDto model)
+    {
+        if (!ModelState.IsValid)
+        {
+            await _viewDataSvc.PopulateForEditAsync(ViewData, model.ProcessId);
+            return false;
+        }
 
+        if (!await _processManagement.Processes.CanChangeStateAsync(
+                (int)model.ProcessId!, model.ProcessStateId))
+        {
+            ModelState.AddModelError(nameof(model.ProcessStateId),
+                GlobalTextManager.GetString("StateTransitionInvalidMessage"));
 
+            await _viewDataSvc.PopulateForEditAsync(ViewData, model.ProcessId);
+            return false;
+        }
 
+        if (model.ProcessType?.ProcessTypeName == AccidentProcessTypeName)
+        {
+            model.ComunicatedToPjm = false;
+        }
+
+        model.ProcessState = await _processManagement.ProcessStates.GetStateById(model.ProcessStateId);
+
+        return true;
+    }
+
+    private async Task<bool> HandleDeclarationFileAsync(ProcessDto model)
+    {
+        if (model.InterestConflictDeclarationUpload == null)
+        {
+            return true;
+        }
+
+        ProcessFileDto? existing = await _processManagement.ProcessFiles
+            .GetDeclarationFileByProcessId(model.ProcessId);
+
+        if (existing != null)
+        {
+            await _processManagement.ProcessFiles.DeleteProcessFile(existing.ProcessFileId);
+        }
+
+        if (!await _fileValidatorSvc.ValidateAndSaveFiles(model.ProcessId, model.InterestConflictDeclarationUpload))
+        {
+            return false;
+        }
+
+        ProcessFileDto? saved = await FindSavedDeclarationAsync(model);
+        if (saved?.ProcessFileId == null)
+        {
+            _toastNotify.Error(GlobalTextManager.GetString("FileSaveFailedMessage"));
+            return false;
+        }
+
+        await _processManagement.Processes.SetDeclarationFileAsync(
+            model.ProcessId!.Value,
+            saved.ProcessFileId.Value);
+
+        return true;
+    }
+
+    private async Task<bool> HandleNormalFilesAsync(ProcessDto model)
+    {
+        var normalFiles = model.ProcessFiles?
+            .Where(f => f != model.InterestConflictDeclarationUpload)
+            .ToList();
+
+        if (normalFiles == null)
+        {
+            return true;
+        }
+
+        foreach (IFormFile? file in normalFiles)
+        {
+            if (!await _fileValidatorSvc.ValidateAndSaveFiles(model.ProcessId, file))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private async Task<bool> ValidateDeclarationRemovalAsync(ProcessDto model)
+    {
+        var currentDeclId = model.InterestConflictDeclarationId
+            ?? (await _processManagement.ProcessFiles
+                    .GetDeclarationFileByProcessId(model.ProcessId))
+                    ?.ProcessFileId;
+
+        if (currentDeclId != null &&
+            model.FilesToRemove?.Contains(currentDeclId.Value) == true &&
+            model.InterestConflictDeclarationUpload == null)
+        {
+            ModelState.AddModelError(nameof(model.InterestConflictDeclarationUploadId),
+                GlobalTextManager.GetString("UserMustInsertDeclarationConflicts"));
+
+            return false;
+        }
+
+        return true;
+    }
+
+    private async Task RemoveFilesIfNeeded(ProcessDto model)
+    {
+        if (model.FilesToRemove?.Count > 0)
+        {
+            await RemoveFiles(model.FilesToRemove);
+        }
+    }
+
+    private async Task<ProcessFileDto?> FindSavedDeclarationAsync(ProcessDto model)
+    {
+        List<ProcessFileDto> uploaded = await _processManagement.ProcessFiles
+            .GetAllProcessFilesByProcessId(model.ProcessId);
+
+        if (uploaded == null || !uploaded.Any())
+        {
+            return null;
+        }
+
+        IFormFile file = model.InterestConflictDeclarationUpload;
+
+        return uploaded.FirstOrDefault(f =>
+                    f.ProcessFileName.Equals(file.FileName, StringComparison.OrdinalIgnoreCase) &&
+                    f.ProcessFileType.Equals(file.ContentType, StringComparison.OrdinalIgnoreCase))
+               ?? uploaded.OrderByDescending(f => f.ProcessFileId).FirstOrDefault();
+    }
 
 
     [HttpGet]

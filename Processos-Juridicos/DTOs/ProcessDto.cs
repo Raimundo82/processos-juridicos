@@ -45,8 +45,6 @@ public partial class ProcessDto
     public string OficialInstTelephone { get; set; }
 
     [ExcludedFromValidation]
-    [MapperIgnore]
-    [NotMapped]
     public int? InterestConflictDeclarationId { get; set; }
 
     [DisplayName("Averiguado Incerto")]
@@ -234,6 +232,5 @@ public partial class ProcessDto
     public IFormFile InterestConflictDeclarationUpload { get; set; }
 
     [ExcludedFromValidation]
-    [MapperIgnore]
     public virtual ProcessFile InterestConflictDeclaration { get; set; }
 }

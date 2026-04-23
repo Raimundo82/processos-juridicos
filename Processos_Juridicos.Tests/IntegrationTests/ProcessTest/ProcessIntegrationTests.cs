@@ -831,7 +831,7 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
         row = doc.QuerySelectorAll("div[id^='file-row-']")?[0];
 
         IElement container = doc.QuerySelector("#deletedFilesContainer")!;
-        var deleteId = row.Id!;
+        var deleteId = row!.Id!;
         var deleteIdSplit = deleteId.Split('-');
         var number = deleteIdSplit[^1];
 
