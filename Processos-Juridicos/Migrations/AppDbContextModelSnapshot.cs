@@ -17,7 +17,7 @@ namespace Processos_Juridicos.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.2")
+                .HasAnnotation("ProductVersion", "10.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -191,6 +191,10 @@ namespace Processos_Juridicos.Migrations
                         .HasColumnType("int")
                         .HasColumnName("harmed_or_casualties_id");
 
+                    b.Property<int?>("InterestConflictDeclarationId")
+                        .HasColumnType("int")
+                        .HasColumnName("interest_conflict_declaration_id");
+
                     b.Property<string>("InvestigatedGender")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("investigated_gender");
@@ -280,6 +284,8 @@ namespace Processos_Juridicos.Migrations
                     b.HasIndex("CrimeTypeId");
 
                     b.HasIndex("HarmedOrCasualtiesId");
+
+                    b.HasIndex("InterestConflictDeclarationId");
 
                     b.HasIndex("MilitarySecurityId");
 
@@ -570,6 +576,10 @@ namespace Processos_Juridicos.Migrations
                         .WithMany()
                         .HasForeignKey("HarmedOrCasualtiesId");
 
+                    b.HasOne("Processos_Juridicos.Entities.ProcessFile", "InterestConflictDeclaration")
+                        .WithMany()
+                        .HasForeignKey("InterestConflictDeclarationId");
+
                     b.HasOne("Processos_Juridicos.Entities.MilitarySecurity", "MilitarySecurity")
                         .WithMany()
                         .HasForeignKey("MilitarySecurityId");
@@ -613,6 +623,8 @@ namespace Processos_Juridicos.Migrations
                     b.Navigation("CrimeType");
 
                     b.Navigation("HarmedOrCasualties");
+
+                    b.Navigation("InterestConflictDeclaration");
 
                     b.Navigation("MilitarySecurity");
 

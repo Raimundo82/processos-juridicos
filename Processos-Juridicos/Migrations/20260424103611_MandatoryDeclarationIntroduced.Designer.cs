@@ -12,15 +12,15 @@ using Processos_Juridicos.Data;
 namespace Processos_Juridicos.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260417103303_MandatoryDeclaration")]
-    partial class MandatoryDeclaration
+    [Migration("20260424103611_MandatoryDeclarationIntroduced")]
+    partial class MandatoryDeclarationIntroduced
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.6")
+                .HasAnnotation("ProductVersion", "10.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
