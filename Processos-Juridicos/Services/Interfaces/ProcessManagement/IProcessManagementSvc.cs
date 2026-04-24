@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore.Storage;
+
 using Processos_Juridicos.Services.Interfaces.DomainData;
 
 namespace Processos_Juridicos.Services.Interfaces.ProcessManagement;
@@ -8,4 +10,5 @@ public interface IProcessManagementSvc
     public IProcessFileSvc ProcessFiles { get; }
     public IProcessStateSvc ProcessStates { get; }
     public IStateTransitionSvc ProcessTransitions { get; }
+    public Task<IDbContextTransaction> BeginTransactionAsync();
 }

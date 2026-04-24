@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 using Processos_Juridicos.Attributes;
 using Processos_Juridicos.DTOs;
@@ -194,48 +195,72 @@ public class ProcessController(
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(ProcessDto model)
     {
+        // Start transaction through ProcessManagement
+        await using IDbContextTransaction tx = await _processManagement.BeginTransactionAsync();
+
+        // 1. Validate model
         if (!await ValidateModelAsync(model))
         {
+            await tx.RollbackAsync();
             return await ReturnToEditView(model);
         }
 
+        // 2. Load current process
         ProcessDto currentProcess = await _processManagement.Processes.GetProcessById(model.ProcessId);
         if (!await UserCanEdit(currentProcess))
         {
+            await tx.RollbackAsync();
             return Forbid();
         }
 
+        // 3. Validate required fields
         if (!ValidateRequiredFieldsForOpenState(model))
         {
+            await tx.RollbackAsync();
             return await ReturnToEditView(model);
         }
 
+        // 4. Apply business rules
         ApplyInvestigatedUncertainRules(model);
         ApplyCommunicatedPJMRules(model);
         SetAuditFields(model, isNew: false, currentProcess);
 
+        // 5. Update process
         await _processManagement.Processes.EditProcess(model);
 
+        // 6. Handle declaration file
         if (!await HandleDeclarationFileAsync(model))
         {
+            await tx.RollbackAsync();
             return await ReturnToEditViewWithFiles(model);
         }
 
+        // 7. Handle normal files
         if (!await HandleNormalFilesAsync(model))
         {
+            await tx.RollbackAsync();
             return await ReturnToEditViewWithFiles(model);
         }
 
+        // 8. Validate declaration removal
         if (!await ValidateDeclarationRemovalAsync(model))
         {
+            await tx.RollbackAsync();
             return await ReturnToEditViewWithFiles(model);
         }
 
+        // 9. Remove files if needed
         await RemoveFilesIfNeeded(model);
 
-        _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("EditSuccessMessage"), "O", EntityName, "o"));
+        // 10. Commit transaction
+        await tx.CommitAsync();
+
+        _toastNotify.Sucesso(string.Format(
+            GlobalTextManager.GetString("EditSuccessMessage"), "O", EntityName, "o"));
+
         return RedirectToAction(nameof(List));
     }
+
 
     private async Task<bool> ValidateModelAsync(ProcessDto model)
     {
