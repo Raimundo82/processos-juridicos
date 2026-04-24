@@ -136,11 +136,22 @@ public class ProcessController(
             return View(model);
         }
 
-        // Save mandatory file
-        if (await _fileValidatorSvc.ValidateAndSaveFiles(insertTarget.ProcessId, model.InterestConflictDeclarationUpload) != null)
+        var declFileId = await _fileValidatorSvc.ValidateAndSaveFiles(
+            insertTarget.ProcessId,
+            model.InterestConflictDeclarationUpload
+        );
+
+        if (declFileId == null)
         {
             return View(model);
         }
+
+        // Save the declaration file ID directly
+        await _processManagement.Processes.SetDeclarationFileAsync(
+            insertTarget.ProcessId!.Value,
+            declFileId.Value
+        );
+
 
         _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("CreateSuccessMessage"), "O", EntityName, "o"));
         return RedirectToAction(nameof(List));
@@ -269,13 +280,12 @@ public class ProcessController(
             await _processManagement.ProcessFiles.DeleteProcessFile(existing.ProcessFileId);
         }
 
-        if (await _fileValidatorSvc.ValidateAndSaveFiles(model.ProcessId, model.InterestConflictDeclarationUpload) != null)
-        {
-            return false;
-        }
+        var declFileId = await _fileValidatorSvc.ValidateAndSaveFiles(
+            model.ProcessId,
+            model.InterestConflictDeclarationUpload
+        );
 
-        ProcessFileDto? saved = await FindSavedDeclarationAsync(model);
-        if (saved?.ProcessFileId == null)
+        if (declFileId == null)
         {
             _toastNotify.Error(GlobalTextManager.GetString("FileSaveFailedMessage"));
             return false;
@@ -283,7 +293,8 @@ public class ProcessController(
 
         await _processManagement.Processes.SetDeclarationFileAsync(
             model.ProcessId!.Value,
-            saved.ProcessFileId.Value);
+            declFileId.Value
+        );
 
         return true;
     }
@@ -301,7 +312,7 @@ public class ProcessController(
 
         foreach (IFormFile? file in normalFiles)
         {
-            if (await _fileValidatorSvc.ValidateAndSaveFiles(model.ProcessId, file) != null)
+            if (await _fileValidatorSvc.ValidateAndSaveFiles(model.ProcessId, file) == null)
             {
                 return false;
             }
@@ -337,25 +348,6 @@ public class ProcessController(
             await RemoveFiles(model.FilesToRemove);
         }
     }
-
-    private async Task<ProcessFileDto?> FindSavedDeclarationAsync(ProcessDto model)
-    {
-        List<ProcessFileDto> uploaded = await _processManagement.ProcessFiles
-            .GetAllProcessFilesByProcessId(model.ProcessId);
-
-        if (uploaded == null || !uploaded.Any())
-        {
-            return null;
-        }
-
-        IFormFile file = model.InterestConflictDeclarationUpload;
-
-        return uploaded.FirstOrDefault(f =>
-                    f.ProcessFileName.Equals(file.FileName, StringComparison.OrdinalIgnoreCase) &&
-                    f.ProcessFileType.Equals(file.ContentType, StringComparison.OrdinalIgnoreCase))
-               ?? uploaded.OrderByDescending(f => f.ProcessFileId).FirstOrDefault();
-    }
-
 
     [HttpGet]
     public async Task<IActionResult> GetFilterValues()
@@ -556,7 +548,7 @@ public class ProcessController(
 
         foreach (IFormFile file in files)
         {
-            if (await _fileValidatorSvc.ValidateAndSaveFiles(processId, file) != null)
+            if (await _fileValidatorSvc.ValidateAndSaveFiles(processId, file) == null)
             {
                 return false;
             }
