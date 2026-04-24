@@ -291,12 +291,19 @@ public class ProcessController(
             return false;
         }
 
-        await _processManagement.Processes.SetDeclarationFileAsync(
-            model.ProcessId!.Value,
+        if (model.ProcessId != null)
+        {
+            await _processManagement.Processes.SetDeclarationFileAsync(
+            model.ProcessId.Value,
             declFileId.Value
-        );
 
-        return true;
+        );
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     private async Task<bool> HandleNormalFilesAsync(ProcessDto model)
