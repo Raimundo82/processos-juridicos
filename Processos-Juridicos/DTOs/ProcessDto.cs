@@ -150,7 +150,7 @@ public partial class ProcessDto
     [ExcludedFromValidation]
     [NotMapped]
     [DisplayName("Declaração de conflito de interesses")]
-    public IFormFile InterestConflictDeclarationUploadId { get; set; }
+    public IFormFile InterestConflictDeclarationUploadFile { get; set; }
 
     [DisplayName("Data da comunicação à PJM")]
     [ExcludedFromValidation]

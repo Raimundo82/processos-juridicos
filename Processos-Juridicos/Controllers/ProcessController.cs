@@ -132,7 +132,7 @@ public class ProcessController(
 
         if (model.InterestConflictDeclarationUpload == null)
         {
-            ModelState.AddModelError(nameof(model.InterestConflictDeclarationUploadId), GlobalTextManager.GetString("UserMustInsertDeclarationConflicts"));
+            ModelState.AddModelError(nameof(model.InterestConflictDeclarationUploadFile), GlobalTextManager.GetString("UserMustInsertDeclarationConflicts"));
             await _viewDataSvc.PopulateForCreateAsync(ViewData);
             return View(model);
         }
@@ -364,7 +364,7 @@ public class ProcessController(
             model.FilesToRemove?.Contains(currentDeclId.Value) == true &&
             model.InterestConflictDeclarationUpload == null)
         {
-            ModelState.AddModelError(nameof(model.InterestConflictDeclarationUploadId),
+            ModelState.AddModelError(nameof(model.InterestConflictDeclarationUploadFile),
                 GlobalTextManager.GetString("UserMustInsertDeclarationConflicts"));
 
             return false;
