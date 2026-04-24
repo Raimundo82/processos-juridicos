@@ -60,23 +60,18 @@ public class ProcessFileSvc(AppDbContext context) : IProcessFileSvc
 
     public async Task<ProcessFileDto?> GetDeclarationFileByProcessId(int? processId)
     {
-        // Get the process to read the FK
-        Process? process = await _context.Processes
+        return await _context.Processes
             .AsNoTracking()
-            .FirstOrDefaultAsync(p => p.ProcessId == processId);
-
-        if (process?.InterestConflictDeclarationId == null)
-        {
-            return null;
-        }
-
-        ProcessFile? file = await _context.ProcessFiles
-            .AsNoTracking()
-            .FirstOrDefaultAsync(f => f.ProcessFileId == process.InterestConflictDeclarationId);
-
-        return file == null ? null : Mapper.MapToFilesDto(file);
+            .Where(p => p.ProcessId == processId)
+            .Select(p => p.InterestConflictDeclarationId)
+            .Where(id => id != null)
+            .Select(id => _context.ProcessFiles
+                .AsNoTracking()
+                .Where(f => f.ProcessFileId == id)
+                .Select(f => Mapper.MapToFilesDto(f))
+                .FirstOrDefault())
+            .FirstOrDefaultAsync();
     }
-
 
 }
 
