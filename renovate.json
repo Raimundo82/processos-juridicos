@@ -1,70 +1,32 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:recommended"
-  ],
-  "enabledManagers": [
-    "nuget",
-    "npm"
-  ],
+  "extends": ["config:recommended"],
+  "enabledManagers": ["nuget", "npm"],
   "rangeStrategy": "bump",
   "packageRules": [
     {
-      "matchUpdateTypes": [
-        "minor",
-        "patch",
-        "pin",
-        "digest"
-      ],
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
       "automerge": true
     },
     {
       "groupName": "keycloak authservices monorepo",
-      "matchPackageNames": [
-        "/^Keycloak\\.AuthServices\\./"
-      ],
-      "matchUpdateTypes": [
-        "digest",
-        "patch",
-        "minor",
-        "major"
-      ]
+      "matchPackageNames": ["/^Keycloak\\.AuthServices\\./"],
+      "matchUpdateTypes": ["digest", "patch", "minor", "major"]
     },
     {
       "groupName": "itext monorepo",
-      "matchPackageNames": [
-        "/^itext(\\.|$)/"
-      ],
-      "matchUpdateTypes": [
-        "digest",
-        "patch",
-        "minor",
-        "major"
-      ]
+      "matchPackageNames": ["/^itext(\\.|$)/"],
+      "matchUpdateTypes": ["digest", "patch", "minor", "major"]
     },
     {
       "groupName": "coverlet monorepo",
-      "matchPackagePatterns": [
-        "^coverlet(\\.|$)"
-      ],
-      "matchUpdateTypes": [
-        "digest",
-        "patch",
-        "minor",
-        "major"
-      ]
+      "matchUpdateTypes": ["digest", "patch", "minor", "major"],
+      "matchPackageNames": ["/^coverlet(\.|$)/"]
     },
     {
-      "extends": [
-        "monorepo:dotnet"
-      ],
+      "extends": ["monorepo:dotnet"],
       "groupName": "dotnet monorepo",
-      "matchUpdateTypes": [
-        "digest",
-        "patch",
-        "minor",
-        "major"
-      ]
+      "matchUpdateTypes": ["digest", "patch", "minor", "major"]
     }
   ]
 }
