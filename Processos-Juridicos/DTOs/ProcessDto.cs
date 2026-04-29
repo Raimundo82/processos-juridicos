@@ -147,7 +147,6 @@ public partial class ProcessDto
     public string JuristName { get; set; }
 
     [MapperIgnore]
-    [ExcludedFromValidation]
     [NotMapped]
     [DisplayName("Declaração de conflito de interesses")]
     public IFormFile InterestConflictDeclarationUploadFile { get; set; }

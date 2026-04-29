@@ -360,17 +360,18 @@ public class ProcessController(
                     .GetDeclarationFileByProcessId(model.ProcessId))
                     ?.ProcessFileId;
 
-        if (currentDeclId != null &&
-            model.FilesToRemove?.Contains(currentDeclId.Value) == true &&
-            model.InterestConflictDeclarationUpload == null)
+        // Case 1: No declaration exists AND user didn't upload one
+        if (currentDeclId == null && model.InterestConflictDeclarationUpload == null)
         {
             ModelState.AddModelError(nameof(model.InterestConflictDeclarationUploadFile),
                 GlobalTextManager.GetString("UserMustInsertDeclarationConflicts"));
-
             return false;
         }
 
-        return true;
+        // Case 2: User is removing existing declaration AND didn't upload a replacement
+        return currentDeclId == null ||
+            (model.FilesToRemove?.Contains(currentDeclId.Value)) != true ||
+            model.InterestConflictDeclarationUpload != null;
     }
 
     private async Task RemoveFilesIfNeeded(ProcessDto model)
