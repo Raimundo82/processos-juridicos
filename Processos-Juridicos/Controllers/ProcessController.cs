@@ -130,12 +130,12 @@ public class ProcessController(
             return View(model);
         }
 
-        if (model.InterestConflictDeclarationUpload == null)
-        {
-            ModelState.AddModelError(nameof(model.InterestConflictDeclarationUploadFile), GlobalTextManager.GetString("UserMustInsertDeclarationConflicts"));
-            await _viewDataSvc.PopulateForCreateAsync(ViewData);
-            return View(model);
-        }
+        //if (model.InterestConflictDeclarationUpload == null)
+        //{
+        //    ModelState.AddModelError(nameof(model.InterestConflictDeclarationUploadFile), GlobalTextManager.GetString("UserMustInsertDeclarationConflicts"));
+        //    await _viewDataSvc.PopulateForCreateAsync(ViewData);
+        //    return View(model);
+        //}
 
         var declFileId = await _fileValidatorSvc.ValidateAndSaveFiles(
             insertTarget.ProcessId,
