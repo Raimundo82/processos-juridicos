@@ -5,7 +5,6 @@ using System.Reflection;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
@@ -113,6 +112,7 @@ public class ProcessController(
     [HttpPost]
     public async Task<IActionResult> Create(ProcessDto model)
     {
+        // 1. ModelState validation
         if (!ModelState.IsValid)
         {
             await _viewDataSvc.PopulateForCreateAsync(ViewData);
@@ -121,73 +121,71 @@ public class ProcessController(
 
         ApplyInvestigatedUncertainRules(model);
         ApplyCommunicatedPJMRules(model);
+
+        if (model.ProcessFiles != null)
+        {
+            foreach (IFormFile? file in model.ProcessFiles)
+            {
+                if (!await _fileValidatorSvc.ValidateFile(file))
+                {
+                    await _viewDataSvc.PopulateForCreateAsync(ViewData);
+                    return View(model);
+                }
+            }
+        }
+
+        if (model.InterestConflictDeclarationUpload == null)
+        {
+            ModelState.AddModelError(nameof(model.InterestConflictDeclarationUploadFile),
+                GlobalTextManager.GetString("UserMustInsertDeclarationConflicts"));
+
+            await _viewDataSvc.PopulateForCreateAsync(ViewData);
+            return View(model);
+        }
+
         SetAuditFields(model, isNew: true, null);
 
         ProcessDto insertTarget = await _processManagement.Processes.CreateProcess(model);
 
-        if (!await ValidateAndSaveFiles(insertTarget.ProcessId, model.ProcessFiles))
+        if (model.ProcessFiles != null)
         {
-            return View(model);
+            foreach (IFormFile? file in model.ProcessFiles)
+            {
+                await _fileValidatorSvc.SaveFile(insertTarget.ProcessId!.Value, file);
+            }
         }
 
-        //if (model.InterestConflictDeclarationUpload == null)
-        //{
-        //    ModelState.AddModelError(nameof(model.InterestConflictDeclarationUploadFile), GlobalTextManager.GetString("UserMustInsertDeclarationConflicts"));
-        //    await _viewDataSvc.PopulateForCreateAsync(ViewData);
-        //    return View(model);
-        //}
-
-        var declFileId = await _fileValidatorSvc.ValidateAndSaveFiles(
-            insertTarget.ProcessId,
-            model.InterestConflictDeclarationUpload
-        );
+        var declFileId = await _fileValidatorSvc.SaveFile(
+        insertTarget.ProcessId!.Value,
+        model.InterestConflictDeclarationUpload!
+         );
 
         if (declFileId == null)
         {
+            await _viewDataSvc.PopulateForCreateAsync(ViewData);
             return View(model);
         }
 
-        // Save the declaration file ID directly
         await _processManagement.Processes.SetDeclarationFileAsync(
             insertTarget.ProcessId!.Value,
             declFileId.Value
         );
 
+        // 8. Save declaration file ID to process
+        await _processManagement.Processes.SetDeclarationFileAsync(
+            insertTarget.ProcessId!.Value,
+            (int)declFileId
+        );
 
-        _toastNotify.Sucesso(string.Format(GlobalTextManager.GetString("CreateSuccessMessage"), "O", EntityName, "o"));
+        // 9. Success toast + redirect
+        _toastNotify.Sucesso(string.Format(
+            GlobalTextManager.GetString("CreateSuccessMessage"),
+            "O", EntityName, "o"
+        ));
+
         return RedirectToAction(nameof(List));
     }
 
-    [Authorize(Policy = "PROCESS-MANAGEMENT")]
-    [HttpGet]
-    public async Task<IActionResult> Edit(int? id)
-    {
-        if (!ModelState.IsValid)
-        {
-            return RedirectToAction(nameof(List));
-        }
-
-        ProcessDto model = await _processManagement.Processes.GetProcessById(id);
-
-        if (!await UserCanEdit(model))
-        {
-            return Forbid();
-        }
-
-        model.UploadedFiles = await _processManagement.ProcessFiles.GetAllProcessFilesByProcessId(id);
-
-        await _viewDataSvc.PopulateForEditAsync(ViewData, model.ProcessId);
-
-        if (ViewData["infringements"] is List<SelectListItem> infrList)
-        {
-            foreach (SelectListItem? item in infrList.Where(i => model.Infringements.Contains(int.Parse(i.Value))))
-            {
-                item.Selected = true;
-            }
-        }
-
-        return View(model);
-    }
 
 
     [Authorize(Policy = "PROCESS-MANAGEMENT")]
@@ -570,23 +568,6 @@ public class ProcessController(
             model.ModifiedByNii = nii;
             model.ModifiedAt = DateOnly.FromDateTime(DateTime.Now);
         }
-    }
-
-    private async Task<bool> ValidateAndSaveFiles(int? processId, IFormFile[]? files)
-    {
-        if (files == null)
-        {
-            return true;
-        }
-
-        foreach (IFormFile file in files)
-        {
-            if (await _fileValidatorSvc.ValidateAndSaveFiles(processId, file) == null)
-            {
-                return false;
-            }
-        }
-        return true;
     }
 
     private async Task RemoveFiles(IEnumerable<int> fileIds)
