@@ -12,11 +12,10 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     permissions:
-      contents: write # to be able to publish a GitHub release
-      issues: write # to be able to comment on released issues
-      pull-requests: write # to be able to comment on released pull requests
-      id-token: write # to enable use of OIDC for npm provenance
-
+      contents: write
+      issues: write
+      pull-requests: write
+      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -32,7 +31,7 @@ jobs:
 
       - name: Install dependencies
         run: npm clean-install
-      
+
       - name: Setup .NET 10.0.x
         uses: actions/setup-dotnet@v4
         with:
@@ -47,20 +46,35 @@ jobs:
           tar -czf processos-juridicos.tar.gz -C ./Release .
         shell: bash
 
-      - name: Prepare CA certificate
+      - name: Prepare Certificates
         run: |
           mkdir -p certs
-          printf "%s\n" "${{ vars.MARINHA_ROOT_CA }}" > ${{ github.workspace }}/certs/marinha-root-ca.crt
-          echo "🔍 Certificate starts with:"
-          head -n 5 "${{ github.workspace }}/certs/marinha-root-ca.crt"
-          echo "✅ Certificate information:"
-          openssl x509 -in "${{ github.workspace }}/certs/marinha-root-ca.crt" -text -noout
+          echo "${{ vars.ROOT_CA_CA_ENCODED }}" | openssl base64 -d -out certs/root-ca-ca.crt
+          echo "${{ vars.MARINHA_ROOT_CA_ENCODED }}" | openssl base64 -d -out certs/marinha-root-ca.crt
+
+      - name: Login to Registry
+        uses: docker/login-action@v4.1.0
+        with:
+          registry: devops-01.marinha.pt
+          username: ${{ vars.USERNAME }}
+          password: ${{ secrets.PACKAGE_UPLOAD_TOKEN }}
+
+      - name: Build and push Docker Image
+        uses: docker/build-push-action@v7.2.0
+        with:
+          context: .
+          push: true
+          tags: devops-01.marinha.pt/marinha-si/processos-juridicos:latest
+          build-args: |
+            HTTP_PROXY_ARG=${{ vars.PROXY }}
+            HTTPS_PROXY_ARG=${{ vars.PROXY }}
+            NO_PROXY_ARG=${{ vars.NO_PROXY }}
 
       - name: Release
         env:
           GITEA_TOKEN: ${{ secrets.PACKAGE_UPLOAD_TOKEN }}
           GITEA_URL: https://devops-01.marinha.pt
-          NODE_EXTRA_CA_CERTS: '${{ github.workspace }}/certs/marinha-root-ca.crt'
+          NODE_EXTRA_CA_CERTS: '${{ github.workspace }}/certs/root-ca-ca.crt'
           DOCKER_REGISTRY_USER: m22600
           DOCKER_REGISTRY_PASSWORD: ${{ secrets.PACKAGE_UPLOAD_TOKEN }}
         run: |
