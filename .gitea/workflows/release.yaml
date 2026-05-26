@@ -11,6 +11,10 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
+    env:
+      http_proxy: ${{ vars.PROXY }}
+      https_proxy: ${{ vars.PROXY }}
+      no_proxy: ${{ vars.NO_PROXY }}
     permissions:
       contents: write
       issues: write
@@ -46,36 +50,25 @@ jobs:
           tar -czf processos-juridicos.tar.gz -C ./Release .
         shell: bash
 
-      - name: Prepare Certificates
+      - name: Prepare ROOT-CA-CA certificate
         run: |
           mkdir -p certs
           echo "${{ vars.ROOT_CA_CA_ENCODED }}" | openssl base64 -d -out certs/root-ca-ca.crt
+          echo "✅ Certificate information:"
+          openssl x509 -in "certs/root-ca-ca.crt" -text -noout
+
+      - name: Prepare MARINHA-ROOT-CA certificate
+        run: |
           echo "${{ vars.MARINHA_ROOT_CA_ENCODED }}" | openssl base64 -d -out certs/marinha-root-ca.crt
-
-      - name: Login to Registry
-        uses: docker/login-action@v4.1.0
-        with:
-          registry: devops-01.marinha.pt
-          username: ${{ vars.USERNAME }}
-          password: ${{ secrets.PACKAGE_UPLOAD_TOKEN }}
-
-      - name: Build and push Docker Image
-        uses: docker/build-push-action@v7.2.0
-        with:
-          context: .
-          push: true
-          tags: devops-01.marinha.pt/marinha-si/processos-juridicos:latest
-          build-args: |
-            HTTP_PROXY_ARG=${{ vars.PROXY }}
-            HTTPS_PROXY_ARG=${{ vars.PROXY }}
-            NO_PROXY_ARG=${{ vars.NO_PROXY }}
+          echo "✅ Certificate information:"
+          openssl x509 -in "certs/marinha-root-ca.crt" -text -noout
 
       - name: Release
         env:
           GITEA_TOKEN: ${{ secrets.PACKAGE_UPLOAD_TOKEN }}
           GITEA_URL: https://devops-01.marinha.pt
-          NODE_EXTRA_CA_CERTS: '${{ github.workspace }}/certs/root-ca-ca.crt'
-          DOCKER_REGISTRY_USER: m22600
+          NODE_EXTRA_CA_CERTS: '${{ github.workspace }}/certs/marinha-root-ca.crt'
+          DOCKER_REGISTRY_USER: "${{ vars.USERNAME }}"
           DOCKER_REGISTRY_PASSWORD: ${{ secrets.PACKAGE_UPLOAD_TOKEN }}
         run: |
           npx semantic-release
