@@ -1,13 +1,9 @@
 # Build stage
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 
-ARG HTTP_PROXY_ARG
-ARG HTTPS_PROXY_ARG
-ARG NO_PROXY_ARG
-
-ENV http_proxy="${HTTP_PROXY_ARG}"
-ENV https_proxy="${HTTPS_PROXY_ARG}"
-ENV no_proxy="${NO_PROXY_ARG}"
+ENV http_proxy=http://proxy-s-wcg.marinha.pt:8080
+ENV https_proxy=http://proxy-s-wcg.marinha.pt:8080
+ENV no_proxy="marinha.pt,.marinha.pt,localhost"
 ENV HUSKY=0
 
 WORKDIR /app
@@ -17,13 +13,9 @@ RUN dotnet publish -c Release -o /out
 # Runtime stage
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 
-ARG HTTP_PROXY_ARG
-ARG HTTPS_PROXY_ARG
-ARG NO_PROXY_ARG
-
-ENV http_proxy="${HTTP_PROXY_ARG}"
-ENV https_proxy="${HTTPS_PROXY_ARG}"
-ENV no_proxy="${NO_PROXY_ARG}"
+ENV http_proxy=http://proxy-s-wcg.marinha.pt:8080
+ENV https_proxy=http://proxy-s-wcg.marinha.pt:8080
+ENV no_proxy="marinha.pt,.marinha.pt,localhost"
 
 RUN apt-get update \ 
     && apt-get install -y --no-install-recommends \ 
