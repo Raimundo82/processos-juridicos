@@ -14,5 +14,6 @@ RUN apt-get update \
     libldap2 libldap-common \
     && rm -rf /var/lib/apt/lists/*
 
+COPY .devcontainer/certs/root-ca-ca.crt /usr/local/share/ca-certificates/
 COPY .devcontainer/certs/marinha-root-ca.crt /usr/local/share/ca-certificates/
 RUN update-ca-certificates

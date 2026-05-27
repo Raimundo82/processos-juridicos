@@ -11,12 +11,15 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
+    env:
+      http_proxy: ${{ vars.PROXY }}
+      https_proxy: ${{ vars.PROXY }}
+      no_proxy: ${{ vars.NO_PROXY }}
     permissions:
-      contents: write # to be able to publish a GitHub release
-      issues: write # to be able to comment on released issues
-      pull-requests: write # to be able to comment on released pull requests
-      id-token: write # to enable use of OIDC for npm provenance
-
+      contents: write
+      issues: write
+      pull-requests: write
+      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -32,7 +35,7 @@ jobs:
 
       - name: Install dependencies
         run: npm clean-install
-      
+
       - name: Setup .NET 10.0.x
         uses: actions/setup-dotnet@v4
         with:
@@ -47,21 +50,25 @@ jobs:
           tar -czf processos-juridicos.tar.gz -C ./Release .
         shell: bash
 
-      - name: Prepare CA certificate
+      - name: Prepare ROOT-CA-CA certificate
         run: |
           mkdir -p certs
-          printf "%s\n" "${{ vars.MARINHA_ROOT_CA }}" > ${{ github.workspace }}/certs/marinha-root-ca.crt
-          echo "🔍 Certificate starts with:"
-          head -n 5 "${{ github.workspace }}/certs/marinha-root-ca.crt"
+          echo "${{ vars.ROOT_CA_CA_ENCODED }}" | openssl base64 -d -out certs/root-ca-ca.crt
           echo "✅ Certificate information:"
-          openssl x509 -in "${{ github.workspace }}/certs/marinha-root-ca.crt" -text -noout
+          openssl x509 -in "certs/root-ca-ca.crt" -text -noout
+
+      - name: Prepare MARINHA-ROOT-CA certificate
+        run: |
+          echo "${{ vars.MARINHA_ROOT_CA_ENCODED }}" | openssl base64 -d -out certs/marinha-root-ca.crt
+          echo "✅ Certificate information:"
+          openssl x509 -in "certs/marinha-root-ca.crt" -text -noout
 
       - name: Release
         env:
           GITEA_TOKEN: ${{ secrets.PACKAGE_UPLOAD_TOKEN }}
           GITEA_URL: https://devops-01.marinha.pt
           NODE_EXTRA_CA_CERTS: '${{ github.workspace }}/certs/marinha-root-ca.crt'
-          DOCKER_REGISTRY_USER: m22600
+          DOCKER_REGISTRY_USER: "${{ vars.USERNAME }}"
           DOCKER_REGISTRY_PASSWORD: ${{ secrets.PACKAGE_UPLOAD_TOKEN }}
         run: |
           npx semantic-release
