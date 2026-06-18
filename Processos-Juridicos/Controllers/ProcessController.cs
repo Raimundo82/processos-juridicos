@@ -5,6 +5,7 @@ using System.Reflection;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
@@ -186,7 +187,32 @@ public class ProcessController(
         return RedirectToAction(nameof(List));
     }
 
+    [Authorize(Policy = "PROCESS-MANAGEMENT")]
+    [HttpGet]
+    public async Task<IActionResult> Edit(int? id)
+    {
+        if (!ModelState.IsValid)
+        {
+            return RedirectToAction(nameof(List));
+        }
+        ProcessDto model = await _processManagement.Processes.GetProcessById(id);
 
+        if (!await UserCanEdit(model))
+        {
+            return Forbid();
+        }
+        model.UploadedFiles = await _processManagement.ProcessFiles.GetAllProcessFilesByProcessId(id);
+        await _viewDataSvc.PopulateForEditAsync(ViewData, model.ProcessId);
+
+        if (ViewData["infringements"] is List<SelectListItem> infrList)
+        {
+            foreach (SelectListItem? item in infrList.Where(i => model.Infringements.Contains(int.Parse(i.Value))))
+            {
+                item.Selected = true;
+            }
+        }
+        return View(model);
+    }
 
     [Authorize(Policy = "PROCESS-MANAGEMENT")]
     [HttpPost]
