@@ -129,7 +129,6 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
 
         dbContext.States.AddRange(scenarioProcesses.Select(s => s.ProcessState));
         dbContext.ProcessTypes.AddRange(scenarioProcesses.Select(s => s.ProcessType));
-
         dbContext.Units.AddRange(scenarioProcesses.Select(s => s.Unit));
 
         await dbContext.SaveChangesAsync();
@@ -153,19 +152,26 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
                 .FirstOrDefault(option => option.TextContent.Trim() == scenarioProcess.ProcessType.ProcessTypeName)?
                 .GetAttribute("value");
 
-            var formData = new Dictionary<string, string?>
+            var multipart = new MultipartFormDataContent
             {
-                ["ProcessTypeId"] = processTypeId,
-                ["ProcessStateId"] = processStateId,
-                ["UnitId"] = unitId,
-                ["CreatedAt"] = scenarioProcess.CreatedAt.ToString()
+                { new StringContent(processTypeId ?? ""), "ProcessTypeId" },
+                { new StringContent(processStateId ?? ""), "ProcessStateId" },
+                { new StringContent(unitId ?? ""), "UnitId" },
+                { new StringContent(scenarioProcess.CreatedAt.ToString()!), "CreatedAt" }
             };
 
-            await _client.PostAsync("/Process/Create", new FormUrlEncodedContent(formData));
+            var fileBytes = new byte[] { 1, 2, 3 };
+            var fileContent = new ByteArrayContent(fileBytes);
+            fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/pdf");
+
+            multipart.Add(fileContent, "InterestConflictDeclarationUpload", "decl.pdf");
+
+            await _client.PostAsync("/Process/Create", multipart);
         }
 
         // Assert
         DbSet<Process> dbItems = dbContext.Processes;
+
         Assert.Equal(scenarioProcesses.Length, dbItems.Count());
 
         Assert.All(scenarioProcesses, scenarioProcess =>
@@ -175,9 +181,9 @@ public class ProcessIntegrationTests(CustomWebApplicationFactory<Program> factor
                 dbItem.Unit.UnitName == scenarioProcess.Unit.UnitName);
 
             Assert.NotNull(expected);
+
             Assert.True(
-                expected.ProcessState.StateName is "Em Edição" or
-                "Em Validação",
+                expected.ProcessState.StateName is "Em Edição" or "Em Validação",
                 $"StateName was '{expected.ProcessState.StateName}', expected 'Em Edição' or 'Em Validação'."
             );
 
