@@ -53,7 +53,16 @@ public class ProcessFileSvc(AppDbContext context) : IProcessFileSvc
 
     public async Task<List<ProcessFileDto>> GetAllProcessFilesByProcessId(int? id)
     {
-        IQueryable<ProcessFileDto> uploadedFiles = _context.ProcessFiles.Where(x => x.ProcessId == id).Select(x => Mapper.MapToFilesDto(x));
+        // Step 1: Get the declaration file ID from the Process
+        var declarationId = await _context.Processes
+            .Where(p => p.ProcessId == id)
+            .Select(p => p.InterestConflictDeclarationId)
+            .FirstOrDefaultAsync();
+
+        // Step 2: Fetch all files except the declaration
+        IQueryable<ProcessFileDto> uploadedFiles = _context.ProcessFiles
+            .Where(f => f.ProcessId == id && f.ProcessFileId != declarationId)
+            .Select(f => Mapper.MapToFilesDto(f));
 
         return await uploadedFiles.ToListAsync();
     }

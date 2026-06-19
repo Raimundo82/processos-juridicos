@@ -58,6 +58,7 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
     {
         Process existingEntity = await _context.Processes
             .Include(p => p.Infringements)
+            .Include(p => p.InterestConflictDeclaration)
             .FirstOrDefaultAsync(p => p.ProcessId == process.ProcessId)
             ?? throw new EntityNotFoundException("Process not found");
 
@@ -149,6 +150,7 @@ public class ProcessSvc(AppDbContext context) : IProcessSvc
             .Include(x => x.AccidentType)
             .Include(x => x.MilitarySecurity)
             .Include(x => x.CrimeType)
+            .Include(x => x.InterestConflictDeclaration)
             .AsSplitQuery()
             .FirstOrDefaultAsync(x => x.ProcessId == id)
             ?? throw new EntityNotFoundException("Process not found");
