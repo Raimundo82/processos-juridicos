@@ -274,6 +274,8 @@ public class ProcessController(
         if (!await ValidateDeclarationRemovalAsync(model))
         {
             await tx.RollbackAsync();
+            _toastNotify.Error(string.Format(
+           GlobalTextManager.GetString("UserMustKeepDeclarationConflicts")));
             return await ReturnToEditViewWithFiles(model);
         }
 

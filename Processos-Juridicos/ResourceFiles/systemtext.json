@@ -20,5 +20,6 @@
     "UserDoesNotExistMessage": "Pelo menos um dos utilizadores que tentou adicionar não pode ser adicionado.",
     "UserCannotBeOfInst": "O utilizador selectionado não pode ser oficial instrutor.",
     "UserMustInsertDeclarationConflicts": "Para criar um processo é necessário submeter o formulário de declaração de conflitos.",
-    "FileSaveFailedMessage":  "Ocorreu um erro ao tentar salvar um dos ficheiros."
+    "UserMustKeepDeclarationConflicts": "Tentou apagar o ficheiro da declaração sem fazer upload de um substituto é necessário submeter uma nova declaração quando a anterior é apagada.",
+    "FileSaveFailedMessage": "Ocorreu um erro ao tentar salvar um dos ficheiros."
 }
