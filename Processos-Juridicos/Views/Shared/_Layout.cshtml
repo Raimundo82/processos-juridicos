@@ -1,11 +1,6 @@
 @using Processos_Juridicos.Utilities.TextManager;
-@{
-    var theme = Context.Request.Cookies["theme"];
-    var darkClass = theme == "dark" ? "dark-mode" : "";
-}
-
 <!DOCTYPE html>
-<html lang="en" class="@darkClass">
+<html lang="en">
 
 <head>
     <meta charset="utf-8" />
@@ -26,7 +21,7 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 
-<body class="@darkClass">
+<body>
     <header>
         <partial name="_Header" />
     </header>
