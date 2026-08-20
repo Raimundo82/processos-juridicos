@@ -160,7 +160,7 @@ p {
     height: 60px;
 }
 
-@media (max-width: 575.98px) {
+@media (max-width: 767.98px) {
     .menu-bar {
         height: 0px;
     }
