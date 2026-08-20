@@ -2,7 +2,7 @@ using NToastNotify;
 
 using Processos_Juridicos.Services.Interfaces.UIHelpers;
 
-namespace Processos_Juridicos.Services.UiHelpers;
+namespace Processos_Juridicos.Services.UIHelpers;
 
 public class ToastNotify(IToastNotification toastNotification) : IToastNotify
 {

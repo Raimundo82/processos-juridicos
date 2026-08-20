@@ -21,7 +21,7 @@ using Processos_Juridicos.Services.Interfaces.UIHelpers;
 using Processos_Juridicos.Services.Interfaces.UserData;
 using Processos_Juridicos.Services.Ldap;
 using Processos_Juridicos.Services.ProcessManagement;
-using Processos_Juridicos.Services.UiHelpers;
+using Processos_Juridicos.Services.UIHelpers;
 using Processos_Juridicos.Services.UserData;
 using Processos_Juridicos.Settings;
 using Processos_Juridicos.Utilities;
@@ -137,6 +137,7 @@ builder.Services.AddScoped<IUserDataSvc, UserDataSvc>();
 builder.Services.AddTransient<RoleSyncSvc>();
 builder.Services.AddHostedService<TimedSyncSvc>();
 builder.Services.AddScoped<IViewRenderSvc, ViewRenderSvc>();
+builder.Services.AddScoped<IAuthenticatedUserProvider, AuthenticatedUserProvider>();
 
 
 // Estatistica Configuration (page estatistica)

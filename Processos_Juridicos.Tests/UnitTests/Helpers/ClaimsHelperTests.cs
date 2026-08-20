@@ -7,22 +7,18 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
 using Processos_Juridicos.Middleware;
-using Processos_Juridicos.Models;
 using Processos_Juridicos.Services.Interfaces;
-using Processos_Juridicos.Services.Interfaces.UserData;
 
 namespace Processos_Juridicos.Tests.UnitTests.Helpers;
 
 public class ClaimsHelperTests
 {
     private readonly Mock<IUserSvc> _userSvc = new();
-    private readonly Mock<IUserDataSvc> _userDataSvc = new();
 
     private ServiceProvider BuildProvider()
     {
         var services = new ServiceCollection();
         services.AddSingleton(_userSvc.Object);
-        services.AddSingleton(_userDataSvc.Object);
         return services.BuildServiceProvider();
     }
 
@@ -32,9 +28,6 @@ public class ClaimsHelperTests
         // Arrange
         var identity = new ClaimsIdentity();
         identity.AddClaim(new Claim("preferred_username", "joao"));
-
-        _userDataSvc.Setup(s => s.FetchUserPhoto("joao"))
-            .ReturnsAsync(new UserDataModel { UserPhoto = null });
 
         _userSvc.Setup(s => s.GetUserRoleNameByNii("joao"))
             .ReturnsAsync("Admin");

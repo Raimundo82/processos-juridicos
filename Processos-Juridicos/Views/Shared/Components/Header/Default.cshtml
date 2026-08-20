@@ -1,34 +1,19 @@
-@using System.Security.Claims
-@{
-    var isAuthenticated = User?.Identity?.IsAuthenticated ?? false;
+@model AuthenticatedUserViewModel
 
-    var name = User?.FindFirst("display_name")?.Value
-        ?? "Utilizador";
-    var nii = User?.FindFirst("preferred_username")?.Value
-        ?? "Utilizador";
-
-    var photo = Url.Content("~/images/default-avatar.webp");
-
-    var base64 = User?.FindFirst("PhotoBase64")?.Value;
-}
-
-@if (isAuthenticated)
+@if (Model.IsAuthenticated)
 {
-    <div class="d-flex align-items-center gap-2" >
+    <div class="d-flex align-items-center gap-2">
         <div class="d-grid text-end">
-            <span class="text-small d-none d-md-block">@name</span>
-            <span class="text-small d-none d-md-block">@nii</span>
+            <span class="text-small d-none d-md-block">@Model.DisplayName</span>
+            <span class="text-small d-none d-md-block">@Model.Nii</span>
         </div>
-        
+
         <a href="~/account/signout" class="avatar-wrapper">
-            @if (!string.IsNullOrEmpty(base64))
-            {
-                <img src="data:image/png;base64,@base64" alt="Fotografia de @nii" class="rounded-circle avatar-img" width="40" height="40" />
-            } else
-            {
-                <img src="@photo" alt="Fotografia de @nii"
-                     class="rounded-circle avatar-img" width="40" height="40" />
-            }
+            <img src="@Model.Photo"
+                 alt="Fotografia de @Model.Nii"
+                 class="rounded-circle avatar-img"
+                 width="40" height="40" />
+
             <div class="avatar-overlay">
                 <i class="bi bi-box-arrow-right text-danger fs-5"></i>
             </div>
