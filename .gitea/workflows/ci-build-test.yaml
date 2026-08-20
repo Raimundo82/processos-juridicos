@@ -11,6 +11,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Debug proxy env
+        run: env | grep -i proxy
+        
       - name: Checkout
         uses: actions/checkout@v6
         with:
