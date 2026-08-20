@@ -13,7 +13,13 @@ jobs:
     steps:
       - name: Debug proxy env
         run: env | grep -i proxy
-        
+
+      - name: Debug cache connectivity
+        run: |
+          curl -v http://gitea-cache-server:8088/ 2>&1 | head -30
+          echo "---"
+          curl -v --noproxy gitea-cache-server http://gitea-cache-server:8088/ 2>&1 | head -30
+          
       - name: Checkout
         uses: actions/checkout@v6
         with:
